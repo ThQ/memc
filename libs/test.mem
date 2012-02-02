@@ -1,0 +1,12 @@
+use char
+
+class test
+
+   __plus__ (t :test) :char
+      1
+
+   dude (t :test) :char
+      1
+
+   fuck  (t :char) :test
+      zou :char = this

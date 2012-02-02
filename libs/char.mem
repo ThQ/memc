@@ -1,0 +1,4 @@
+
+class char
+   __plus__ (p :char) :char
+      1

@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+flex grammar.lex -o mem_parser.c && gcc main.c -o mem_parser

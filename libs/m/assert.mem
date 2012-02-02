@@ -1,0 +1,10 @@
+namespace
+   assert (condition :bool, message :string) :void
+      if condition != true
+         exit(message)
+
+   assert_is_true (condition :bool, message :string) :void
+      assert(condition, message)
+
+   assert_is_false (condition :bool, message: string) :void
+      assert(condition, message)

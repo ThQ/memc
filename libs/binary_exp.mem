@@ -1,0 +1,5 @@
+
+class
+   dude(t :binary_exp) :binary_exp
+      ns1.ns2.obj(2)
+

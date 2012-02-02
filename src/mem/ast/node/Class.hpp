@@ -1,0 +1,19 @@
+#ifndef _MEM__AST__NODE__CLASS__HPP_
+#define _MEM__AST__NODE__CLASS__HPP_
+
+
+#include "mem/ast/node/Type.hpp"
+
+
+namespace mem { namespace ast { namespace node {
+
+
+class Class : public Type
+{
+   public: Class ();
+};
+
+
+} } }
+
+#endif
