@@ -7,7 +7,7 @@ BLOCK Block
 CALL Call
 CLASS Class
 CLASS_DECLARATION Class
-DOT .
+DOT Dot
 EXPR_LIST ExpressionList
 FIELD Field
 FILE File
@@ -30,6 +30,7 @@ NAMESPACE Namespace
 OBJECT_DECLARATION Object
 PATCH_DECLARATION Patch
 PRIMITIVE Primitive
+RETURN Return
 ROOT Root
 SELF Self
 TEXT Text

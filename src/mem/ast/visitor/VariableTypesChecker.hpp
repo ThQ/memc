@@ -8,8 +8,6 @@
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
-#include "mem/log/Logger.hpp"
-#include "mem/st/SymbolTable.hpp"
 
 
 namespace mem { namespace ast { namespace visitor {
@@ -17,10 +15,8 @@ namespace mem { namespace ast { namespace visitor {
 
 class VariableTypesChecker : public Visitor
 {
-   public: log::Logger* _logger;
-   public: st::SymbolTable* _symbols;
+   public: VariableTypesChecker ();
 
-   public: VariableTypesChecker (st::SymbolTable* symbols, log::Logger* logger);
    public: virtual bool visit (node::Node* node);
 };
 

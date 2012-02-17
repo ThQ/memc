@@ -16,7 +16,7 @@ class Class : public Type
    public: Class ();
    public: virtual ~Class();
    public: Instance* g_instance_type();
-   public: virtual void print ();
+   //public: virtual void print ();
 };
 
 

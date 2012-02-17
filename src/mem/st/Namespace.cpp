@@ -42,6 +42,7 @@ Namespace::has_symbol (std::string name)
    return this->_children.find(name) != this->_children.end();
 }
 
+/*
 void
 Namespace::print ()
 {
@@ -57,6 +58,7 @@ Namespace::print ()
       i->second->print();
    }
 }
+*/
 
 Namespace*
 Namespace::push (Namespace* ns)

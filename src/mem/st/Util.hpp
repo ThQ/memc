@@ -2,6 +2,7 @@
 #define _MEM__ST__UTIL__HPP_
 
 
+#include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/st/Function.hpp"
@@ -13,6 +14,8 @@ namespace mem { namespace st {
 
 class Util
 {
+   public: static Class* lookup_class (Symbol* scope, std::string cls_name);
+   public: static Symbol* lookup_member (Symbol* scope, std::string symbol_name);
    public: static Symbol* lookup_symbol (Symbol* scope, std::string symbol_name);
    public: static Symbol* get_eval_type (Symbol* symbol);
    public: static Function* get_function (SymbolTable* st, ast::node::Node* func);

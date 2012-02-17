@@ -73,6 +73,7 @@ Symbol::is (SymbolKind kind)
    return this->_kind == kind;
 }
 
+/*
 void
 Symbol::print ()
 {
@@ -85,9 +86,10 @@ Symbol::print_depth ()
 {
    for (unsigned i = 0 ; i < this->_depth ; ++i)
    {
-      printf("   ");
+      printf("     ");
    }
 }
+*/
 
 void
 Symbol::set_name (char* name, size_t name_len)

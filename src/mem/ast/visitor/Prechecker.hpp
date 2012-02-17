@@ -1,5 +1,5 @@
-#ifndef _MEM__AST__VISITOR__FIND_USE__HPP_
-#define _MEM__AST__VISITOR__FIND_USE__HPP_
+#ifndef _MEM__AST__VISITOR__PRECHECKER__HPP_
+#define _MEM__AST__VISITOR__PRECHECKER__HPP_
 
 
 #include <string>
@@ -11,11 +11,10 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-class FindUse : public Visitor
+class Prechecker : public Visitor
 {
-   public: FindUse();
+   public: Prechecker ();
 
-   public: std::vector<std::string> _uses;
    public: virtual bool visit (node::Node* node);
 };
 

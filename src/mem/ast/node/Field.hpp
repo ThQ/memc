@@ -8,14 +8,13 @@
 
 namespace mem { namespace ast { namespace node {
 
-   class Field : public Text
-   {
-      //public: const char* _field_name;
-      //public: const char* _field_type;
 
-      public: Field ();
-      public: std::string get_type_name ();
-   };
+class Field : public Text
+{
+   public: Field ();
+   public: std::string get_type_name ();
+};
+
 
 } } }
 

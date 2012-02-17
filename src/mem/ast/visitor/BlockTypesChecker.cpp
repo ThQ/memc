@@ -3,15 +3,10 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-BlockTypesChecker::BlockTypesChecker (st::SymbolTable* symbols, log::Logger* logger)
+BlockTypesChecker::BlockTypesChecker ()
 {
-   assert(logger != 0);
-   assert(symbols != 0);
-
-   this->_logger = logger;
-   this->_symbols = symbols;
+   this->_name = "BlockTypesChecker";
 }
-
 
 bool
 BlockTypesChecker::visit (node::Node* node)
@@ -20,7 +15,10 @@ BlockTypesChecker::visit (node::Node* node)
    {
       case MEM_NODE_FUNCTION_DECLARATION:
       {
-         this->visit_block(node->_bound_type, node->get_child(2));
+         if (((node::Function*)node)->g_body_node() != NULL)
+         {
+            this->visit_block(node->_bound_type, ((node::Function*)node)->g_body_node());
+         }
          return false;
       }
       break;
@@ -40,32 +38,70 @@ BlockTypesChecker::visit (node::Node* node)
 void
 BlockTypesChecker::visit_call (st::Symbol* scope, node::Node* call_node)
 {
-   //printf ("Visit CALL...\n");
    node::Node* base_object = call_node->get_child(0);
    this->visit_exp(scope, base_object);
 
-   if (base_object->_exp_type != NULL)
+   if (base_object->_bound_type != NULL)
    {
-      if (base_object->_exp_type->is(st::FUNCTION))
+      if (base_object->_bound_type->is(st::FUNCTION))
       {
-         call_node->_bound_type = base_object->_exp_type;
-         call_node->_exp_type = st::Util::get_eval_type(base_object->_exp_type);
+         call_node->_bound_type = base_object->_bound_type;
+         call_node->_exp_type = static_cast<st::Function*>(base_object->_exp_type)->_return_type;
       }
       else
       {
          log::Message* err = new log::Message(log::ERROR);
          err->format_message(
             "Trying to call an object that is not a function but a {symbol:%s} (%s)",
-            base_object->_exp_type->_name.c_str(),
-            base_object->_exp_type->get_qualified_name().c_str()
+            base_object->_bound_type->_name.c_str(),
+            base_object->_bound_type->get_qualified_name().c_str()
             );
          this->_logger->log(err);
       }
    }
 
-   if (call_node->_child_count == 2)
+   st::Function* func_sym = (st::Function*)(call_node->_bound_type);
+
+   if (func_sym != NULL)
    {
-      this->visit_expr_list (scope, call_node->get_child(1));
+      int params_count = call_node->_child_count < 2 ? 0 : call_node->get_child(1)->_child_count;
+
+      // Check parameters count against function signature
+      if (params_count != func_sym->_params.size())
+      {
+         log::Message* err = new log::Message(log::ERROR);
+         err->set_message("Bad number of parameters in call");
+         err->format_description("Function <%s> expects %d parameters, but got %d.",
+            call_node->_bound_type->get_qualified_name().c_str(),
+            ((st::Function*)(call_node->_bound_type))->_params.size(),
+            params_count);
+         err->set_position(call_node->get_child(0)->_position->copy());
+         this->_logger->log(err);
+      }
+
+
+      // Call has parameters
+      if (params_count > 0)
+      {
+         this->visit_expr_list (scope, call_node->get_child(1));
+
+         // @TODO Parameters types could be checked even though there are not
+         // enough parameters
+         for (int i=0; i < call_node->get_child(1)->_child_count ; ++i)
+         {
+            if (call_node->get_child(1)->get_child(i)->_exp_type != func_sym->_params[i])
+            {
+               log::Message* err = new log::Message(log::ERROR);
+               err->set_message("Bad parameter type");
+               err->format_description("Parameter %d must be of type {type:%s}, but got a parameter of type {type:%s} instead.",
+                  i+1,
+                  func_sym->_params[i]->get_qualified_name().c_str(),
+                  call_node->get_child(1)->get_child(i)->_exp_type->get_qualified_name().c_str());
+               err->set_position(call_node->get_child(1)->get_child(i)->_position->copy());
+               this->_logger->log(err);
+            }
+         }
+      }
    }
 }
 
@@ -76,14 +112,27 @@ BlockTypesChecker::visit_dot (st::Symbol* scope, node::Node* dot_node)
    this->visit_exp(scope, dot_node->get_child(1));
 
    assert(dot_node->get_child(1)->_type == MEM_NODE_ID);
-
-   dot_node->_exp_type = st::Util::lookup_symbol(
-      dot_node->get_child(0)->_exp_type,
-      static_cast<node::Text*>(dot_node->get_child(1))->_value);
-
-   if (dot_node->_exp_type != NULL)
+   if (dot_node->get_child(0)->_exp_type != NULL)
    {
-      dot_node->get_child(1)->_bound_type = dot_node->_exp_type;
+      dot_node->_bound_type = st::Util::lookup_member(
+         dot_node->get_child(0)->_exp_type,
+         static_cast<node::Text*>(dot_node->get_child(1))->_value);
+
+      if (dot_node->_bound_type != NULL)
+      {
+         dot_node->get_child(1)->_bound_type = dot_node->_bound_type;
+         dot_node->_exp_type = dot_node->_bound_type;
+      }
+      else
+      {
+         log::Message* err = new log::Message(log::ERROR);
+         err->format_message(
+            "Symbol {id:%s} not found in {id:%s}",
+            static_cast<node::Text*>(dot_node->get_child(1))->_value.c_str(),
+            static_cast<node::Text*>(dot_node->get_child(0))->_exp_type->get_qualified_name().c_str());
+         err->set_position(dot_node->get_child(1)->_position->copy());
+         this->_logger->log(err);
+      }
    }
 }
 
@@ -111,6 +160,10 @@ BlockTypesChecker::visit_exp (st::Symbol* scope, node::Node* node)
          this->visit_call(scope, node);
          break;
 
+      case MEM_NODE_IF:
+         this->visit_if(scope, node);
+         break;
+
       case MEM_NODE_FINAL_ID:
          this->visit_final_id(scope, static_cast<node::Text*>(node));
          break;
@@ -135,6 +188,23 @@ BlockTypesChecker::visit_exp (st::Symbol* scope, node::Node* node)
 }
 
 void
+BlockTypesChecker::visit_if (st::Symbol* scope, node::Node* if_node)
+{
+   this->visit_exp(scope, if_node->get_child(0));
+   this->visit_block(scope, if_node->get_child(1));
+
+   if (if_node->get_child(0)->_exp_type != this->_symbols->_glob_bool_cls)
+   {
+      log::Message* err = new log::Message(log::ERROR);
+      err->format_message("If expects an expression of type bool, but got %s instead",
+         if_node->get_child(0)->_exp_type->get_qualified_name().c_str());
+      err->set_position(if_node->get_child(0)->_position->copy());
+      this->_logger->log(err);
+
+   }
+}
+
+void
 BlockTypesChecker::visit_final_id (st::Symbol* scope, node::Text* id_node)
 {
    //printf("VISITING ID [%s]...\n", id_node->_value.c_str());
@@ -146,7 +216,8 @@ BlockTypesChecker::visit_final_id (st::Symbol* scope, node::Text* id_node)
 
    if (sym != NULL)
    {
-      id_node->_exp_type = st::Util::get_eval_type(sym);
+      id_node->_bound_type = sym;
+      id_node->_exp_type = static_cast<st::Var*>(sym)->_type;
    }
    else
    {

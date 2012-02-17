@@ -1,6 +1,8 @@
 #include "mem/st/SymbolTable.hpp"
 
+
 namespace mem { namespace st {
+
 
 SymbolTable::SymbolTable ()
 {
@@ -22,8 +24,8 @@ SymbolTable::create_class (std::string full_class_name)
    }
    else
    {
-      free(klass);
-      return 0;
+      delete klass;
+      return NULL;
    }
 }
 
@@ -104,11 +106,13 @@ SymbolTable::create_namespace (std::string name)
    return ns;
 }
 
+/*
 void
 SymbolTable::dump ()
 {
    this->_root->print();
 }
+*/
 
 Namespace*
 SymbolTable::get_namespace (std::string ns_name)
@@ -230,5 +234,45 @@ SymbolTable::register_symbol (std::string path, Symbol* sym)
    return false;
 }
 
+void
+SymbolTable::setup ()
+{
+   this->setup_bool();
+   this->setup_ints();
+}
+
+void
+SymbolTable::setup_bool ()
+{
+   this->_glob_bool_cls = new st::Class();
+   this->_glob_bool_cls->_name = "bool";
+   this->_root->add_child(this->_glob_bool_cls);
+
+   st::Var* true_inst = new st::Var();
+   true_inst->_name = "true";
+   true_inst->set_type(this->_glob_bool_cls);
+   this->_root->add_child(true_inst);
+
+   st::Var* false_inst = new st::Var();
+   false_inst->_name = "false";
+   false_inst->set_type(this->_glob_bool_cls);
+   this->_root->add_child(false_inst);
+}
+
+void
+SymbolTable::setup_ints ()
+{
+   st::Class* int_cls = new st::Class();
+   int_cls->_name = "int";
+   this->_root->add_child(int_cls);
+
+   st::Class* uint_cls = new st::Class();
+   uint_cls->_name = "uint";
+   this->_root->add_child(uint_cls);
+
+   st::Class* char_cls = new st::Class();
+   char_cls->_name = "char";
+   this->_root->add_child(char_cls);
+}
 
 } }

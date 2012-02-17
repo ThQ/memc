@@ -14,7 +14,7 @@ class Instance : public Type
 
    public: Instance ();
    public: virtual std::string get_qualified_name();
-   public: virtual void print ();
+   //public: virtual void print ();
    public: void set_type (Symbol* type);
 };
 

@@ -15,7 +15,7 @@ class Var : public Symbol
    public: Type* _type;
 
    public: Var ();
-   public: virtual void print ();
+   //public: virtual void print ();
 
    public: void set_type (Symbol* type);
 };

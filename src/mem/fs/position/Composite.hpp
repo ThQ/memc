@@ -14,6 +14,9 @@ class Composite : public Position
 {
    public : std::vector<Position*> _children;
 
+
+   public: ~Composite ();
+
    public: void add_child (Position* child);
    public: virtual PositionType get_type_at (int column);
 };

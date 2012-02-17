@@ -2,6 +2,10 @@
 
 namespace mem { namespace fs { namespace position {
 
+Position::~Position()
+{
+}
+
 Position*
 Position::copy ()
 {

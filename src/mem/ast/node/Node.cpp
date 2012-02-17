@@ -96,69 +96,19 @@ Node::get_type_name (unsigned int type)
     return mem::parser::node_names[type];
 }
 
-void
-Node::dump ()
+bool
+Node::is_text ()
 {
-   this->dump_self();
-   this->dump_children();
-}
-
-void
-Node::dump_depth ()
-{
-   if (this->_parent != 0)
+   switch (this->_type)
    {
-      for (unsigned int i = 0 ; i < this->_depth; ++ i)
-      {
-         printf("    ");
-      }
+      case MEM_NODE_TEXT:
+      case MEM_NODE_FUNCTION:
+      case MEM_NODE_CLASS:
+      case MEM_NODE_ID:
+      case MEM_NODE_FINAL_ID:
+         return true;
    }
-}
-
-void
-Node::dump_children ()
-{
-   Node* child = this->_first_child;
-   while (child != 0)
-   {
-      child->dump();
-      child = child->_next;
-   }
-}
-
-void
-Node::dump_self ()
-{
-   this->dump_depth();
-   printf("%s", get_type_name(this->_type));
-
-   if (this->_bound_type != NULL || this->_exp_type != NULL)
-   {
-      printf(" (");
-      if (this->_bound_type != NULL)
-      {
-         printf("%s", this->_bound_type->get_qualified_name().c_str());
-      }
-      else
-      {
-         printf(" ");
-      }
-      printf(" -> ");
-      if (this->_exp_type != NULL)
-      {
-         printf("%s", this->_exp_type->get_qualified_name().c_str());
-      }
-      else
-      {
-         printf(" ");
-      }
-      printf(")");
-   }
-   if (this->_position != NULL)
-   {
-      printf(" @%s:%d:%d", this->_position->_file->_path.c_str(), this->_position->_line, this->_position->_column_start);
-   }
-   printf("\n");
+   return false;
 }
 
 void

@@ -2,6 +2,18 @@
 
 namespace mem { namespace fs { namespace position {
 
+
+Composite::~Composite ()
+{
+   for (unsigned int i = 0; i < this->_children.size() ; ++i)
+   {
+      if (this->_children[i] != NULL)
+      {
+         delete this->_children[i];
+      }
+   }
+}
+
 void
 Composite::add_child (Position* child)
 {
@@ -25,5 +37,6 @@ Composite::get_type_at (int column)
    }
    return i_type;
 }
+
 
 } } }

@@ -24,6 +24,7 @@ class Position
       this->_line = line;
    }
 
+   public: virtual ~Position();
    public: virtual Position* copy ();
    public: virtual PositionType get_type_at (int column);
 

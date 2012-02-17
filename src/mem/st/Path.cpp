@@ -1,6 +1,8 @@
 #include "mem/st/Path.hpp"
 
+
 namespace mem { namespace st {
+
 
 Path::Path (std::string path)
 {
@@ -35,5 +37,6 @@ Path::reset ()
 {
    this->_last_dot_pos = 0;
 }
+
 
 } }

@@ -14,7 +14,6 @@ namespace mem { namespace ast { namespace node {
 
       public: Text ();
       public: Text (unsigned int type);
-      public: virtual void dump_self ();
       public: void set_value (const char* value);
       public: void set_value (const char* value, size_t len);
       public: void set_value (std::string value);

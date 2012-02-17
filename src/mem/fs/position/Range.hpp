@@ -1,6 +1,7 @@
 #ifndef _MEM__FS__POSITION__RANGE__HPP_
 #define _MEM__FS__POSITION__RANGE__HPP_
 
+
 #include <iostream>
 #include "mem/fs/position/Position.hpp"
 
@@ -21,7 +22,14 @@ class Range : public Position
       this->_column_end = col_end;
    }
 
-   public: Range();
+   public: int _line_end;
+   public: inline void s_line_end (int line)
+   {
+      this->_line_end = line;
+   }
+
+   public: Range ();
+   public: Range (Range pos_start, Range pos_end);
    public: virtual Position* copy ();
    public: virtual Range* copy_range();
    public: virtual PositionType get_type_at (int column);

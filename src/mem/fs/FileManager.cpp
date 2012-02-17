@@ -6,7 +6,7 @@ namespace mem { namespace fs {
 FileManager::~FileManager ()
 {
    std::map<std::string,File*>::iterator it = this->_files.begin();
-   for (; it != this->_files.end(); it++ )
+   for (; it != this->_files.end(); ++it )
    {
       delete it->second;
    }

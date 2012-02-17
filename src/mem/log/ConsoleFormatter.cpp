@@ -29,6 +29,13 @@ ConsoleFormatter::format (Message* msg)
 
    this->format_message(res, msg);
 
+   bool has_details = msg->_description != "" || msg->_position != NULL;
+
+
+   if (has_details)
+   {
+      res << "           --------------------------------------------------------------------\n";
+   }
    if (msg->_description != "")
    {
       this->format_description(res, msg);
@@ -39,28 +46,31 @@ ConsoleFormatter::format (Message* msg)
       this->format_position(res, msg->_position);
    }
 
+   if (has_details)
+   {
+      res << "           --------------------------------------------------------------------\n";
+   }
    return res.str();
 }
 
 void
 ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
 {
-   str << "          --------------------------------------------------------------------\n";
    size_t i;
    size_t last_nl = -1;
    for (i=0; i<msg->_description.length(); ++i)
    {
       if (msg->_description.data()[i] == '\n')
       {
-         str << "          ";
-         str << msg->_description.substr(last_nl+1, i-last_nl);
+         str << "          | ";
+         str << msg->_description.substr(last_nl+1, i-last_nl-1);
          str << "\n";
          last_nl = i+1;
       }
    }
    if (last_nl != msg->_description.size())
    {
-      str << "          ";
+      str << "          | ";
       str << msg->_description.substr(last_nl+1, msg->_description.size()-last_nl+1);
       str << "\n";
    }
@@ -85,7 +95,7 @@ void
 ConsoleFormatter::format_message (std::ostringstream& str, Message* msg)
 {
    this->format_level_name(str, msg->_level);
-   str << " | \033[1m";
+   str << " : \033[1m";
    str << msg->_message;
    str << "\033[0m\n";
 }
@@ -95,7 +105,7 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
 {
    if (pos->_file != NULL)
    {
-      str << "          @ {path:";
+      str << "          |\n          | @ {path:";
       str << pos->_file->_path;
       str << "}:";
       str << pos->_line;
@@ -104,9 +114,9 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
       if (pos->_line > 0)
       {
          std::string context_line = pos->_file->_lines[pos->_line-1]->c_str();
-         str << "          > ";
+         str << "          | > ";
          str << context_line;
-         str << "\n          ~ ";
+         str << "\n          |   ";
          for (size_t i = 1 ; i <= context_line.length() ; ++i)
          {
             switch (pos->get_type_at(i))

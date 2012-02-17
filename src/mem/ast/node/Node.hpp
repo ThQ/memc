@@ -47,11 +47,13 @@ class Node
 
    public: void eat (Node* n);
    public: static const char* get_type_name (unsigned int type);
-   public: void dump ();
-   public: void dump_children ();
-   public: void dump_depth ();
-   public: virtual void dump_self ();
    public: Node* get_child (unsigned int i);
+   public: bool has_children ()
+   {
+      return this->_child_count > 0;
+   }
+
+   public: bool is_text ();
    public: inline bool is_type (unsigned int type)
    {
       return this->_type == type;

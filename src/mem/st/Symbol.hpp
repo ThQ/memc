@@ -22,15 +22,8 @@ class Symbol
    public: Symbol* _last_child;
    public: std::string _name;
 
-   public: inline std::string g_name()
-   {
-      return this->_name;
-   }
-
-   public: inline const char* g_name_cstr()
-   {
-      return this->_name.c_str();
-   }
+   public: inline std::string g_name() {return this->_name;}
+   public: inline const char* g_name_cstr() {return this->_name.c_str();}
 
    public: Symbol* _parent;
    public: Symbol* _prev;
@@ -44,8 +37,8 @@ class Symbol
    public: bool is (SymbolKind kind);
    public: Symbol* get_child (std::string name);
    public: virtual std::string get_qualified_name();
-   public: virtual void print ();
-   public: void print_depth ();
+   //public: virtual void print ();
+   //public: void print_depth ();
    public: void set_name (char* name, size_t len);
    public: void set_name (std::string name);
 };

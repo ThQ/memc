@@ -9,24 +9,14 @@ Var::Var ()
    this->_type = NULL;
 }
 
+/*
 void
 Var::print ()
 {
    this->print_depth();
-   printf("<Var[%s :%s]> @",
+   printf("[Var:%s] :%s\n",
           this->g_name_cstr(),
           (this->_type!=NULL) ? this->_type->get_qualified_name().c_str() : "?");
-
-
-   if (this->_pos._file != NULL)
-   {
-      printf("%s", this->_pos._file->_path.c_str());
-   }
-   else
-   {
-      printf("?");
-   }
-   printf(":%d[%d:%d]\n", this->_pos._line, this->_pos._column_start, this->_pos._column_end);
 
    std::map<std::string, Symbol*>::iterator i;
    for (i = this->_children.begin() ; i != this->_children.end() ; ++ i)
@@ -34,6 +24,7 @@ Var::print ()
       i->second->print();
    }
 }
+*/
 
 
 void

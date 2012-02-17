@@ -7,11 +7,13 @@
 #include <stdio.h>
 #include <string>
 #include <queue>
-#include "mem/ast/Ast.hpp"
+#include <vector>
 #include "mem/ast/node/File.hpp"
+#include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/BlockTypesChecker.hpp"
 #include "mem/ast/visitor/FindClasses.hpp"
 #include "mem/ast/visitor/FindUse.hpp"
+#include "mem/ast/visitor/Prechecker.hpp"
 #include "mem/ast/visitor/TopTypesChecker.hpp"
 #include "mem/ast/visitor/TypeMatch.hpp"
 #include "mem/ast/visitor/VariableTypesChecker.hpp"
@@ -34,7 +36,8 @@ namespace mem
 {
    class Compiler
    {
-      public: ast::Ast ast;
+      public: ast::node::Node ast;
+      public: std::vector<ast::visitor::Visitor*> ast_visitors;
       public: fs::FileManager fm;
       public: log::ConsoleLogger logger;
       public: std::queue<std::string> _parse_queue;
@@ -46,6 +49,7 @@ namespace mem
       public: void compile (char* file_path);
       public: void parse (std::string file_path);
       public: void process_parse_queue();
+      public: void register_ast_visitor(ast::visitor::Visitor* visitor);
    };
 }
 

@@ -3,14 +3,9 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-VariableTypesChecker::VariableTypesChecker (st::SymbolTable* symbols,
-   log::Logger* logger)
+VariableTypesChecker::VariableTypesChecker ()
 {
-   assert(logger != 0);
-   assert(symbols != 0);
-
-   this->_logger = logger;
-   this->_symbols = symbols;
+   this->_name = "VariableTypesChecker";
 }
 
 bool

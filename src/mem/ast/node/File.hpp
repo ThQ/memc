@@ -16,7 +16,6 @@ class File : public Node
    public: std::string _path;
 
    public: File ();
-   public: virtual void dump_self ();
 };
 
 

@@ -3,6 +3,11 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+FindUse::FindUse ()
+{
+   this->_name = "FindUser";
+}
+
 bool
 FindUse::visit (node::Node* node)
 {

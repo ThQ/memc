@@ -3,14 +3,9 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-TopTypesChecker::TopTypesChecker (st::SymbolTable* symbols,
-   log::Logger* logger)
+TopTypesChecker::TopTypesChecker ()
 {
-   assert(logger != 0);
-   assert(symbols != 0);
-
-   this->_logger = logger;
-   this->_symbols = symbols;
+   this->_name = "TopTypesChecker";
 }
 
 bool
@@ -32,7 +27,7 @@ TopTypesChecker::visit (node::Node* node)
       case MEM_NODE_FUNCTION_DECLARATION:
       {
          class_scope = cls->_bound_type;
-         this->visit_function_declaration(class_scope, static_cast<node::Text*>(node));
+         this->visit_function_declaration(class_scope, static_cast<node::Function*>(node));
          return false;
       }
    }
@@ -51,7 +46,7 @@ TopTypesChecker::visit_field (st::Symbol* scope, node::Field* field)
    {
       st::Var* sym_field = new st::Var();
       sym_field->set_name(static_cast<node::Text*>(field->get_child(0))->_value);
-      sym_field->set_type(static_cast<st::Class*>(field->get_child(1)->_exp_type)->g_instance_type());
+      sym_field->set_type(static_cast<st::Class*>(field->get_child(1)->_exp_type));
       scope->add_child(sym_field);
 
       field->get_child(0)->_bound_type = sym_field;
@@ -64,7 +59,7 @@ TopTypesChecker::visit_field (st::Symbol* scope, node::Field* field)
 void
 TopTypesChecker::visit_qualified_name (st::Symbol* scope, node::Text* name_node)
 {
-   assert (scope != NULL);
+   //assert (scope != NULL);
    assert (name_node != NULL);
 
    //printf("VISITING QUALIFIED NAME [%s]...\n", name_node->_value.c_str());
@@ -96,11 +91,10 @@ TopTypesChecker::visit_qualified_name (st::Symbol* scope, node::Text* name_node)
 }
 
 void
-TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Text* func_decl)
+TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* func_decl)
 {
    assert(scope != NULL);
-   assert(func_decl->get_child(0) != NULL);
-   assert(func_decl->get_child(1) != NULL);
+   assert(func_decl != NULL);
 
    // Add the function to the symbol table
    st::Function* func_sym = new st::Function();
@@ -108,40 +102,61 @@ TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Text* func
    scope->add_child(func_sym);
 
    // Add {this} to the symbol table
-   st::Var* vthis = new st::Var();
-   vthis->set_name("this");
-   vthis->set_type(static_cast<st::Class*>(func_sym->_parent)->g_instance_type());
-   func_sym->add_child(vthis);
+   if (!func_decl->is_virtual())
+   {
+      st::Var* vthis = new st::Var();
+      vthis->set_name("this");
+      vthis->set_type(static_cast<st::Class*>(func_sym->_parent));
+      func_sym->add_child(vthis);
+   }
 
    // Visit return type node
-   this->visit_qualified_name(func_sym->_parent, static_cast<node::Text*>(func_decl->get_child(1)));
-   func_decl->_bound_type = func_sym;
-   if (func_decl->get_child(1)->_exp_type != NULL)
+   if (func_decl->g_return_type_node() != NULL)
    {
-      func_sym->_return_type = static_cast<st::Class*>(st::Util::get_eval_type(func_decl->get_child(1)->_exp_type))->g_instance_type();
-      func_decl->_exp_type = func_sym->_return_type;
+      this->visit_qualified_name(func_sym->_parent, static_cast<node::Text*>(func_decl->g_return_type_node()));
+      func_decl->_bound_type = func_sym;
+      if (func_decl->g_return_type_node()->_exp_type != NULL)
+      {
+         // @TODO Ouch, this is really ugly
+         func_sym->_return_type = static_cast<st::Class*>(func_decl->g_return_type_node()->_exp_type);
+         func_decl->_exp_type = func_sym->_return_type;
+
+         assert(func_sym->_return_type != NULL);
+         assert(func_decl->_exp_type != NULL);
+      }
+   }
+   else
+   {
+      // @TODO Set the return type to void
    }
 
    // Visit function parameters
-   st::Var* param_sym = NULL;
-   node::Node* func_params = func_decl->get_child(0);
-   node::Node* param_node = NULL;
-   for (size_t i = 0; i < func_params->_child_count; ++i)
+   node::Node* func_params = func_decl->g_parameters_node();
+   if (func_params != NULL)
    {
-      param_node = func_params->get_child(i);
-      this->visit_func_param(scope, param_node);
-
-      param_sym = new st::Var();
-      param_sym->set_name(static_cast<node::Text*>(param_node->get_child(0))->_value);
-      if (param_node->get_child(1)->_exp_type != NULL)
+      st::Var* param_sym = NULL;
+      node::Node* param_node = NULL;
+      for (size_t i = 0; i < func_params->_child_count; ++i)
       {
-         param_sym->set_type(static_cast<st::Class*>(param_node->get_child(1)->_exp_type)->g_instance_type());
-      }
-      func_sym->add_child(param_sym);
+         param_node = func_params->get_child(i);
+         this->visit_func_param(scope, param_node);
 
-      param_node->get_child(0)->_bound_type = param_sym;
-      param_node->_bound_type = param_sym;
-      param_node->_exp_type = param_sym->_type;
+         // Add parameter to the symbol table of the block
+         param_sym = new st::Var();
+         param_sym->set_name(static_cast<node::Text*>(param_node->get_child(0))->_value);
+         if (param_node->get_child(1)->_exp_type != NULL)
+         {
+            param_sym->set_type(static_cast<st::Class*>(param_node->get_child(1)->_exp_type));
+         }
+         func_sym->add_child(param_sym);
+
+         param_node->get_child(0)->_bound_type = param_sym;
+         param_node->_bound_type = param_sym;
+         param_node->_exp_type = param_sym->_type;
+
+         // Add parameter to function symbol parameters
+         func_sym->_params.push_back(param_node->_exp_type);
+      }
    }
 }
 

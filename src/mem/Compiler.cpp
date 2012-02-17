@@ -1,15 +1,30 @@
 #include "mem/Compiler.hpp"
 
+
 namespace mem {
 
 
 Compiler::Compiler ()
 {
    this->logger._formatter = new log::ConsoleFormatter();
+   this->ast._type = MEM_NODE_ROOT;
+   this->symbols.setup ();
+
+   this->register_ast_visitor(new ast::visitor::Prechecker());
+   this->register_ast_visitor(new ast::visitor::FindClasses());
+   this->register_ast_visitor(new ast::visitor::TopTypesChecker());
+   this->register_ast_visitor(new ast::visitor::VariableTypesChecker());
+   this->register_ast_visitor(new ast::visitor::BlockTypesChecker());
+   this->register_ast_visitor(new ast::visitor::TypeMatch());
 }
 
 Compiler::~Compiler ()
 {
+   for (int i = 0 ; i < this->ast_visitors.size() ; ++i)
+   {
+      assert(this->ast_visitors[i] != NULL);
+      delete this->ast_visitors[i];
+   }
 }
 
 void
@@ -19,29 +34,12 @@ Compiler::compile (char* fp)
    this->_parse_queue.push(file_path);
    this->process_parse_queue();
 
-   // Find types and register them in the symbol table
-   ast::visitor::FindClasses find_classes(&this->symbols);
-   this->logger.info("Starting [FindClasses] visitor...%s", "");
-   find_classes.visit_preorder(this->ast._root);
-
-   // Check if top types used exist
-   ast::visitor::TopTypesChecker check_top_types(&this->symbols, &this->logger);
-   this->logger.info("Starting [TopTypesChecker] visitor...%s", "");
-   check_top_types.visit_preorder(this->ast._root);
-
-   // Check if types in variable declarations exist
-   ast::visitor::VariableTypesChecker check_variable_declaration_types(&this->symbols, &this->logger);
-   this->logger.info("Starting [VariableTypesChecker] visitor...%s", "");
-   check_variable_declaration_types.visit_preorder(this->ast._root);
-
-   // Check types in blocks
-   ast::visitor::BlockTypesChecker check_block_types(&this->symbols, &this->logger);
-   this->logger.info("Starting [BlockTypesChecker] visitor...%s", "");
-   check_block_types.visit_preorder(this->ast._root);
-
-   // Check type matches (in variable declarations, etc)
-   ast::visitor::TypeMatch type_match(&this->symbols, &this->logger);
-   type_match.visit_preorder(this->ast._root);
+   for (int i=0; i < this->ast_visitors.size(); ++i)
+   {
+      this->logger.debug("Running visitor <%s>",this->ast_visitors[i]->_name.c_str());
+      this->ast_visitors[i]->init(&this->symbols, &this->logger);
+      this->ast_visitors[i]->visit_preorder(&this->ast);
+   }
 
    reset_lexer(); // Cleans up lexer global vars
 }
@@ -85,12 +83,12 @@ Compiler::parse (std::string file_path)
       file_node->_id.assign(ns);
       file_node->_include_path.assign(include_path);
       file_node->_path = file_path;
-      this->ast._root->push_child(file_node);
+      this->ast.push_child(file_node);
 
       // Used by yyparse
       yyin = fopen(file_path.c_str(), "rb");
       // @FIXME The file was opened ms before
-      // We could open the file only once if you used Bison++
+      // We could open the file only once if we used Bison++
       ASSERT_NOT_NULL(yyin);
       yyfile = file;
       yyparse(this->fm, file_node, this->symbols, this->logger, file);
@@ -144,5 +142,11 @@ Compiler::process_parse_queue ()
    }
 }
 
+
+void
+Compiler::register_ast_visitor (ast::visitor::Visitor* visitor)
+{
+   this->ast_visitors.push_back(visitor);
+}
 
 }

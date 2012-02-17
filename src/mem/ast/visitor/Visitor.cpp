@@ -3,6 +3,16 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+void
+Visitor::init (st::SymbolTable* symbols, log::Logger* logger)
+{
+   assert(symbols != NULL);
+   assert(logger != NULL);
+
+   this->_symbols = symbols;
+   this->_logger = logger;
+}
+
 bool
 Visitor::visit (node::Node* node)
 {

@@ -1,12 +1,29 @@
-use char
 
-class test
-
-   __plus__ (t :test) :char
+class Blabla
+   test (t :char) -> Blabla
       1
 
-   dude (t :test) :char
+
+class A
+   some_field :Blabla
+
+   zoinzoin () -> char
       1
 
-   fuck  (t :char) :test
-      zou :char = this
+
+class B < A
+   p :char
+
+
+class C < B
+   __plus__ (t :C) -> char
+      1
+
+   fuck_me () -> char
+
+   dude (t :C, b :bool) ->Blabla
+      1
+
+   fuck  (t :char) -> char
+      while true
+         this.dude(this)

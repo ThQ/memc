@@ -2,6 +2,36 @@
 
 namespace mem { namespace st {
 
+Class*
+Util::lookup_class (Symbol* scope, std::string cls_name)
+{
+   Symbol* cls = Util::lookup_symbol(scope, cls_name);
+   if (cls != NULL && cls->_kind == CLASS)
+   {
+      return (Class*)cls;
+   }
+   return NULL;
+}
+
+Symbol*
+Util::lookup_member (Symbol* scope, std::string symbol_name)
+{
+   Symbol* res = NULL;
+   if (scope->_kind == INSTANCE)
+   {
+      scope = static_cast<Instance*>(scope)->_type; //static_cast<Class*>(scope)->g_instance_type();
+   }
+
+   while (scope != NULL)
+   {
+      res = scope->get_child(symbol_name);
+      if (res != NULL) return res;
+      scope = static_cast<Class*>(scope)->_parent_type;
+   }
+
+   return NULL;
+}
+
 Symbol*
 Util::lookup_symbol (Symbol* scope, std::string symbol_name)
 {
@@ -10,6 +40,7 @@ Util::lookup_symbol (Symbol* scope, std::string symbol_name)
    {
       scope = static_cast<Class*>(scope)->g_instance_type();
    }
+
    while (scope != NULL)
    {
       res = scope->get_child(symbol_name);

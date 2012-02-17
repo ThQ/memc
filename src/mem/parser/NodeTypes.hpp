@@ -33,13 +33,14 @@
 #define MEM_NODE_OBJECT_DECLARATION 30
 #define MEM_NODE_PATCH_DECLARATION 31
 #define MEM_NODE_PRIMITIVE 32
-#define MEM_NODE_ROOT 33
-#define MEM_NODE_SELF 34
-#define MEM_NODE_TEXT 35
-#define MEM_NODE_VARIABLE 36
-#define MEM_NODE_VARIABLE_DECLARATION 37
-#define MEM_NODE_USE 38
-#define MEM_NODE_WHILE 39
+#define MEM_NODE_RETURN 33
+#define MEM_NODE_ROOT 34
+#define MEM_NODE_SELF 35
+#define MEM_NODE_TEXT 36
+#define MEM_NODE_VARIABLE 37
+#define MEM_NODE_VARIABLE_DECLARATION 38
+#define MEM_NODE_USE 39
+#define MEM_NODE_WHILE 40
 
 namespace mem { namespace parser {
 extern const char* node_names[];

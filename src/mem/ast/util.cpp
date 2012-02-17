@@ -3,6 +3,7 @@
 
 namespace mem { namespace ast { namespace util {
 
+
 st::Symbol*
 find_local_variable_type(node::Node* start_at, std::string var_name)
 {
@@ -45,6 +46,7 @@ find_local_variable_type(node::Node* start_at, std::string var_name)
    }
    return NULL;
 }
+
 st::Symbol*
 find_self_type (node::Node* start_at)
 {

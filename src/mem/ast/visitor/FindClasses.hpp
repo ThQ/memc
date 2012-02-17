@@ -7,18 +7,18 @@
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
-#include "mem/st/SymbolTable.hpp"
+#include "mem/st/Util.hpp"
 
 
-namespace mem { namespace ast { namespace visitor
+namespace mem { namespace ast { namespace visitor {
+
+
+class FindClasses : public Visitor
 {
-   class FindClasses : public Visitor
-   {
-      public: st::SymbolTable* _symbols;
+   public: FindClasses ();
+   public: virtual bool visit (node::Node* node);
+};
 
-      public: FindClasses (st::SymbolTable* symbols);
-      public: virtual bool visit (node::Node* node);
-   };
 
 } } }
 

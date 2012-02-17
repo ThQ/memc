@@ -10,7 +10,6 @@ namespace mem { namespace ast { namespace node {
    class Root : public Node
    {
       public: Root ();
-      public: virtual void dump_self ();
    };
 
 } } }

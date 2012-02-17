@@ -13,7 +13,7 @@ mem::fs::File* yyfile = NULL;
     yylloc._file = yyfile; \
     yycolumn += yyleng;
 
-#define NEW_LINE ((0));
+#define NEW_LINE ((void)0);
 
 
 int i = T_ID;
@@ -162,6 +162,10 @@ ST_USE      {KW_USE}[ ]+{NS_PART_NAME}
    return T_WHILE;
 }
 
+"return" {
+   return T_RETURN;
+}
+
 ":" {
    return T_SEMICOLON;
 }
@@ -223,11 +227,15 @@ ST_USE      {KW_USE}[ ]+{NS_PART_NAME}
 }
 
 ">" {
+   return T_GT;
+}
+
+"->" {
    return T_RARR;
 }
 
 "<" {
-   return T_LARR;
+   return T_LT;
 }
 
 "<=" {

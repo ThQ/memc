@@ -38,7 +38,6 @@
 #define PASS (0);
 #include <stdio.h>
 #include <string.h>
-#include "mem/ast/Ast.hpp"
 #include "mem/ast/node/BinaryExpression.hpp"
 #include "mem/ast/node/Block.hpp"
 #include "mem/ast/node/Class.hpp"
@@ -70,6 +69,7 @@ using namespace mem;
       if (YYID (N)) \
       { \
          (Current).s_line(YYRHSLOC (Rhs, 1)._line); \
+         (Current).s_line_end(YYRHSLOC (Rhs, 1)._line_end); \
          (Current).s_col_start(YYRHSLOC (Rhs, 1)._column_start); \
          (Current).s_col_end(YYRHSLOC (Rhs, N)._column_end); \
          (Current)._file = YYRHSLOC(Rhs, 1)._file; \
@@ -77,6 +77,7 @@ using namespace mem;
       else \
       { \
          (Current).s_line(YYRHSLOC (Rhs, 0)._line); \
+         (Current).s_line_end(YYRHSLOC (Rhs, 0)._line_end); \
          (Current).s_col_start(YYRHSLOC (Rhs, 0)._column_end); \
          (Current).s_col_end(YYRHSLOC (Rhs, 0)._column_end); \
          (Current)._file = NULL; \
@@ -86,13 +87,13 @@ using namespace mem;
 
 
 /* Line 2068 of yacc.c  */
-#line 75 "src/mem/grammar/mem.y"
+#line 76 "src/mem/grammar/mem.y"
 
 
 
 
 /* Line 2068 of yacc.c  */
-#line 96 "src/mem/parser/Bison.hpp"
+#line 97 "src/mem/parser/Bison.hpp"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -124,27 +125,29 @@ using namespace mem;
      T_PRIMITIVE = 279,
      T_OBJECT = 280,
      T_RBRACKET = 281,
-     T_STRING = 282,
-     T_USE = 283,
-     T_WHITESPACE = 284,
-     T_LEFT_BINARY_OP = 285,
-     T_SEMICOLON = 286,
-     T_WHILE = 287,
-     T_SELF = 288,
-     T_BANG = 289,
-     T_LARR_EQ = 290,
-     T_LARR = 291,
-     T_RARR_EQ = 292,
-     T_RARR = 293,
-     T_EQ_EQ = 294,
-     T_PLUS = 295,
-     T_MINUS = 296,
-     T_DIV = 297,
-     T_MUL = 298,
-     T_MODULO = 299,
-     T_MUL_MUL = 300,
-     T_PLUS_PLUS = 301,
-     T_MINUS_MINUS = 302
+     T_RARR = 282,
+     T_STRING = 283,
+     T_USE = 284,
+     T_WHITESPACE = 285,
+     T_LEFT_BINARY_OP = 286,
+     T_RETURN = 287,
+     T_SEMICOLON = 288,
+     T_WHILE = 289,
+     T_SELF = 290,
+     T_BANG = 291,
+     T_LARR_EQ = 292,
+     T_LT = 293,
+     T_RARR_EQ = 294,
+     T_GT = 295,
+     T_EQ_EQ = 296,
+     T_PLUS = 297,
+     T_MINUS = 298,
+     T_DIV = 299,
+     T_MUL = 300,
+     T_MODULO = 301,
+     T_MUL_MUL = 302,
+     T_PLUS_PLUS = 303,
+     T_MINUS_MINUS = 304
    };
 #endif
 
@@ -155,7 +158,7 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 78 "src/mem/grammar/mem.y"
+#line 79 "src/mem/grammar/mem.y"
 
    int integer;
    char* text;
@@ -166,7 +169,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 170 "src/mem/parser/Bison.hpp"
+#line 173 "src/mem/parser/Bison.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
