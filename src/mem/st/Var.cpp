@@ -9,6 +9,13 @@ Var::Var ()
    this->_type = NULL;
 }
 
+Var::Var (std::string name, Type* type)
+{
+   this->_kind = VAR;
+   this->_name = name;
+   this->_type = type;
+}
+
 /*
 void
 Var::print ()

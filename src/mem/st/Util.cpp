@@ -6,9 +6,20 @@ Class*
 Util::lookup_class (Symbol* scope, std::string cls_name)
 {
    Symbol* cls = Util::lookup_symbol(scope, cls_name);
-   if (cls != NULL && cls->_kind == CLASS)
+   if (cls != NULL && cls->is(CLASS))
    {
       return (Class*)cls;
+   }
+   return NULL;
+}
+
+Function*
+Util::lookup_function (Symbol* scope, std::string func_name)
+{
+   Symbol* func = Util::lookup_symbol(scope, func_name);
+   if (func != NULL && func->is(FUNCTION))
+   {
+      return static_cast<Function*>(func);
    }
    return NULL;
 }

@@ -11,6 +11,7 @@
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 #include "mem/fs/position/Range.hpp"
+#include "mem/st/FunctionSignature.hpp"
 #include "mem/st/Util.hpp"
 #include "mem/st/Var.hpp"
 

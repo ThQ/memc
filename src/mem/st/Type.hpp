@@ -13,6 +13,7 @@ class Type: public Symbol
    public: Type* _parent_type;
 
    public: Type();
+   public: bool is_subclass (Type* parent);
 };
 
 

@@ -19,11 +19,13 @@ class C < B
    __plus__ (t :C) -> char
       1
 
-   fuck_me () -> char
-
-   dude (t :C, b :bool) ->Blabla
+   dude (t :C, b :bool) -> Blabla
       1
 
    fuck  (t :char) -> char
+      pf :A = this
       while true
-         this.dude(this)
+         this.dude(true)
+
+   dude (t :bool) -> Blabla
+      1

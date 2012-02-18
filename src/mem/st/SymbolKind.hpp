@@ -12,7 +12,8 @@ namespace mem { namespace st
       PRIMITIVE=5,
       FUNCTION=6,
       VAR=7,
-      INSTANCE=8
+      INSTANCE=8,
+      FUNCTION_SIGNATURE=9
    } SymbolKind;
 }
 }

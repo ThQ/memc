@@ -248,15 +248,8 @@ SymbolTable::setup_bool ()
    this->_glob_bool_cls->_name = "bool";
    this->_root->add_child(this->_glob_bool_cls);
 
-   st::Var* true_inst = new st::Var();
-   true_inst->_name = "true";
-   true_inst->set_type(this->_glob_bool_cls);
-   this->_root->add_child(true_inst);
-
-   st::Var* false_inst = new st::Var();
-   false_inst->_name = "false";
-   false_inst->set_type(this->_glob_bool_cls);
-   this->_root->add_child(false_inst);
+   this->_root->add_child(new st::Var("true", this->_glob_bool_cls));
+   this->_root->add_child(new st::Var("false", this->_glob_bool_cls));
 }
 
 void

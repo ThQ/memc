@@ -3,19 +3,18 @@
 
 
 #include <vector>
-#include "mem/st/Symbol.hpp"
+#include "mem/st/Type.hpp"
 
 
 namespace mem { namespace st {
 
 
-class Function : public Symbol
+class Function : public Type
 {
    public: std::vector<Symbol*> _params;
    public: Symbol* _return_type;
 
    public: Function ();
-   //public: virtual void print ();
 };
 
 

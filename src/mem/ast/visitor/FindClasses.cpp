@@ -25,7 +25,7 @@ FindClasses::visit (node::Node* node)
       st::Class* cls = new st::Class();
       cls->_name = static_cast<node::Text*>(node)->_value;
       this->_symbols->_root->add_child(cls);
-      cls_node->_bound_type = cls;
+      cls_node->s_bound_symbol(cls);
 
 
       node::Text* parent_type_node = cls_node->g_parent_type_node();
@@ -41,9 +41,9 @@ FindClasses::visit (node::Node* node)
          {
             log::Message* err = new log::Message(log::ERROR);
             err->format_message("Symbol not found {symbol:%s} in {symbol:%s}",
-               cls_node->_value.c_str(),
-               this->_symbols->_root->get_qualified_name().c_str());
-            err->set_position(parent_type_node->_position->copy());
+               cls_node->g_value_cstr(),
+               this->_symbols->_root->g_qualified_name_cstr());
+            err->set_position(parent_type_node->copy_position());
             this->_logger->log(err);
          }
       }

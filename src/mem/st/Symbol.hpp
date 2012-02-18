@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include <map>
+#include <sstream>
 #include <stdio.h>
 #include <string>
 #include "mem/fs/position/Range.hpp"
@@ -37,6 +38,7 @@ class Symbol
    public: bool is (SymbolKind kind);
    public: Symbol* get_child (std::string name);
    public: virtual std::string get_qualified_name();
+   public: const char* g_qualified_name_cstr() { return this->get_qualified_name().c_str();}
    //public: virtual void print ();
    //public: void print_depth ();
    public: void set_name (char* name, size_t len);

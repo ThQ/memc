@@ -32,15 +32,15 @@ TypeMatch::visit_var_decl (node::VarDecl* var_decl_node)
       st::Symbol* var_type = var_decl_node->_exp_type;
       st::Symbol* value_type = value_node->_exp_type;
 
-      if (var_type != NULL && value_type != NULL && var_type != value_type &&
+      if (var_type != NULL && value_type != NULL && !static_cast<st::Type*>(value_type)->is_subclass(static_cast<st::Type*>(var_type)) &&
          value_node != NULL && type_node != NULL)
       {
          log::Message* err = new log::Message(log::ERROR);
          err->format_message("Types mismatch in %s variable assignment",
             var_decl_node->get_name().c_str());
-         err->format_description("Variable expects value type = %s\n Value type = %s",
-            var_decl_node->_exp_type->get_qualified_name().c_str(),
-            var_decl_node->get_value_node()->_exp_type->get_qualified_name().c_str()
+         err->format_description("Variable expects value of type %s, but got %s instead",
+            var_decl_node->g_expr_type()->g_qualified_name_cstr(),
+            var_decl_node->get_value_node()->_exp_type->g_qualified_name_cstr()
          );
 
          if (type_node->_position != NULL && value_node->_position != NULL)

@@ -15,6 +15,7 @@ namespace mem { namespace st {
 class Util
 {
    public: static Class* lookup_class (Symbol* scope, std::string cls_name);
+   public: static Function* lookup_function (Symbol* scope, std::string func_name);
    public: static Symbol* lookup_member (Symbol* scope, std::string symbol_name);
    public: static Symbol* lookup_symbol (Symbol* scope, std::string symbol_name);
    public: static Symbol* get_eval_type (Symbol* symbol);

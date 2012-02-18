@@ -57,13 +57,13 @@ void
 ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
 {
    size_t i;
-   size_t last_nl = -1;
+   size_t last_nl = 0;
    for (i=0; i<msg->_description.length(); ++i)
    {
       if (msg->_description.data()[i] == '\n')
       {
          str << "          | ";
-         str << msg->_description.substr(last_nl+1, i-last_nl-1);
+         str << msg->_description.substr(last_nl, i-last_nl);
          str << "\n";
          last_nl = i+1;
       }
@@ -71,7 +71,7 @@ ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
    if (last_nl != msg->_description.size())
    {
       str << "          | ";
-      str << msg->_description.substr(last_nl+1, msg->_description.size()-last_nl+1);
+      str << msg->_description.substr(last_nl, msg->_description.size()-last_nl);
       str << "\n";
    }
 }

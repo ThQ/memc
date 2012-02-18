@@ -9,6 +9,7 @@ Symbol::Symbol ()
    this->_kind = UNKNOWN;
    this->_next = NULL;
    this->_parent = NULL;
+   this->_child_count = 0;
 }
 
 Symbol::~Symbol ()
@@ -23,6 +24,16 @@ Symbol::~Symbol ()
 bool
 Symbol::add_child (Symbol* sym)
 {
+   if (sym->g_name() == "")
+   {
+      std::ostringstream id;
+      id << this->g_name();
+      id << "/";
+      id << this->_children.size() + 1;
+
+      sym->set_name(id.str());
+   }
+
    if (!this->get_child(sym->_name))
    {
       sym->_parent = this;

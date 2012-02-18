@@ -60,6 +60,15 @@ TextDumper::dump_symbol (st::Symbol* sym, int level)
          res += this->dump_children(sym, level+1);
          res += depth + "</Function>";
          break;
+      case FUNCTION_SIGNATURE:
+         res += "<FunctionSignature";
+         res += " name=\"" + sym->_name + "\"";
+         res += " return_type=\"" + ((st::Function*)sym->_parent)->_return_type->get_qualified_name() + "\"";
+         res += ">\n";
+         res += this->dump_children(sym, level+1);
+         res += depth + "</FunctionSignature>";
+         break;
+
       case CLASS:
          res += "<Class";
          res += " name=\"" + sym->_name + "\"";

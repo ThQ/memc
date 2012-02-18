@@ -97,9 +97,18 @@ TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* 
    assert(func_decl != NULL);
 
    // Add the function to the symbol table
-   st::Function* func_sym = new st::Function();
-   func_sym->set_name(func_decl->_value);
-   scope->add_child(func_sym);
+   st::Function* func_sym = st::Util::lookup_function(scope, func_decl->_value);
+   if (func_sym == NULL)
+   {
+      func_sym = new st::Function();
+      func_sym->set_name(func_decl->_value);
+      scope->add_child(func_sym);
+   }
+   assert (func_sym != NULL);
+
+   //
+   st::FunctionSignature* func_sign_sym = new st::FunctionSignature();
+   func_sym->add_child(func_sign_sym);
 
    // Add {this} to the symbol table
    if (!func_decl->is_virtual())
@@ -107,19 +116,32 @@ TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* 
       st::Var* vthis = new st::Var();
       vthis->set_name("this");
       vthis->set_type(static_cast<st::Class*>(func_sym->_parent));
-      func_sym->add_child(vthis);
+      func_sign_sym->add_child(vthis);
    }
 
    // Visit return type node
    if (func_decl->g_return_type_node() != NULL)
    {
       this->visit_qualified_name(func_sym->_parent, static_cast<node::Text*>(func_decl->g_return_type_node()));
-      func_decl->_bound_type = func_sym;
-      if (func_decl->g_return_type_node()->_exp_type != NULL)
+      func_decl->s_bound_symbol(func_sign_sym);
+      if (func_decl->g_return_type_node()->g_expr_type() != NULL)
       {
+         // Return type differs from a previously defined function with
+         // the same name (function overloading)
+         if (func_sym->_return_type != NULL && func_decl->g_return_type_node()->g_expr_type() != func_sym->_return_type)
+         {
+            log::Message* err = new log::Message(log::ERROR);
+            err->set_message("When overloading functions, return type must be the same");
+            err->format_description("Return type was defined as %s, but got %s instead.",
+               func_sym->_return_type->g_qualified_name_cstr(),
+               func_decl->g_return_type_node()->g_expr_type()->g_qualified_name_cstr());
+            err->set_position(func_decl->g_return_type_node()->_position->copy());
+            this->_logger->log(err);
+         }
+
          // @TODO Ouch, this is really ugly
-         func_sym->_return_type = static_cast<st::Class*>(func_decl->g_return_type_node()->_exp_type);
-         func_decl->_exp_type = func_sym->_return_type;
+         func_sym->_return_type = static_cast<st::Class*>(func_decl->g_return_type_node()->g_expr_type());
+         func_decl->s_expr_type(func_sym->_return_type);
 
          assert(func_sym->_return_type != NULL);
          assert(func_decl->_exp_type != NULL);
@@ -148,14 +170,14 @@ TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* 
          {
             param_sym->set_type(static_cast<st::Class*>(param_node->get_child(1)->_exp_type));
          }
-         func_sym->add_child(param_sym);
+         func_sign_sym->add_child(param_sym);
 
          param_node->get_child(0)->_bound_type = param_sym;
          param_node->_bound_type = param_sym;
          param_node->_exp_type = param_sym->_type;
 
          // Add parameter to function symbol parameters
-         func_sym->_params.push_back(param_node->_exp_type);
+         func_sign_sym->_params.push_back(param_node->_exp_type);
       }
    }
 }

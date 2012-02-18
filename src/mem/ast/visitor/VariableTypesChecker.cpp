@@ -26,8 +26,8 @@ VariableTypesChecker::visit (node::Node* node)
          st::Symbol* var_st_type = this->_symbols->get_symbol(class_name);
          if (var_st_type != NULL)
          {
-            node->_exp_type = static_cast<st::Class*>(var_st_type)->g_instance_type();
-            node->get_child(1)->_exp_type = node->_exp_type;
+            node->s_expr_type(static_cast<st::Class*>(var_st_type));
+            node->get_child(1)->s_expr_type(node->g_expr_type());
          }
       }
    }

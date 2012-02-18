@@ -7,6 +7,7 @@
 
 #include "mem/st/Class.hpp"
 #include "mem/st/Function.hpp"
+#include "mem/st/FunctionSignature.hpp"
 #include "mem/st/Symbol.hpp"
 #include "mem/st/Var.hpp"
 

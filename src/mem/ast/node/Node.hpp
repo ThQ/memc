@@ -45,6 +45,12 @@ class Node
       }
    }
 
+   public: inline st::Symbol* g_bound_symbol () {return this->_bound_type;}
+   public: inline void s_bound_symbol (st::Symbol* sym) {this->_bound_type = sym;}
+   public: inline st::Type* g_expr_type () {return static_cast<st::Type*>(this->_exp_type);}
+   public: inline void s_expr_type (st::Symbol* sym) {this->_exp_type = sym;};
+
+   public: fs::position::Range* copy_position() { return this->_position->copy_range();}
    public: void eat (Node* n);
    public: static const char* get_type_name (unsigned int type);
    public: Node* get_child (unsigned int i);
