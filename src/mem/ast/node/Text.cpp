@@ -16,19 +16,19 @@ Text::Text (unsigned int type)
 }
 
 void
-Text::set_value (const char* value)
+Text::sValue (const char* value)
 {
    this->_value.assign(value);
 }
 
 void
-Text::set_value (const char* value, size_t len)
+Text::sValue (const char* value, size_t len)
 {
    this->_value.assign(value, len);
 }
 
 void
-Text::set_value (std::string value)
+Text::sValue (std::string value)
 {
    this->_value.assign(value);
 }

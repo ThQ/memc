@@ -35,7 +35,7 @@ SymbolTable::create_type (Type* type, std::string full_type_name)
    std::string ns_name;
    std::string type_name;
    mem::Util::partition_full_type_name(full_type_name, ns_name, type_name);
-   type->set_name(type_name);
+   type->sName(type_name);
 
    Namespace* ns = 0;
    if (ns_name.size() == 0)
@@ -71,7 +71,7 @@ SymbolTable::create_namespace (std::string name)
          if (child_namespace == NULL)
          {
             Namespace* ns_to_create = new Namespace();
-            ns_to_create->set_name(buffer, buffer_len);
+            ns_to_create->sName(buffer, buffer_len);
             ns_to_create = cur_namespace->push(ns_to_create);
             /**if (ns_to_create != 0)
             {
@@ -99,7 +99,7 @@ SymbolTable::create_namespace (std::string name)
    if (buffer_len != 0)
    {
       ns = new Namespace();
-      ns->set_name((char*)buffer, buffer_len);
+      ns->sName((char*)buffer, buffer_len);
       ns = cur_namespace->push(ns);
    }
 
@@ -192,7 +192,7 @@ SymbolTable::get_symbol (std::string name)
 
    while ((cur_symbol_name = path.next_name()) != "")
    {
-      cur_symbol = cur_symbol->get_child(cur_symbol_name);
+      cur_symbol = cur_symbol->getChild(cur_symbol_name);
       if (cur_symbol == NULL)
       {
          return NULL;
@@ -215,9 +215,9 @@ SymbolTable::register_function (std::string func_full_name)
    }
 
    Function* func = new Function();
-   func->set_name(func_name);
+   func->sName(func_name);
 
-   ns->add_child(func);
+   ns->addChild(func);
 
    return func;
 }
@@ -227,7 +227,7 @@ SymbolTable::register_symbol (std::string path, Symbol* sym)
 {
    assert(sym != NULL);
    Symbol* parent_sym = this->get_symbol(path);
-   if (parent_sym != NULL && parent_sym->add_child(sym))
+   if (parent_sym != NULL && parent_sym->addChild(sym))
    {
       return true;
    }
@@ -246,26 +246,26 @@ SymbolTable::setup_bool ()
 {
    this->_glob_bool_cls = new st::Class();
    this->_glob_bool_cls->_name = "bool";
-   this->_root->add_child(this->_glob_bool_cls);
+   this->_root->addChild(this->_glob_bool_cls);
 
-   this->_root->add_child(new st::Var("true", this->_glob_bool_cls));
-   this->_root->add_child(new st::Var("false", this->_glob_bool_cls));
+   this->_root->addChild(new st::Var("true", this->_glob_bool_cls));
+   this->_root->addChild(new st::Var("false", this->_glob_bool_cls));
 }
 
 void
 SymbolTable::setup_ints ()
 {
    st::Class* int_cls = new st::Class();
-   int_cls->_name = "int";
-   this->_root->add_child(int_cls);
+   int_cls->sName("int");
+   this->_root->addChild(int_cls);
 
    st::Class* uint_cls = new st::Class();
-   uint_cls->_name = "uint";
-   this->_root->add_child(uint_cls);
+   uint_cls->sName("uint");
+   this->_root->addChild(uint_cls);
 
    st::Class* char_cls = new st::Class();
-   char_cls->_name = "char";
-   this->_root->add_child(char_cls);
+   char_cls->sName("char");
+   this->_root->addChild(char_cls);
 }
 
 } }

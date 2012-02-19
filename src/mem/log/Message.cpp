@@ -2,6 +2,16 @@
 
 namespace mem { namespace log {
 
+Message::Message ()
+{
+   this->_position = NULL;
+}
+
+Message::Message (MessageLevel level)
+{
+   this->_position = NULL;
+   this->_level = level;
+}
 
 Message::~Message ()
 {
@@ -12,7 +22,7 @@ Message::~Message ()
 }
 
 void
-Message::format_message (const char* format, ...)
+Message::formatMessage (const char* format, ...)
 {
    va_list args;
    va_start(args, format);
@@ -23,7 +33,7 @@ Message::format_message (const char* format, ...)
 }
 
 void
-Message::format_description (const char* format, ...)
+Message::formatDescription (const char* format, ...)
 {
    va_list args;
    va_start(args, format);
@@ -40,25 +50,25 @@ Message::format_description (const char* format, ...)
 }
 
 void
-Message::set_description (const char* desc)
+Message::sDescription (const char* desc)
 {
    this->_description.assign(desc);
 }
 
 void
-Message::set_level (MessageLevel level)
+Message::sLevel (MessageLevel level)
 {
    this->_level = level;
 }
 
 void
-Message::set_message (const char* message)
+Message::sMessage (const char* message)
 {
    this->_message.assign(message);
 }
 
 void
-Message::set_position (fs::position::Position* position)
+Message::sPosition (fs::position::Position* position)
 {
    this->_position = position;
 }

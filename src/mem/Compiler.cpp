@@ -83,7 +83,7 @@ Compiler::parse (std::string file_path)
       file_node->_id.assign(ns);
       file_node->_include_path.assign(include_path);
       file_node->_path = file_path;
-      this->ast.push_child(file_node);
+      this->ast.pushChild(file_node);
 
       // Used by yyparse
       yyin = fopen(file_path.c_str(), "rb");
@@ -100,7 +100,7 @@ Compiler::parse (std::string file_path)
          if (ns == find_use._uses[i])
          {
             log::Message warn(log::WARNING);
-            warn.format_message(
+            warn.formatMessage(
                "File {path:%s} is trying to include itself: include ignored.",
                file_path.c_str()
             );
@@ -126,8 +126,8 @@ Compiler::parse (std::string file_path)
       }
 
       log::Message msg(log::ERROR);
-      msg.format_message("Couldn't open file {path:%s}.", file_path.c_str());
-      msg.set_description(description);
+      msg.formatMessage("Couldn't open file {path:%s}.", file_path.c_str());
+      msg.sDescription(description);
       this->logger.log(&msg);
    }
 }

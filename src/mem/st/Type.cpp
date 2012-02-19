@@ -8,7 +8,7 @@ Type::Type ()
 }
 
 bool
-Type::is_subclass (Type* possible_parent)
+Type::isSubclass (Type* possible_parent)
 {
    Type* direct_parent = this;
 

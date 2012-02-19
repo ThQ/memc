@@ -26,21 +26,21 @@ TypeMatch::visit_var_decl (node::VarDecl* var_decl_node)
 {
    if (var_decl_node->_child_count == 3)
    {
-      node::Node* value_node = var_decl_node->get_value_node();
-      node::Node* type_node = var_decl_node->get_type_node();
+      node::Node* value_node = var_decl_node->gValueNode();
+      node::Node* type_node = var_decl_node->gTypeNode();
 
-      st::Symbol* var_type = var_decl_node->_exp_type;
-      st::Symbol* value_type = value_node->_exp_type;
+      st::Symbol* var_type = var_decl_node->gExprType();
+      st::Symbol* value_type = value_node->gExprType();
 
-      if (var_type != NULL && value_type != NULL && !static_cast<st::Type*>(value_type)->is_subclass(static_cast<st::Type*>(var_type)) &&
+      if (var_type != NULL && value_type != NULL && !static_cast<st::Type*>(value_type)->isSubclass(static_cast<st::Type*>(var_type)) &&
          value_node != NULL && type_node != NULL)
       {
          log::Message* err = new log::Message(log::ERROR);
-         err->format_message("Types mismatch in %s variable assignment",
-            var_decl_node->get_name().c_str());
-         err->format_description("Variable expects value of type %s, but got %s instead",
-            var_decl_node->g_expr_type()->g_qualified_name_cstr(),
-            var_decl_node->get_value_node()->_exp_type->g_qualified_name_cstr()
+         err->formatMessage("Types mismatch in %s variable assignment",
+            var_decl_node->gName().c_str());
+         err->formatDescription("Variable expects value of type %s, but got %s instead",
+            var_decl_node->gExprType()->gQualifiedNameCstr(),
+            var_decl_node->gValueNode()->gExprType()->gQualifiedNameCstr()
          );
 
          if (type_node->_position != NULL && value_node->_position != NULL)
@@ -48,7 +48,7 @@ TypeMatch::visit_var_decl (node::VarDecl* var_decl_node)
             fs::position::Composite* pos = new fs::position::Composite();
             pos->add_child(type_node->_position->copy());
             pos->add_child(value_node->_position->copy());
-            err->set_position(pos);
+            err->sPosition(pos);
          }
          else
          {

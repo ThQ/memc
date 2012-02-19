@@ -14,11 +14,11 @@ Class::g_parent_type_node ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {
-      assert (this->get_child(i) != NULL);
+      assert (this->getChild(i) != NULL);
 
-      if (this->get_child(i)->_type == MEM_NODE_ID)
+      if (this->getChild(i)->isType(MEM_NODE_ID))
       {
-         return (Text*)this->get_child(i);
+         return static_cast<Text*>(this->getChild(i));
       }
    }
    return NULL;

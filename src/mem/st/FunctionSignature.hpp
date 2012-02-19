@@ -14,7 +14,7 @@ class FunctionSignature : public Type
 
    public: FunctionSignature ();
 
-   public: std::string g_signature();
+   public: std::string gSignature();
 
 };
 

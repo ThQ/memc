@@ -14,11 +14,11 @@ namespace mem { namespace ast { namespace node {
 
       public: Text ();
       public: Text (unsigned int type);
-      public: std::string g_value() { return this->_value;}
-      public: const char* g_value_cstr() {return this->_value.c_str();}
-      public: void set_value (const char* value);
-      public: void set_value (const char* value, size_t len);
-      public: void set_value (std::string value);
+      public: std::string gValue() { return this->_value;}
+      public: const char* gValueCstr() {return this->_value.c_str();}
+      public: void sValue (const char* value);
+      public: void sValue (const char* value, size_t len);
+      public: void sValue (std::string value);
    };
 
 } } }

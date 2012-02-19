@@ -35,7 +35,7 @@ Util::lookup_member (Symbol* scope, std::string symbol_name)
 
    while (scope != NULL)
    {
-      res = scope->get_child(symbol_name);
+      res = scope->getChild(symbol_name);
       if (res != NULL) return res;
       scope = static_cast<Class*>(scope)->_parent_type;
    }
@@ -54,7 +54,7 @@ Util::lookup_symbol (Symbol* scope, std::string symbol_name)
 
    while (scope != NULL)
    {
-      res = scope->get_child(symbol_name);
+      res = scope->getChild(symbol_name);
       if (res != NULL)
       {
          return res;

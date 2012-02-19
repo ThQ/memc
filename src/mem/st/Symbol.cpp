@@ -22,19 +22,19 @@ Symbol::~Symbol ()
 }
 
 bool
-Symbol::add_child (Symbol* sym)
+Symbol::addChild (Symbol* sym)
 {
-   if (sym->g_name() == "")
+   if (sym->gName() == "")
    {
       std::ostringstream id;
-      id << this->g_name();
-      id << "/";
+      id << this->gName();
+      id << "#";
       id << this->_children.size() + 1;
 
-      sym->set_name(id.str());
+      sym->sName(id.str());
    }
 
-   if (!this->get_child(sym->_name))
+   if (!this->getChild(sym->_name))
    {
       sym->_parent = this;
       this->_children[sym->_name] = sym;
@@ -45,7 +45,7 @@ Symbol::add_child (Symbol* sym)
 }
 
 Symbol*
-Symbol::get_child (std::string name)
+Symbol::getChild (std::string name)
 {
    if (name.size() != 0 && this->_children.find(name) != this->_children.end())
    {
@@ -55,19 +55,19 @@ Symbol::get_child (std::string name)
 }
 
 std::string
-Symbol::get_qualified_name ()
+Symbol::gQualifiedName ()
 {
    std::string name = "";
    Symbol* sym = this;
    while (sym != NULL)
    {
-      if (sym->_name.size() != 0)
+      if (sym->gName().size() != 0)
       {
          if (name.size() != 0)
          {
             name.insert(0, ".");
          }
-         name.insert(0, sym->_name);
+         name.insert(0, sym->gName());
       }
       sym = sym->_parent;
    }
@@ -84,32 +84,14 @@ Symbol::is (SymbolKind kind)
    return this->_kind == kind;
 }
 
-/*
 void
-Symbol::print ()
-{
-   this->print_depth();
-   printf("<Symbol:%s>\n", this->get_qualified_name().c_str());
-}
-
-void
-Symbol::print_depth ()
-{
-   for (unsigned i = 0 ; i < this->_depth ; ++i)
-   {
-      printf("     ");
-   }
-}
-*/
-
-void
-Symbol::set_name (char* name, size_t name_len)
+Symbol::sName (char* name, size_t name_len)
 {
    this->_name.assign(name, name_len);
 }
 
 void
-Symbol::set_name (std::string name)
+Symbol::sName (std::string name)
 {
    this->_name = name;
 }

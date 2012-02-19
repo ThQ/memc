@@ -14,9 +14,9 @@ Function::g_body_node ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {
-      if (this->get_child(i)->_type == MEM_NODE_BLOCK)
+      if (this->getChild(i)->isType(MEM_NODE_BLOCK))
       {
-         return (Block*)this->get_child(i);
+         return static_cast<Block*>(this->getChild(i));
       }
    }
    return NULL;
@@ -27,9 +27,9 @@ Function::g_parameters_node ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {
-      if (this->get_child(i)->_type == MEM_NODE_FUNCTION_PARAMETERS)
+      if (this->getChild(i)->isType(MEM_NODE_FUNCTION_PARAMETERS))
       {
-         return this->get_child(i);
+         return this->getChild(i);
       }
    }
    return NULL;
@@ -40,9 +40,9 @@ Function::g_return_type_node ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {
-      if (this->get_child(i)->_type != MEM_NODE_FUNCTION_PARAMETERS && this->get_child(i)->_type != MEM_NODE_BLOCK)
+      if (this->getChild(i)->_type != MEM_NODE_FUNCTION_PARAMETERS && this->getChild(i)->_type != MEM_NODE_BLOCK)
       {
-         return this->get_child(i);
+         return this->getChild(i);
       }
    }
    return NULL;

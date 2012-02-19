@@ -15,6 +15,7 @@ class Function : public Type
    public: Symbol* _return_type;
 
    public: Function ();
+   public: inline Symbol* gReturnType () { return this->_return_type;}
 };
 
 

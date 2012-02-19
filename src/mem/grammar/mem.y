@@ -65,9 +65,9 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
    pos->_file = file;
 
    log::Message* msg = new log::Message(log::ERROR);
-   msg->set_message("Syntax error");
-   msg->set_description(s);
-   msg->set_position(pos);
+   msg->sMessage("Syntax error");
+   msg->sDescription(s);
+   msg->sPosition(pos);
    logger.log(msg);
 }
 }
@@ -174,11 +174,11 @@ input :
    | input T_WHITESPACE T_NEWLINE
    | input use
    {
-      ast->push_child($2);
+      ast->pushChild($2);
    }
    | input type_declaration
    {
-      ast->push_child($2);
+      ast->pushChild($2);
    }
 
 
@@ -186,8 +186,8 @@ use:
    T_USE T_ID T_NEWLINE
    {
       $$ = new ast::node::Use();
-      $$->set_value($2, strlen($2));
-      $$->set_position(new fs::position::Range(@1, @3));
+      $$->sValue($2, strlen($2));
+      $$->sPosition(new fs::position::Range(@1, @3));
       free($2);
    }
 /*
@@ -212,9 +212,9 @@ class_declaration:
    {
       ast::node::Class* cls = new ast::node::Class();
 
-      cls->set_value($2->_value);
+      cls->sValue($2->_value);
       cls->eat($3);
-      cls->set_position(new fs::position::Range(@1, @3));
+      cls->sPosition(new fs::position::Range(@1, @3));
       delete $2;
       delete $3;
       $$ = cls;
@@ -223,10 +223,10 @@ class_declaration:
    {
       ast::node::Class* cls = new ast::node::Class();
 
-      cls->set_value($2->_value);
+      cls->sValue($2->_value);
       cls->eat($5);
-      cls->push_child($4);
-      cls->set_position(new fs::position::Range(@1, @3));
+      cls->pushChild($4);
+      cls->sPosition(new fs::position::Range(@1, @3));
       delete $2;
       delete $5;
       $$ = cls;
@@ -242,29 +242,29 @@ if:
    T_IF expr block
    {
       $$ = new ast::node::Node(MEM_NODE_IF);
-      $$->push_children($2, $3);
-      $$->set_position(new fs::position::Range(@1, @2));
+      $$->pushChildren($2, $3);
+      $$->sPosition(new fs::position::Range(@1, @2));
    }
    | T_IF expr block T_ELSE block
    {
       $$ = new ast::node::Node(MEM_NODE_IF_ELSE);
-      $$->push_children($2, $3, $5);
-      $$->set_position(new fs::position::Range(@1, @5));
+      $$->pushChildren($2, $3, $5);
+      $$->sPosition(new fs::position::Range(@1, @5));
    }
 
 while:
    T_WHILE expr block
    {
       $$ = new ast::node::Node(MEM_NODE_WHILE);
-      $$->push_children($2, $3);
-      $$->set_position(new fs::position::Range(@1, @3));
+      $$->pushChildren($2, $3);
+      $$->sPosition(new fs::position::Range(@1, @3));
    }
 
 block:
    T_NEWLINE T_INDENT statements T_DEDENT
    {
       $$ = new ast::node::Block();
-      $$->set_position(new fs::position::Range(@3, @3));
+      $$->sPosition(new fs::position::Range(@3, @3));
       $$->eat($3);
       delete $3;
    }
@@ -273,7 +273,7 @@ statements:
    statement
    {
       $$ = new ast::node::Node();
-      $$->push_child($1);
+      $$->pushChild($1);
    }
    | statements statement
    {
@@ -281,7 +281,7 @@ statements:
       {
          $$ = new ast::node::Node();
       }
-      $$->push_child($2);
+      $$->pushChild($2);
    }
 
 statement:
@@ -310,7 +310,7 @@ return_statement:
    T_RETURN expr
    {
       $$ = new ast::node::Node(MEM_NODE_RETURN);
-      $$->push_child($2);
+      $$->pushChild($2);
    }
 
 top_level_statement:
@@ -325,11 +325,11 @@ top_level_statements:
    top_level_statement
    {
       $$ = new ast::node::Node();
-      $$->push_child($1);
+      $$->pushChild($1);
    }
    | top_level_statements top_level_statement
    {
-      $$->push_child($2);
+      $$->pushChild($2);
    }
 
 function_name:
@@ -342,9 +342,9 @@ function_declaration:
    function_name T_OP T_CP T_RARR type_name T_NEWLINE
    {
       ast::node::Function* n = new ast::node::Function();
-      n->set_value($1, strlen($1));
-      n->push_child($5);
-      n->set_position(@$.copy_range());
+      n->sValue($1, strlen($1));
+      n->pushChild($5);
+      n->sPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
 
       free($1);
@@ -353,14 +353,14 @@ function_declaration:
    // Ex: my_function_name(my_variable :my_type) :my_return_type
    | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name T_NEWLINE
    {
-      $3->set_position(new fs::position::Range(
-         *($3->get_child(0)->_position),
-         *($3->get_child($3->_child_count-1)->_position)));
+      $3->sPosition(new fs::position::Range(
+         *($3->getChild(0)->_position),
+         *($3->getChild($3->_child_count-1)->_position)));
 
       ast::node::Function* n = new ast::node::Function();
-      n->set_value($1, strlen($1));
-      n->push_children($3, $6);
-      n->set_position(@$.copy_range());
+      n->sValue($1, strlen($1));
+      n->pushChildren($3, $6);
+      n->sPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
 
       free($1);
@@ -369,9 +369,9 @@ function_declaration:
    | function_name T_OP T_CP T_RARR type_name block
    {
       ast::node::Function* n = new ast::node::Function();
-      n->set_value($1, strlen($1));
-      n->push_children($5, $6);
-      n->set_position(@$.copy_range());
+      n->sValue($1, strlen($1));
+      n->pushChildren($5, $6);
+      n->sPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
 
       free($1);
@@ -379,13 +379,13 @@ function_declaration:
    // Ex: my_function_name(my_variable :my_type) :my_return_type
    | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name block
    {
-      $3->set_position(new fs::position::Range(
-         *($3->get_child(0)->_position),
-         *($3->get_child($3->_child_count-1)->_position)));
+      $3->sPosition(new fs::position::Range(
+         *($3->getChild(0)->_position),
+         *($3->getChild($3->_child_count-1)->_position)));
       ast::node::Function* n = new ast::node::Function();
-      n->set_value($1, strlen($1));
-      n->push_children($3, $6, $7);
-      n->set_position(@$.copy_range());
+      n->sValue($1, strlen($1));
+      n->pushChildren($3, $6, $7);
+      n->sPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
 
       free($1);
@@ -396,8 +396,8 @@ member_declaration:
    id T_SEMICOLON type_name T_NEWLINE
    {
       ast::node::Field* field = new ast::node::Field();
-      field->set_position(@$.copy_range());
-      field->push_children($1, $3);
+      field->sPosition(@$.copy_range());
+      field->pushChildren($1, $3);
 
       $$ = (ast::node::Node*)field;
    }
@@ -406,19 +406,19 @@ function_declaration_parameter_list:
    function_declaration_parameter
    {
       $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETERS);
-      $$->push_child($1);
+      $$->pushChild($1);
    }
    | function_declaration_parameter_list T_COMMA function_declaration_parameter
    {
-      $$->push_child($3);
+      $$->pushChild($3);
    }
 
 function_declaration_parameter:
    id T_SEMICOLON type_name
    {
       $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETER);
-      $$->push_children($1, $3);
-      $$->set_position(new fs::position::Range(@1, @3));
+      $$->pushChildren($1, $3);
+      $$->sPosition(new fs::position::Range(@1, @3));
    }
 
 type_name :
@@ -432,26 +432,26 @@ variable_declaration :
    id T_SEMICOLON type_name T_NEWLINE
    {
       ast::node::VarDecl* n = new ast::node::VarDecl();
-      n->set_position(@$.copy_range());
-      n->push_children($1, $3);
+      n->sPosition(@$.copy_range());
+      n->pushChildren($1, $3);
       $$ = (ast::node::Node*)n;
    }
    // Ex: my_variable := my_function()
    | id T_SEMICOLON T_EQ expr T_NEWLINE
    {
       ast::node::Text* type = new ast::node::Text(MEM_NODE_ID);
-      type->set_value("$AUTO");
+      type->sValue("$AUTO");
 
       ast::node::VarDecl* n = new ast::node::VarDecl();
-      n->push_children($1, type, $4);
+      n->pushChildren($1, type, $4);
       $$ = (ast::node::Node*)n;
    }
    // Ex: my_variable :my_type = my_function()
    | id T_SEMICOLON type_name T_EQ expr T_NEWLINE
    {
       ast::node::VarDecl* n = new ast::node::VarDecl();
-      n->set_position(@$.copy_range());
-      n->push_children($1, $3, $5);
+      n->sPosition(@$.copy_range());
+      n->pushChildren($1, $3, $5);
       $$ = (ast::node::Node*)n;
    }
 
@@ -459,8 +459,8 @@ id :
    T_ID
    {
       $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->set_position(@$.copy_range());
-      $$->set_value($1, strlen($1));
+      $$->sPosition(@$.copy_range());
+      $$->sValue($1, strlen($1));
 
       free($1);
    }
@@ -473,16 +473,16 @@ qualified_id :
    | qualified_id T_DOT id
    {
       $$ = new ast::node::Text(MEM_NODE_DOT);
-      $$->push_children($1, $3);
-      $$->set_position(@$.copy_range());
+      $$->pushChildren($1, $3);
+      $$->sPosition(@$.copy_range());
    }
 
 dot_expr :
    expr T_DOT id
    {
       $$ = new ast::node::Node(MEM_NODE_DOT);
-      $$->set_position(@$.copy_range());
-      $$->push_children($1, $3);
+      $$->sPosition(@$.copy_range());
+      $$->pushChildren($1, $3);
    }
 
 expr :
@@ -506,7 +506,7 @@ expr :
    | T_OP expr T_CP
    {
       $$ = new ast::node::Node(MEM_NODE_GROUP);
-      $$->push_child($2);
+      $$->pushChild($2);
    }
    | qualified_id
    {
@@ -521,101 +521,101 @@ binary_operator:
    T_DIV
    {
       $$ = new ast::node::Text();
-      $$->set_value("__div__", 7);
+      $$->sValue("__div__", 7);
    }
    | T_EQ_EQ
    {
       $$ = new ast::node::Text();
-      $$->set_value("__equals__", 10);
+      $$->sValue("__equals__", 10);
    }
    | T_LT
    {
       $$ = new ast::node::Text();
-      $$->set_value("__lt__", 6);
+      $$->sValue("__lt__", 6);
    }
    | T_LARR_EQ
    {
       $$ = new ast::node::Text();
-      $$->set_value("__lte__", 7);
+      $$->sValue("__lte__", 7);
    }
    | T_MINUS
    {
       $$ = new ast::node::Text();
-      $$->set_value("__minus__", 9);
+      $$->sValue("__minus__", 9);
    }
    | T_MODULO
    {
       $$ = new ast::node::Text();
-      $$->set_value("__modulo__", 10);
+      $$->sValue("__modulo__", 10);
    }
    | T_MUL
    {
       $$ = new ast::node::Text();
-      $$->set_value("__mul__", 7);
+      $$->sValue("__mul__", 7);
    }
    | T_MUL_MUL
    {
       $$ = new ast::node::Text();
-      $$->set_value("__pow__", 7);
+      $$->sValue("__pow__", 7);
    }
    | T_PLUS
    {
       $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->set_value("__plus__", 8);
+      $$->sValue("__plus__", 8);
    }
    | T_GT
    {
       $$ = new ast::node::Text();
-      $$->set_value("__gt__", 6);
+      $$->sValue("__gt__", 6);
    }
    | T_RARR_EQ
    {
       $$ = new ast::node::Text();
-      $$->set_value("__gte__", 7);
+      $$->sValue("__gte__", 7);
    }
 
 left_unary_operator:
    T_BANG
    {
       $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->set_value("__bang__");
+      $$->sValue("__bang__");
    }
    | T_MINUS_MINUS
    {
       $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->set_value("__minus_minus__");
+      $$->sValue("__minus_minus__");
    }
    | T_PLUS_PLUS
    {
       $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->set_value("__plus_plus__");
+      $$->sValue("__plus_plus__");
    }
 
 binary_expr:
    expr binary_operator expr
    {
       ast::node::Node* func = new ast::node::Node(MEM_NODE_DOT);
-      func->push_children($1, $2);
+      func->pushChildren($1, $2);
 
       $$ = new ast::node::Text(MEM_NODE_CALL);
-      $$->push_children(func, $3);
+      $$->pushChildren(func, $3);
    }
 
 left_unary_expr:
    left_unary_operator expr
    {
       ast::node::Node* func = new ast::node::Node(MEM_NODE_DOT);
-      func->push_child ($2);
+      func->pushChild ($2);
 
       $$ = new ast::node::Text(MEM_NODE_CALL);
-      $$->push_child(func);
+      $$->pushChild(func);
    }
 
 expr_list :
    expr
    {
       $$ = new ast::node::Node(MEM_NODE_EXPR_LIST);
-      $$->push_child($1);
+      $$->pushChild($1);
    }
    | expr_list T_COMMA expr
    {
@@ -623,7 +623,7 @@ expr_list :
       {
          $$ = new ast::node::Node(MEM_NODE_EXPR_LIST);
       }
-      $$->push_child($3);
+      $$->pushChild($3);
    }
 
 call :
@@ -631,24 +631,24 @@ call :
    expr T_OP T_CP
    {
       $$ = new ast::node::Node(MEM_NODE_CALL);
-      $$->set_position(new fs::position::Range(@1, @3));
-      $$->push_child($1);
+      $$->sPosition(new fs::position::Range(@1, @3));
+      $$->pushChild($1);
    }
    /* ex: my_func(1, 2, 3) */
    | expr T_OP expr_list T_CP
    {
-      $3->set_position(@3.copy_range());
+      $3->sPosition(@3.copy_range());
       $$ = new ast::node::Node(MEM_NODE_CALL);
-      $$->set_position(new fs::position::Range(@1, @4));
-      $$->push_children($1, $3);
+      $$->sPosition(new fs::position::Range(@1, @4));
+      $$->pushChildren($1, $3);
    }
 
 literal :
    T_LITERAL_INT
    {
       $$ = new ast::node::Text(MEM_NODE_LITERAL_INT);
-      $$->set_position(@1.copy_range());
-      $$->set_value($1);
+      $$->sPosition(@1.copy_range());
+      $$->sValue($1);
 
       free($1);
    }

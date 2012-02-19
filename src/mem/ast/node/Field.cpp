@@ -12,7 +12,7 @@ Field::Field ()
 std::string
 Field::get_type_name ()
 {
-   node::Type* type = static_cast<node::Type*>(this->get_child(1));
+   node::Type* type = static_cast<node::Type*>(this->getChild(1));
    return type->_value;
 }
 

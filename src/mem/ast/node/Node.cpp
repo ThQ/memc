@@ -80,7 +80,7 @@ Node::eat (Node* n)
 }
 
 Node*
-Node::get_child (unsigned int i)
+Node::getChild (unsigned int i)
 {
    Node* res = this->_first_child;
    for(unsigned int j = 0; j < i && res != NULL; ++j)
@@ -97,7 +97,7 @@ Node::get_type_name (unsigned int type)
 }
 
 bool
-Node::is_text ()
+Node::isText ()
 {
    switch (this->_type)
    {
@@ -112,7 +112,7 @@ Node::is_text ()
 }
 
 void
-Node::push_child (Node* n)
+Node::pushChild (Node* n)
 {
    if (n != NULL)
    {
@@ -127,25 +127,25 @@ Node::push_child (Node* n)
       n->_parent = this;
       n->_prev = this->_last_child;
       this->_last_child = n;
-      n->set_depth(this->_depth + 1);
+      n->sDepth(this->_depth + 1);
       ++this->_child_count;
    }
 }
 
 void
-Node::set_depth (unsigned long depth)
+Node::sDepth (unsigned long depth)
 {
    this->_depth = depth;
    Node* node = this->_first_child;
    while (node != 0)
    {
-      node->set_depth(depth + 1);
+      node->sDepth(depth + 1);
       node = node->_next;
    }
 }
 
 void
-Node::set_position(fs::position::Range* pos)
+Node::sPosition(fs::position::Range* pos)
 {
    assert(pos != NULL);
    this->_position = pos;

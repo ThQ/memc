@@ -74,7 +74,7 @@ void
 Logger::log (MessageLevel level, const char* message)
 {
    Message* msg = new Message(level);
-   msg->set_message(message);
+   msg->sMessage(message);
    this->log(msg);
 }
 
@@ -85,7 +85,7 @@ Logger::log (MessageLevel level, const char* format, va_list varg)
    vsprintf(fmsg, format, varg);
 
    Message* msg = new Message(level);
-   msg->set_message(fmsg);
+   msg->sMessage(fmsg);
    this->log(msg);
 
    delete[] fmsg;

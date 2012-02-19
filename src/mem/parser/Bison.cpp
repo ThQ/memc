@@ -265,9 +265,9 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
    pos->_file = file;
 
    log::Message* msg = new log::Message(log::ERROR);
-   msg->set_message("Syntax error");
-   msg->set_description(s);
-   msg->set_position(pos);
+   msg->sMessage("Syntax error");
+   msg->sDescription(s);
+   msg->sPosition(pos);
    logger.log(msg);
 }
 
@@ -1735,7 +1735,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 176 "src/mem/grammar/mem.y"
     {
-      ast->push_child((yyvsp[(2) - (2)].text_node));
+      ast->pushChild((yyvsp[(2) - (2)].text_node));
    }
     break;
 
@@ -1744,7 +1744,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 180 "src/mem/grammar/mem.y"
     {
-      ast->push_child((yyvsp[(2) - (2)].node));
+      ast->pushChild((yyvsp[(2) - (2)].node));
    }
     break;
 
@@ -1754,8 +1754,8 @@ yyreduce:
 #line 187 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Use();
-      (yyval.text_node)->set_value((yyvsp[(2) - (3)].text), strlen((yyvsp[(2) - (3)].text)));
-      (yyval.text_node)->set_position(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
+      (yyval.text_node)->sValue((yyvsp[(2) - (3)].text), strlen((yyvsp[(2) - (3)].text)));
+      (yyval.text_node)->sPosition(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
       free((yyvsp[(2) - (3)].text));
    }
     break;
@@ -1778,9 +1778,9 @@ yyreduce:
     {
       ast::node::Class* cls = new ast::node::Class();
 
-      cls->set_value((yyvsp[(2) - (3)].text_node)->_value);
+      cls->sValue((yyvsp[(2) - (3)].text_node)->_value);
       cls->eat((yyvsp[(3) - (3)].node));
-      cls->set_position(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
+      cls->sPosition(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
       delete (yyvsp[(2) - (3)].text_node);
       delete (yyvsp[(3) - (3)].node);
       (yyval.node) = cls;
@@ -1794,10 +1794,10 @@ yyreduce:
     {
       ast::node::Class* cls = new ast::node::Class();
 
-      cls->set_value((yyvsp[(2) - (5)].text_node)->_value);
+      cls->sValue((yyvsp[(2) - (5)].text_node)->_value);
       cls->eat((yyvsp[(5) - (5)].node));
-      cls->push_child((yyvsp[(4) - (5)].text_node));
-      cls->set_position(new fs::position::Range((yylsp[(1) - (5)]), (yylsp[(3) - (5)])));
+      cls->pushChild((yyvsp[(4) - (5)].text_node));
+      cls->sPosition(new fs::position::Range((yylsp[(1) - (5)]), (yylsp[(3) - (5)])));
       delete (yyvsp[(2) - (5)].text_node);
       delete (yyvsp[(5) - (5)].node);
       (yyval.node) = cls;
@@ -1810,8 +1810,8 @@ yyreduce:
 #line 243 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_IF);
-      (yyval.node)->push_children((yyvsp[(2) - (3)].node), (yyvsp[(3) - (3)].node));
-      (yyval.node)->set_position(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(2) - (3)])));
+      (yyval.node)->pushChildren((yyvsp[(2) - (3)].node), (yyvsp[(3) - (3)].node));
+      (yyval.node)->sPosition(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(2) - (3)])));
    }
     break;
 
@@ -1821,8 +1821,8 @@ yyreduce:
 #line 249 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_IF_ELSE);
-      (yyval.node)->push_children((yyvsp[(2) - (5)].node), (yyvsp[(3) - (5)].node), (yyvsp[(5) - (5)].node));
-      (yyval.node)->set_position(new fs::position::Range((yylsp[(1) - (5)]), (yylsp[(5) - (5)])));
+      (yyval.node)->pushChildren((yyvsp[(2) - (5)].node), (yyvsp[(3) - (5)].node), (yyvsp[(5) - (5)].node));
+      (yyval.node)->sPosition(new fs::position::Range((yylsp[(1) - (5)]), (yylsp[(5) - (5)])));
    }
     break;
 
@@ -1832,8 +1832,8 @@ yyreduce:
 #line 257 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_WHILE);
-      (yyval.node)->push_children((yyvsp[(2) - (3)].node), (yyvsp[(3) - (3)].node));
-      (yyval.node)->set_position(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
+      (yyval.node)->pushChildren((yyvsp[(2) - (3)].node), (yyvsp[(3) - (3)].node));
+      (yyval.node)->sPosition(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
    }
     break;
 
@@ -1843,7 +1843,7 @@ yyreduce:
 #line 265 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Block();
-      (yyval.node)->set_position(new fs::position::Range((yylsp[(3) - (4)]), (yylsp[(3) - (4)])));
+      (yyval.node)->sPosition(new fs::position::Range((yylsp[(3) - (4)]), (yylsp[(3) - (4)])));
       (yyval.node)->eat((yyvsp[(3) - (4)].node));
       delete (yyvsp[(3) - (4)].node);
    }
@@ -1855,7 +1855,7 @@ yyreduce:
 #line 274 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node();
-      (yyval.node)->push_child((yyvsp[(1) - (1)].node));
+      (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
    }
     break;
 
@@ -1868,7 +1868,7 @@ yyreduce:
       {
          (yyval.node) = new ast::node::Node();
       }
-      (yyval.node)->push_child((yyvsp[(2) - (2)].node));
+      (yyval.node)->pushChild((yyvsp[(2) - (2)].node));
    }
     break;
 
@@ -1905,7 +1905,7 @@ yyreduce:
 #line 311 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_RETURN);
-      (yyval.node)->push_child((yyvsp[(2) - (2)].node));
+      (yyval.node)->pushChild((yyvsp[(2) - (2)].node));
    }
     break;
 
@@ -1924,7 +1924,7 @@ yyreduce:
 #line 326 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node();
-      (yyval.node)->push_child((yyvsp[(1) - (1)].node));
+      (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
    }
     break;
 
@@ -1933,7 +1933,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 331 "src/mem/grammar/mem.y"
     {
-      (yyval.node)->push_child((yyvsp[(2) - (2)].node));
+      (yyval.node)->pushChild((yyvsp[(2) - (2)].node));
    }
     break;
 
@@ -1943,9 +1943,9 @@ yyreduce:
 #line 343 "src/mem/grammar/mem.y"
     {
       ast::node::Function* n = new ast::node::Function();
-      n->set_value((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
-      n->push_child((yyvsp[(5) - (6)].node));
-      n->set_position((yyloc).copy_range());
+      n->sValue((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
+      n->pushChild((yyvsp[(5) - (6)].node));
+      n->sPosition((yyloc).copy_range());
       (yyval.node) = (ast::node::Node*)n;
 
       free((yyvsp[(1) - (6)].text));
@@ -1957,14 +1957,14 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 355 "src/mem/grammar/mem.y"
     {
-      (yyvsp[(3) - (7)].node)->set_position(new fs::position::Range(
-         *((yyvsp[(3) - (7)].node)->get_child(0)->_position),
-         *((yyvsp[(3) - (7)].node)->get_child((yyvsp[(3) - (7)].node)->_child_count-1)->_position)));
+      (yyvsp[(3) - (7)].node)->sPosition(new fs::position::Range(
+         *((yyvsp[(3) - (7)].node)->getChild(0)->_position),
+         *((yyvsp[(3) - (7)].node)->getChild((yyvsp[(3) - (7)].node)->_child_count-1)->_position)));
 
       ast::node::Function* n = new ast::node::Function();
-      n->set_value((yyvsp[(1) - (7)].text), strlen((yyvsp[(1) - (7)].text)));
-      n->push_children((yyvsp[(3) - (7)].node), (yyvsp[(6) - (7)].node));
-      n->set_position((yyloc).copy_range());
+      n->sValue((yyvsp[(1) - (7)].text), strlen((yyvsp[(1) - (7)].text)));
+      n->pushChildren((yyvsp[(3) - (7)].node), (yyvsp[(6) - (7)].node));
+      n->sPosition((yyloc).copy_range());
       (yyval.node) = (ast::node::Node*)n;
 
       free((yyvsp[(1) - (7)].text));
@@ -1977,9 +1977,9 @@ yyreduce:
 #line 370 "src/mem/grammar/mem.y"
     {
       ast::node::Function* n = new ast::node::Function();
-      n->set_value((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
-      n->push_children((yyvsp[(5) - (6)].node), (yyvsp[(6) - (6)].node));
-      n->set_position((yyloc).copy_range());
+      n->sValue((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
+      n->pushChildren((yyvsp[(5) - (6)].node), (yyvsp[(6) - (6)].node));
+      n->sPosition((yyloc).copy_range());
       (yyval.node) = (ast::node::Node*)n;
 
       free((yyvsp[(1) - (6)].text));
@@ -1991,13 +1991,13 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 381 "src/mem/grammar/mem.y"
     {
-      (yyvsp[(3) - (7)].node)->set_position(new fs::position::Range(
-         *((yyvsp[(3) - (7)].node)->get_child(0)->_position),
-         *((yyvsp[(3) - (7)].node)->get_child((yyvsp[(3) - (7)].node)->_child_count-1)->_position)));
+      (yyvsp[(3) - (7)].node)->sPosition(new fs::position::Range(
+         *((yyvsp[(3) - (7)].node)->getChild(0)->_position),
+         *((yyvsp[(3) - (7)].node)->getChild((yyvsp[(3) - (7)].node)->_child_count-1)->_position)));
       ast::node::Function* n = new ast::node::Function();
-      n->set_value((yyvsp[(1) - (7)].text), strlen((yyvsp[(1) - (7)].text)));
-      n->push_children((yyvsp[(3) - (7)].node), (yyvsp[(6) - (7)].node), (yyvsp[(7) - (7)].node));
-      n->set_position((yyloc).copy_range());
+      n->sValue((yyvsp[(1) - (7)].text), strlen((yyvsp[(1) - (7)].text)));
+      n->pushChildren((yyvsp[(3) - (7)].node), (yyvsp[(6) - (7)].node), (yyvsp[(7) - (7)].node));
+      n->sPosition((yyloc).copy_range());
       (yyval.node) = (ast::node::Node*)n;
 
       free((yyvsp[(1) - (7)].text));
@@ -2010,8 +2010,8 @@ yyreduce:
 #line 397 "src/mem/grammar/mem.y"
     {
       ast::node::Field* field = new ast::node::Field();
-      field->set_position((yyloc).copy_range());
-      field->push_children((yyvsp[(1) - (4)].text_node), (yyvsp[(3) - (4)].node));
+      field->sPosition((yyloc).copy_range());
+      field->pushChildren((yyvsp[(1) - (4)].text_node), (yyvsp[(3) - (4)].node));
 
       (yyval.node) = (ast::node::Node*)field;
    }
@@ -2023,7 +2023,7 @@ yyreduce:
 #line 407 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETERS);
-      (yyval.node)->push_child((yyvsp[(1) - (1)].node));
+      (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
    }
     break;
 
@@ -2032,7 +2032,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 412 "src/mem/grammar/mem.y"
     {
-      (yyval.node)->push_child((yyvsp[(3) - (3)].node));
+      (yyval.node)->pushChild((yyvsp[(3) - (3)].node));
    }
     break;
 
@@ -2042,8 +2042,8 @@ yyreduce:
 #line 418 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETER);
-      (yyval.node)->push_children((yyvsp[(1) - (3)].text_node), (yyvsp[(3) - (3)].node));
-      (yyval.node)->set_position(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
+      (yyval.node)->pushChildren((yyvsp[(1) - (3)].text_node), (yyvsp[(3) - (3)].node));
+      (yyval.node)->sPosition(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
    }
     break;
 
@@ -2062,8 +2062,8 @@ yyreduce:
 #line 433 "src/mem/grammar/mem.y"
     {
       ast::node::VarDecl* n = new ast::node::VarDecl();
-      n->set_position((yyloc).copy_range());
-      n->push_children((yyvsp[(1) - (4)].text_node), (yyvsp[(3) - (4)].node));
+      n->sPosition((yyloc).copy_range());
+      n->pushChildren((yyvsp[(1) - (4)].text_node), (yyvsp[(3) - (4)].node));
       (yyval.node) = (ast::node::Node*)n;
    }
     break;
@@ -2074,10 +2074,10 @@ yyreduce:
 #line 441 "src/mem/grammar/mem.y"
     {
       ast::node::Text* type = new ast::node::Text(MEM_NODE_ID);
-      type->set_value("$AUTO");
+      type->sValue("$AUTO");
 
       ast::node::VarDecl* n = new ast::node::VarDecl();
-      n->push_children((yyvsp[(1) - (5)].text_node), type, (yyvsp[(4) - (5)].node));
+      n->pushChildren((yyvsp[(1) - (5)].text_node), type, (yyvsp[(4) - (5)].node));
       (yyval.node) = (ast::node::Node*)n;
    }
     break;
@@ -2088,8 +2088,8 @@ yyreduce:
 #line 451 "src/mem/grammar/mem.y"
     {
       ast::node::VarDecl* n = new ast::node::VarDecl();
-      n->set_position((yyloc).copy_range());
-      n->push_children((yyvsp[(1) - (6)].text_node), (yyvsp[(3) - (6)].node), (yyvsp[(5) - (6)].node));
+      n->sPosition((yyloc).copy_range());
+      n->pushChildren((yyvsp[(1) - (6)].text_node), (yyvsp[(3) - (6)].node), (yyvsp[(5) - (6)].node));
       (yyval.node) = (ast::node::Node*)n;
    }
     break;
@@ -2100,8 +2100,8 @@ yyreduce:
 #line 460 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
-      (yyval.text_node)->set_position((yyloc).copy_range());
-      (yyval.text_node)->set_value((yyvsp[(1) - (1)].text), strlen((yyvsp[(1) - (1)].text)));
+      (yyval.text_node)->sPosition((yyloc).copy_range());
+      (yyval.text_node)->sValue((yyvsp[(1) - (1)].text), strlen((yyvsp[(1) - (1)].text)));
 
       free((yyvsp[(1) - (1)].text));
    }
@@ -2122,8 +2122,8 @@ yyreduce:
 #line 474 "src/mem/grammar/mem.y"
     {
       (yyval.binary_node) = new ast::node::Text(MEM_NODE_DOT);
-      (yyval.binary_node)->push_children((yyvsp[(1) - (3)].binary_node), (yyvsp[(3) - (3)].text_node));
-      (yyval.binary_node)->set_position((yyloc).copy_range());
+      (yyval.binary_node)->pushChildren((yyvsp[(1) - (3)].binary_node), (yyvsp[(3) - (3)].text_node));
+      (yyval.binary_node)->sPosition((yyloc).copy_range());
    }
     break;
 
@@ -2133,8 +2133,8 @@ yyreduce:
 #line 482 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_DOT);
-      (yyval.node)->set_position((yyloc).copy_range());
-      (yyval.node)->push_children((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].text_node));
+      (yyval.node)->sPosition((yyloc).copy_range());
+      (yyval.node)->pushChildren((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].text_node));
    }
     break;
 
@@ -2180,7 +2180,7 @@ yyreduce:
 #line 507 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_GROUP);
-      (yyval.node)->push_child((yyvsp[(2) - (3)].node));
+      (yyval.node)->pushChild((yyvsp[(2) - (3)].node));
    }
     break;
 
@@ -2208,7 +2208,7 @@ yyreduce:
 #line 522 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__div__", 7);
+      (yyval.text_node)->sValue("__div__", 7);
    }
     break;
 
@@ -2218,7 +2218,7 @@ yyreduce:
 #line 527 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__equals__", 10);
+      (yyval.text_node)->sValue("__equals__", 10);
    }
     break;
 
@@ -2228,7 +2228,7 @@ yyreduce:
 #line 532 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__lt__", 6);
+      (yyval.text_node)->sValue("__lt__", 6);
    }
     break;
 
@@ -2238,7 +2238,7 @@ yyreduce:
 #line 537 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__lte__", 7);
+      (yyval.text_node)->sValue("__lte__", 7);
    }
     break;
 
@@ -2248,7 +2248,7 @@ yyreduce:
 #line 542 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__minus__", 9);
+      (yyval.text_node)->sValue("__minus__", 9);
    }
     break;
 
@@ -2258,7 +2258,7 @@ yyreduce:
 #line 547 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__modulo__", 10);
+      (yyval.text_node)->sValue("__modulo__", 10);
    }
     break;
 
@@ -2268,7 +2268,7 @@ yyreduce:
 #line 552 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__mul__", 7);
+      (yyval.text_node)->sValue("__mul__", 7);
    }
     break;
 
@@ -2278,7 +2278,7 @@ yyreduce:
 #line 557 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__pow__", 7);
+      (yyval.text_node)->sValue("__pow__", 7);
    }
     break;
 
@@ -2288,7 +2288,7 @@ yyreduce:
 #line 562 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
-      (yyval.text_node)->set_value("__plus__", 8);
+      (yyval.text_node)->sValue("__plus__", 8);
    }
     break;
 
@@ -2298,7 +2298,7 @@ yyreduce:
 #line 567 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__gt__", 6);
+      (yyval.text_node)->sValue("__gt__", 6);
    }
     break;
 
@@ -2308,7 +2308,7 @@ yyreduce:
 #line 572 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text();
-      (yyval.text_node)->set_value("__gte__", 7);
+      (yyval.text_node)->sValue("__gte__", 7);
    }
     break;
 
@@ -2318,7 +2318,7 @@ yyreduce:
 #line 579 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
-      (yyval.text_node)->set_value("__bang__");
+      (yyval.text_node)->sValue("__bang__");
    }
     break;
 
@@ -2328,7 +2328,7 @@ yyreduce:
 #line 584 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
-      (yyval.text_node)->set_value("__minus_minus__");
+      (yyval.text_node)->sValue("__minus_minus__");
    }
     break;
 
@@ -2338,7 +2338,7 @@ yyreduce:
 #line 589 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
-      (yyval.text_node)->set_value("__plus_plus__");
+      (yyval.text_node)->sValue("__plus_plus__");
    }
     break;
 
@@ -2348,10 +2348,10 @@ yyreduce:
 #line 596 "src/mem/grammar/mem.y"
     {
       ast::node::Node* func = new ast::node::Node(MEM_NODE_DOT);
-      func->push_children((yyvsp[(1) - (3)].node), (yyvsp[(2) - (3)].text_node));
+      func->pushChildren((yyvsp[(1) - (3)].node), (yyvsp[(2) - (3)].text_node));
 
       (yyval.node) = new ast::node::Text(MEM_NODE_CALL);
-      (yyval.node)->push_children(func, (yyvsp[(3) - (3)].node));
+      (yyval.node)->pushChildren(func, (yyvsp[(3) - (3)].node));
    }
     break;
 
@@ -2361,10 +2361,10 @@ yyreduce:
 #line 606 "src/mem/grammar/mem.y"
     {
       ast::node::Node* func = new ast::node::Node(MEM_NODE_DOT);
-      func->push_child ((yyvsp[(2) - (2)].node));
+      func->pushChild ((yyvsp[(2) - (2)].node));
 
       (yyval.text_node) = new ast::node::Text(MEM_NODE_CALL);
-      (yyval.text_node)->push_child(func);
+      (yyval.text_node)->pushChild(func);
    }
     break;
 
@@ -2374,7 +2374,7 @@ yyreduce:
 #line 616 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_EXPR_LIST);
-      (yyval.node)->push_child((yyvsp[(1) - (1)].node));
+      (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
    }
     break;
 
@@ -2387,7 +2387,7 @@ yyreduce:
       {
          (yyval.node) = new ast::node::Node(MEM_NODE_EXPR_LIST);
       }
-      (yyval.node)->push_child((yyvsp[(3) - (3)].node));
+      (yyval.node)->pushChild((yyvsp[(3) - (3)].node));
    }
     break;
 
@@ -2397,8 +2397,8 @@ yyreduce:
 #line 632 "src/mem/grammar/mem.y"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_CALL);
-      (yyval.node)->set_position(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
-      (yyval.node)->push_child((yyvsp[(1) - (3)].node));
+      (yyval.node)->sPosition(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
+      (yyval.node)->pushChild((yyvsp[(1) - (3)].node));
    }
     break;
 
@@ -2407,10 +2407,10 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 639 "src/mem/grammar/mem.y"
     {
-      (yyvsp[(3) - (4)].node)->set_position((yylsp[(3) - (4)]).copy_range());
+      (yyvsp[(3) - (4)].node)->sPosition((yylsp[(3) - (4)]).copy_range());
       (yyval.node) = new ast::node::Node(MEM_NODE_CALL);
-      (yyval.node)->set_position(new fs::position::Range((yylsp[(1) - (4)]), (yylsp[(4) - (4)])));
-      (yyval.node)->push_children((yyvsp[(1) - (4)].node), (yyvsp[(3) - (4)].node));
+      (yyval.node)->sPosition(new fs::position::Range((yylsp[(1) - (4)]), (yylsp[(4) - (4)])));
+      (yyval.node)->pushChildren((yyvsp[(1) - (4)].node), (yyvsp[(3) - (4)].node));
    }
     break;
 
@@ -2420,8 +2420,8 @@ yyreduce:
 #line 648 "src/mem/grammar/mem.y"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_LITERAL_INT);
-      (yyval.text_node)->set_position((yylsp[(1) - (1)]).copy_range());
-      (yyval.text_node)->set_value((yyvsp[(1) - (1)].text));
+      (yyval.text_node)->sPosition((yylsp[(1) - (1)]).copy_range());
+      (yyval.text_node)->sValue((yyvsp[(1) - (1)].text));
 
       free((yyvsp[(1) - (1)].text));
    }

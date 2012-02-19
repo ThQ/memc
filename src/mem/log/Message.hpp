@@ -24,30 +24,17 @@ class Message
    public: fs::position::Position* _position;
    public: std::string _source_line;
 
-   public: inline Message ()
-   {
-      this->_position = NULL;
-   }
-
-   public: inline Message (MessageLevel level)
-   {
-      this->_position = NULL;
-      this->set_level(level);
-   }
-
+   public: Message ();
+   public: Message (MessageLevel level);
    public: ~Message();
 
-   public: void format_description(const char* format, ...);
-   public: void format_message (const char* format, ...);
-   public: void set_description(const char* desc);
-   public: inline void set_description (std::string desc)
-   {
-      this->_description.assign(desc);
-   }
-
-   public: void set_level (MessageLevel level);
-   public: void set_message (const char* message);
-   public: void set_position (fs::position::Position* position);
+   public: void formatDescription(const char* format, ...);
+   public: void formatMessage (const char* format, ...);
+   public: void sDescription(const char* desc);
+   public: inline void sDescription (std::string desc) { this->_description.assign(desc); }
+   public: void sLevel (MessageLevel level);
+   public: void sMessage (const char* message);
+   public: void sPosition (fs::position::Position* position);
 };
 
 

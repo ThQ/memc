@@ -23,8 +23,8 @@ class Symbol
    public: Symbol* _last_child;
    public: std::string _name;
 
-   public: inline std::string g_name() {return this->_name;}
-   public: inline const char* g_name_cstr() {return this->_name.c_str();}
+   public: inline std::string gName() {return this->_name;}
+   public: inline const char* gNameCstr() {return this->_name.c_str();}
 
    public: Symbol* _parent;
    public: Symbol* _prev;
@@ -34,15 +34,15 @@ class Symbol
 
    public: Symbol ();
    public: virtual ~Symbol ();
-   public: bool add_child (Symbol* symb);
+   public: bool addChild (Symbol* symb);
    public: bool is (SymbolKind kind);
-   public: Symbol* get_child (std::string name);
-   public: virtual std::string get_qualified_name();
-   public: const char* g_qualified_name_cstr() { return this->get_qualified_name().c_str();}
+   public: Symbol* getChild (std::string name);
+   public: virtual std::string gQualifiedName();
+   public: const char* gQualifiedNameCstr() { return this->gQualifiedName().c_str();}
    //public: virtual void print ();
    //public: void print_depth ();
-   public: void set_name (char* name, size_t len);
-   public: void set_name (std::string name);
+   public: void sName (char* name, size_t len);
+   public: void sName (std::string name);
 };
 
 

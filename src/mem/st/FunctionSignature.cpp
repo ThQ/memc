@@ -9,13 +9,13 @@ FunctionSignature::FunctionSignature ()
 }
 
 std::string
-FunctionSignature::g_signature ()
+FunctionSignature::gSignature ()
 {
    std::string res = "";
    for (size_t i = 0 ; i < this->_params.size() ; ++i)
    {
       if (res != "") res += ", ";
-      res += this->_params[i]->get_qualified_name();
+      res += this->_params[i]->gQualifiedName();
    }
    res = this->_parent->_name + " (" + res + ")";
    return res;

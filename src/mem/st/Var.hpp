@@ -18,7 +18,7 @@ class Var : public Symbol
    public: Var (std::string name, Type* type);
    //public: virtual void print ();
 
-   public: void set_type (Symbol* type);
+   public: void sType (Symbol* type);
 };
 
 

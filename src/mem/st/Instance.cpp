@@ -15,7 +15,7 @@ Instance::get_qualified_name()
    std::string res = "InstanceOf(?)";
    if (this->_type != NULL)
    {
-      res = "InstanceOf(" + this->_type->get_qualified_name() + ")";
+      res = "InstanceOf(" + this->_type->gQualifiedName() + ")";
    }
    return res;
 }

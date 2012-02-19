@@ -16,33 +16,33 @@ XmlDumper::dump_node (node::Node* node, unsigned int level)
 {
    std::string dump = this->get_indent(level) + "<";
    dump += node::Node::get_type_name(node->_type);
-   if (node->is_text())
+   if (node->isText())
    {
       dump += " text=\"";
       dump += ((node::Text*)node)->_value;
       dump += "\"";
    }
 
-   if (node->_bound_type != NULL)
+   if (node->gBoundSymbol() != NULL)
    {
       dump += " bound_type=\"";
-      dump += node->_bound_type->get_qualified_name();
+      dump += node->gBoundSymbol()->gQualifiedName();
       dump += "\"";
    }
 
-   if (node->_exp_type != NULL)
+   if (node->gExprType() != NULL)
    {
       dump += " expr_type=\"";
-      dump += node->_exp_type->get_qualified_name();
+      dump += node->gExprType()->gQualifiedName();
       dump += "\"";
    }
 
-   if (node->has_children())
+   if (node->hasChildren())
    {
       dump += ">\n";
       for (unsigned int i = 0 ; i < node->_child_count ; ++i)
       {
-         dump += this->dump_node(node->get_child(i), level+1);
+         dump += this->dump_node(node->getChild(i), level+1);
       }
       dump += this->get_indent(level);
       dump += "</";
