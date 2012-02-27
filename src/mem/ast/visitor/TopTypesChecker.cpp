@@ -124,6 +124,30 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    {
       this->visitFuncParams(scope, func_params, func_sign_sym);
    }
+
+   // Try to find an overridden function
+   st::Class* parent_cls = static_cast<st::Class*>(static_cast<st::Class*>(scope)->_parent_type);
+   st::Func* older_func = NULL;
+   st::FunctionSignature* overridden_func = NULL;
+   std::map<std::string, st::Symbol*>::iterator i;
+
+   while (parent_cls != NULL)
+   {
+      older_func = static_cast<st::Func*>(parent_cls->getChild(func_sym->gName()));
+      if (older_func != NULL)
+      {
+         for (i=older_func->_children.begin() ; i != older_func->_children.end() ; ++i)
+         {
+            overridden_func = static_cast<st::FunctionSignature*>(i->second);
+            if (func_sign_sym->canOverride(overridden_func))
+            {
+               func_sign_sym->sOverriddenFunc(overridden_func);
+               break;
+            }
+         }
+      }
+      parent_cls = static_cast<st::Class*>(parent_cls->_parent_type);
+   }
 }
 
 void

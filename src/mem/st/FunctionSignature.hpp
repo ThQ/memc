@@ -10,11 +10,17 @@ namespace mem { namespace st {
 
 class FunctionSignature : public Type
 {
-   public: std::vector<Symbol*> _params;
+   public:
+      FunctionSignature* _overridden_func;
+      std::vector<Symbol*> _params;
 
-   public: FunctionSignature ();
+   public:
+      FunctionSignature ();
+      bool canOverride (FunctionSignature* func_sign);
+      inline FunctionSignature* gOverriddenFunc() {return this->_overridden_func;}
+      inline void sOverriddenFunc(FunctionSignature* func) {assert(func!=this);this->_overridden_func = func;}
 
-   public: std::string gSignature();
+      std::string gSignature();
 
 };
 

@@ -54,16 +54,21 @@ BlockTypesChecker::pickFuncSign (st::Func* func_sym, node::Node* call_node,
    std::map<std::string, st::Symbol*>::iterator i;
    st::FunctionSignature* sig_sym = NULL;
 
-   for (i=func_sym->_children.begin(); i != func_sym->_children.end(); ++i)
+   st::Func* cur_func_sym = func_sym;
+   while (cur_func_sym != NULL)
    {
-      if (i->second->is(st::FUNCTION_SIGNATURE))
+      for (i=cur_func_sym->_children.begin(); i != cur_func_sym->_children.end(); ++i)
       {
-         sig_sym = static_cast<st::FunctionSignature*>(i->second);
-         if (this->isCompatibleFuncSign(sig_sym, params_node))
+         if (i->second->is(st::FUNCTION_SIGNATURE))
          {
-            compat_sigs.push_back(sig_sym);
+            sig_sym = static_cast<st::FunctionSignature*>(i->second);
+            if (this->isCompatibleFuncSign(sig_sym, params_node))
+            {
+               compat_sigs.push_back(sig_sym);
+            }
          }
       }
+      cur_func_sym = static_cast<st::Func*>(cur_func_sym->_parent);
    }
 
    // @TODO Can be more precise, think type precision
@@ -84,6 +89,7 @@ BlockTypesChecker::pickFuncSign (st::Func* func_sym, node::Node* call_node,
             }
             if (params_node->getChild(i)->hasExprType())
             {
+               func_sig += ":";
                func_sig += params_node->getChild(i)->gExprType()->gQualifiedName();
             }
             else

@@ -53,27 +53,40 @@ TextDumper::dump_symbol (st::Symbol* sym, int level)
          res += depth + "</Namespace>";
          break;
       case FUNCTION:
+      {
+         st::Func* func = static_cast<st::Func*>(sym);
+
          res += "<Function";
-         res += " name=\"" + sym->_name + "\"";
-         if (((st::Func*)sym)->gReturnType() != NULL)
+         res += " name=\"" + func->gName() + "\"";
+         if (func->gReturnType() != NULL)
          {
-            res += " return_type=\"" + ((st::Func*)sym)->gReturnType()->gQualifiedName() + "\"";
+            res += " return_type=\"" + func->gReturnType()->gQualifiedName() + "\"";
          }
          res += ">\n";
-         res += this->dump_children(sym, level+1);
+         res += this->dump_children(func, level+1);
          res += depth + "</Function>";
+      }
          break;
+
       case FUNCTION_SIGNATURE:
+      {
+         st::FunctionSignature* func_sign = static_cast<st::FunctionSignature*>(sym);
+
          res += "<FunctionSignature";
-         res += " name=\"" + sym->_name + "\"";
-         if (((st::Func*)sym->_parent)->gReturnType() != NULL)
+         res += " name=\"" + func_sign->_name + "\"";
+         if (func_sign->gOverriddenFunc() != NULL)
          {
-            res += " return_type=\"" + ((st::Func*)sym->_parent)->gReturnType()->gQualifiedName() + "\"";
+            res += " override=\"" + func_sign->gOverriddenFunc()->gQualifiedName() + "\"";
+         }
+         if (static_cast<st::Func*>(func_sign->_parent)->gReturnType() != NULL)
+         {
+            res += " return_type=\"" + static_cast<st::Func*>(func_sign->_parent)->gReturnType()->gQualifiedName() + "\"";
          }
          res += ">\n";
-         res += this->dump_children(sym, level+1);
+         res += this->dump_children(func_sign, level+1);
          res += depth + "</FunctionSignature>";
-         break;
+      }
+      break;
 
       case CLASS:
          res += "<Class";
