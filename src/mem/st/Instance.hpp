@@ -3,7 +3,7 @@
 
 
 #include "mem/st/Type.hpp"
-
+/*
 
 namespace mem { namespace st {
 
@@ -20,5 +20,6 @@ class Instance : public Type
 
 
 } }
+*/
 
 #endif

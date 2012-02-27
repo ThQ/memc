@@ -34,13 +34,13 @@ class Symbol
 
    public: Symbol ();
    public: virtual ~Symbol ();
+
    public: bool addChild (Symbol* symb);
    public: bool is (SymbolKind kind);
+   public: bool isTypeSymbol ();
    public: Symbol* getChild (std::string name);
    public: virtual std::string gQualifiedName();
    public: const char* gQualifiedNameCstr() { return this->gQualifiedName().c_str();}
-   //public: virtual void print ();
-   //public: void print_depth ();
    public: void sName (char* name, size_t len);
    public: void sName (std::string name);
 };

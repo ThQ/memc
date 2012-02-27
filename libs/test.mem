@@ -7,16 +7,19 @@ class Blabla
 class A
    some_field :Blabla
 
-   zoinzoin () -> char
+   zoinzoin (t :bool) -> char
       1
 
 
 class B < A
-   p :char
+   p :bool
+
+   zoinzoin (t :bool) -> bool
+      1
 
 
 class C < B
-   __plus__ (t :C) -> char
+   __plus__ (t :C) -> bool
       1
 
    dude (t :C, b :bool) -> Blabla
@@ -25,7 +28,7 @@ class C < B
    fuck  (t :char) -> char
       pf :A = this
       while true
-         this.zoinzoin()
+         this.zoinzoin(true)
 
    dude (t :bool) -> Blabla
       1

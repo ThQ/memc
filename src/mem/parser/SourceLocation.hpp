@@ -1,6 +1,7 @@
 #ifndef MEM_PARSER_SOURCE_LOCATION_HPP
 #define MEM_PARSER_SOURCE_LOCATION_HPP
 
+/*
 namespace mem { namespace parser {
 
 
@@ -14,5 +15,6 @@ class SourceLocation
 
 
 } }
+*/
 
 #endif

@@ -119,7 +119,7 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
          str << "\n          |   ";
          for (size_t i = 1 ; i <= context_line.length() ; ++i)
          {
-            switch (pos->get_type_at(i))
+            switch (pos->getTypeAt(i))
             {
                case fs::position::NOTHING: str << " "; break;
                case fs::position::RANGE:   str << "-"; break;

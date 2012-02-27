@@ -55,7 +55,10 @@ TextDumper::dump_symbol (st::Symbol* sym, int level)
       case FUNCTION:
          res += "<Function";
          res += " name=\"" + sym->_name + "\"";
-         res += " return_type=\"" + ((st::Function*)sym)->_return_type->gQualifiedName() + "\"";
+         if (((st::Func*)sym)->gReturnType() != NULL)
+         {
+            res += " return_type=\"" + ((st::Func*)sym)->gReturnType()->gQualifiedName() + "\"";
+         }
          res += ">\n";
          res += this->dump_children(sym, level+1);
          res += depth + "</Function>";
@@ -63,7 +66,10 @@ TextDumper::dump_symbol (st::Symbol* sym, int level)
       case FUNCTION_SIGNATURE:
          res += "<FunctionSignature";
          res += " name=\"" + sym->_name + "\"";
-         res += " return_type=\"" + ((st::Function*)sym->_parent)->_return_type->gQualifiedName() + "\"";
+         if (((st::Func*)sym->_parent)->gReturnType() != NULL)
+         {
+            res += " return_type=\"" + ((st::Func*)sym->_parent)->gReturnType()->gQualifiedName() + "\"";
+         }
          res += ">\n";
          res += this->dump_children(sym, level+1);
          res += depth + "</FunctionSignature>";
@@ -83,7 +89,10 @@ TextDumper::dump_symbol (st::Symbol* sym, int level)
       case VAR:
          res += "<Variable";
          res += " name=\"" + sym->_name + "\"";
-         res += " type=\"" + ((st::Var*)sym)->_type->gQualifiedName() + "\"";
+         if (((st::Var*)sym)->_type != NULL)
+         {
+            res += " type=\"" + ((st::Var*)sym)->_type->gQualifiedName() + "\"";
+         }
          res += ">\n";
          res += this->dump_children(sym, level+1);
          res += depth + "</Variable>";

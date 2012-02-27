@@ -17,8 +17,8 @@ class Composite : public Position
 
    public: ~Composite ();
 
-   public: void add_child (Position* child);
-   public: virtual PositionType get_type_at (int column);
+   public: void addChild (Position* child);
+   public: virtual PositionType getTypeAt (int column);
 };
 
 

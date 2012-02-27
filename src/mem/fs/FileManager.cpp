@@ -13,7 +13,7 @@ FileManager::~FileManager ()
 }
 
 std::string
-FileManager::get_line_of (std::string file_path, unsigned int lineno)
+FileManager::getLineOf (std::string file_path, unsigned int lineno)
 {
    std::string line;
    std::map<std::string, File*>::iterator file_it;
@@ -28,7 +28,7 @@ FileManager::get_line_of (std::string file_path, unsigned int lineno)
 }
 
 File*
-FileManager::open_file (std::string file_path)
+FileManager::openFile (std::string file_path)
 {
    File* file = new File();
    if (file->open(file_path))

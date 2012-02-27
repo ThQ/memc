@@ -11,11 +11,11 @@ namespace mem { namespace st {
 
 class Class : public Type
 {
-   public: Instance* _instance_type;
+   //public: Instance* _instance_type;
 
    public: Class ();
    public: virtual ~Class();
-   public: Instance* g_instance_type();
+   //public: Instance* g_instance_type();
    //public: virtual void print ();
 };
 

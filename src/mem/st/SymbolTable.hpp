@@ -7,7 +7,7 @@
 #include <string>
 #include "check.h"
 #include "mem/st/Class.hpp"
-#include "mem/st/Function.hpp"
+#include "mem/st/Func.hpp"
 #include "mem/st/Namespace.hpp"
 #include "mem/st/Path.hpp"
 #include "mem/st/Var.hpp"
@@ -20,6 +20,7 @@ namespace mem { namespace st {
 class SymbolTable
 {
    public: st::Class* _glob_bool_cls;
+   public: st::Class* _glob_void_cls;
    public: Namespace* _root;
 
    public: SymbolTable ();
@@ -32,11 +33,12 @@ class SymbolTable
    public: Symbol* get_symbol (std::string name);
    public: bool has_class (std::string class_name);
    public: bool has_namespace (std::string ns_name);
-   public: Function* register_function (std::string func_full_name);
+   public: Func* register_function (std::string func_full_name);
    public: bool register_symbol (std::string path, Symbol* sym);
    public: void setup ();
-   public: void setup_bool ();
-   public: void setup_ints ();
+   public: void setupBool ();
+   public: void setupInts ();
+   public: void setupVoid ();
 };
 
 

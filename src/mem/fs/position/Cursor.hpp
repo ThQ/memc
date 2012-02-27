@@ -17,7 +17,7 @@ class Cursor : public Position
    public: Cursor (fs::File* file, int line, int column);
 
    public: virtual Position* copy ();
-   public: virtual PositionType get_type_at (int column);
+   public: virtual PositionType getTypeAt (int column);
 };
 
 } } }

@@ -19,8 +19,8 @@ class FileManager
    public: std::vector<std::string> _path;
 
    public: ~FileManager();
-   public: std::string get_line_of (std::string file_path, unsigned int line);
-   public: File* open_file (std::string file_path);
+   public: std::string getLineOf (std::string file_path, unsigned int line);
+   public: File* openFile (std::string file_path);
 };
 
 

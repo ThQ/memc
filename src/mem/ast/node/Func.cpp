@@ -1,16 +1,16 @@
-#include "mem/ast/node/Function.hpp"
+#include "mem/ast/node/Func.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-Function::Function ()
+Func::Func()
 {
    this->_type = MEM_NODE_FUNCTION_DECLARATION;
 }
 
 Block*
-Function::g_body_node ()
+Func::gBodyNode ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {
@@ -23,7 +23,7 @@ Function::g_body_node ()
 }
 
 Node*
-Function::g_parameters_node ()
+Func::gParamsNode ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {
@@ -36,7 +36,7 @@ Function::g_parameters_node ()
 }
 
 Node*
-Function::g_return_type_node ()
+Func::gReturnTypeNode ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {
@@ -49,9 +49,9 @@ Function::g_return_type_node ()
 }
 
 bool
-Function::is_virtual ()
+Func::isVirtual ()
 {
-   return this->g_body_node() == NULL;
+   return this->gBodyNode() == NULL;
 }
 
 

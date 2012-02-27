@@ -68,19 +68,19 @@ using namespace mem;
    { \
       if (YYID (N)) \
       { \
-         (Current).s_line(YYRHSLOC (Rhs, 1)._line); \
-         (Current).s_line_end(YYRHSLOC (Rhs, 1)._line_end); \
-         (Current).s_col_start(YYRHSLOC (Rhs, 1)._column_start); \
-         (Current).s_col_end(YYRHSLOC (Rhs, N)._column_end); \
-         (Current)._file = YYRHSLOC(Rhs, 1)._file; \
+         (Current).sLine(YYRHSLOC (Rhs, 1)._line); \
+         (Current).sLineEnd(YYRHSLOC (Rhs, 1)._line_end); \
+         (Current).sColStart(YYRHSLOC (Rhs, 1)._column_start); \
+         (Current).sColEnd(YYRHSLOC (Rhs, N)._column_end); \
+         (Current).sFile(YYRHSLOC(Rhs, 1)._file); \
       } \
       else \
       { \
-         (Current).s_line(YYRHSLOC (Rhs, 0)._line); \
-         (Current).s_line_end(YYRHSLOC (Rhs, 0)._line_end); \
-         (Current).s_col_start(YYRHSLOC (Rhs, 0)._column_end); \
-         (Current).s_col_end(YYRHSLOC (Rhs, 0)._column_end); \
-         (Current)._file = NULL; \
+         (Current).sLine(YYRHSLOC (Rhs, 0)._line); \
+         (Current).sLineEnd(YYRHSLOC (Rhs, 0)._line_end); \
+         (Current).sColStart(YYRHSLOC (Rhs, 0)._column_end); \
+         (Current).sColEnd(YYRHSLOC (Rhs, 0)._column_end); \
+         (Current).sFile(NULL); \
       } \
    } \
    while (YYID (0))

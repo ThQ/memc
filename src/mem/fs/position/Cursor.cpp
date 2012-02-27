@@ -36,7 +36,7 @@ Cursor::copy ()
 }
 
 PositionType
-Cursor::get_type_at (int column)
+Cursor::getTypeAt (int column)
 {
    if (column == this->_column)
    {

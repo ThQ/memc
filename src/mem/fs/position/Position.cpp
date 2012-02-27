@@ -15,7 +15,7 @@ Position::copy ()
 }
 
 PositionType
-Position::get_type_at (int column)
+Position::getTypeAt (int column)
 {
    return NOTHING;
 }

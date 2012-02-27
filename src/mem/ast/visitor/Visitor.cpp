@@ -3,6 +3,10 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+Visitor::~Visitor ()
+{
+}
+
 void
 Visitor::init (st::SymbolTable* symbols, log::Logger* logger)
 {

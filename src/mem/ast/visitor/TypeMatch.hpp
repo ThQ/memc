@@ -16,7 +16,7 @@ class TypeMatch : public Visitor
    public: TypeMatch ();
 
    public: virtual bool visit (node::Node* node);
-   public: void visit_var_decl (node::VarDecl* var_decl_node);
+   public: void visitVarDecl (node::VarDecl* var_decl_node);
 };
 
 

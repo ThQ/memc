@@ -125,19 +125,19 @@ using namespace mem;
    { \
       if (YYID (N)) \
       { \
-         (Current).s_line(YYRHSLOC (Rhs, 1)._line); \
-         (Current).s_line_end(YYRHSLOC (Rhs, 1)._line_end); \
-         (Current).s_col_start(YYRHSLOC (Rhs, 1)._column_start); \
-         (Current).s_col_end(YYRHSLOC (Rhs, N)._column_end); \
-         (Current)._file = YYRHSLOC(Rhs, 1)._file; \
+         (Current).sLine(YYRHSLOC (Rhs, 1)._line); \
+         (Current).sLineEnd(YYRHSLOC (Rhs, 1)._line_end); \
+         (Current).sColStart(YYRHSLOC (Rhs, 1)._column_start); \
+         (Current).sColEnd(YYRHSLOC (Rhs, N)._column_end); \
+         (Current).sFile(YYRHSLOC(Rhs, 1)._file); \
       } \
       else \
       { \
-         (Current).s_line(YYRHSLOC (Rhs, 0)._line); \
-         (Current).s_line_end(YYRHSLOC (Rhs, 0)._line_end); \
-         (Current).s_col_start(YYRHSLOC (Rhs, 0)._column_end); \
-         (Current).s_col_end(YYRHSLOC (Rhs, 0)._column_end); \
-         (Current)._file = NULL; \
+         (Current).sLine(YYRHSLOC (Rhs, 0)._line); \
+         (Current).sLineEnd(YYRHSLOC (Rhs, 0)._line_end); \
+         (Current).sColStart(YYRHSLOC (Rhs, 0)._column_end); \
+         (Current).sColEnd(YYRHSLOC (Rhs, 0)._column_end); \
+         (Current).sFile(NULL); \
       } \
    } \
    while (YYID (0))
@@ -262,9 +262,9 @@ extern int yylex();
 void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols, log::Logger& logger, fs::File* file, const char *s)
 {
    fs::position::Position* pos = new fs::position::Position();
-   pos->_file = file;
+   pos->sFile(file);
 
-   log::Message* msg = new log::Message(log::ERROR);
+   log::Message* msg = new log::Error();
    msg->sMessage("Syntax error");
    msg->sDescription(s);
    msg->sPosition(pos);
@@ -1942,7 +1942,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 343 "src/mem/grammar/mem.y"
     {
-      ast::node::Function* n = new ast::node::Function();
+      ast::node::Func* n = new ast::node::Func();
       n->sValue((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
       n->pushChild((yyvsp[(5) - (6)].node));
       n->sPosition((yyloc).copy_range());
@@ -1961,7 +1961,7 @@ yyreduce:
          *((yyvsp[(3) - (7)].node)->getChild(0)->_position),
          *((yyvsp[(3) - (7)].node)->getChild((yyvsp[(3) - (7)].node)->_child_count-1)->_position)));
 
-      ast::node::Function* n = new ast::node::Function();
+      ast::node::Func* n = new ast::node::Func();
       n->sValue((yyvsp[(1) - (7)].text), strlen((yyvsp[(1) - (7)].text)));
       n->pushChildren((yyvsp[(3) - (7)].node), (yyvsp[(6) - (7)].node));
       n->sPosition((yyloc).copy_range());
@@ -1976,7 +1976,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 370 "src/mem/grammar/mem.y"
     {
-      ast::node::Function* n = new ast::node::Function();
+      ast::node::Func* n = new ast::node::Func();
       n->sValue((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
       n->pushChildren((yyvsp[(5) - (6)].node), (yyvsp[(6) - (6)].node));
       n->sPosition((yyloc).copy_range());
@@ -1994,7 +1994,7 @@ yyreduce:
       (yyvsp[(3) - (7)].node)->sPosition(new fs::position::Range(
          *((yyvsp[(3) - (7)].node)->getChild(0)->_position),
          *((yyvsp[(3) - (7)].node)->getChild((yyvsp[(3) - (7)].node)->_child_count-1)->_position)));
-      ast::node::Function* n = new ast::node::Function();
+      ast::node::Func* n = new ast::node::Func();
       n->sValue((yyvsp[(1) - (7)].text), strlen((yyvsp[(1) - (7)].text)));
       n->pushChildren((yyvsp[(3) - (7)].node), (yyvsp[(6) - (7)].node), (yyvsp[(7) - (7)].node));
       n->sPosition((yyloc).copy_range());

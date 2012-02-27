@@ -1,5 +1,5 @@
-#ifndef _MEM__ST__FUNCTION__HPP
-#define _MEM__ST__FUNCTION__HPP
+#ifndef _MEM__ST__FUNC__HPP
+#define _MEM__ST__FUNC__HPP
 
 
 #include <vector>
@@ -9,13 +9,14 @@
 namespace mem { namespace st {
 
 
-class Function : public Type
+class Func: public Type
 {
    public: std::vector<Symbol*> _params;
    public: Symbol* _return_type;
 
-   public: Function ();
+   public: Func();
    public: inline Symbol* gReturnType () { return this->_return_type;}
+   public: inline void sReturnType (Symbol* ret_type) {this->_return_type = ret_type;}
 };
 
 

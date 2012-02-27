@@ -1,5 +1,6 @@
 #include "mem/st/Instance.hpp"
 
+/*
 namespace mem { namespace st {
 
 
@@ -20,15 +21,6 @@ Instance::get_qualified_name()
    return res;
 }
 
-/*
-void
-Instance::print ()
-{
-   this->print_depth();
-   printf("<Instance(%s)>\n", (this->_type!=NULL) ? this->_type->get_qualified_name().c_str() : "?");
-}
-*/
-
 void
 Instance::set_type (Symbol* type)
 {
@@ -38,3 +30,4 @@ Instance::set_type (Symbol* type)
 
 
 } }
+*/

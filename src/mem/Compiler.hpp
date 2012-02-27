@@ -48,8 +48,8 @@ namespace mem
 
       public: void compile (char* file_path);
       public: void parse (std::string file_path);
-      public: void process_parse_queue();
-      public: void register_ast_visitor(ast::visitor::Visitor* visitor);
+      public: void processParseQueue();
+      public: void registerAstVisitor(ast::visitor::Visitor* visitor);
    };
 }
 

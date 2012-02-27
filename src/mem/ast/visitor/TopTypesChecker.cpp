@@ -20,14 +20,14 @@ TopTypesChecker::visit (node::Node* node)
    {
       case MEM_NODE_FIELD:
       {
-         class_scope = cls->_bound_type;
-         this->visit_field(class_scope, static_cast<node::Field*>(node));
+         class_scope = cls->gBoundSymbol();
+         this->visitField(class_scope, static_cast<node::Field*>(node));
          return false;
       }
       case MEM_NODE_FUNCTION_DECLARATION:
       {
-         class_scope = cls->_bound_type;
-         this->visit_function_declaration(class_scope, static_cast<node::Function*>(node));
+         class_scope = cls->gBoundSymbol();
+         this->visitFuncDecl(class_scope, static_cast<node::Func*>(node));
          return false;
       }
    }
@@ -35,73 +35,63 @@ TopTypesChecker::visit (node::Node* node)
 }
 
 void
-TopTypesChecker::visit_field (st::Symbol* scope, node::Field* field)
+TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
 {
    assert(scope!=NULL);
    assert(field!=NULL);
 
-   this->visit_qualified_name(scope, static_cast<node::Text*>(field->getChild(1)));
+   node::Text* name_node = static_cast<node::Text*>(field->getChild(0));
+   node::Node* type_node = field->getChild(1);
 
-   if (field->getChild(1)->_exp_type != NULL)
+   this->visitQualifiedName(scope, name_node);
+
+   if (type_node->hasExprType()
+      && this->ensureSymbolIsType(type_node, type_node->gExprType()))
    {
       st::Var* sym_field = new st::Var();
-      sym_field->sName(static_cast<node::Text*>(field->getChild(0))->_value);
-      sym_field->sType(static_cast<st::Class*>(field->getChild(1)->_exp_type));
+      sym_field->sName(name_node->gValue());
+      sym_field->sType(static_cast<st::Class*>(type_node->gExprType()));
       scope->addChild(sym_field);
 
-      field->getChild(0)->_bound_type = sym_field;
-      field->_bound_type = sym_field;
-      field->_exp_type = sym_field->_type;
+      name_node->sBoundSymbol(sym_field);
+      field->sBoundSymbol(sym_field);
+      field->sExprType(sym_field->_type);
       assert (sym_field->_type != NULL);
    }
 }
 
 void
-TopTypesChecker::visit_qualified_name (st::Symbol* scope, node::Text* name_node)
+TopTypesChecker::visitQualifiedName (st::Symbol* scope, node::Text* name_node)
 {
-   //assert (scope != NULL);
    assert (name_node != NULL);
 
-   //printf("VISITING QUALIFIED NAME [%s]...\n", name_node->_value.c_str());
    if (name_node->isType(MEM_NODE_FINAL_ID))
    {
-      name_node->sExprType(st::Util::lookup_symbol(scope, name_node->_value));
-      if (name_node->gExprType() == NULL)
+      name_node->sExprType(st::Util::lookupSymbol(scope, name_node->gValue()));
+      if (!name_node->hasExprType())
       {
-         log::Message* err = new log::Message(log::ERROR);
+         log::Message* err = new log::Error();
          err->formatMessage("Unknown symbol (%s) in scope (%s)",
-            name_node->_value.c_str(),
+            name_node->gValueCstr(),
             scope->gQualifiedNameCstr());
-         err->sPosition(name_node->_position->copy());
-         this->_logger->log(err);
+         err->sPosition(name_node->copyPosition());
+         this->log(err);
       }
-   }
-   // @FIXME : Make this happen
-   else
-   {
-      /*
-      node::Text* sub_node = NULL;
-      st::Symbol* node_expr_type = NULL;
-
-      for (size_t i = 0 ; i < name_node->_child_count; ++i)
-      {
-      }
-      */
    }
 }
 
 void
-TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* func_decl)
+TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
 {
    assert(scope != NULL);
    assert(func_decl != NULL);
 
-   // Add the function to the symbol table
-   st::Function* func_sym = st::Util::lookup_function(scope, func_decl->_value);
+   // Lookup the function, or create it
+   st::Func* func_sym = st::Util::lookupFunction(scope, func_decl->gValue());
    if (func_sym == NULL)
    {
-      func_sym = new st::Function();
-      func_sym->sName(func_decl->_value);
+      func_sym = new st::Func();
+      func_sym->sName(func_decl->gValue());
       scope->addChild(func_sym);
    }
    assert (func_sym != NULL);
@@ -111,7 +101,7 @@ TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* 
    func_sym->addChild(func_sign_sym);
 
    // Add {this} to the symbol table
-   if (!func_decl->is_virtual())
+   if (!func_decl->isVirtual())
    {
       st::Var* vthis = new st::Var();
       vthis->sName("this");
@@ -119,33 +109,9 @@ TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* 
       func_sign_sym->addChild(vthis);
    }
 
-   // Visit return type node
-   if (func_decl->g_return_type_node() != NULL)
+   if (func_decl->gReturnTypeNode() != NULL)
    {
-      this->visit_qualified_name(func_sym->_parent, static_cast<node::Text*>(func_decl->g_return_type_node()));
-      func_decl->sBoundSymbol(func_sign_sym);
-      if (func_decl->g_return_type_node()->gExprType() != NULL)
-      {
-         // Return type differs from a previously defined function with
-         // the same name (function overloading)
-         if (func_sym->_return_type != NULL && func_decl->g_return_type_node()->gExprType() != func_sym->_return_type)
-         {
-            log::Message* err = new log::Message(log::ERROR);
-            err->sMessage("When overloading functions, return type must be the same");
-            err->formatDescription("Return type was defined as %s, but got %s instead.",
-               func_sym->_return_type->gQualifiedNameCstr(),
-               func_decl->g_return_type_node()->gExprType()->gQualifiedNameCstr());
-            err->sPosition(func_decl->g_return_type_node()->_position->copy());
-            this->_logger->log(err);
-         }
-
-         // @TODO Ouch, this is really ugly
-         func_sym->_return_type = static_cast<st::Class*>(func_decl->g_return_type_node()->gExprType());
-         func_decl->sExprType(func_sym->gReturnType());
-
-         assert(func_sym->gReturnType() != NULL);
-         assert(func_decl->gExprType() != NULL);
-      }
+      this->visitFuncReturnType (func_decl, func_sym, func_sign_sym);
    }
    else
    {
@@ -153,39 +119,81 @@ TopTypesChecker::visit_function_declaration (st::Symbol* scope, node::Function* 
    }
 
    // Visit function parameters
-   node::Node* func_params = func_decl->g_parameters_node();
+   node::Node* func_params = func_decl->gParamsNode();
    if (func_params != NULL)
    {
-      st::Var* param_sym = NULL;
-      node::Node* param_node = NULL;
-      for (size_t i = 0; i < func_params->_child_count; ++i)
-      {
-         param_node = func_params->getChild(i);
-         this->visit_func_param(scope, param_node);
-
-         // Add parameter to the symbol table of the block
-         param_sym = new st::Var();
-         param_sym->sName(static_cast<node::Text*>(param_node->getChild(0))->_value);
-         if (param_node->getChild(1)->gExprType() != NULL)
-         {
-            param_sym->sType(static_cast<st::Class*>(param_node->getChild(1)->gExprType()));
-         }
-         func_sign_sym->addChild(param_sym);
-
-         param_node->getChild(0)->sBoundSymbol(param_sym);
-         param_node->sBoundSymbol(param_sym);
-         param_node->sExprType(param_sym->_type);
-
-         // Add parameter to function symbol parameters
-         func_sign_sym->_params.push_back(param_node->gExprType());
-      }
+      this->visitFuncParams(scope, func_params, func_sign_sym);
    }
 }
 
 void
-TopTypesChecker::visit_func_param(st::Symbol* scope, node::Node* param_node)
+TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
+   st::FunctionSignature* func_sign_sym)
 {
-   this->visit_qualified_name(scope, static_cast<node::Text*>(param_node->getChild(1)));
+   st::Var* param_sym = NULL;
+   node::Node* param_node = NULL;
+   node::Text* name_node = NULL;
+   node::Text* type_node = NULL;
+
+   for (size_t i = 0; i < params_node->gChildCount(); ++i)
+   {
+      param_node = params_node->getChild(i);
+      name_node = static_cast<node::Text*>(param_node->getChild(0));
+      type_node = static_cast<node::Text*>(param_node->getChild(1));
+
+      this->visitQualifiedName(scope, type_node);
+
+      // Add parameter to the symbol table of the block
+      param_sym = new st::Var();
+      param_sym->sName(name_node->gValue());
+      if (type_node->hasExprType()
+         && this->ensureSymbolIsType(type_node, type_node->gExprType()))
+      {
+         param_sym->sType(static_cast<st::Class*>(type_node->gExprType()));
+      }
+      func_sign_sym->addChild(param_sym);
+
+      name_node->sBoundSymbol(param_sym);
+      param_node->sBoundSymbol(param_sym);
+      param_node->sExprType(param_sym->_type);
+
+      // Add parameter to function symbol parameters
+      func_sign_sym->_params.push_back(param_node->gExprType());
+   }
+}
+
+void
+TopTypesChecker::visitFuncReturnType (node::Func* func_node,
+   st::Func* func_sym, st::FunctionSignature* func_sign_sym)
+{
+   node::Text* ret_ty_node = static_cast<node::Text*>(func_node->gReturnTypeNode());
+
+   this->visitQualifiedName(func_sym->_parent, ret_ty_node);
+   func_node->sBoundSymbol(func_sign_sym);
+
+   if (func_node->gReturnTypeNode()->hasExprType()
+      && this->ensureSymbolIsType(ret_ty_node, ret_ty_node->gExprType()))
+   {
+      if (func_sym->gReturnType() != NULL
+         && ret_ty_node->gExprType() != func_sym->gReturnType())
+      {
+         // Return type differs from a previously defined function with
+         // the same name (function overloading)
+         log::Message* err = new log::Error();
+         err->sMessage("When overloading functions, return type must be the same");
+         err->formatDescription("Return type was defined as %s, but got %s instead.",
+            func_sym->gReturnType()->gQualifiedNameCstr(),
+            ret_ty_node->gExprType()->gQualifiedNameCstr());
+         err->sPosition(ret_ty_node->copyPosition());
+         this->log(err);
+      }
+
+      func_sym->sReturnType(static_cast<st::Class*>(ret_ty_node->gExprType()));
+      func_node->sExprType(func_sym->gReturnType());
+
+      assert(func_sym->gReturnType() != NULL);
+      assert(func_node->hasExprType());
+   }
 }
 
 

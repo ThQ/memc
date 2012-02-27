@@ -84,6 +84,18 @@ Symbol::is (SymbolKind kind)
    return this->_kind == kind;
 }
 
+bool
+Symbol::isTypeSymbol ()
+{
+   switch (this->_kind)
+   {
+      case CLASS:
+         return true;
+      default:
+         return false;
+   }
+}
+
 void
 Symbol::sName (char* name, size_t name_len)
 {

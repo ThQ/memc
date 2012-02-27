@@ -1,5 +1,6 @@
 #include "mem/parser/SourceLocation.hpp"
 
+/*
 namespace mem { namespace parser {
 
 
@@ -11,3 +12,4 @@ SourceLocation::SourceLocation (int line, int column)
 
 
 } }
+*/

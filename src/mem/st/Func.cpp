@@ -1,9 +1,9 @@
-#include "mem/st/Function.hpp"
+#include "mem/st/Func.hpp"
 
 namespace mem { namespace st {
 
 
-Function::Function ()
+Func::Func()
 {
    this->_kind = FUNCTION;
    this->_return_type = NULL;

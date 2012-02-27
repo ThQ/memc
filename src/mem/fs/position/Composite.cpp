@@ -15,7 +15,7 @@ Composite::~Composite ()
 }
 
 void
-Composite::add_child (Position* child)
+Composite::addChild (Position* child)
 {
    this->_file = child->_file;
    this->_line = child->_line;
@@ -23,13 +23,14 @@ Composite::add_child (Position* child)
 }
 
 PositionType
-Composite::get_type_at (int column)
+Composite::getTypeAt (int column)
 {
    PositionType i_type = NOTHING;
    PositionType cur_type = NOTHING;
+
    for (unsigned int i = 0 ; i < this->_children.size() ; ++i)
    {
-      cur_type = this->_children[i]->get_type_at(column);
+      cur_type = this->_children[i]->getTypeAt(column);
       if (cur_type > i_type)
       {
          i_type = cur_type;

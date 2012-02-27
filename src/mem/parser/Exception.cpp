@@ -1,5 +1,5 @@
 #include "mem/parser/Exception.hpp"
-
+/*
 namespace mem { namespace parser {
 
 
@@ -95,5 +95,6 @@ Exception::size_hints (unsigned char size)
    this->_hints = new char*[size];
 }
 
-
 } }
+
+*/

@@ -7,10 +7,12 @@
 
 namespace mem { namespace ast { namespace node {
 
-   class Root : public Node
-   {
-      public: Root ();
-   };
+
+class Root : public Node
+{
+   public: Root ();
+};
+
 
 } } }
 

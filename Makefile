@@ -9,7 +9,7 @@ src_MEM_FS_POSITION:=`echo src/mem/fs/position/*.cpp`
 src_MEM_LOG:=`echo src/mem/log/*.cpp`
 src_MEM_ST:=`echo src/mem/st/*.cpp` `echo src/mem/st/dumper/*.cpp`
 src_MEM_TOKENIZER:=`echo src/mem/tokenizer/*.cpp`
-GXX:=clang++ -Wall -pedantic -g -I./src
+GXX:=clang++ -Wall -Wunused -Wunreachable-code -pedantic -g -I./src
 
 cppcheck:
 	cppcheck --enable=all -q -f src/mem/ast src/mem/fs/ src/mem/log/ src/mem/parser/ src/mem/st/ src/mem/tokenizer/

@@ -10,12 +10,12 @@ Compiler::Compiler ()
    this->ast._type = MEM_NODE_ROOT;
    this->symbols.setup ();
 
-   this->register_ast_visitor(new ast::visitor::Prechecker());
-   this->register_ast_visitor(new ast::visitor::FindClasses());
-   this->register_ast_visitor(new ast::visitor::TopTypesChecker());
-   this->register_ast_visitor(new ast::visitor::VariableTypesChecker());
-   this->register_ast_visitor(new ast::visitor::BlockTypesChecker());
-   this->register_ast_visitor(new ast::visitor::TypeMatch());
+   this->registerAstVisitor(new ast::visitor::Prechecker());
+   this->registerAstVisitor(new ast::visitor::FindClasses());
+   this->registerAstVisitor(new ast::visitor::TopTypesChecker());
+   this->registerAstVisitor(new ast::visitor::VariableTypesChecker());
+   this->registerAstVisitor(new ast::visitor::BlockTypesChecker());
+   this->registerAstVisitor(new ast::visitor::TypeMatch());
 }
 
 Compiler::~Compiler ()
@@ -32,7 +32,7 @@ Compiler::compile (char* fp)
 {
    std::string file_path(fp);
    this->_parse_queue.push(file_path);
-   this->process_parse_queue();
+   this->processParseQueue();
 
    for (int i=0; i < this->ast_visitors.size(); ++i)
    {
@@ -53,7 +53,7 @@ Compiler::parse (std::string file_path)
    std::string include_path("");
 
    // Try finding the file using include path directories
-   fs::File* file = this->fm.open_file(file_path);
+   fs::File* file = this->fm.openFile(file_path);
    paths_tried.push_back(file_path);
    if (file == NULL)
    {
@@ -62,7 +62,7 @@ Compiler::parse (std::string file_path)
       for (i=0; file==NULL && i<this->fm._path.size(); ++i)
       {
          try_file_path.assign(this->fm._path[i] + "/" + file_path);
-         file = this->fm.open_file(try_file_path);
+         file = this->fm.openFile(try_file_path);
          paths_tried.push_back(try_file_path);
          if (file != NULL)
          {
@@ -125,15 +125,15 @@ Compiler::parse (std::string file_path)
          description.append("* {path:" + paths_tried[i] + "}\n");
       }
 
-      log::Message msg(log::ERROR);
-      msg.formatMessage("Couldn't open file {path:%s}.", file_path.c_str());
-      msg.sDescription(description);
-      this->logger.log(&msg);
+      log::Message* msg = new log::Error();
+      msg->formatMessage("Couldn't open file {path:%s}.", file_path.c_str());
+      msg->sDescription(description);
+      this->logger.log(msg);
    }
 }
 
 void
-Compiler::process_parse_queue ()
+Compiler::processParseQueue ()
 {
    while (!this->_parse_queue.empty())
    {
@@ -144,7 +144,7 @@ Compiler::process_parse_queue ()
 
 
 void
-Compiler::register_ast_visitor (ast::visitor::Visitor* visitor)
+Compiler::registerAstVisitor (ast::visitor::Visitor* visitor)
 {
    this->ast_visitors.push_back(visitor);
 }

@@ -18,7 +18,9 @@ class Visitor
    public: std::string _name;
    public: st::SymbolTable* _symbols;
 
+   public: virtual ~Visitor ();
    public: virtual void init (st::SymbolTable* symbols, log::Logger* logger);
+   public: inline void log (log::Message* msg) {this->_logger->log(msg);}
    public: virtual bool visit (node::Node* node);
    public: virtual void visit_preorder (node::Node* node);
 };

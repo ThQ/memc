@@ -10,7 +10,7 @@ Class::Class ()
 }
 
 Text*
-Class::g_parent_type_node ()
+Class::gParentTypeNode ()
 {
    for (int i = 0 ; i < this->_child_count ; ++i)
    {

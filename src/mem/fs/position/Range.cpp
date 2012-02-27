@@ -40,7 +40,7 @@ Range::copy_range ()
 }
 
 PositionType
-Range::get_type_at (int column)
+Range::getTypeAt (int column)
 {
    // @FIXME : does not work on multi-lines
    if (column >= this->_column_start && column <= this->_column_end)

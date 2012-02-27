@@ -13,7 +13,7 @@ class Class : public Type
 {
    public: Class ();
 
-   public: Text* g_parent_type_node ();
+   public: Text* gParentTypeNode ();
 };
 
 

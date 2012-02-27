@@ -26,7 +26,7 @@ class Message
 
    public: Message ();
    public: Message (MessageLevel level);
-   public: ~Message();
+   public: virtual ~Message();
 
    public: void formatDescription(const char* format, ...);
    public: void formatMessage (const char* format, ...);
@@ -35,6 +35,11 @@ class Message
    public: void sLevel (MessageLevel level);
    public: void sMessage (const char* message);
    public: void sPosition (fs::position::Position* position);
+};
+
+class Error : public Message
+{
+   public: Error() { this->_level = log::ERROR; }
 };
 
 

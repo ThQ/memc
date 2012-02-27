@@ -201,7 +201,7 @@ SymbolTable::get_symbol (std::string name)
    return cur_symbol;
 }
 
-Function*
+Func*
 SymbolTable::register_function (std::string func_full_name)
 {
    std::string ns_name;
@@ -214,7 +214,7 @@ SymbolTable::register_function (std::string func_full_name)
       return NULL;
    }
 
-   Function* func = new Function();
+   Func* func = new Func();
    func->sName(func_name);
 
    ns->addChild(func);
@@ -237,15 +237,16 @@ SymbolTable::register_symbol (std::string path, Symbol* sym)
 void
 SymbolTable::setup ()
 {
-   this->setup_bool();
-   this->setup_ints();
+   this->setupBool();
+   this->setupInts();
+   this->setupVoid();
 }
 
 void
-SymbolTable::setup_bool ()
+SymbolTable::setupBool ()
 {
    this->_glob_bool_cls = new st::Class();
-   this->_glob_bool_cls->_name = "bool";
+   this->_glob_bool_cls->sName("bool");
    this->_root->addChild(this->_glob_bool_cls);
 
    this->_root->addChild(new st::Var("true", this->_glob_bool_cls));
@@ -253,7 +254,7 @@ SymbolTable::setup_bool ()
 }
 
 void
-SymbolTable::setup_ints ()
+SymbolTable::setupInts ()
 {
    st::Class* int_cls = new st::Class();
    int_cls->sName("int");
@@ -268,4 +269,13 @@ SymbolTable::setup_ints ()
    this->_root->addChild(char_cls);
 }
 
+void
+SymbolTable::setupVoid ()
+{
+   this->_glob_void_cls = new st::Class();
+   this->_glob_void_cls->sName("void");
+   this->_root->addChild(this->_glob_void_cls);
+
+   this->_root->addChild(new st::Var("null", this->_glob_void_cls));
+}
 } }

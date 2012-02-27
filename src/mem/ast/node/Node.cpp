@@ -5,9 +5,9 @@ namespace mem { namespace ast { namespace node {
 
 Node::Node ()
 {
-   this->_accept_children = false;
+   //this->_accept_children = false;
    this->_depth = 0;
-   this->_expected_child_count = -1;
+   //this->_expected_child_count = -1;
    this->_first_child = 0;
    this->_last_child = 0;
    this->_next = 0;
@@ -22,9 +22,9 @@ Node::Node ()
 
 Node::Node (unsigned int type)
 {
-   this->_accept_children = false;
+   //this->_accept_children = false;
    this->_depth = 0;
-   this->_expected_child_count = -1;
+   //this->_expected_child_count = -1;
    this->_first_child = 0;
    this->_last_child = 0;
    this->_next = 0;

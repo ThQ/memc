@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "mem/parser/SourceLocation.hpp"
 
+/**
 namespace mem { namespace parser {
 
    class Exception
@@ -30,5 +31,6 @@ namespace mem { namespace parser {
    };
 
 } }
+*/
 
 #endif

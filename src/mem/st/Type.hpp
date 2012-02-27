@@ -14,6 +14,7 @@ class Type: public Symbol
 
    public: Type();
    public: inline Type* gParentType () { return this->_parent_type; }
+   public: inline void sParentType (Type* ty) { this->_parent_type = ty;}
    public: bool isSubclass (Type* parent);
 };
 
