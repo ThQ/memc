@@ -1,4 +1,4 @@
-**Memc** is a compiler for the Mem language.
+**Memc** is a compiler for Mem (a programming language).
 
 
 # Mem
@@ -6,7 +6,7 @@
 * Compiled
 * Imperative
 * Static typing
-
+* Low level (in a C++ sense)
 
 # *Hello, World !*
 
