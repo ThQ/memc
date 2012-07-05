@@ -23,5 +23,5 @@
 * LLVM (used to compile to native code)
 * Python (for some utils)
 
-## Optionnal
+## Optional
 * Automake
