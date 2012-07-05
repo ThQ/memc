@@ -1,4 +1,4 @@
-*Memc* is a compiler for the Mem language.
+**Memc** is a compiler for the Mem language.
 
 
 # Mem
@@ -8,7 +8,7 @@
 * Static typing
 
 
-# Hello, World !
+# *Hello, World !*
 
 > use io
 > 
