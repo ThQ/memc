@@ -33,7 +33,7 @@
 /* "%code requires" blocks.  */
 
 /* Line 2068 of yacc.c  */
-#line 7 "src/mem/grammar/mem.y"
+#line 7 "src/mem/lang/Bison.ypp"
 
 #define PASS (0);
 #include <stdio.h>
@@ -92,13 +92,13 @@ using namespace mem;
 
 
 /* Line 2068 of yacc.c  */
-#line 81 "src/mem/grammar/mem.y"
+#line 81 "src/mem/lang/Bison.ypp"
 
 
 
 
 /* Line 2068 of yacc.c  */
-#line 102 "src/mem/parser/Bison.hpp"
+#line 102 "src/mem/lang/Bison.hpp"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -158,6 +158,58 @@ using namespace mem;
      T_MINUS_MINUS = 307
    };
 #endif
+/* Tokens.  */
+#define T_AROBASE 258
+#define T_AND 259
+#define T_CLASS 260
+#define T_COMMA 261
+#define T_CP 262
+#define T_DEDENT 263
+#define T_DOT 264
+#define T_ELSE 265
+#define T_EQ 266
+#define T_IF 267
+#define T_ID 268
+#define T_INDENT 269
+#define T_INTERFACE 270
+#define T_LBRACKET 271
+#define T_LITERAL_FLOAT 272
+#define T_LITERAL_HEX 273
+#define T_LITERAL_INT 274
+#define T_LITERAL_NUMBER 275
+#define T_NEW 276
+#define T_NEWLINE 277
+#define T_OP 278
+#define T_OR 279
+#define T_PASS 280
+#define T_PATCH 281
+#define T_PRIMITIVE 282
+#define T_OBJECT 283
+#define T_RBRACKET 284
+#define T_RARR 285
+#define T_STRING 286
+#define T_USE 287
+#define T_WHITESPACE 288
+#define T_LEFT_BINARY_OP 289
+#define T_RETURN 290
+#define T_SEMICOLON 291
+#define T_WHILE 292
+#define T_SELF 293
+#define T_BANG 294
+#define T_LARR_EQ 295
+#define T_LT 296
+#define T_RARR_EQ 297
+#define T_GT 298
+#define T_EQ_EQ 299
+#define T_PLUS 300
+#define T_MINUS 301
+#define T_DIV 302
+#define T_MUL 303
+#define T_MODULO 304
+#define T_MUL_MUL 305
+#define T_PLUS_PLUS 306
+#define T_MINUS_MINUS 307
+
 
 
 
@@ -166,7 +218,7 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 84 "src/mem/grammar/mem.y"
+#line 84 "src/mem/lang/Bison.ypp"
 
    int integer;
    char* text;
@@ -177,7 +229,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 181 "src/mem/parser/Bison.hpp"
+#line 233 "src/mem/lang/Bison.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

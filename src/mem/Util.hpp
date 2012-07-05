@@ -2,17 +2,31 @@
 #define _MEM__UTIL__HPP_
 
 
+#include <limits.h>
 #include <string>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vector>
 
 
-namespace mem
+namespace mem {
+
+
+class Util
 {
-   class Util
-   {
-      public: static void namespace_to_path (std::string& path);
-      public: static void partition_full_type_name (std::string full_type_name, std::string& ns, std::string& type_name);
-      public: static void path_to_namespace (std::string& path);
-   };
+   public: static void namespace_to_path (std::string& path);
+   public: static void partition_full_type_name (std::string full_type_name, std::string& ns, std::string& type_name);
+   public: static void path_to_namespace (std::string& path);
+   public: static std::string stripFileExtension (std::string file_path);
+   public: static std::vector<std::string>split (std::string qualified_name, char separator);
+
+   public: static int getIntStringLength (double nb);
+   public: static bool getIntFromString (const char* nb, int& i_out);
+};
+
+
 }
 
 #endif

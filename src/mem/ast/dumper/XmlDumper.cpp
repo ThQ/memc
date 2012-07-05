@@ -6,54 +6,81 @@ namespace mem { namespace ast { namespace dumper {
 std::string
 XmlDumper::dump (node::Node* root)
 {
-   std::string res = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-   res += this->dump_node(root, 0);
-   return res;
+   std::ostringstream res;
+   res << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
+   this->dump_node(res, root, 0);
+   return res.str();
 }
 
-std::string
-XmlDumper::dump_node (node::Node* node, unsigned int level)
+void
+XmlDumper::dump_node (std::ostringstream& dump, node::Node* node, unsigned int level)
 {
-   std::string dump = this->get_indent(level) + "<";
-   dump += node::Node::get_type_name(node->_type);
+   dump << this->get_indent(level);
+   dump << "<";
+
+   dump << node::Node::get_type_name(node->gType());
    if (node->isText())
    {
-      dump += " text=\"";
-      dump += ((node::Text*)node)->_value;
-      dump += "\"";
+      dump << " text=\"";
+      dump << ((node::Text*)node)->_value;
+      dump << "\"";
    }
 
    if (node->gBoundSymbol() != NULL)
    {
-      dump += " bound_type=\"";
-      dump += node->gBoundSymbol()->gQualifiedName();
-      dump += "\"";
+      dump << " bound_type=\"";
+      dump << node->gBoundSymbol()->gQualifiedName();
+      dump << "\"";
    }
 
    if (node->gExprType() != NULL)
    {
-      dump += " expr_type=\"";
-      dump += node->gExprType()->gQualifiedName();
-      dump += "\"";
+      dump << " expr_type=\"";
+      dump << node->gExprType()->gQualifiedName();
+      dump << "\"";
+   }
+
+   if (node->gPosition() != NULL)
+   {
+      dump << " line=\"";
+      dump << node->gPosition()->gLine();
+      dump << "\"";
+   }
+
+   switch (node->gType())
+   {
+      case MEM_NODE_NUMBER:
+         dump << " val=\"";
+         dump << static_cast<node::Number*>(node)->getStringFromVal();
+         dump << "\"";
+         break;
+
+      case MEM_NODE_FILE:
+         dump << " id=\"";
+         dump << static_cast<node::File*>(node)->_id;
+         dump << "\"";
+         break;
+
+      default:
+         break;
    }
 
    if (node->hasChildren())
    {
-      dump += ">\n";
-      for (unsigned int i = 0 ; i < node->_child_count ; ++i)
+      dump << ">\n";
+      for (size_t i = 0 ; i < node->_child_count ; ++i)
       {
-         dump += this->dump_node(node->getChild(i), level+1);
+         this->dump_node(dump, node->getChild(i), level+1);
       }
-      dump += this->get_indent(level);
-      dump += "</";
-      dump += node::Node::get_type_name(node->_type);
-      dump += ">\n";
+      dump << this->get_indent(level);
+      dump << "</";
+      dump << node::Node::get_type_name(node->_type);
+      dump << ">\n";
    }
    else
    {
-      dump += " />\n";
+      dump << " />\n";
    }
-   return dump;
 }
 
 

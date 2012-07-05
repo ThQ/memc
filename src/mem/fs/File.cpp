@@ -9,25 +9,32 @@ File::File ()
 
 File::~File ()
 {
-   for (size_t i = 0 ; i < this->_lines.size() ; ++i)
+   for (size_t i = 0; i < _lines.size(); ++i)
    {
-      delete this->_lines[i];
+      delete _lines[i];
    }
 }
 
 void
 File::dump ()
 {
-   for (size_t i = 0 ; i < this->_lines.size() ; ++ i)
+   for (size_t i = 0; i < _lines.size(); ++ i)
    {
-      printf("#%d. %s\n", i + 1, this->_lines[i]->c_str());
+      printf("#%d. %s\n", i + 1, _lines[i]->c_str());
    }
+}
+
+std::string*
+File::getLine (size_t i) const
+{
+   assert(i < _lines.size() && "Line out of file");
+   return _lines[i];
 }
 
 bool
 File::open (std::string name)
 {
-   this->_path = name;
+   _path = name;
    std::ifstream is;
    is.open(name.c_str(), std::ios::in);
 
@@ -44,18 +51,19 @@ File::open (std::string name)
       bool eol_found = false;
       size_t j = 0;
       size_t i = 0;
+
       while (!is.eof() && !is.fail())
       {
          j = 0;
          is.read(buffer, 5);
          buffer_len = is.gcount();
-         for (i = 0; i < buffer_len ; ++i)
+         for (i = 0; i < buffer_len; ++i)
          {
             if (buffer[i] == '\n')
             {
                eol_found = true;
                cur_line->append(buffer, j, i - j);
-               this->_lines.push_back(cur_line);
+               _lines.push_back(cur_line);
                cur_line = new std::string();
                j = i + 1;
             }
@@ -74,7 +82,7 @@ File::open (std::string name)
       if (buffer_len != 0)
       {
          cur_line->append(buffer, j, buffer_len - 1);
-         this->_lines.push_back(cur_line);
+         _lines.push_back(cur_line);
       }
 
       delete[] buffer;

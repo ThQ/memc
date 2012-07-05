@@ -6,53 +6,134 @@ namespace mem {
 
 Compiler::Compiler ()
 {
-   this->logger._formatter = new log::ConsoleFormatter();
-   this->ast._type = MEM_NODE_ROOT;
-   this->symbols.setup ();
+   this->logger.sFormatter(new log::ConsoleFormatter());
 
-   this->registerAstVisitor(new ast::visitor::Prechecker());
-   this->registerAstVisitor(new ast::visitor::FindClasses());
-   this->registerAstVisitor(new ast::visitor::TopTypesChecker());
-   this->registerAstVisitor(new ast::visitor::VariableTypesChecker());
-   this->registerAstVisitor(new ast::visitor::BlockTypesChecker());
-   this->registerAstVisitor(new ast::visitor::TypeMatch());
+   setUpOptions();
+
+   registerAstVisitor(new ast::visitor::Prechecker());
+   registerAstVisitor(new ast::visitor::FindClasses());
+   registerAstVisitor(new ast::visitor::TopTypesChecker());
+   registerAstVisitor(new ast::visitor::BlockTypesChecker());
+   registerAstVisitor(new ast::visitor::TypeMatch());
+   registerAstVisitor(new ast::visitor::CheckValidity());
+   registerAstVisitor(new ast::visitor::FindEntryPoint());
+
+   registerStVisitor(new st::visitor::DepBuilder());
+
+   st::Util::setupBool(this->symbols, this->symbols.gCoreTypes());
+   st::Util::setupInts(this->symbols, this->symbols.gCoreTypes());
+   st::Util::setupVoid(this->symbols, this->symbols.gCoreTypes());
 }
 
 Compiler::~Compiler ()
 {
-   for (int i = 0 ; i < this->ast_visitors.size() ; ++i)
+   // Delete AST visitors
+   for (size_t i = 0; i < ast_visitors.size(); ++i)
    {
-      assert(this->ast_visitors[i] != NULL);
-      delete this->ast_visitors[i];
+      delete ast_visitors[i];
+   }
+
+   // Delete ST visitors
+   for (size_t i = 0; i < st_visitors.size(); ++i)
+   {
+      delete st_visitors[i];
    }
 }
 
 void
 Compiler::compile (char* fp)
 {
-   std::string file_path(fp);
-   this->_parse_queue.push(file_path);
-   this->processParseQueue();
+   logger.sLevel(gOptions()->getInt("log.level"));
 
-   for (int i=0; i < this->ast_visitors.size(); ++i)
-   {
-      this->logger.debug("Running visitor <%s>",this->ast_visitors[i]->_name.c_str());
-      this->ast_visitors[i]->init(&this->symbols, &this->logger);
-      this->ast_visitors[i]->visit_preorder(&this->ast);
-   }
+   _parse_queue.push(fp);
+
+   processParseQueue();
+
+   runAstVisitors();
+   runStVisitors();
+
+   if (isBuildSuccessful()) emitCode();
+
+   printBuildSummary();
 
    reset_lexer(); // Cleans up lexer global vars
+
+   if (gOptions()->isSet("ast.dump.file")) dumpAst();
+   if (gOptions()->isSet("st.dump.file")) dumpSt();
+}
+
+void
+Compiler::dumpAst ()
+{
+   std::ofstream dump_file;
+   dump_file.open(gOptions()->getStr("ast.dump.file").c_str());
+
+   mem::ast::dumper::XmlDumper dumper;
+   dumper.dump_to(&ast, dump_file);
+
+   dump_file.close();
+   logger.debug("AST dumped to %s", gOptions()->getStr("ast.dump.file").c_str());
+}
+
+void
+Compiler::dumpSt ()
+{
+   if (gOptions()->isSet("st.dump.format")
+      && gOptions()->getInt("st.dump.format") != Compiler::NO)
+   {
+      // Open dump file
+      // TODO We should have a default output file in case the user did not
+      // give one
+      std::ofstream st_dump_file(gOptions()->getStr("st.dump.file").c_str());
+
+      // Choose ST dumper based on the requested format
+      st::visitor::IDumper* dumper = NULL;
+      switch (gOptions()->getInt("st.dump.format"))
+      {
+         case Compiler::XML:
+            dumper = new st::visitor::XmlDumper();
+            break;
+      }
+
+      if (dumper != NULL)
+      {
+         dumper->_out = &st_dump_file;
+         dumper->setup();
+         dumper->visitPreorder(symbols._root);
+
+         st_dump_file.close();
+         logger.debug("SymbolTable dumped to %s",
+            gOptions()->getStr("st.dump.file").c_str());
+      }
+   }
+}
+
+void
+Compiler::emitCode ()
+{
+   if (gOptions()->getBool("codegen.native"))
+   {
+      mem::codegen::llvm_::Codegen cg;
+      cg._st = &symbols;
+      cg.gen(&ast);
+   }
 }
 
 void
 Compiler::parse (std::string file_path)
 {
-   this->logger.info("Parsing {path:%s}...", file_path.c_str());
+   this->logger.debug("[%s] parsing...", file_path.c_str());
+
+   // @TODO Split it
+   st::Namespace* file_sym = st::Util::createNamespace(this->symbols._root, Util::split(Util::stripFileExtension(file_path),'/'));
+   assert(file_sym != NULL);
+
    reset_lexer();
    std::vector<std::string> paths_tried;
    std::string include_path("");
 
    // Try finding the file using include path directories
+   // TODO This should be moved to fs::FileManager
    fs::File* file = this->fm.openFile(file_path);
    paths_tried.push_back(file_path);
    if (file == NULL)
@@ -80,25 +161,27 @@ Compiler::parse (std::string file_path)
       std::string ns(file_path.substr(include_path.length(), file_path.length() - include_path.length() + 1));
       mem::Util::path_to_namespace(ns);
       ast::node::File* file_node = new ast::node::File();
+      file_node->sBoundSymbol(file_sym);
       file_node->_id.assign(ns);
       file_node->_include_path.assign(include_path);
       file_node->_path = file_path;
-      this->ast.pushChild(file_node);
+      ast.pushChild(file_node);
 
       // Used by yyparse
       yyin = fopen(file_path.c_str(), "rb");
       // @FIXME The file was opened ms before
       // We could open the file only once if we used Bison++
-      ASSERT_NOT_NULL(yyin);
+      assert(yyin != NULL);
       yyfile = file;
       yyparse(this->fm, file_node, this->symbols, this->logger, file);
 
       ast::visitor::FindUse find_use;
       find_use.visit_preorder(file_node);
-      for (size_t i = 0 ; i < find_use._uses.size() ; ++i)
+      for (size_t i = 0; i < find_use._uses.size(); ++i)
       {
          if (ns == find_use._uses[i])
          {
+            // FIXME This thing is probably failing, should use a pointer.
             log::Message warn(log::WARNING);
             warn.formatMessage(
                "File {path:%s} is trying to include itself: include ignored.",
@@ -133,12 +216,44 @@ Compiler::parse (std::string file_path)
 }
 
 void
+Compiler::printBuildSummary ()
+{
+   std::ostringstream sum;
+   if (this->logger._n_fatal_errors > 0)
+   {
+      sum << this->logger._n_fatal_errors;
+      sum << " fatal errors, ";
+   }
+   if (this->logger._n_errors > 0)
+   {
+      sum << this->logger._n_errors;
+      sum << " errors, ";
+   }
+
+   if (this->logger._n_warnings > 0)
+   {
+      sum << this->logger._n_warnings;
+      sum << " warnings, ";
+   }
+
+   if (this->isBuildSuccessful())
+   {
+      this->logger.info("Build SUCCESSFUL", "");
+   }
+   else
+   {
+      this->logger.info(sum.str().c_str(), "");
+      this->logger.fatalError("Build FAILED", "");
+   }
+}
+
+void
 Compiler::processParseQueue ()
 {
-   while (!this->_parse_queue.empty())
+   while (!_parse_queue.empty())
    {
-      this->parse(this->_parse_queue.front());
-      this->_parse_queue.pop();
+      parse(_parse_queue.front());
+      _parse_queue.pop();
    }
 }
 
@@ -146,7 +261,56 @@ Compiler::processParseQueue ()
 void
 Compiler::registerAstVisitor (ast::visitor::Visitor* visitor)
 {
-   this->ast_visitors.push_back(visitor);
+   ast_visitors.push_back(visitor);
+}
+
+void
+Compiler::registerStVisitor (st::visitor::Visitor* visitor)
+{
+   st_visitors.push_back(visitor);
+}
+
+void
+Compiler::runAstVisitors ()
+{
+   for (size_t i=0;
+      i < ast_visitors.size() && logger._n_fatal_errors == 0; ++i)
+   {
+      logger.debug("[%s] running...", ast_visitors[i]->_name.c_str());
+      ast_visitors[i]->setup(&symbols, &logger);
+      ast_visitors[i]->visit_preorder(&ast);
+      ast_visitors[i]->tearDown();
+   }
+}
+
+void
+Compiler::runStVisitors ()
+{
+   for (size_t i = 0; i < st_visitors.size(); ++i)
+   {
+      logger.debug("[%s] running...", st_visitors[i]->gNameCstr());
+      st_visitors[i]->setup();
+      st_visitors[i]->visitPreorder(symbols.gRoot());
+      st_visitors[i]->tearDown();
+   }
+}
+
+void
+Compiler::setUpOptions ()
+{
+   _opts.addStrOpt("ast.dump.file");
+      _opts.addBoolOpt("codegen.native");
+   _opts.addIntEnumOpt("log.level")
+      ->bind("unknown", log::UNKNOWN)
+      ->bind("debug", log::DEBUG)
+      ->bind("info", log::INFO)
+      ->bind("warning", log::WARNING)
+      ->bind("error", log::ERROR)
+      ->bind("fatal-error", log::FATAL_ERROR);
+   _opts.addStrOpt("st.dump.file");
+   _opts.addIntEnumOpt("st.dump.format")
+      ->bind("no", Compiler::NO)
+      ->bind("xml", Compiler::XML);
 }
 
 }

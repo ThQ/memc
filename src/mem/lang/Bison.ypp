@@ -1,0 +1,705 @@
+%parse-param{mem::fs::FileManager& fm}
+%parse-param{mem::ast::node::Node* ast}
+%parse-param{mem::st::SymbolTable& symbols}
+%parse-param{mem::log::Logger& logger}
+%parse-param{mem::fs::File* file}
+
+%code requires{
+#define PASS (0);
+#include <stdio.h>
+#include <string.h>
+#include "mem/ast/node/BinaryExpression.hpp"
+#include "mem/ast/node/Block.hpp"
+#include "mem/ast/node/Call.hpp"
+#include "mem/ast/node/Class.hpp"
+#include "mem/ast/node/Field.hpp"
+#include "mem/ast/node/LeftUnary.hpp"
+#include "mem/ast/node/New.hpp"
+#include "mem/ast/node/Primitive.hpp"
+#include "mem/ast/node/Root.hpp"
+#include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/Use.hpp"
+#include "mem/ast/node/VarDecl.hpp"
+#include "mem/ast/node/While.hpp"
+#include "mem/fs/File.hpp"
+#include "mem/fs/FileManager.hpp"
+#include "mem/fs/position/Range.hpp"
+#include "mem/log/Logger.hpp"
+#include "mem/st/SymbolTable.hpp"
+#include "mem/Compiler.hpp"
+#include "mem/number.hpp"
+
+using namespace mem;
+
+#ifndef YYERROR_VERBOSE
+#define YYERROR_VERBOSE 1
+#endif
+
+#define YYLTYPE fs::position::Range
+#define YYLTYPE_IS_DECLARED 1
+
+#define YYLLOC_DEFAULT(Current, Rhs, N) \
+   do \
+   { \
+      if (YYID (N)) \
+      { \
+         (Current).sLine(YYRHSLOC (Rhs, 1)._line); \
+         (Current).sLineEnd(YYRHSLOC (Rhs, 1)._line_end); \
+         (Current).sColStart(YYRHSLOC (Rhs, 1)._column_start); \
+         (Current).sColEnd(YYRHSLOC (Rhs, N)._column_end); \
+         (Current).sFile(YYRHSLOC(Rhs, 1)._file); \
+      } \
+      else \
+      { \
+         (Current).sLine(YYRHSLOC (Rhs, 0)._line); \
+         (Current).sLineEnd(YYRHSLOC (Rhs, 0)._line_end); \
+         (Current).sColStart(YYRHSLOC (Rhs, 0)._column_end); \
+         (Current).sColEnd(YYRHSLOC (Rhs, 0)._column_end); \
+         (Current).sFile(NULL); \
+      } \
+   } \
+   while (YYID (0))
+}
+
+%code {
+extern int yylex();
+
+void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols, log::Logger& logger, fs::File* file, const char *s)
+{
+   fs::position::Position* pos = new fs::position::Position();
+   pos->sFile(file);
+
+   log::Message* msg = new log::Error();
+   msg->sMessage("Syntax error");
+   msg->sDescription(s);
+   msg->sPosition(pos);
+   logger.log(msg);
+}
+}
+
+
+%code requires {
+}
+
+%union {
+   int integer;
+   char* text;
+   ast::node::Node* binary_node;
+   ast::node::Node* node;
+   ast::node::Text* text_node;
+}
+
+%code {
+}
+
+
+%locations
+%token T_AROBASE
+%token T_AND
+%token T_CLASS
+%token T_COMMA
+%token T_CP
+%token T_DEDENT
+%token T_DOT
+%token T_ELSE
+%token T_EQ
+%token T_IF
+%token <text> T_ID
+%token T_INDENT
+%token T_INTERFACE
+%token T_LBRACKET
+%token T_LITERAL_FLOAT
+%token T_LITERAL_HEX
+%token <text> T_LITERAL_INT
+%token <text> T_LITERAL_NUMBER
+%token T_NEW
+%token T_NEWLINE
+%token T_OP
+%token T_OR
+%token T_PASS
+%token T_PATCH
+%token T_PRIMITIVE
+%token T_OBJECT
+%token T_RBRACKET
+%token T_RARR
+%token <text> T_STRING
+%token T_USE
+%token T_WHITESPACE
+%token T_LEFT_BINARY_OP
+%token T_RETURN
+%token T_SEMICOLON
+%token T_WHILE
+%token T_SELF
+
+%right <node> T_OP T_CP
+%right <node> T_BANG
+%left <node> T_EQ_EQ T_GT T_RARR_EQ T_LT T_RARR T_LARR_EQ
+%left <node> T_MINUS T_PLUS
+%left <node> T_MUL T_DIV
+%left <node> T_DOT
+%left <node> T_MUL_MUL T_MODULO
+%left <node> T_MINUS_MINUS T_PLUS_PLUS
+
+%type <node> binary_expr
+%type <text_node> binary_operator
+%type <node> block
+%type <node> call
+%type <node> class_declaration
+%type <node> class_members
+%type <node> compound_statement
+%type <node> dot_expr
+%type <node> expr
+%type <node> expr_list
+%type <node> function_declaration
+%type <node> function_declaration_parameter
+%type <node> function_declaration_parameter_list
+%type <text> function_name
+%type <text_node> id
+%type <node> if
+%type <text_node> left_unary_expr
+%type <text_node> left_unary_operator
+%type <node> literal
+%type <node> members_declarations
+%type <node> member_declaration
+%type <node> return_statement
+%type <node> simple_statement
+%type <node> statement
+%type <node> statements
+%type <node> type_name
+%type <text_node> use
+%type <node> variable_declaration
+%type <node> while
+%type <text_node> qualified_id
+%type <text_node> use_file
+
+%%
+
+input :
+   /* empty */
+   | input T_NEWLINE
+   | input T_DEDENT
+   | input T_WHITESPACE T_NEWLINE
+   | input use
+   {
+      ast->pushChild($2);
+   }
+   | input class_declaration
+   {
+      ast->pushChild($2);
+   }
+   | input function_declaration
+   {
+      ast->pushChild($2);
+   }
+
+
+use:
+
+   T_USE use_file
+   {
+      $$ = new ast::node::Use();
+      $$->sValue($2->gValue());
+      $$->sPosition(new fs::position::Range(@1, @2));
+      delete $2;
+   }
+
+use_file :
+   T_ID
+   {
+      $$ = new ast::node::Text();
+      $$->sValue($1);
+   }
+   | use_file T_DOT T_ID
+   {
+      $$->sValue($$->gValue() + '.' + $3);
+   }
+
+/*
+=============================================================================
+  DECLARATION
+=============================================================================
+*/
+
+class_declaration:
+   T_CLASS id class_members
+   {
+      ast::node::Class* cls = new ast::node::Class();
+
+      cls->sValue($2->_value);
+      cls->eat($3);
+      cls->sPosition(new fs::position::Range(@1, @3));
+      delete $2;
+      delete $3;
+      $$ = cls;
+   }
+   | T_CLASS id T_LT id class_members
+   {
+      ast::node::Class* cls = new ast::node::Class();
+
+      cls->sValue($2->_value);
+      cls->eat($5);
+      cls->pushChild($4);
+      cls->sPosition(new fs::position::Range(@1, @3));
+      delete $2;
+      delete $5;
+      $$ = cls;
+   }
+
+class_members:
+   T_NEWLINE T_INDENT members_declarations T_DEDENT
+   {
+      $$ = new ast::node::Block();
+      $$->sPosition(new fs::position::Range(@3, @3));
+      $$->eat($3);
+      delete $3;
+   }
+
+
+/*
+=============================================================================
+  CONTROL FLOW
+=============================================================================
+*/
+if:
+   T_IF expr block
+   {
+      $$ = new ast::node::Node(MEM_NODE_IF);
+      $$->pushChildren($2, $3);
+      $$->sPosition(new fs::position::Range(@1, @2));
+   }
+   | T_IF expr block T_ELSE block
+   {
+      $$ = new ast::node::Node(MEM_NODE_IF_ELSE);
+      $$->pushChildren($2, $3, $5);
+      $$->sPosition(new fs::position::Range(@1, @5));
+   }
+
+while:
+   T_WHILE expr block
+   {
+      $$ = new ast::node::While();
+      $$->pushChildren($2, $3);
+      $$->sPosition(new fs::position::Range(@1, @3));
+   }
+
+block:
+   T_NEWLINE T_INDENT statements T_DEDENT
+   {
+      $$ = new ast::node::Block();
+      $$->sPosition(new fs::position::Range(@3, @3));
+      $$->eat($3);
+      delete $3;
+   }
+
+statements:
+   statement
+   {
+      $$ = new ast::node::Node();
+      $$->pushChild($1);
+   }
+   | statements statement
+   {
+      if ($$ == 0)
+      {
+         $$ = new ast::node::Node();
+      }
+      $$->pushChild($2);
+   }
+
+statement:
+   expr T_NEWLINE
+   {
+      $$ = $1;
+   }
+   | simple_statement
+   {
+      $$ = $1;
+   }
+   | compound_statement
+   {
+      $$ = $1;
+   }
+
+compound_statement:
+   if
+   | while
+
+simple_statement:
+   variable_declaration
+   | return_statement
+
+return_statement:
+   T_RETURN expr
+   {
+      $$ = new ast::node::Node(MEM_NODE_RETURN);
+      $$->pushChild($2);
+   }
+
+function_name:
+   T_ID
+   | T_STRING
+
+function_declaration:
+   // Virtual function : no parameters, return type
+   // Ex: my_function_name() -> my_return_type
+   function_name T_OP T_CP T_RARR type_name T_NEWLINE
+   {
+      ast::node::Func* n = new ast::node::Func();
+      n->sValue($1, strlen($1));
+      n->pushChild($5);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+
+      free($1);
+   }
+   // Virtual function : parameters, return type
+   // Ex: my_function_name(my_variable :my_type) -> my_return_type
+   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name T_NEWLINE
+   {
+      $3->sPosition(new fs::position::Range(
+         *($3->getChild(0)->_position),
+         *($3->getChild($3->_child_count-1)->_position)));
+
+      ast::node::Func* n = new ast::node::Func();
+      n->sValue($1, strlen($1));
+      n->pushChildren($3, $6);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+
+      free($1);
+   }
+   // Ex: my_function_name() -> my_return_type
+   | function_name T_OP T_CP T_RARR type_name block
+   {
+      ast::node::Func* n = new ast::node::Func();
+      n->sValue($1, strlen($1));
+      n->pushChildren($5, $6);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+
+      free($1);
+   }
+   // Ex: my_function_name(my_variable :my_type) :my_return_type
+   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name block
+   {
+      $3->sPosition(new fs::position::Range(
+         *($3->getChild(0)->_position),
+         *($3->getChild($3->_child_count-1)->_position)));
+      ast::node::Func* n = new ast::node::Func();
+      n->sValue($1, strlen($1));
+      n->pushChildren($3, $6, $7);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+
+      free($1);
+   }
+
+
+members_declarations:
+   member_declaration
+   {
+      $$ = new ast::node::Node();
+      $$->pushChild($1);
+   }
+   | members_declarations member_declaration
+   {
+      $$->pushChild($2);
+   }
+
+member_declaration:
+   // Ex: my_variable :my_type
+   id T_SEMICOLON type_name T_NEWLINE
+   {
+      ast::node::Field* field = new ast::node::Field();
+      field->sPosition(@$.copy_range());
+      field->pushChildren($1, $3);
+
+      $$ = (ast::node::Node*)field;
+   }
+
+function_declaration_parameter_list:
+   function_declaration_parameter
+   {
+      $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETERS);
+      $$->pushChild($1);
+   }
+   | function_declaration_parameter_list T_COMMA function_declaration_parameter
+   {
+      $$->pushChild($3);
+   }
+
+function_declaration_parameter:
+   id T_SEMICOLON type_name
+   {
+      $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETER);
+      $$->pushChildren($1, $3);
+      $$->sPosition(new fs::position::Range(@1, @3));
+   }
+
+type_name :
+   qualified_id
+   {
+      $$ = static_cast<ast::node::Node*>($1);
+   }
+
+variable_declaration :
+   // Ex: my_variable :my_type
+   id T_SEMICOLON type_name T_NEWLINE
+   {
+      ast::node::VarDecl* n = new ast::node::VarDecl();
+      n->sPosition(@$.copy_range());
+      n->pushChildren($1, $3);
+      $$ = (ast::node::Node*)n;
+   }
+   // Ex: my_variable := my_function()
+   | id T_SEMICOLON T_EQ expr T_NEWLINE
+   {
+      ast::node::Node* ty_place_holder = new ast::node::Node(MEM_NODE_PLACE_HOLDER);
+      ty_place_holder->sPosition(@3.copy_range());
+
+      ast::node::VarDecl* n = new ast::node::VarDecl();
+      n->pushChildren($1, ty_place_holder, $4);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+   }
+   // Ex: my_variable :my_type = my_function()
+   | id T_SEMICOLON type_name T_EQ expr T_NEWLINE
+   {
+      ast::node::VarDecl* n = new ast::node::VarDecl();
+      n->sPosition(@$.copy_range());
+      n->pushChildren($1, $3, $5);
+      $$ = (ast::node::Node*)n;
+   }
+
+id :
+   T_ID
+   {
+      $$ = new ast::node::Text(MEM_NODE_ID);
+      $$->sPosition(@$.copy_range());
+      $$->sValue($1, strlen($1));
+
+      free($1);
+   }
+
+qualified_id :
+   id
+   {
+      $$->_type = MEM_NODE_FINAL_ID;
+   }
+   | qualified_id T_DOT id
+   {
+      $$ = new ast::node::Text(MEM_NODE_DOT);
+      $$->pushChildren($1, $3);
+      $$->sPosition(@$.copy_range());
+   }
+
+dot_expr :
+   expr T_DOT id
+   {
+      $$ = new ast::node::Node(MEM_NODE_DOT);
+      $$->sPosition(@$.copy_range());
+      $$->pushChildren($1, $3);
+   }
+
+expr :
+   literal
+   {
+      $$ = $1;
+   }
+   | dot_expr
+   {
+      $$ = $1;
+   }
+   | binary_expr
+   {
+      $$ = (ast::node::Node*)$1;
+   }
+   | left_unary_expr
+   {
+      $$ = (ast::node::Node*)$1;
+   }
+   /* ex: (1 + 2 + 3) */
+   | T_OP expr T_CP
+   {
+      $$ = new ast::node::Node(MEM_NODE_GROUP);
+      $$->pushChild($2);
+   }
+   | qualified_id
+   {
+      $$ = static_cast<ast::node::Node*>($1);
+   }
+   | call
+   {
+      $$ = (ast::node::Node*)$1;
+   }
+   | T_NEW type_name
+   {
+      $$ = new ast::node::New();
+      $$->sPosition(@$.copy_range());
+      $$->pushChild($2);
+   }
+
+binary_operator:
+   // ex: this.canRead() and this.bytesReceived > 0
+   T_AND
+   {
+      $$ = new ast::node::Text(MEM_NODE_AND);
+   }
+   | T_OR
+   {
+      $$ = new ast::node::Text(MEM_NODE_OR);
+   }
+   | T_DIV
+   {
+      $$ = new ast::node::Text(MEM_NODE_DIV);
+   }
+   | T_EQ_EQ
+   {
+      $$ = new ast::node::Text();
+      $$->sValue("__equals__", 10);
+   }
+   | T_LT
+   {
+      $$ = new ast::node::Text();
+      $$->sValue("__lt__", 6);
+   }
+   | T_LARR_EQ
+   {
+      $$ = new ast::node::Text();
+      $$->sValue("__lte__", 7);
+   }
+   | T_MINUS
+   {
+      $$ = new ast::node::Text(MEM_NODE_MINUS);
+   }
+   | T_MODULO
+   {
+      $$ = new ast::node::Text();
+      $$->sValue("__modulo__", 10);
+   }
+   | T_MUL
+   {
+      $$ = new ast::node::Text(MEM_NODE_MUL);
+   }
+   // ex: 2 ** 8
+   | T_MUL_MUL
+   {
+      $$ = new ast::node::Text(MEM_NODE_POW);
+   }
+   | T_PLUS
+   {
+      $$ = new ast::node::Text(MEM_NODE_PLUS);
+   }
+   | T_GT
+   {
+      $$ = new ast::node::Text();
+      $$->sValue("__gt__", 6);
+   }
+   | T_RARR_EQ
+   {
+      $$ = new ast::node::Text();
+      $$->sValue("__gte__", 7);
+   }
+
+left_unary_operator:
+   T_BANG
+   {
+      $$ = new ast::node::Text(MEM_NODE_ID);
+      $$->sValue("__bang__");
+   }
+   | T_MINUS_MINUS
+   {
+      $$ = new ast::node::Text(MEM_NODE_ID);
+      $$->sValue("__minus_minus__");
+   }
+   | T_PLUS_PLUS
+   {
+      $$ = new ast::node::Text(MEM_NODE_ID);
+      $$->sValue("__plus_plus__");
+   }
+
+binary_expr:
+   expr binary_operator expr
+   {
+      $2->pushChildren($1, $3);
+      $2->sPosition(@$.copy_range());
+      $$ = $2;
+   }
+
+left_unary_expr:
+   left_unary_operator expr
+   {
+      ast::node::Node* func = new ast::node::Node(MEM_NODE_DOT);
+      func->pushChild ($2);
+
+      $$ = new ast::node::Text(MEM_NODE_CALL);
+      $$->pushChild(func);
+   }
+
+expr_list :
+   expr
+   {
+      $$ = new ast::node::Node(MEM_NODE_EXPR_LIST);
+      $$->pushChild($1);
+   }
+   | expr_list T_COMMA expr
+   {
+      if ($$ == 0)
+      {
+         $$ = new ast::node::Node(MEM_NODE_EXPR_LIST);
+      }
+      $$->pushChild($3);
+   }
+
+call :
+   /* ex: my_func() */
+   expr T_OP T_CP
+   {
+      $$ = new ast::node::Call();
+      $$->sPosition(new fs::position::Range(@1, @3));
+      $$->pushChild($1);
+   }
+   /* ex: my_func(1, 2, 3) */
+   | expr T_OP expr_list T_CP
+   {
+      $3->sPosition(@3.copy_range());
+      $$ = new ast::node::Call();
+      $$->sPosition(new fs::position::Range(@1, @4));
+      $$->pushChildren($1, $3);
+   }
+
+literal :
+   T_LITERAL_NUMBER
+   {
+      int i_val = 0;
+      short s_val = 0;
+
+      if (mem::number::getShortFromString($1, s_val))
+      {
+         ast::node::Number* s_node = new ast::node::Number();
+         s_node->setShort(s_val);
+         s_node->sExprType(symbols._core_types.gShortTy());
+         $$ = s_node;
+      }
+      else if (mem::number::getIntFromString($1, i_val))
+      {
+         ast::node::Number* i_node = new ast::node::Number();
+         i_node->setInt(i_val);
+         i_node->sExprType(symbols._core_types.gIntTy());
+         $$ = i_node;
+      }
+
+      if ($$ != NULL)
+      {
+         $$->sPosition(@1.copy_range());
+      }
+      else
+      {
+         //FIXME Couldnt fit this value into a numeric type, so should fail
+      }
+
+      free($1);
+   }
+%%
+
+#include "mem/ast/node/Node.hpp"

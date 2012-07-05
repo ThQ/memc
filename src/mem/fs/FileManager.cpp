@@ -1,12 +1,13 @@
 #include "mem/fs/FileManager.hpp"
 
+
 namespace mem { namespace fs {
 
 
 FileManager::~FileManager ()
 {
-   std::map<std::string,File*>::iterator it = this->_files.begin();
-   for (; it != this->_files.end(); ++it )
+   std::map<std::string,File*>::iterator it = _files.begin();
+   for (; it != _files.end(); ++it )
    {
       delete it->second;
    }
@@ -17,7 +18,7 @@ FileManager::getLineOf (std::string file_path, unsigned int lineno)
 {
    std::string line;
    std::map<std::string, File*>::iterator file_it;
-   if ((file_it = this->_files.find(file_path)) != this->_files.end())
+   if ((file_it = _files.find(file_path)) != _files.end())
    {
       if (file_it->second->_lines.size() > lineno)
       {
@@ -33,7 +34,7 @@ FileManager::openFile (std::string file_path)
    File* file = new File();
    if (file->open(file_path))
    {
-      this->_files[file_path] = file;
+      _files[file_path] = file;
       return file;
    }
    delete file;

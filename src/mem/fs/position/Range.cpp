@@ -5,45 +5,45 @@ namespace mem { namespace fs { namespace position {
 
 Range::Range ()
 {
-   this->_file = NULL;
-   this->_line = 0;
-   this->_line_end = 0;
-   this->_column_start = 0;
-   this->_column_end = 0;
+   _file = NULL;
+   _line = 0;
+   _line_end = 0;
+   _column_start = 0;
+   _column_end = 0;
 }
 
 Range::Range(Range pos_start, Range pos_end)
 {
-   this->_file = pos_start._file;
-   this->_line = pos_start._line;
-   this->_line_end = pos_end._line;
-   this->_column_start = pos_start._column_start;
-   this->_column_end = pos_end._column_end;
+   _file = pos_start._file;
+   _line = pos_start._line;
+   _line_end = pos_end._line;
+   _column_start = pos_start._column_start;
+   _column_end = pos_end._column_end;
 }
 
 Position*
 Range::copy ()
 {
    Range* rnge = new Range();
-   rnge->_file = this->_file;
-   rnge->_line = this->_line;
-   rnge->_line_end = this->_line_end;
-   rnge->_column_start = this->_column_start;
-   rnge->_column_end = this->_column_end;
+   rnge->_file = _file;
+   rnge->_line = _line;
+   rnge->_line_end = _line_end;
+   rnge->_column_start = _column_start;
+   rnge->_column_end = _column_end;
    return rnge;
 }
 
 Range*
 Range::copy_range ()
 {
-   return static_cast<Range*>(this->copy());
+   return static_cast<Range*>(copy());
 }
 
 PositionType
 Range::getTypeAt (int column)
 {
    // @FIXME : does not work on multi-lines
-   if (column >= this->_column_start && column <= this->_column_end)
+   if (column >= _column_start && column <= _column_end)
    {
       return RANGE;
    }

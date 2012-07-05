@@ -6,7 +6,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "macro.h"
 #include "mem/fs/File.hpp"
 
 
@@ -19,6 +18,7 @@ class FileManager
    public: std::vector<std::string> _path;
 
    public: ~FileManager();
+   public: inline void appendPath (std::string dir_path) {_path.push_back(dir_path);}
    public: std::string getLineOf (std::string file_path, unsigned int line);
    public: File* openFile (std::string file_path);
 };

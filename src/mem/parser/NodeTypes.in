@@ -1,3 +1,4 @@
+AND And
 BINARY Binary
 BINARY_ADD BinaryAddition
 BINARY_SUB BinarySubstraction
@@ -7,6 +8,7 @@ BLOCK Block
 CALL Call
 CLASS Class
 CLASS_DECLARATION Class
+DIV Divide
 DOT Dot
 EXPR_LIST ExpressionList
 FIELD Field
@@ -26,9 +28,18 @@ INTERFACE_DECLARATION Interface
 LEFT_UNARY LeftUnary
 LITERAL_STRING LiteralString
 LITERAL_INT LiteralInt
+LITERAL_NUMBER LiteralNumber
+MINUS Minus
+MUL Multiply
 NAMESPACE Namespace
+NEW New
+NUMBER Number
+POW Power
 OBJECT_DECLARATION Object
+OR Or
 PATCH_DECLARATION Patch
+PLACE_HOLDER PlaceHolder
+PLUS Plus
 PRIMITIVE Primitive
 RETURN Return
 ROOT Root

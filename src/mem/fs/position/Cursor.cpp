@@ -5,32 +5,32 @@ namespace mem { namespace fs { namespace position {
 
 Cursor::Cursor ()
 {
-   this->_file = NULL;
-   this->_line = 0;
-   this->_column = 0;
+   _file = NULL;
+   _line = 0;
+   _column = 0;
 }
 
 Cursor::Cursor (int line, int column)
 {
-   this->_file = NULL;
-   this->_line = line;
-   this->_column = column;
+   _file = NULL;
+   _line = line;
+   _column = column;
 }
 
 Cursor::Cursor (fs::File* file, int line, int column)
 {
-   this->_column = column;
-   this->_file = file;
-   this->_line = line;
+   _column = column;
+   _file = file;
+   _line = line;
 }
 
 Position*
 Cursor::copy ()
 {
    Cursor* cur = new Cursor();
-   cur->_file = this->_file;
-   cur->_line = this->_line;
-   cur->_column = this->_column;
+   cur->_file = _file;
+   cur->_line = _line;
+   cur->_column = _column;
 
    return cur;
 }
@@ -38,7 +38,7 @@ Cursor::copy ()
 PositionType
 Cursor::getTypeAt (int column)
 {
-   if (column == this->_column)
+   if (column == _column)
    {
       return CURSOR;
    }

@@ -4,6 +4,20 @@
 namespace mem { namespace ast { namespace util {
 
 
+node::File*
+getFileNode (node::Node* cur_node)
+{
+   while (cur_node != NULL)
+   {
+      if (cur_node->isType(MEM_NODE_FILE))
+      {
+         return static_cast<node::File*>(cur_node);
+      }
+      cur_node = cur_node->_parent;
+   }
+   return NULL;
+}
+
 st::Symbol*
 find_local_variable_type(node::Node* start_at, std::string var_name)
 {

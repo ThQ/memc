@@ -10,19 +10,25 @@
 #include <vector>
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Node.hpp"
+#include "mem/ast/dumper/XmlDumper.hpp"
 #include "mem/ast/visitor/BlockTypesChecker.hpp"
+#include "mem/ast/visitor/CheckValidity.hpp"
 #include "mem/ast/visitor/FindClasses.hpp"
+#include "mem/ast/visitor/FindEntryPoint.hpp"
 #include "mem/ast/visitor/FindUse.hpp"
 #include "mem/ast/visitor/Prechecker.hpp"
 #include "mem/ast/visitor/TopTypesChecker.hpp"
 #include "mem/ast/visitor/TypeMatch.hpp"
-#include "mem/ast/visitor/VariableTypesChecker.hpp"
-#include "fs/File.hpp"
-#include "fs/FileManager.hpp"
+#include "mem/codegen/llvm/Codegen.hpp"
+#include "mem/fs/File.hpp"
+#include "mem/fs/FileManager.hpp"
+#include "mem/lang/Bison.hpp"
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
-#include "mem/parser/Bison.hpp"
+#include "mem/opt/Options.hpp"
 #include "mem/st/SymbolTable.hpp"
+#include "mem/st/visitor/DepBuilder.hpp"
+#include "mem/st/visitor/XmlDumper.hpp"
 #include "mem/Util.hpp"
 
 
@@ -32,25 +38,110 @@ extern void reset_lexer();
 extern mem::fs::File* yyfile;
 
 
-namespace mem
+namespace mem {
+
+
+class Compiler
 {
-   class Compiler
-   {
-      public: ast::node::Node ast;
-      public: std::vector<ast::visitor::Visitor*> ast_visitors;
-      public: fs::FileManager fm;
-      public: log::ConsoleLogger logger;
-      public: std::queue<std::string> _parse_queue;
-      public: st::SymbolTable symbols;
+   public: typedef enum {NO, XML} StDumpFormat;
 
-      public: Compiler();
-      public: ~Compiler();
+   public: ast::node::Root ast;
+   public: std::vector<ast::visitor::Visitor*> ast_visitors;
+   public: std::vector<st::visitor::Visitor*> st_visitors;
+   public: fs::FileManager fm;
+   public: log::ConsoleLogger logger;
+   public: std::queue<std::string> _parse_queue;
+   public: st::SymbolTable symbols;
 
-      public: void compile (char* file_path);
-      public: void parse (std::string file_path);
-      public: void processParseQueue();
-      public: void registerAstVisitor(ast::visitor::Visitor* visitor);
-   };
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+
+   public: opt::Options _opts;
+   public: opt::Options* gOptions () {return &_opts;}
+
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Compiler();
+
+   /**
+    * Destructor.
+    */
+   ~Compiler();
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Starts a compiling job starting with an entry file.
+    */
+   void
+   compile (char* file_path);
+
+   void
+   dumpAst ();
+
+   void
+   dumpSt ();
+
+   void
+   emitCode ();
+
+   /**
+    * Returns true if no warning nor fatal errors have been emitted.
+    */
+    bool
+    isBuildSuccessful () const {return logger._n_warnings == 0 && logger._n_fatal_errors ==0;}
+   /**
+    * Parses a file given its path.
+    */
+   void
+   parse (std::string file_path);
+
+   /**
+    * Prints a compilation summary to stdout.
+    */
+   void
+   printBuildSummary ();
+
+   /**
+    * Parses each file in the parse queue until there's nothing left.
+    */
+   void
+   processParseQueue ();
+
+   /**
+    * Appends an AST visitor to the visitor list (FIFO).
+    */
+   void
+   registerAstVisitor (ast::visitor::Visitor* visitor);
+
+   /**
+    * Appends an AST visitor to the visitor list (FIFO).
+    */
+   void
+   registerStVisitor (st::visitor::Visitor* visitor);
+
+   void
+   runAstVisitors ();
+
+   void
+   runStVisitors ();
+
+   void
+   setUpOptions ();
+};
+
+
 }
+
 
 #endif

@@ -67,11 +67,11 @@
 
 
 /* Line 268 of yacc.c  */
-#line 71 "src/mem/parser/Bison.cpp"
+#line 71 "src/mem/lang/Bison.cpp"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 1
+# define YYDEBUG 0
 #endif
 
 /* Enabling verbose error messages.  */
@@ -84,13 +84,13 @@
 
 /* Enabling the token table.  */
 #ifndef YYTOKEN_TABLE
-# define YYTOKEN_TABLE 1
+# define YYTOKEN_TABLE 0
 #endif
 
 /* "%code requires" blocks.  */
 
 /* Line 288 of yacc.c  */
-#line 7 "src/mem/grammar/mem.y"
+#line 7 "src/mem/lang/Bison.ypp"
 
 #define PASS (0);
 #include <stdio.h>
@@ -149,13 +149,13 @@ using namespace mem;
 
 
 /* Line 288 of yacc.c  */
-#line 81 "src/mem/grammar/mem.y"
+#line 81 "src/mem/lang/Bison.ypp"
 
 
 
 
 /* Line 288 of yacc.c  */
-#line 159 "src/mem/parser/Bison.cpp"
+#line 159 "src/mem/lang/Bison.cpp"
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -215,6 +215,58 @@ using namespace mem;
      T_MINUS_MINUS = 307
    };
 #endif
+/* Tokens.  */
+#define T_AROBASE 258
+#define T_AND 259
+#define T_CLASS 260
+#define T_COMMA 261
+#define T_CP 262
+#define T_DEDENT 263
+#define T_DOT 264
+#define T_ELSE 265
+#define T_EQ 266
+#define T_IF 267
+#define T_ID 268
+#define T_INDENT 269
+#define T_INTERFACE 270
+#define T_LBRACKET 271
+#define T_LITERAL_FLOAT 272
+#define T_LITERAL_HEX 273
+#define T_LITERAL_INT 274
+#define T_LITERAL_NUMBER 275
+#define T_NEW 276
+#define T_NEWLINE 277
+#define T_OP 278
+#define T_OR 279
+#define T_PASS 280
+#define T_PATCH 281
+#define T_PRIMITIVE 282
+#define T_OBJECT 283
+#define T_RBRACKET 284
+#define T_RARR 285
+#define T_STRING 286
+#define T_USE 287
+#define T_WHITESPACE 288
+#define T_LEFT_BINARY_OP 289
+#define T_RETURN 290
+#define T_SEMICOLON 291
+#define T_WHILE 292
+#define T_SELF 293
+#define T_BANG 294
+#define T_LARR_EQ 295
+#define T_LT 296
+#define T_RARR_EQ 297
+#define T_GT 298
+#define T_EQ_EQ 299
+#define T_PLUS 300
+#define T_MINUS 301
+#define T_DIV 302
+#define T_MUL 303
+#define T_MODULO 304
+#define T_MUL_MUL 305
+#define T_PLUS_PLUS 306
+#define T_MINUS_MINUS 307
+
 
 
 
@@ -223,7 +275,7 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 84 "src/mem/grammar/mem.y"
+#line 84 "src/mem/lang/Bison.ypp"
 
    int integer;
    char* text;
@@ -234,7 +286,7 @@ typedef union YYSTYPE
 
 
 /* Line 293 of yacc.c  */
-#line 238 "src/mem/parser/Bison.cpp"
+#line 290 "src/mem/lang/Bison.cpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -259,11 +311,11 @@ typedef struct YYLTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 263 "src/mem/parser/Bison.cpp"
+#line 315 "src/mem/lang/Bison.cpp"
 /* Unqualified %code blocks.  */
 
 /* Line 344 of yacc.c  */
-#line 64 "src/mem/grammar/mem.y"
+#line 64 "src/mem/lang/Bison.ypp"
 
 extern int yylex();
 
@@ -281,13 +333,13 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 
 
 /* Line 344 of yacc.c  */
-#line 92 "src/mem/grammar/mem.y"
+#line 92 "src/mem/lang/Bison.ypp"
 
 
 
 
 /* Line 344 of yacc.c  */
-#line 291 "src/mem/parser/Bison.cpp"
+#line 343 "src/mem/lang/Bison.cpp"
 
 #ifdef short
 # undef short
@@ -1761,7 +1813,7 @@ yyreduce:
         case 6:
 
 /* Line 1806 of yacc.c  */
-#line 183 "src/mem/grammar/mem.y"
+#line 183 "src/mem/lang/Bison.ypp"
     {
       ast->pushChild((yyvsp[(2) - (2)].text_node));
    }
@@ -1770,7 +1822,7 @@ yyreduce:
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 187 "src/mem/grammar/mem.y"
+#line 187 "src/mem/lang/Bison.ypp"
     {
       ast->pushChild((yyvsp[(2) - (2)].node));
    }
@@ -1779,7 +1831,7 @@ yyreduce:
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 191 "src/mem/grammar/mem.y"
+#line 191 "src/mem/lang/Bison.ypp"
     {
       ast->pushChild((yyvsp[(2) - (2)].node));
    }
@@ -1788,7 +1840,7 @@ yyreduce:
   case 9:
 
 /* Line 1806 of yacc.c  */
-#line 199 "src/mem/grammar/mem.y"
+#line 199 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Use();
       (yyval.text_node)->sValue((yyvsp[(2) - (2)].text_node)->gValue());
@@ -1800,7 +1852,7 @@ yyreduce:
   case 10:
 
 /* Line 1806 of yacc.c  */
-#line 208 "src/mem/grammar/mem.y"
+#line 208 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text();
       (yyval.text_node)->sValue((yyvsp[(1) - (1)].text));
@@ -1810,7 +1862,7 @@ yyreduce:
   case 11:
 
 /* Line 1806 of yacc.c  */
-#line 213 "src/mem/grammar/mem.y"
+#line 213 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node)->sValue((yyval.text_node)->gValue() + '.' + (yyvsp[(3) - (3)].text));
    }
@@ -1819,7 +1871,7 @@ yyreduce:
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 225 "src/mem/grammar/mem.y"
+#line 225 "src/mem/lang/Bison.ypp"
     {
       ast::node::Class* cls = new ast::node::Class();
 
@@ -1835,7 +1887,7 @@ yyreduce:
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 236 "src/mem/grammar/mem.y"
+#line 236 "src/mem/lang/Bison.ypp"
     {
       ast::node::Class* cls = new ast::node::Class();
 
@@ -1852,7 +1904,7 @@ yyreduce:
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 250 "src/mem/grammar/mem.y"
+#line 250 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Block();
       (yyval.node)->sPosition(new fs::position::Range((yylsp[(3) - (4)]), (yylsp[(3) - (4)])));
@@ -1864,7 +1916,7 @@ yyreduce:
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 265 "src/mem/grammar/mem.y"
+#line 265 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_IF);
       (yyval.node)->pushChildren((yyvsp[(2) - (3)].node), (yyvsp[(3) - (3)].node));
@@ -1875,7 +1927,7 @@ yyreduce:
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 271 "src/mem/grammar/mem.y"
+#line 271 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_IF_ELSE);
       (yyval.node)->pushChildren((yyvsp[(2) - (5)].node), (yyvsp[(3) - (5)].node), (yyvsp[(5) - (5)].node));
@@ -1886,7 +1938,7 @@ yyreduce:
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 279 "src/mem/grammar/mem.y"
+#line 279 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::While();
       (yyval.node)->pushChildren((yyvsp[(2) - (3)].node), (yyvsp[(3) - (3)].node));
@@ -1897,7 +1949,7 @@ yyreduce:
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 287 "src/mem/grammar/mem.y"
+#line 287 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Block();
       (yyval.node)->sPosition(new fs::position::Range((yylsp[(3) - (4)]), (yylsp[(3) - (4)])));
@@ -1909,7 +1961,7 @@ yyreduce:
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 296 "src/mem/grammar/mem.y"
+#line 296 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node();
       (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
@@ -1919,7 +1971,7 @@ yyreduce:
   case 20:
 
 /* Line 1806 of yacc.c  */
-#line 301 "src/mem/grammar/mem.y"
+#line 301 "src/mem/lang/Bison.ypp"
     {
       if ((yyval.node) == 0)
       {
@@ -1932,7 +1984,7 @@ yyreduce:
   case 21:
 
 /* Line 1806 of yacc.c  */
-#line 311 "src/mem/grammar/mem.y"
+#line 311 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (yyvsp[(1) - (2)].node);
    }
@@ -1941,7 +1993,7 @@ yyreduce:
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 315 "src/mem/grammar/mem.y"
+#line 315 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (yyvsp[(1) - (1)].node);
    }
@@ -1950,7 +2002,7 @@ yyreduce:
   case 23:
 
 /* Line 1806 of yacc.c  */
-#line 319 "src/mem/grammar/mem.y"
+#line 319 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (yyvsp[(1) - (1)].node);
    }
@@ -1959,7 +2011,7 @@ yyreduce:
   case 28:
 
 /* Line 1806 of yacc.c  */
-#line 333 "src/mem/grammar/mem.y"
+#line 333 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_RETURN);
       (yyval.node)->pushChild((yyvsp[(2) - (2)].node));
@@ -1969,7 +2021,7 @@ yyreduce:
   case 31:
 
 /* Line 1806 of yacc.c  */
-#line 346 "src/mem/grammar/mem.y"
+#line 346 "src/mem/lang/Bison.ypp"
     {
       ast::node::Func* n = new ast::node::Func();
       n->sValue((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
@@ -1984,7 +2036,7 @@ yyreduce:
   case 32:
 
 /* Line 1806 of yacc.c  */
-#line 358 "src/mem/grammar/mem.y"
+#line 358 "src/mem/lang/Bison.ypp"
     {
       (yyvsp[(3) - (7)].node)->sPosition(new fs::position::Range(
          *((yyvsp[(3) - (7)].node)->getChild(0)->_position),
@@ -2003,7 +2055,7 @@ yyreduce:
   case 33:
 
 /* Line 1806 of yacc.c  */
-#line 373 "src/mem/grammar/mem.y"
+#line 373 "src/mem/lang/Bison.ypp"
     {
       ast::node::Func* n = new ast::node::Func();
       n->sValue((yyvsp[(1) - (6)].text), strlen((yyvsp[(1) - (6)].text)));
@@ -2018,7 +2070,7 @@ yyreduce:
   case 34:
 
 /* Line 1806 of yacc.c  */
-#line 384 "src/mem/grammar/mem.y"
+#line 384 "src/mem/lang/Bison.ypp"
     {
       (yyvsp[(3) - (7)].node)->sPosition(new fs::position::Range(
          *((yyvsp[(3) - (7)].node)->getChild(0)->_position),
@@ -2036,7 +2088,7 @@ yyreduce:
   case 35:
 
 /* Line 1806 of yacc.c  */
-#line 400 "src/mem/grammar/mem.y"
+#line 400 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node();
       (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
@@ -2046,7 +2098,7 @@ yyreduce:
   case 36:
 
 /* Line 1806 of yacc.c  */
-#line 405 "src/mem/grammar/mem.y"
+#line 405 "src/mem/lang/Bison.ypp"
     {
       (yyval.node)->pushChild((yyvsp[(2) - (2)].node));
    }
@@ -2055,7 +2107,7 @@ yyreduce:
   case 37:
 
 /* Line 1806 of yacc.c  */
-#line 412 "src/mem/grammar/mem.y"
+#line 412 "src/mem/lang/Bison.ypp"
     {
       ast::node::Field* field = new ast::node::Field();
       field->sPosition((yyloc).copy_range());
@@ -2068,7 +2120,7 @@ yyreduce:
   case 38:
 
 /* Line 1806 of yacc.c  */
-#line 422 "src/mem/grammar/mem.y"
+#line 422 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETERS);
       (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
@@ -2078,7 +2130,7 @@ yyreduce:
   case 39:
 
 /* Line 1806 of yacc.c  */
-#line 427 "src/mem/grammar/mem.y"
+#line 427 "src/mem/lang/Bison.ypp"
     {
       (yyval.node)->pushChild((yyvsp[(3) - (3)].node));
    }
@@ -2087,7 +2139,7 @@ yyreduce:
   case 40:
 
 /* Line 1806 of yacc.c  */
-#line 433 "src/mem/grammar/mem.y"
+#line 433 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETER);
       (yyval.node)->pushChildren((yyvsp[(1) - (3)].text_node), (yyvsp[(3) - (3)].node));
@@ -2098,7 +2150,7 @@ yyreduce:
   case 41:
 
 /* Line 1806 of yacc.c  */
-#line 441 "src/mem/grammar/mem.y"
+#line 441 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = static_cast<ast::node::Node*>((yyvsp[(1) - (1)].text_node));
    }
@@ -2107,7 +2159,7 @@ yyreduce:
   case 42:
 
 /* Line 1806 of yacc.c  */
-#line 448 "src/mem/grammar/mem.y"
+#line 448 "src/mem/lang/Bison.ypp"
     {
       ast::node::VarDecl* n = new ast::node::VarDecl();
       n->sPosition((yyloc).copy_range());
@@ -2119,7 +2171,7 @@ yyreduce:
   case 43:
 
 /* Line 1806 of yacc.c  */
-#line 456 "src/mem/grammar/mem.y"
+#line 456 "src/mem/lang/Bison.ypp"
     {
       ast::node::Node* ty_place_holder = new ast::node::Node(MEM_NODE_PLACE_HOLDER);
       ty_place_holder->sPosition((yylsp[(3) - (5)]).copy_range());
@@ -2134,7 +2186,7 @@ yyreduce:
   case 44:
 
 /* Line 1806 of yacc.c  */
-#line 467 "src/mem/grammar/mem.y"
+#line 467 "src/mem/lang/Bison.ypp"
     {
       ast::node::VarDecl* n = new ast::node::VarDecl();
       n->sPosition((yyloc).copy_range());
@@ -2146,7 +2198,7 @@ yyreduce:
   case 45:
 
 /* Line 1806 of yacc.c  */
-#line 476 "src/mem/grammar/mem.y"
+#line 476 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
       (yyval.text_node)->sPosition((yyloc).copy_range());
@@ -2159,7 +2211,7 @@ yyreduce:
   case 46:
 
 /* Line 1806 of yacc.c  */
-#line 486 "src/mem/grammar/mem.y"
+#line 486 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node)->_type = MEM_NODE_FINAL_ID;
    }
@@ -2168,7 +2220,7 @@ yyreduce:
   case 47:
 
 /* Line 1806 of yacc.c  */
-#line 490 "src/mem/grammar/mem.y"
+#line 490 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_DOT);
       (yyval.text_node)->pushChildren((yyvsp[(1) - (3)].text_node), (yyvsp[(3) - (3)].text_node));
@@ -2179,7 +2231,7 @@ yyreduce:
   case 48:
 
 /* Line 1806 of yacc.c  */
-#line 498 "src/mem/grammar/mem.y"
+#line 498 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_DOT);
       (yyval.node)->sPosition((yyloc).copy_range());
@@ -2190,7 +2242,7 @@ yyreduce:
   case 49:
 
 /* Line 1806 of yacc.c  */
-#line 506 "src/mem/grammar/mem.y"
+#line 506 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (yyvsp[(1) - (1)].node);
    }
@@ -2199,7 +2251,7 @@ yyreduce:
   case 50:
 
 /* Line 1806 of yacc.c  */
-#line 510 "src/mem/grammar/mem.y"
+#line 510 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (yyvsp[(1) - (1)].node);
    }
@@ -2208,7 +2260,7 @@ yyreduce:
   case 51:
 
 /* Line 1806 of yacc.c  */
-#line 514 "src/mem/grammar/mem.y"
+#line 514 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (ast::node::Node*)(yyvsp[(1) - (1)].node);
    }
@@ -2217,7 +2269,7 @@ yyreduce:
   case 52:
 
 /* Line 1806 of yacc.c  */
-#line 518 "src/mem/grammar/mem.y"
+#line 518 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (ast::node::Node*)(yyvsp[(1) - (1)].text_node);
    }
@@ -2226,7 +2278,7 @@ yyreduce:
   case 53:
 
 /* Line 1806 of yacc.c  */
-#line 523 "src/mem/grammar/mem.y"
+#line 523 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_GROUP);
       (yyval.node)->pushChild((yyvsp[(2) - (3)].node));
@@ -2236,7 +2288,7 @@ yyreduce:
   case 54:
 
 /* Line 1806 of yacc.c  */
-#line 528 "src/mem/grammar/mem.y"
+#line 528 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = static_cast<ast::node::Node*>((yyvsp[(1) - (1)].text_node));
    }
@@ -2245,7 +2297,7 @@ yyreduce:
   case 55:
 
 /* Line 1806 of yacc.c  */
-#line 532 "src/mem/grammar/mem.y"
+#line 532 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = (ast::node::Node*)(yyvsp[(1) - (1)].node);
    }
@@ -2254,7 +2306,7 @@ yyreduce:
   case 56:
 
 /* Line 1806 of yacc.c  */
-#line 536 "src/mem/grammar/mem.y"
+#line 536 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::New();
       (yyval.node)->sPosition((yyloc).copy_range());
@@ -2265,7 +2317,7 @@ yyreduce:
   case 57:
 
 /* Line 1806 of yacc.c  */
-#line 545 "src/mem/grammar/mem.y"
+#line 545 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_AND);
    }
@@ -2274,7 +2326,7 @@ yyreduce:
   case 58:
 
 /* Line 1806 of yacc.c  */
-#line 549 "src/mem/grammar/mem.y"
+#line 549 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_OR);
    }
@@ -2283,7 +2335,7 @@ yyreduce:
   case 59:
 
 /* Line 1806 of yacc.c  */
-#line 553 "src/mem/grammar/mem.y"
+#line 553 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_DIV);
    }
@@ -2292,7 +2344,7 @@ yyreduce:
   case 60:
 
 /* Line 1806 of yacc.c  */
-#line 557 "src/mem/grammar/mem.y"
+#line 557 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text();
       (yyval.text_node)->sValue("__equals__", 10);
@@ -2302,7 +2354,7 @@ yyreduce:
   case 61:
 
 /* Line 1806 of yacc.c  */
-#line 562 "src/mem/grammar/mem.y"
+#line 562 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text();
       (yyval.text_node)->sValue("__lt__", 6);
@@ -2312,7 +2364,7 @@ yyreduce:
   case 62:
 
 /* Line 1806 of yacc.c  */
-#line 567 "src/mem/grammar/mem.y"
+#line 567 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text();
       (yyval.text_node)->sValue("__lte__", 7);
@@ -2322,7 +2374,7 @@ yyreduce:
   case 63:
 
 /* Line 1806 of yacc.c  */
-#line 572 "src/mem/grammar/mem.y"
+#line 572 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_MINUS);
    }
@@ -2331,7 +2383,7 @@ yyreduce:
   case 64:
 
 /* Line 1806 of yacc.c  */
-#line 576 "src/mem/grammar/mem.y"
+#line 576 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text();
       (yyval.text_node)->sValue("__modulo__", 10);
@@ -2341,7 +2393,7 @@ yyreduce:
   case 65:
 
 /* Line 1806 of yacc.c  */
-#line 581 "src/mem/grammar/mem.y"
+#line 581 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_MUL);
    }
@@ -2350,7 +2402,7 @@ yyreduce:
   case 66:
 
 /* Line 1806 of yacc.c  */
-#line 586 "src/mem/grammar/mem.y"
+#line 586 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_POW);
    }
@@ -2359,7 +2411,7 @@ yyreduce:
   case 67:
 
 /* Line 1806 of yacc.c  */
-#line 590 "src/mem/grammar/mem.y"
+#line 590 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_PLUS);
    }
@@ -2368,7 +2420,7 @@ yyreduce:
   case 68:
 
 /* Line 1806 of yacc.c  */
-#line 594 "src/mem/grammar/mem.y"
+#line 594 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text();
       (yyval.text_node)->sValue("__gt__", 6);
@@ -2378,7 +2430,7 @@ yyreduce:
   case 69:
 
 /* Line 1806 of yacc.c  */
-#line 599 "src/mem/grammar/mem.y"
+#line 599 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text();
       (yyval.text_node)->sValue("__gte__", 7);
@@ -2388,7 +2440,7 @@ yyreduce:
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 606 "src/mem/grammar/mem.y"
+#line 606 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
       (yyval.text_node)->sValue("__bang__");
@@ -2398,7 +2450,7 @@ yyreduce:
   case 71:
 
 /* Line 1806 of yacc.c  */
-#line 611 "src/mem/grammar/mem.y"
+#line 611 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
       (yyval.text_node)->sValue("__minus_minus__");
@@ -2408,7 +2460,7 @@ yyreduce:
   case 72:
 
 /* Line 1806 of yacc.c  */
-#line 616 "src/mem/grammar/mem.y"
+#line 616 "src/mem/lang/Bison.ypp"
     {
       (yyval.text_node) = new ast::node::Text(MEM_NODE_ID);
       (yyval.text_node)->sValue("__plus_plus__");
@@ -2418,7 +2470,7 @@ yyreduce:
   case 73:
 
 /* Line 1806 of yacc.c  */
-#line 623 "src/mem/grammar/mem.y"
+#line 623 "src/mem/lang/Bison.ypp"
     {
       (yyvsp[(2) - (3)].text_node)->pushChildren((yyvsp[(1) - (3)].node), (yyvsp[(3) - (3)].node));
       (yyvsp[(2) - (3)].text_node)->sPosition((yyloc).copy_range());
@@ -2429,7 +2481,7 @@ yyreduce:
   case 74:
 
 /* Line 1806 of yacc.c  */
-#line 631 "src/mem/grammar/mem.y"
+#line 631 "src/mem/lang/Bison.ypp"
     {
       ast::node::Node* func = new ast::node::Node(MEM_NODE_DOT);
       func->pushChild ((yyvsp[(2) - (2)].node));
@@ -2442,7 +2494,7 @@ yyreduce:
   case 75:
 
 /* Line 1806 of yacc.c  */
-#line 641 "src/mem/grammar/mem.y"
+#line 641 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Node(MEM_NODE_EXPR_LIST);
       (yyval.node)->pushChild((yyvsp[(1) - (1)].node));
@@ -2452,7 +2504,7 @@ yyreduce:
   case 76:
 
 /* Line 1806 of yacc.c  */
-#line 646 "src/mem/grammar/mem.y"
+#line 646 "src/mem/lang/Bison.ypp"
     {
       if ((yyval.node) == 0)
       {
@@ -2465,7 +2517,7 @@ yyreduce:
   case 77:
 
 /* Line 1806 of yacc.c  */
-#line 657 "src/mem/grammar/mem.y"
+#line 657 "src/mem/lang/Bison.ypp"
     {
       (yyval.node) = new ast::node::Call();
       (yyval.node)->sPosition(new fs::position::Range((yylsp[(1) - (3)]), (yylsp[(3) - (3)])));
@@ -2476,7 +2528,7 @@ yyreduce:
   case 78:
 
 /* Line 1806 of yacc.c  */
-#line 664 "src/mem/grammar/mem.y"
+#line 664 "src/mem/lang/Bison.ypp"
     {
       (yyvsp[(3) - (4)].node)->sPosition((yylsp[(3) - (4)]).copy_range());
       (yyval.node) = new ast::node::Call();
@@ -2488,7 +2540,7 @@ yyreduce:
   case 79:
 
 /* Line 1806 of yacc.c  */
-#line 673 "src/mem/grammar/mem.y"
+#line 673 "src/mem/lang/Bison.ypp"
     {
       int i_val = 0;
       short s_val = 0;
@@ -2524,7 +2576,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 2528 "src/mem/parser/Bison.cpp"
+#line 2580 "src/mem/lang/Bison.cpp"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2762,7 +2814,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 703 "src/mem/grammar/mem.y"
+#line 703 "src/mem/lang/Bison.ypp"
 
 
 #include "mem/ast/node/Node.hpp"

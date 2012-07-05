@@ -5,11 +5,11 @@ namespace mem { namespace fs { namespace position {
 
 Composite::~Composite ()
 {
-   for (unsigned int i = 0; i < this->_children.size() ; ++i)
+   for (size_t i = 0; i < _children.size() ; ++i)
    {
-      if (this->_children[i] != NULL)
+      if (_children[i] != NULL)
       {
-         delete this->_children[i];
+         delete _children[i];
       }
    }
 }
@@ -17,9 +17,9 @@ Composite::~Composite ()
 void
 Composite::addChild (Position* child)
 {
-   this->_file = child->_file;
-   this->_line = child->_line;
-   this->_children.push_back(child);
+   _file = child->_file;
+   _line = child->_line;
+   _children.push_back(child);
 }
 
 PositionType
@@ -28,9 +28,9 @@ Composite::getTypeAt (int column)
    PositionType i_type = NOTHING;
    PositionType cur_type = NOTHING;
 
-   for (unsigned int i = 0 ; i < this->_children.size() ; ++i)
+   for (size_t i = 0 ; i < _children.size() ; ++i)
    {
-      cur_type = this->_children[i]->getTypeAt(column);
+      cur_type = _children[i]->getTypeAt(column);
       if (cur_type > i_type)
       {
          i_type = cur_type;
