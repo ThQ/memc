@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include "macro.h"
 #include "mem/fs/position/Position.hpp"
 #include "mem/log/Formatter.hpp"
 

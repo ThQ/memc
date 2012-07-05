@@ -2,7 +2,6 @@
 #define _MEM__ST__VAR__HPP
 
 
-#include "mem/st/Instance.hpp"
 #include "mem/st/Symbol.hpp"
 #include "mem/st/Type.hpp"
 
@@ -12,13 +11,41 @@ namespace mem { namespace st {
 
 class Var : public Symbol
 {
-   public: Type* _type;
+   // -------------------------------------------------------------------------
+   // PROPERTIES
+   // -------------------------------------------------------------------------
+   public:
 
-   public: Var ();
-   public: Var (std::string name, Type* type);
-   //public: virtual void print ();
+   // PROPERTY : Type
+   Type* _type;
 
-   public: void sType (Symbol* type);
+   inline Type* gType() {return _type;}
+   inline void sType (Symbol* type) {this->_type = static_cast<Type*>(type);}
+
+   // -------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTORS
+   // -------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Var ();
+
+   /**
+    * Creates a Var based on its name and type.
+    */
+   Var (std::string name, Type* type);
+
+
+   // -------------------------------------------------------------------------
+   // PUBLIC METHODS
+   // -------------------------------------------------------------------------
+   public:
+
+   static Var* create(std::string name, Type* ty);
+
+   virtual Symbol* gEvalType ();
 };
 
 

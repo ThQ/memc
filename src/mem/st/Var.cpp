@@ -5,21 +5,30 @@ namespace mem { namespace st {
 
 Var::Var ()
 {
-   this->_kind = VAR;
-   this->_type = NULL;
+   _kind = VAR;
+   _type = NULL;
 }
 
 Var::Var (std::string name, Type* type)
 {
-   this->_kind = VAR;
-   this->_name = name;
-   this->_type = type;
+   _kind = VAR;
+   _name.assign(name);
+   _type = type;
 }
 
-void
-Var::sType (Symbol* type)
+Var*
+Var::create (std::string name, Type* ty)
 {
-   this->_type = static_cast<Type*>(type);
+   Var* var = new st::Var();
+   var->sName(name);
+   var->sType(ty);
+   return var;
+}
+
+Symbol*
+Var::gEvalType ()
+{
+   return _type;
 }
 
 

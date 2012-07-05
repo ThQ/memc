@@ -1,0 +1,100 @@
+
+{
+	"BadParameterCount":
+	{
+		"message":"Bad parameter count : expected $ExpectedParamCount, but got $ParamCount",
+		"type": "Error",
+		"params":
+		{
+			"ExpectedParamCount": "int",
+			"ParamCount": "int"
+		}
+	},
+	"CallNonFunction":
+	{
+		"message": "Trying to call an object ($ObjectName) that is not a function, but a $ObjectTypeName",
+		"type": "Error",
+		"params":
+		{
+			"ObjectName": "std::string",
+			"ObjectTypeName": "std::string"
+		}
+	},
+	"SymbolNotFound":
+	{
+		"message": "Symbol $SymbolName not found in $ScopeName",
+		"type": "Error",
+		"params":
+		{
+			"SymbolName": "std::string",
+			"ScopeName": "std::string"
+		}
+	},
+	"VariableAlreadyDefined":
+	{
+		"message": "Variable $VarName already defined",
+		"type": "Error",
+		"params":
+		{
+			"VarName": "std::string"
+		}
+	},
+	"EntryPointNotFound":
+	{
+		"type": "FatalError",
+		"message": "Entry point not found",
+		"description": "Declare a main function (anywhere) :%NEWLINE   main () -> int"
+	},
+	"TypeExpected":
+	{
+		"type": "Error",
+		"message": "$SymbolName is not a type",
+		"params":
+		{
+			"SymbolName": "std::string"
+		}
+	},
+	"SpecificTypeExpected":
+	{
+		"type": "Error",
+		"message": "Expression of type $ExpectedTypeName expected, but got $TypeName instead",
+		"params":
+		{
+			"ExpectedTypeName": "std::string",
+			"TypeName": "std::string"
+		}
+	},
+	"InvalidTypeInVarAssignment":
+	{
+		"type": "Error",
+		"message": "Types mismatch in variable assigment",
+		"description": "Variable $VariableName expects value of type $ExpectedTypeName, but got $TypeName instead",
+		"params":
+		{
+			"VariableName": "std::string",
+			"ExpectedTypeName": "std::string",
+			"TypeName": "std::string"
+		}
+	},
+	"CannotInstantiatePointerType":
+	{
+		"type": "Error",
+		"message": "Pointer types cannot be instantiated",
+		"description": "Trying to instantiate pointer type $PointerTypeName",
+		"params":
+		{
+			"PointerTypeName": "std::string"
+		}
+	},
+   "CircularClassDependency":
+   {
+      "type": "FatalError",
+      "message": "Circular dependency",
+      "description": "Class $BaseClassName depends on class $DepClassName and vice verso",
+      "params":
+      {
+         "BaseClassName": "std::string",
+         "DepClassName": "std::string"
+      }
+   }
+}

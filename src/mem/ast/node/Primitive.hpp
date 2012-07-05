@@ -7,10 +7,12 @@
 
 namespace mem { namespace ast { namespace node {
 
-   class Primitive : public Type
-   {
-      public: Primitive ();
-   };
+
+class Primitive : public Type
+{
+   public: Primitive ();
+};
+
 
 } } }
 

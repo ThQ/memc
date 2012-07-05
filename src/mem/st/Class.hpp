@@ -2,8 +2,8 @@
 #define _MEM__ST__CLASS__HPP
 
 
-#include "mem/st/Instance.hpp"
 #include "mem/st/Type.hpp"
+#include "mem/st/Var.hpp"
 
 
 namespace mem { namespace st {
@@ -11,12 +11,34 @@ namespace mem { namespace st {
 
 class Class : public Type
 {
-   //public: Instance* _instance_type;
+   // -------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTORS
+   // -------------------------------------------------------------------------
+   public:
 
-   public: Class ();
-   public: virtual ~Class();
-   //public: Instance* g_instance_type();
-   //public: virtual void print ();
+   Class ();
+
+   virtual ~Class();
+
+
+   // -------------------------------------------------------------------------
+   // PUBLIC METHODS
+   // -------------------------------------------------------------------------
+   public:
+
+
+   /**
+    * Returns the parent class in the type hierarchy.
+    */
+   Class*
+   gParentClass () const { return static_cast<Class*>(this->_parent);}
+
+
+   /**
+    * Checks wether a class depends on another (directly or indirectly).
+    */
+    bool
+    isDependingOn (Class* cls);
 };
 
 

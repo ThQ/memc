@@ -5,21 +5,21 @@ namespace mem { namespace ast { namespace visitor {
 bool
 TypeChecker::ensureBoolExpr (node::Node* expr)
 {
-   return this->ensureExprType(expr, this->_symbols->_glob_bool_cls);
+   return ensureExprType(expr, _core_types->gBoolTy());
 }
 
 bool
 TypeChecker::ensureExprType (node::Node* expr, st::Symbol* expr_type)
 {
-   if (expr->gExprType() != expr_type)
+   if (expr->hasExprType() && expr->gExprType() != expr_type)
    {
       // @FIXME Prints the same types, why ?
-      log::Message* err = new log::Error();
-      err->formatMessage("Expression of type {id:%s} expected, but got {id:%s} instead",
-         expr->gExprType()->gQualifiedNameCstr(),
-         expr_type->gQualifiedNameCstr());
+      log::SpecificTypeExpected* err = new log::SpecificTypeExpected();
+      err->sExpectedTypeName(expr->gExprType()->gQualifiedName());
+      err->sTypeName(expr_type->gQualifiedName());
       err->sPosition(expr->copyPosition());
-      this->log(err);
+      err->format();
+      log(err);
       return false;
    }
    return true;
@@ -30,10 +30,11 @@ TypeChecker::ensureSymbolIsType (node::Node* node, st::Symbol* sym)
 {
    if (!sym->isTypeSymbol())
    {
-      log::Message* err = new log::Error();
-      err->formatMessage("%s is not a type", sym->gNameCstr());
+      log::TypeExpected* err = new log::TypeExpected();
+      err->sSymbolName(sym->gName());
       err->sPosition(node->copyPosition());
-      this->log(err);
+      err->format();
+      log(err);
       return false;
    }
    return true;

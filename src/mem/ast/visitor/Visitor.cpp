@@ -8,13 +8,19 @@ Visitor::~Visitor ()
 }
 
 void
-Visitor::init (st::SymbolTable* symbols, log::Logger* logger)
+Visitor::setup (st::SymbolTable* symbols, log::Logger* logger)
 {
    assert(symbols != NULL);
    assert(logger != NULL);
 
-   this->_symbols = symbols;
-   this->_logger = logger;
+   _core_types = &symbols->gCoreTypes();
+   _symbols = symbols;
+   _logger = logger;
+}
+
+void
+Visitor::tearDown ()
+{
 }
 
 bool
@@ -26,12 +32,12 @@ Visitor::visit (node::Node* node)
 void
 Visitor::visit_preorder (node::Node* node)
 {
-   if (this->visit(node))
+   if (visit(node))
    {
       node::Node* child_node = node->_first_child;
       while (child_node != NULL)
       {
-         this->visit_preorder(child_node);
+         visit_preorder(child_node);
          child_node = child_node->_next;
       }
    }

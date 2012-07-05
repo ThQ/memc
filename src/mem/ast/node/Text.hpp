@@ -8,19 +8,31 @@
 
 namespace mem { namespace ast { namespace node {
 
-   class Text: public Node
-   {
-      public: std::string _value;
 
-      public: Text ();
-      public: Text (unsigned int type);
-      public: std::string gValue() { return this->_value;}
-      public: const char* gValueCstr() {return this->_value.c_str();}
-      public: void sValue (const char* value);
-      public: void sValue (const char* value, size_t len);
-      public: void sValue (std::string value);
-   };
+class Text: public Node
+{
+   public: std::string _value;
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+
+   // PROPERTY : Value
+   public: std::string gValue() { return this->_value;}
+   public: const char* gValueCstr() {return this->_value.c_str();}
+   public: void sValue (const char* value);
+   public: void sValue (const char* value, size_t len);
+   public: void sValue (std::string value);
+
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public: Text ();
+   public: Text (unsigned int type);
+};
+
 
 } } }
+
 
 #endif

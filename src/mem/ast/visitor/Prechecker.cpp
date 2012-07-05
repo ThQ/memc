@@ -6,25 +6,29 @@ namespace mem { namespace ast { namespace visitor {
 
 Prechecker::Prechecker ()
 {
-   this->_name = "Prechecker";
+   _name = "ast.Prechecker";
 }
 
 bool
 Prechecker::visit (node::Node* node)
 {
-   if (node->_position == NULL && node->_type != MEM_NODE_ROOT && node->_type != MEM_NODE_FILE)
+   if (node->gPosition() == NULL && node->isRootNode() && node->isFileNode())
    {
-      this->_logger->warning("Node(%s) has no position", node::Node::get_type_name(node->_type));
+      log::Message* warn = new log::Warning();
+      warn->formatMessage("Node (%s) has no position.",
+         node::Node::get_type_name(node->_type));
+      _logger->log(warn);
    }
 
-   if (node->_type == 0)
+   if (node->gType() == 0)
    {
-      this->_logger->warning("Node has an unknown type", "");
+      _logger->warning("Node has an unknown type", "");
    }
 
-   if (node->_type != MEM_NODE_ROOT && node->_parent == NULL)
+   if (!node->isRootNode() && node->gParent() == NULL)
    {
-      this->_logger->warning("Node(%s) has no parent", node::Node::get_type_name(node->_type));
+      _logger->warning("Node(%s) has no parent",
+         node::Node::get_type_name(node->gType()));
    }
    return true;
 }

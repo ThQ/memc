@@ -6,17 +6,17 @@ namespace mem { namespace ast { namespace node {
 
 Func::Func()
 {
-   this->_type = MEM_NODE_FUNCTION_DECLARATION;
+   _type = MEM_NODE_FUNCTION_DECLARATION;
 }
 
 Block*
 Func::gBodyNode ()
 {
-   for (int i = 0 ; i < this->_child_count ; ++i)
+   for (size_t i = 0 ; i < gChildCount() ; ++i)
    {
-      if (this->getChild(i)->isType(MEM_NODE_BLOCK))
+      if (getChild(i)->isBlockNode())
       {
-         return static_cast<Block*>(this->getChild(i));
+         return static_cast<Block*>(getChild(i));
       }
    }
    return NULL;
@@ -25,11 +25,11 @@ Func::gBodyNode ()
 Node*
 Func::gParamsNode ()
 {
-   for (int i = 0 ; i < this->_child_count ; ++i)
+   for (size_t i = 0 ; i < gChildCount() ; ++i)
    {
-      if (this->getChild(i)->isType(MEM_NODE_FUNCTION_PARAMETERS))
+      if (getChild(i)->isFuncParamsNode())
       {
-         return this->getChild(i);
+         return getChild(i);
       }
    }
    return NULL;
@@ -38,11 +38,11 @@ Func::gParamsNode ()
 Node*
 Func::gReturnTypeNode ()
 {
-   for (int i = 0 ; i < this->_child_count ; ++i)
+   for (size_t i = 0 ; i < gChildCount() ; ++i)
    {
-      if (this->getChild(i)->_type != MEM_NODE_FUNCTION_PARAMETERS && this->getChild(i)->_type != MEM_NODE_BLOCK)
+      if (!getChild(i)->isFuncParamsNode() && !getChild(i)->isBlockNode())
       {
-         return this->getChild(i);
+         return getChild(i);
       }
    }
    return NULL;
@@ -51,7 +51,7 @@ Func::gReturnTypeNode ()
 bool
 Func::isVirtual ()
 {
-   return this->gBodyNode() == NULL;
+   return gBodyNode() == NULL;
 }
 
 

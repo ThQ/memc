@@ -3,10 +3,16 @@
 
 namespace mem { namespace log {
 
+Logger::Logger()
+{
+   this->_n_errors = 0;
+   this->_n_warnings = 0;
+   this->_n_fatal_errors = 0;
+}
 
 Logger::~Logger()
 {
-   if (this->_formatter!= NULL)
+   if (this->_formatter != NULL)
    {
       delete this->_formatter;
    }
@@ -41,6 +47,20 @@ Logger::error (const char* message)
 }
 
 void
+Logger::fatalError (const char* format, ...)
+{
+   va_list vargs;
+   va_start(vargs, format);
+   this->log(FATAL_ERROR, format, vargs);
+}
+
+void
+Logger::fatalError (const char* message)
+{
+   this->log(FATAL_ERROR, message);
+}
+
+void
 Logger::info (const char* message)
 {
    this->log(INFO, message);
@@ -57,13 +77,21 @@ Logger::info (const char* format, ...)
 void
 Logger::log (Message* msg)
 {
-   ASSERT_NOT_NULL(this->_formatter);
+   assert(this->_formatter != NULL);
 
    if (msg != NULL)
    {
-      if (msg->_level >= this->_level)
+      switch (msg->_level)
       {
-         std::string log_msg = this->_formatter->format(msg);
+         case ERROR: _n_errors++; break;
+         case WARNING: _n_warnings++; break;
+         case FATAL_ERROR: _n_fatal_errors++; break;
+         default:break; // Keep that, or clang will complain
+      }
+
+      if (msg->gLevel() >= _level)
+      {
+         std::string log_msg = _formatter->format(msg);
          this->write(log_msg);
       }
       delete msg;

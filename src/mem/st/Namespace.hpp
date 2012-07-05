@@ -1,8 +1,9 @@
 #ifndef _MEM__ST__NAMESPACE__HPP_
 #define _MEM__ST__NAMESPACE__HPP_
 
-#include "check.h"
+
 #include "mem/st/Type.hpp"
+
 
 namespace mem { namespace st {
 

@@ -6,30 +6,52 @@ namespace mem { namespace st {
 
 Class::Class ()
 {
-   this->_kind = CLASS;
-   //this->_instance_type = NULL;
+   _kind = CLASS;
 }
 
 Class::~Class ()
 {
-   /*
-   if (this->_instance_type != NULL)
-   {
-      delete this->_instance_type;
-   }
-   */
 }
-/*
-Instance*
-Class::g_instance_type ()
+
+
+bool
+Class::isDependingOn (Class* other_cls)
 {
-   if (this->_instance_type == NULL)
+   assert (other_cls != NULL);
+   assert (other_cls->isClassSymbol());
+
+   st::Var* cls_field = NULL;
+
+   if (this == other_cls)
    {
-      this->_instance_type = new Instance();
-      this->_instance_type->set_type(this);
+      return true;
    }
-   return this->_instance_type;
+   else
+   {
+      // TODO This is an ugly one here...
+      SymbolCollectionIterator i;
+      for (i = _children.begin(); i != _children.end(); i++)
+      {
+         if ((*i).second->isVarSymbol())
+         {
+            cls_field = static_cast<st::Var*>(i->second);
+            if (cls_field->gType()->isClassSymbol())
+            {
+               if (cls_field->gType() == other_cls)
+               {
+                  return true;
+               }
+               else if (static_cast<st::Class*>(cls_field->gType())->isDependingOn(other_cls))
+               {
+                  return true;
+               }
+            }
+         }
+      }
+   }
+
+   return false;
 }
-*/
+
 
 } }

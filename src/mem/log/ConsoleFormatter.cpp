@@ -29,13 +29,13 @@ ConsoleFormatter::format (Message* msg)
 
    this->format_message(res, msg);
 
-   bool has_details = msg->_description != "" || msg->_position != NULL;
+   bool has_details = msg->_description != "" || msg->gPosition() != NULL;
 
 
-   if (has_details)
+   /*if (has_details)
    {
       res << "           --------------------------------------------------------------------\n";
-   }
+   }*/
    if (msg->_description != "")
    {
       this->format_description(res, msg);
@@ -43,12 +43,12 @@ ConsoleFormatter::format (Message* msg)
 
    if (msg->_position != NULL)
    {
-      this->format_position(res, msg->_position);
+      this->format_position(res, msg->gPosition());
    }
 
    if (has_details)
    {
-      res << "           --------------------------------------------------------------------\n";
+      res << "\n";//           --------------------------------------------------------------------\n";
    }
    return res.str();
 }
@@ -56,23 +56,26 @@ ConsoleFormatter::format (Message* msg)
 void
 ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
 {
-   size_t i;
-   size_t last_nl = 0;
-   for (i=0; i<msg->_description.length(); ++i)
+   if (msg->_description.length() != 0)
    {
-      if (msg->_description.data()[i] == '\n')
+      size_t i;
+      size_t last_nl = 0;
+      for (i=0; i<msg->_description.length(); ++i)
       {
-         str << "          | ";
-         str << msg->_description.substr(last_nl, i-last_nl);
-         str << "\n";
-         last_nl = i+1;
+         if (msg->_description.data()[i] == '\n')
+         {
+            str << "      ";
+            str << msg->_description.substr(last_nl, i-last_nl);
+            str << "\n";
+            last_nl = i+1;
+         }
       }
-   }
-   if (last_nl != msg->_description.size())
-   {
-      str << "          | ";
-      str << msg->_description.substr(last_nl, msg->_description.size()-last_nl);
-      str << "\n";
+      if (last_nl != msg->_description.size())
+      {
+         str << "      ";
+         str << msg->_description.substr(last_nl, msg->_description.size()-last_nl);
+         str << "\n";
+      }
    }
 }
 
@@ -81,12 +84,12 @@ ConsoleFormatter::format_level_name (std::ostringstream& str, MessageLevel lvl)
 {
    switch (lvl)
    {
-      case UNKNOWN:     str << "     ???"; break;
-      case INFO:        str << "   INFO"; break;
-      case DEBUG:       str << "  DEBUG"; break;
-      case WARNING:     str << "\033[0;31mWARNING\033[0m"; break;
-      case ERROR:       str << "  \033[1;31mERROR\033[0m"; break;
-      case FATAL_ERROR: str << "FATAL_ERROR"; break;
+      case UNKNOWN:     str << " (?)"; break;
+      case INFO:        str << " (I)"; break;
+      case DEBUG:       str << " \033[1;30m(D)"; break;
+      case WARNING:     str << " \033[0;31m(W)"; break;
+      case ERROR:       str << " \033[1;31m(E)"; break;
+      case FATAL_ERROR: str << " \033[1;31m(F)"; break;
    }
 
 }
@@ -95,7 +98,7 @@ void
 ConsoleFormatter::format_message (std::ostringstream& str, Message* msg)
 {
    this->format_level_name(str, msg->_level);
-   str << " : \033[1m";
+   str << " "; //\033[1m";
    str << msg->_message;
    str << "\033[0m\n";
 }
@@ -105,18 +108,19 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
 {
    if (pos->_file != NULL)
    {
-      str << "          |\n          | @ {path:";
-      str << pos->_file->_path;
-      str << "}:";
-      str << pos->_line;
+      str << "     \n     @ ";
+      str << pos->gFile()->gPath();
+      str << ":";
+      str << pos->gLine();
       str << "\n";
 
-      if (pos->_line > 0)
+      str << "     > ";
+      if (pos->gLine() > 0 && pos->gFile()->isLineInFile(pos->gLine()-1))
       {
-         std::string context_line = pos->_file->_lines[pos->_line-1]->c_str();
-         str << "          | > ";
+         std::string context_line = pos->gFile()->getLineCstr(pos->gLine()-1);
          str << context_line;
-         str << "\n          |   ";
+         str << "\n       ";
+
          for (size_t i = 1 ; i <= context_line.length() ; ++i)
          {
             switch (pos->getTypeAt(i))
@@ -128,10 +132,16 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
          }
          str << "\n";
       }
+      else
+      {
+         str << "~~BOGUS LINE (";
+         str << pos->_line;
+         str << ")~~\n";
+      }
    }
    else
    {
-      str << "        @  {path:???}\n";
+      str << "       @  {path:???}\n";
    }
 }
 
@@ -210,7 +220,7 @@ ConsoleFormatter::format_string (const char* message)
 
    for (size_t i = 0 ; stack.size() ; ++i)
    {
-      M_DELETE(stack[i]);
+      delete stack[i];
    }
 
    char* result = new char[sresult.size() + 1];

@@ -234,48 +234,5 @@ SymbolTable::register_symbol (std::string path, Symbol* sym)
    return false;
 }
 
-void
-SymbolTable::setup ()
-{
-   this->setupBool();
-   this->setupInts();
-   this->setupVoid();
-}
 
-void
-SymbolTable::setupBool ()
-{
-   this->_glob_bool_cls = new st::Class();
-   this->_glob_bool_cls->sName("bool");
-   this->_root->addChild(this->_glob_bool_cls);
-
-   this->_root->addChild(new st::Var("true", this->_glob_bool_cls));
-   this->_root->addChild(new st::Var("false", this->_glob_bool_cls));
-}
-
-void
-SymbolTable::setupInts ()
-{
-   st::Class* int_cls = new st::Class();
-   int_cls->sName("int");
-   this->_root->addChild(int_cls);
-
-   st::Class* uint_cls = new st::Class();
-   uint_cls->sName("uint");
-   this->_root->addChild(uint_cls);
-
-   st::Class* char_cls = new st::Class();
-   char_cls->sName("char");
-   this->_root->addChild(char_cls);
-}
-
-void
-SymbolTable::setupVoid ()
-{
-   this->_glob_void_cls = new st::Class();
-   this->_glob_void_cls->sName("void");
-   this->_root->addChild(this->_glob_void_cls);
-
-   this->_root->addChild(new st::Var("null", this->_glob_void_cls));
-}
 } }

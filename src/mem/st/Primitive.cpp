@@ -5,7 +5,7 @@ namespace mem { namespace st {
 
 Primitive::Primitive ()
 {
-   this->_kind = PRIMITIVE;
+   _kind = PRIMITIVE;
 }
 
 

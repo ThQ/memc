@@ -6,6 +6,7 @@
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Type.hpp"
+#include "mem/ast/util.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 #include "mem/st/Util.hpp"
 
@@ -17,6 +18,7 @@ class FindClasses : public Visitor
 {
    public: FindClasses ();
    public: virtual bool visit (node::Node* node);
+   public: void visitClassDecl (node::Class* cls_node);
 };
 
 

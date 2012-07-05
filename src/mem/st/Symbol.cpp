@@ -5,17 +5,17 @@ namespace mem { namespace st {
 
 Symbol::Symbol ()
 {
-   this->_depth = 0;
-   this->_kind = UNKNOWN;
-   this->_next = NULL;
-   this->_parent = NULL;
-   this->_child_count = 0;
+   _depth = 0;
+   _kind = UNKNOWN;
+   _parent = NULL;
+   _child_count = 0;
+   _size = 0;
 }
 
 Symbol::~Symbol ()
 {
-   std::map<std::string, Symbol*>::iterator i = this->_children.begin();
-   for(; i != this->_children.end(); ++i )
+   std::map<std::string, Symbol*>::iterator i = _children.begin();
+   for(; i != _children.end(); ++i)
    {
       delete i->second;
    }
@@ -27,18 +27,18 @@ Symbol::addChild (Symbol* sym)
    if (sym->gName() == "")
    {
       std::ostringstream id;
-      id << this->gName();
+      id << gName();
       id << "#";
-      id << this->_children.size() + 1;
+      id << gChildCount() + 1;
 
       sym->sName(id.str());
    }
 
-   if (!this->getChild(sym->_name))
+   if (!getChild(sym->_name))
    {
       sym->_parent = this;
-      this->_children[sym->_name] = sym;
-      sym->_depth = this->_depth + 1;
+      _children[sym->_name] = sym;
+      sym->_depth = _depth + 1;
       return true;
    }
    return false;
@@ -47,12 +47,20 @@ Symbol::addChild (Symbol* sym)
 Symbol*
 Symbol::getChild (std::string name)
 {
-   if (name.size() != 0 && this->_children.find(name) != this->_children.end())
+   if (name.size() != 0 && _children.find(name) != _children.end())
    {
-      return this->_children[name];
+      return _children[name];
    }
    return NULL;
 }
+
+/*
+Symbol*
+Symbol::gEvalType ()
+{
+   return this;
+}
+*/
 
 std::string
 Symbol::gQualifiedName ()
@@ -71,25 +79,18 @@ Symbol::gQualifiedName ()
       }
       sym = sym->_parent;
    }
-   if (name.size() != 0)
-   {
-      return name;
-   }
-   return "?";
+
+   return name;
 }
 
 bool
-Symbol::is (SymbolKind kind)
-{
-   return this->_kind == kind;
-}
-
-bool
-Symbol::isTypeSymbol ()
+Symbol::isTypeSymbol () const
 {
    switch (this->_kind)
    {
       case CLASS:
+      case POINTER:
+      case PRIMITIVE:
          return true;
       default:
          return false;
@@ -99,13 +100,13 @@ Symbol::isTypeSymbol ()
 void
 Symbol::sName (char* name, size_t name_len)
 {
-   this->_name.assign(name, name_len);
+   _name.assign(name, name_len);
 }
 
 void
 Symbol::sName (std::string name)
 {
-   this->_name = name;
+   _name = name;
 }
 
 

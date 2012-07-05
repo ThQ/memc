@@ -6,16 +6,16 @@ namespace mem { namespace ast { namespace visitor {
 
 FindUse::FindUse ()
 {
-   this->_name = "FindUser";
+   _name = "FindUse";
 }
 
 bool
 FindUse::visit (node::Node* node)
 {
-   if (node->_type == MEM_NODE_USE)
+   if (node->isUseNode())
    {
       node::Text* text_node = static_cast<node::Text*>(node);
-      this->_uses.push_back(text_node->gValue());
+      _uses.push_back(text_node->gValue());
    }
    return true;
 }

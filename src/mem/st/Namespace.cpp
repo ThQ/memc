@@ -59,7 +59,6 @@ Namespace::print ()
    }
 }
 */
-
 Namespace*
 Namespace::push (Namespace* ns)
 {

@@ -15,7 +15,22 @@ class File : public Node
    public: std::string _include_path;
    public: std::string _path;
 
-   public: File ();
+   //--------------------------------------------------------------------------
+   // Constructors / Destrutors
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   File ();
+
+   //--------------------------------------------------------------------------
+   // PUBLIC METHODS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual bool isValid();
 };
 
 

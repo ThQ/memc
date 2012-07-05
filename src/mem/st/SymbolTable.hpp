@@ -3,10 +3,11 @@
 
 
 #include <assert.h>
+#include <map>
 #include <stdlib.h>
 #include <string>
-#include "check.h"
 #include "mem/st/Class.hpp"
+#include "mem/st/CoreTypes.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/Namespace.hpp"
 #include "mem/st/Path.hpp"
@@ -19,12 +20,33 @@ namespace mem { namespace st {
 
 class SymbolTable
 {
-   public: st::Class* _glob_bool_cls;
-   public: st::Class* _glob_void_cls;
    public: Namespace* _root;
+   public: inline Namespace* gRoot () {return _root;}
+   public: std::map<std::string, st::Type*> _types;
+   public: std::map<std::string, st::Type*> gTypes (){return _types;}
 
-   public: SymbolTable ();
-   public: ~SymbolTable ();
+   public: st::CoreTypes _core_types;
+   public: inline st::CoreTypes& gCoreTypes(){return _core_types;}
+
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   SymbolTable ();
+
+   /**
+    * Destructor.
+    */
+   ~SymbolTable ();
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+
    public: Class* create_class (std::string full_class_name);
    public: bool create_type (Type* anonymous_type, std::string full_type_name);
    public: Namespace* create_namespace (std::string name);
@@ -35,10 +57,6 @@ class SymbolTable
    public: bool has_namespace (std::string ns_name);
    public: Func* register_function (std::string func_full_name);
    public: bool register_symbol (std::string path, Symbol* sym);
-   public: void setup ();
-   public: void setupBool ();
-   public: void setupInts ();
-   public: void setupVoid ();
 };
 
 

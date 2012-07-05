@@ -6,19 +6,19 @@ namespace mem { namespace ast { namespace node {
 
 Class::Class ()
 {
-   this->_type = MEM_NODE_CLASS;
+   _type = MEM_NODE_CLASS;
 }
 
 Text*
 Class::gParentTypeNode ()
 {
-   for (int i = 0 ; i < this->_child_count ; ++i)
+   for (size_t i = 0 ; i < gChildCount() ; ++i)
    {
-      assert (this->getChild(i) != NULL);
+      assert (getChild(i) != NULL);
 
-      if (this->getChild(i)->isType(MEM_NODE_ID))
+      if (getChild(i)->isIdNode())
       {
-         return static_cast<Text*>(this->getChild(i));
+         return static_cast<Text*>(getChild(i));
       }
    }
    return NULL;
