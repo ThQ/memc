@@ -12,7 +12,7 @@
 
 > use io
 > 
-> main ()
+> main () 
 >    io.print("Hello, World !")
 
 
