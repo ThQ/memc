@@ -1,8 +1,0 @@
-class
-   chars :char[]
-
-   reverse (dude :char) :void
-      if ++this.size % 2 == 0
-         swap :char
-      else
-         dude

@@ -17,4 +17,10 @@ missing
 depcomp
 compile
 aclocal.m4
+src/config.h
+src/config.h.in
 ylwrap
+COPYING
+INSTALL
+src/stamp-h1
+

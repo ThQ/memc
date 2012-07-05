@@ -4,5 +4,5 @@ valgrind \
 	--show-reachable=yes \
 	--log-file=valgrind-log \
 	--suppressions=valgrind-suppressions \
-	../build/mem-compile \
+	memc \
 	$1
