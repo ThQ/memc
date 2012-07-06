@@ -1,5 +1,5 @@
 AC_INIT([memc], [1.0], [https://github.com/thomas-quemard/memc/issues/new])
-AM_INIT_AUTOMAKE([1.10 no-define])
+AM_INIT_AUTOMAKE([1.10 foreign no-define])
 AC_CONFIG_HEADERS([src/config.h])
 AC_SUBST(LLVM_CPPFLAGS, $(llvm-config --cppflags))
 AC_SUBST(LLVM_LDADD, $(llvm-config --ldflags --libs nativecodegen | tr '\n' ' '))
