@@ -23,4 +23,6 @@ ylwrap
 COPYING
 INSTALL
 src/stamp-h1
+src/mem/lang/*.cpp
+src/mem/lang/*.hpp
 
