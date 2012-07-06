@@ -10,15 +10,15 @@ Compiler::Compiler ()
 
    setUpOptions();
 
-   registerAstVisitor(new ast::visitor::Prechecker());
-   registerAstVisitor(new ast::visitor::FindClasses());
-   registerAstVisitor(new ast::visitor::TopTypesChecker());
-   registerAstVisitor(new ast::visitor::BlockTypesChecker());
-   registerAstVisitor(new ast::visitor::TypeMatch());
-   registerAstVisitor(new ast::visitor::CheckValidity());
-   registerAstVisitor(new ast::visitor::FindEntryPoint());
+   addAstVisitor(new ast::visitor::Prechecker());
+   addAstVisitor(new ast::visitor::FindClasses());
+   addAstVisitor(new ast::visitor::TopTypesChecker());
+   addAstVisitor(new ast::visitor::BlockTypesChecker());
+   addAstVisitor(new ast::visitor::TypeMatch());
+   addAstVisitor(new ast::visitor::CheckValidity());
+   addAstVisitor(new ast::visitor::FindEntryPoint());
 
-   registerStVisitor(new st::visitor::DepBuilder());
+   addStVisitor(new st::visitor::DepBuilder());
 
    st::Util::setupBool(this->symbols, this->symbols.gCoreTypes());
    st::Util::setupInts(this->symbols, this->symbols.gCoreTypes());
@@ -59,7 +59,7 @@ Compiler::compile (char* fp)
    reset_lexer(); // Cleans up lexer global vars
 
    if (gOptions()->isSet("ast.dump.file")) dumpAst();
-   if (gOptions()->isSet("st.dump.file")) dumpSt();
+   dumpSt();
 }
 
 void
@@ -78,33 +78,21 @@ Compiler::dumpAst ()
 void
 Compiler::dumpSt ()
 {
-   if (gOptions()->isSet("st.dump.format")
-      && gOptions()->getInt("st.dump.format") != Compiler::NO)
+   if (gOptions()->isSet("st.dump.xml"))
    {
       // Open dump file
       // TODO We should have a default output file in case the user did not
       // give one
-      std::ofstream st_dump_file(gOptions()->getStr("st.dump.file").c_str());
+      std::ofstream st_dump_file(gOptions()->getStr("st.dump.xml").c_str());
 
-      // Choose ST dumper based on the requested format
-      st::visitor::IDumper* dumper = NULL;
-      switch (gOptions()->getInt("st.dump.format"))
-      {
-         case Compiler::XML:
-            dumper = new st::visitor::XmlDumper();
-            break;
-      }
+      st::visitor::IDumper* dumper = new st::visitor::XmlDumper;
+      dumper->_out = &st_dump_file;
+      dumper->setup();
+      dumper->visitPreorder(symbols._root);
 
-      if (dumper != NULL)
-      {
-         dumper->_out = &st_dump_file;
-         dumper->setup();
-         dumper->visitPreorder(symbols._root);
-
-         st_dump_file.close();
-         logger.debug("SymbolTable dumped to %s",
-            gOptions()->getStr("st.dump.file").c_str());
-      }
+      st_dump_file.close();
+      logger.debug("SymbolTable dumped to %s (XML)",
+         gOptions()->getStr("st.dump.xml").c_str());
    }
 }
 
@@ -169,7 +157,7 @@ Compiler::parse (std::string file_path)
 
       // Used by yyparse
       yyin = fopen(file_path.c_str(), "rb");
-      // @FIXME The file was opened ms before
+      // TODO The file was opened ms before
       // We could open the file only once if we used Bison++
       assert(yyin != NULL);
       yyfile = file;
@@ -257,19 +245,6 @@ Compiler::processParseQueue ()
    }
 }
 
-
-void
-Compiler::registerAstVisitor (ast::visitor::Visitor* visitor)
-{
-   ast_visitors.push_back(visitor);
-}
-
-void
-Compiler::registerStVisitor (st::visitor::Visitor* visitor)
-{
-   st_visitors.push_back(visitor);
-}
-
 void
 Compiler::runAstVisitors ()
 {
@@ -307,10 +282,7 @@ Compiler::setUpOptions ()
       ->bind("warning", log::WARNING)
       ->bind("error", log::ERROR)
       ->bind("fatal-error", log::FATAL_ERROR);
-   _opts.addStrOpt("st.dump.file");
-   _opts.addIntEnumOpt("st.dump.format")
-      ->bind("no", Compiler::NO)
-      ->bind("xml", Compiler::XML);
+   _opts.addStrOpt("st.dump.xml");
 }
 
 }

@@ -60,6 +60,7 @@ class Compiler
    public: opt::Options _opts;
    public: opt::Options* gOptions () {return &_opts;}
 
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -81,6 +82,18 @@ class Compiler
    public:
 
    /**
+    * Appends an AST visitor to the visitor list (FIFO).
+    */
+   inline void
+   addAstVisitor (ast::visitor::Visitor* visitor){ast_visitors.push_back(visitor);}
+
+   /**
+    * Appends an ST visitor to the visitor list (FIFO).
+    */
+   inline void
+   addStVisitor (st::visitor::Visitor* visitor){st_visitors.push_back(visitor);}
+
+   /**
     * Starts a compiling job starting with an entry file.
     */
    void
@@ -100,6 +113,7 @@ class Compiler
     */
     bool
     isBuildSuccessful () const {return logger._n_warnings == 0 && logger._n_fatal_errors ==0;}
+
    /**
     * Parses a file given its path.
     */
@@ -117,18 +131,6 @@ class Compiler
     */
    void
    processParseQueue ();
-
-   /**
-    * Appends an AST visitor to the visitor list (FIFO).
-    */
-   void
-   registerAstVisitor (ast::visitor::Visitor* visitor);
-
-   /**
-    * Appends an AST visitor to the visitor list (FIFO).
-    */
-   void
-   registerStVisitor (st::visitor::Visitor* visitor);
 
    void
    runAstVisitors ();

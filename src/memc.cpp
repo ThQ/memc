@@ -11,8 +11,7 @@ int main (int argc, char** argv)
 
    opt::Options* opt = memc.gOptions();
    opt->set("ast.dump.file", "/home/thomas/mem_ast.xml");
-   opt->set("st.dump.file", "/home/thomas/mem_st.xml");
-   opt->set("st.dump.format", "xml");
+   opt->set("st.dump.xml", "/home/thomas/mem_st.xml");
    opt->set("log.level", "debug");
 
    memc.fm.appendPath("/home/thomas/code/mem/libs");
