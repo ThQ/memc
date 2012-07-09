@@ -54,6 +54,16 @@ Compiler::compile (int argc, char** argv)
 
    logger.sLevel(gOptions()->getInt("log.level"));
 
+   if (gOptions()->isSet("version.show"))
+   {
+      std::cout << PACKAGE_NAME " version " PACKAGE_VERSION "\n";
+   }
+
+   else if (gOptions()->isSet("help.show"))
+   {
+      printUsage(std::cout);
+   }
+
    if (opt_parser._params.size() >= 1)
    {
       _parse_queue.push(opt_parser._params[0]);
@@ -72,10 +82,6 @@ Compiler::compile (int argc, char** argv)
       dumpSt();
 
       printBuildSummary();
-   }
-   else
-   {
-      printUsage(std::cout);
    }
 }
 
@@ -330,6 +336,7 @@ Compiler::setUpOptions ()
       ->bind("error", log::ERROR)
       ->bind("fatal-error", log::FATAL_ERROR);
    _opts.addBoolOpt("help.show");
+   _opts.addBoolOpt("version.show");
    _opts.addStrOpt("st.dump.xml");
 
 
@@ -337,6 +344,7 @@ Compiler::setUpOptions ()
    _opts.addCliOpt("dump-st-xml", "st.dump.xml", "Dump the Symbol Table as XML");
    _opts.addCliOpt("emit-llvm-bc", "codegen.llvm-bc", "Emit LLVM bytecode");
    _opts.addCliOpt("help", "help.show", "Display available options");
+   _opts.addCliOpt("version", "version.show", "Display " PACKAGE_NAME " version");
 }
 
 }

@@ -140,6 +140,11 @@ Options::set (std::string opt_name, std::string opt_value)
          opt->_is_set = true;
          return true;
       }
+      else if (opt->_type == _Option::BOOL)
+      {
+         opt->_is_set = true;
+         return true;
+      }
    }
    assert (false && "Options does not exist.");
    return false;
