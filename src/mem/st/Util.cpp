@@ -204,22 +204,30 @@ Util::setupInts (SymbolTable& st, CoreTypes& core_types)
    core_types._short->sName("short");
    Util::registerType(&st, st.gRoot(), core_types._short);
 
+   // Function : short_add_short
+   st::Func* func_s_add_s = new st::Func();
+   func_s_add_s->sName("short_plus_short");
+   func_s_add_s->addParam("base_short", core_types._short);
+   func_s_add_s->addParam("short_to_add", core_types._short);
+   func_s_add_s->sReturnType(core_types._short);
+   st.gRoot()->addChild(func_s_add_s);
+
    // Type : int
    core_types._int = new st::Primitive();
    core_types._int->sName("int");
    Util::registerType(&st, st.gRoot(), core_types._int);
 
-   // Function : int_add_i
+   // Function : int_add_int
    st::Func* func_i_add_i = new st::Func();
-   func_i_add_i->sName("int_add_i");
+   func_i_add_i->sName("int_plus_int");
    func_i_add_i->addParam("base_int", core_types._int);
    func_i_add_i->addParam("int_to_add", core_types._int);
    func_i_add_i->sReturnType(core_types._int);
    st.gRoot()->addChild(func_i_add_i);
 
-   // Function : int_add_s
+   // Function : int_add_short
    st::Func* func_i_add_s = new st::Func();
-   func_i_add_s->sName("int_add_s");
+   func_i_add_s->sName("int_plus_short");
    func_i_add_s->addParam("base_int", core_types._int);
    func_i_add_s->addParam("short_to_add", core_types._short);
    func_i_add_s->sReturnType(core_types._int);

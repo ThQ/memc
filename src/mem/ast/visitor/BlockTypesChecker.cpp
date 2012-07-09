@@ -194,23 +194,51 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
    // Check left node
    node::Node* left_node = node->getChild(0);
    visitExpr(scope, left_node);
-   ensureExprType(left_node, _core_types->gIntTy());
 
    // Check right node
    node::Node* right_node = node->getChild(1);
    visitExpr(scope, right_node);
-   ensureExprType(right_node, _core_types->gIntTy());
 
-   if (left_node->gExprType()->gSize() > left_node->gExprType()->gSize())
+   std::string op_name;
+   switch (node->gType())
    {
-      node->sExprType(left_node->gExprType());
+      case MEM_NODE_PLUS:
+         op_name = "plus";
+         break;
+
+      default:
+         // FIXME Must fail properly if op is not found.
+         assert (false && "Unknown arithmetic operator.");
+
+   }
+
+   std::string op_func_name;
+   op_func_name += left_node->gExprType()->gName();
+   op_func_name += "_" + op_name + "_";
+   op_func_name += right_node->gExprType()->gName();
+
+   st::Func* op_func = static_cast<st::Func*>(_symbols->gRoot()->getChild(op_func_name));
+   if (op_func != NULL)
+   {
+      // FIXME Must check parameters type
+      node->sExprType(op_func->gReturnType());
    }
    else
    {
-      node->sExprType(right_node->gExprType());
-   }
-}
+      fs::position::Composite* pos = new fs::position::Composite();
+      pos->addChild(left_node->copyPosition());
+      pos->addChild(right_node->copyPosition());
 
+      log::UnsupportedArithmeticOperation* err = new log::UnsupportedArithmeticOperation();
+      err->sLeftTypeName(left_node->gExprType()->gNameCstr());
+      err->sOpName(op_name.c_str());
+      err->sRightTypeName(right_node->gExprType()->gNameCstr());
+      err->format();
+      err->sPosition(pos);
+      log(err);
+   }
+
+}
 
 void
 BlockTypesChecker::visitLogicalExpr (st::Symbol* scope, node::Node* expr_node)

@@ -106,6 +106,18 @@ class CircularClassDependency : public FatalError
    public: inline void format() {formatMessage("Circular dependency ");formatDescription("Class %s depends on class %s and vice verso ", _BaseClassName.c_str(), _DepClassName.c_str());}
 };
 
+class UnsupportedArithmeticOperation : public FatalError
+{
+   public: std::string _LeftTypeName;
+   public: std::string _OpName;
+   public: std::string _RightTypeName;
+
+   public: inline void sLeftTypeName(std::string LeftTypeName) {_LeftTypeName=LeftTypeName;}
+   public: inline void sOpName(std::string OpName) {_OpName=OpName;}
+   public: inline void sRightTypeName(std::string RightTypeName) {_RightTypeName=RightTypeName;}
+   public: inline void format() {formatMessage("Unsupported arithmetic operation : %s %s %s ", _LeftTypeName.c_str(), _OpName.c_str(), _RightTypeName.c_str());}
+};
+
 
 
 } }

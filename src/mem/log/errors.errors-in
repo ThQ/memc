@@ -96,5 +96,16 @@
          "BaseClassName": "std::string",
          "DepClassName": "std::string"
       }
+   },
+   "UnsupportedArithmeticOperation":
+   {
+      "type": "FatalError",
+      "message": "Unsupported arithmetic operation : $LeftTypeName $OpName $RightTypeName",
+      "params":
+      {
+         "LeftTypeName": "std::string",
+         "OpName": "std::string",
+         "RightTypeName": "std::string"
+      }
    }
 }
