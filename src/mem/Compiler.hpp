@@ -8,6 +8,7 @@
 #include <string>
 #include <queue>
 #include <vector>
+#include "config.h"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/dumper/XmlDumper.hpp"

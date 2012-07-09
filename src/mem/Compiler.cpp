@@ -263,7 +263,9 @@ Compiler::printBuildSummary ()
 void
 Compiler::printUsage (std::ostream& out)
 {
-   out << "USAGE: memc [OPTIONS] <input>\n\n";
+   out << "USAGE: ";
+   out << PACKAGE_NAME;
+   out << " [OPTIONS] <input>\n\n";
    out << "OPTIONS:\n";
    std::map<std::string, opt::CliOption*>::iterator i;
    for (i = gOptions()->_cli_options.begin(); i != gOptions()->_cli_options.end(); ++i)
@@ -272,7 +274,7 @@ Compiler::printUsage (std::ostream& out)
       {
          out << " --";
          out << i->second->_cli_name;
-         out << " : ";
+         out << " : \n    ";
          out << i->second->_description;
          out << "\n";
       }
