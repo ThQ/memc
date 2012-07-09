@@ -149,40 +149,18 @@ Compiler::parse (std::string file_path)
 
    reset_lexer();
    std::vector<std::string> paths_tried;
-   std::string include_path("");
 
-   // Try finding the file using include path directories
-   // TODO This should be moved to fs::FileManager
-   fs::File* file = this->fm.openFile(file_path);
-   paths_tried.push_back(file_path);
-   if (file == NULL)
-   {
-      std::vector<std::string>::size_type i;
-      std::string try_file_path;
-      for (i=0; file==NULL && i<this->fm._path.size(); ++i)
-      {
-         try_file_path.assign(this->fm._path[i] + "/" + file_path);
-         file = this->fm.openFile(try_file_path);
-         paths_tried.push_back(try_file_path);
-         if (file != NULL)
-         {
-            include_path = this->fm._path[i];
-         }
-      }
-      if (file != NULL)
-      {
-         file_path.assign(try_file_path);
-      }
-   }
+   fs::File* file = fm.tryOpenFile(file_path, paths_tried);
 
    if (file != NULL)
    {
-      std::string ns(file_path.substr(include_path.length(), file_path.length() - include_path.length() + 1));
+      std::string ns = file->gPathWithoutInclude();
       mem::Util::path_to_namespace(ns);
+
       ast::node::File* file_node = new ast::node::File();
       file_node->sBoundSymbol(file_sym);
-      file_node->_id.assign(ns);
-      file_node->_include_path.assign(include_path);
+      file_node->_id = ns;
+      file_node->_include_path = file->_include_path;
       file_node->_path = file_path;
       ast.pushChild(file_node);
 

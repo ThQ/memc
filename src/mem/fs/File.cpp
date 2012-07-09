@@ -5,6 +5,7 @@ namespace mem { namespace fs {
 
 File::File ()
 {
+   _include_path = "";
 }
 
 File::~File ()

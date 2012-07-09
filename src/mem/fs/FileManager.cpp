@@ -41,5 +41,35 @@ FileManager::openFile (std::string file_path)
    return NULL;
 }
 
+File*
+FileManager::tryOpenFile (std::string file_path,
+   std::vector<std::string>& paths_tried)
+{
+   File* res = openFile(file_path);
+   paths_tried.push_back(file_path);
+
+   if (res == NULL)
+   {
+      std::string try_file_path;
+
+      std::vector<std::string>::size_type i;
+      for (i=0; res==NULL && i < _path.size(); ++i)
+      {
+         try_file_path = _path[i] + "/" + file_path;
+         paths_tried.push_back(try_file_path);
+
+         res = openFile(try_file_path);
+
+         if (res == NULL)
+         {
+            res->_include_path = _path[i];
+            break;
+         }
+      }
+   }
+
+   return res;
+}
+
 
 } }

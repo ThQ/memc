@@ -16,7 +16,12 @@ class File
 {
    public: std::vector<std::string*> _lines;
    public: std::string _path;
+   public: std::string _include_path;
    public: std::string gPath() const {return this->_path;}
+
+   public:
+   std::string
+   gPathWithoutInclude () {return _path.substr(_include_path.size(), _path.size() - _include_path.size() + 1);}
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
