@@ -41,26 +41,38 @@ Compiler::~Compiler ()
 }
 
 void
-Compiler::compile (char* fp)
+Compiler::compile (int argc, char** argv)
 {
+   fm.appendPath(".");
+
+   // Need to set this before parsing command line arguments because it can
+   // raise warnings
+   logger.sLevel(log::WARNING);
+
+   opt::Parser opt_parser;
+   opt_parser.parse(argc, argv, &logger, gOptions());
+
    logger.sLevel(gOptions()->getInt("log.level"));
 
-   _parse_queue.push(fp);
+   if (opt_parser._params.size() >= 1)
+   {
+      _parse_queue.push(opt_parser._params[0]);
 
-   processParseQueue();
+      processParseQueue();
 
-   runAstVisitors();
-   runStVisitors();
+      runAstVisitors();
+      runStVisitors();
 
-   if (isBuildSuccessful()) emitCode();
+      if (isBuildSuccessful()) emitCode();
 
 
-   reset_lexer(); // Cleans up lexer global vars
+      reset_lexer(); // Cleans up lexer global vars
 
-   if (gOptions()->isSet("ast.dump.file")) dumpAst();
-   dumpSt();
+      if (gOptions()->isSet("ast.dump.file")) dumpAst();
+      dumpSt();
 
-   printBuildSummary();
+      printBuildSummary();
+   }
 }
 
 void
@@ -293,6 +305,10 @@ Compiler::setUpOptions ()
       ->bind("error", log::ERROR)
       ->bind("fatal-error", log::FATAL_ERROR);
    _opts.addStrOpt("st.dump.xml");
+
+
+   // Set CLI options
+   _opts.addCliOpt ("emit-llvm-bc", "codegen.llvm-bc", "Emit LLVM bytecode");
 }
 
 }

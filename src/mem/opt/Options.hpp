@@ -4,6 +4,7 @@
 
 #include <map>
 #include <string>
+#include "mem/opt/CliOption.hpp"
 #include "mem/opt/Option.hpp"
 
 
@@ -13,6 +14,7 @@ namespace mem { namespace opt {
 class Options
 {
    public: std::string name;
+   public: std::map<std::string, CliOption*> _cli_options;
    public: std::map<std::string, _Option*> _options;
 
    public:
@@ -56,6 +58,9 @@ class Options
    addStrOpt (std::string name);
 
    bool
+   addCliOpt (std::string cli_name, std::string name, std::string desc);
+
+   bool
    getBool (std::string name);
 
    std::string
@@ -72,11 +77,20 @@ class Options
       return 0;
    }
 
+   inline bool
+   hasCliOpt (std::string name) {return _cli_options[name] != NULL;}
+
+   inline bool
+   hasOpt (std::string name) {return _getOptObject(name)!=NULL;}
+
    bool
    isSet (std::string name);
 
    bool
    set (std::string opt_name, std::string opt_value);
+
+   bool
+   setCli (std::string opt_name, std::string opt_value);
 };
 
 } }

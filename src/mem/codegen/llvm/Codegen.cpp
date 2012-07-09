@@ -4,6 +4,27 @@
 namespace mem { namespace codegen { namespace llvm_ {
 
 
+llvm::Type*
+Codegen::_getLlvmIntTy (size_t size)
+{
+   return llvm::Type::getIntNTy(_module->getContext(), size * 8);
+   /*
+   switch (size)
+   {
+      case 1:
+         return llvm::Type::getInt16Ty(_module->getContext());
+      case 2:
+         return llvm::Type::getInt32Ty(_module->getContext());
+      case 4:
+         return llvm::Type::getInt32Ty(_module->getContext());
+      default:
+         printf("Undefined type size : %d\n", size);
+         assert(false);
+   }
+   return NULL;
+   */
+}
+
 void
 Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
 {
@@ -12,22 +33,23 @@ Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
       // TODO This is very ugly...
       if (mem_ty == _st->_core_types.gIntTy())
       {
-         _classes[mem_ty->gQualifiedName()] = llvm::Type::getInt32Ty(_module->getContext());
+         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(int));
       }
       else if (mem_ty == _st->_core_types.gBoolTy())
       {
-         _classes[mem_ty->gQualifiedName()] = llvm::Type::getInt32Ty(_module->getContext());
+         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(bool));
       }
       else if (mem_ty == _st->_core_types.gCharTy())
       {
-         _classes[mem_ty->gQualifiedName()] = llvm::Type::getInt32Ty(_module->getContext());
+         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(char));
       }
       else if (mem_ty == _st->_core_types.gShortTy())
       {
-         _classes[mem_ty->gQualifiedName()] = llvm::Type::getInt32Ty(_module->getContext());
+         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(short));
       }
       else if (mem_ty == _st->_core_types.gVoidTy())
       {
+         _classes[mem_ty->gQualifiedName()] = _getVoidTy();
       }
       else
       {
@@ -69,6 +91,28 @@ Codegen::gen (ast::node::Node* root)
    }
 }
 
+llvm::Value*
+Codegen::cgBinaryExpr (ast::node::Node* node)
+{
+   llvm::Value* val = NULL;
+   llvm::Value* left_val = cgExpr(node->getChild(0));
+   llvm::Value* right_val = cgExpr(node->getChild(1));
+
+   switch (node->gType())
+   {
+      case MEM_NODE_PLUS:
+         val = builder.CreateAdd(left_val, right_val);
+         break;
+
+      default:
+         printf("Unsupported arithmetic operation\n");
+         assert (false);
+   }
+
+   assert (val != NULL);
+   return val;
+}
+
 void
 Codegen::cgClass (st::Class* cls_sym)
 {
@@ -83,6 +127,33 @@ Codegen::cgClass (st::Class* cls_sym)
    }
    addType (cls_sym, ty);
    //this->_classes[cls_sym->gQualifiedName()] =  ty;
+}
+
+llvm::Value*
+Codegen::cgExpr (ast::node::Node* node)
+{
+   llvm::Value* res = NULL;
+
+   switch (node->gType())
+   {
+      case MEM_NODE_PLUS:
+         res = cgBinaryExpr(node);
+         break;
+      case MEM_NODE_NUMBER:
+         res = cgNumberExpr(static_cast<ast::node::Number*>(node));
+         break;
+      case MEM_NODE_VARIABLE_DECLARATION:
+         cgVarDecl (static_cast<ast::node::VarDecl*>(node));
+         break;
+      case MEM_NODE_FINAL_ID:
+         res = cgFinalId (static_cast<ast::node::Text*>(node));
+         break;
+      default:
+         printf("Unsupported node type %s\n", ast::node::Node::get_type_name(node->gType()));
+         assert(false);
+   }
+
+   return res;
 }
 
 void
@@ -101,10 +172,19 @@ Codegen::cgFile (ast::node::File* file_node)
    }
 }
 
+llvm::Value*
+Codegen::cgFinalId (ast::node::Text* node)
+{
+   llvm::LoadInst* inst = builder.CreateLoad(_block_vars[node->gValue()], node->gValue());
+
+   return inst; //_block_vars[node->gValue()]; //inst->getPointerOperand();
+}
+
 void
 Codegen::cgFunction (ast::node::Func* func_node)
 {
    assert(func_node->isFuncNode());
+   _block_vars.clear();
 
    st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
    std::vector<llvm::Type*> func_ty_args;
@@ -124,10 +204,61 @@ Codegen::cgFunction (ast::node::Func* func_node)
       _getFuncParamsTy(func_sym),
       /*isVarArg=*/false);
 
-   llvm::Function::Create(func_ty,
+   llvm::Function* func = llvm::Function::Create(func_ty,
       llvm::GlobalValue::ExternalLinkage,
       func_name,
       _module);
+
+   // Codegen function body
+   llvm::BasicBlock* block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", func);
+   builder.SetInsertPoint(block);
+
+   ast::node::Node* cur_node = func_node->gBodyNode()->_first_child;
+   llvm::Value* ret_val = NULL;
+   while (cur_node != NULL)
+   {
+      ret_val = cgExpr(cur_node);
+      cur_node = cur_node->_next;
+   }
+
+   if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
+   {
+      builder.CreateRetVoid();
+   }
+}
+
+llvm::Value*
+Codegen::cgNumberExpr (ast::node::Number* node)
+{
+   llvm::Value* val = NULL;
+   switch (node->_format)
+   {
+      case 's':
+         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
+            llvm::APInt(sizeof(short) * 8, node->getShort(), false));
+         break;
+      case 'i':
+         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
+            llvm::APInt(sizeof(int) * 8, node->getInt(), false));
+         break;
+      case 'l':
+         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
+            llvm::APInt(sizeof(long) * 8, node->getLong(), false));
+         break;
+      default:
+         assert (false && "Invalid constant type.");
+   }
+   assert (val != NULL);
+   return val;
+}
+
+void
+Codegen::cgVarDecl (ast::node::VarDecl* node)
+{
+   _block_vars[node->gName()] = builder.CreateAlloca(
+      _classes[node->gExprType()->gName()],
+      cgExpr(node->gValueNode()),
+      node->gName());
 }
 
 std::vector<llvm::Type*>

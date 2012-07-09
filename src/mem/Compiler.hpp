@@ -26,6 +26,7 @@
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
 #include "mem/opt/Options.hpp"
+#include "mem/opt/Parser.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/visitor/DepBuilder.hpp"
 #include "mem/st/visitor/XmlDumper.hpp"
@@ -97,7 +98,7 @@ class Compiler
     * Starts a compiling job starting with an entry file.
     */
    void
-   compile (char* file_path);
+   compile (int argc, char** argv);
 
    void
    dumpAst ();

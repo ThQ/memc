@@ -5,7 +5,14 @@ namespace mem { namespace opt {
 
 Options::~Options ()
 {
-   for (std::map<std::string, _Option*>::iterator i= _options.begin(); i!= _options.end(); ++i)
+   for (std::map<std::string, _Option*>::iterator i= _options.begin();
+      i!= _options.end(); ++i)
+   {
+      delete i->second;
+   }
+
+   for (std::map<std::string, CliOption*>::iterator i=_cli_options.begin();
+      i!= _cli_options.end(); ++i)
    {
       delete i->second;
    }
@@ -41,6 +48,22 @@ Options::_getStrOptObject (std::string opt_name)
       return static_cast<StringOption*>(opt);
    }
    return NULL;
+}
+
+bool
+Options::addCliOpt (std::string cli_name, std::string opt_name,
+   std::string description)
+{
+   CliOption* cli_opt = new CliOption();
+   cli_opt->_cli_name = cli_name;
+   cli_opt->_opt_name = opt_name;
+   cli_opt->_description = description;
+
+   if (_cli_options[cli_name] == NULL && hasOpt(opt_name))
+   {
+      _cli_options[cli_name] = cli_opt;
+   }
+   return false;
 }
 
 bool
@@ -100,7 +123,7 @@ Options::addStrOpt (std::string name)
 }
 
 bool
-Options::set(std::string opt_name, std::string opt_value)
+Options::set (std::string opt_name, std::string opt_value)
 {
    _Option* opt = _getOptObject(opt_name);
    if (opt != NULL)
@@ -122,5 +145,14 @@ Options::set(std::string opt_name, std::string opt_value)
    return false;
 }
 
+bool
+Options::setCli (std::string opt_name, std::string opt_value)
+{
+   if (hasCliOpt(opt_name))
+   {
+      return set(_cli_options[opt_name]->_opt_name, opt_value);
+   }
+   return false;
+}
 
 } }

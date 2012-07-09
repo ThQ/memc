@@ -117,7 +117,9 @@ src_mem_opt = \
  src/mem/opt/Option.cpp \
  src/mem/opt/Option.hpp \
  src/mem/opt/Options.cpp \
- src/mem/opt/Options.hpp
+ src/mem/opt/Options.hpp \
+ src/mem/opt/Parser.cpp \
+ src/mem/opt/Parser.hpp
 src_mem_parser = \
  src/mem/parser/NodeTypes.cpp \
  src/mem/parser/NodeTypes.hpp

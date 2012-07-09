@@ -24,6 +24,8 @@ class Number : public Node
 
    public: int getInt ();
    public: short getShort ();
+   public: inline long getLong () {assert(_format=='l');return _lval;}
+
    public: std::string getStringFromVal();
    public: unsigned int getUInt();
    public: bool isValid();

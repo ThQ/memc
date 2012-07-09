@@ -472,7 +472,7 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::Text* id_node)
    if (sym != NULL)
    {
       id_node->sBoundSymbol(sym);
-      id_node->sExprType(sym);
+      id_node->sExprType(static_cast<st::Var*>(sym)->gType());
    }
    else
    {
