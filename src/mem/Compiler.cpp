@@ -332,8 +332,9 @@ Compiler::setUpOptions ()
 
 
    // Set CLI options
-   _opts.addCliOpt ("help", "help.show", "Display available options");
-   _opts.addCliOpt ("emit-llvm-bc", "codegen.llvm-bc", "Emit LLVM bytecode");
+   _opts.addCliOpt("dump-st-xml", "st.dump.xml", "Dump the Symbol Table as XML");
+   _opts.addCliOpt("emit-llvm-bc", "codegen.llvm-bc", "Emit LLVM bytecode");
+   _opts.addCliOpt("help", "help.show", "Display available options");
 }
 
 }
