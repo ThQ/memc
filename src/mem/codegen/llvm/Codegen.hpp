@@ -6,6 +6,7 @@
 #include <llvm/LLVMContext.h>
 #include <llvm/Module.h>
 #include <llvm/Support/IRBuilder.h>
+#include <llvm/Support/raw_ostream.h>
 #include <map>
 #include "mem/ast/node/Func.hpp"
 #include "mem/codegen/ICodegen.hpp"
@@ -32,6 +33,7 @@ class Codegen : public mem::codegen::ICodegen
    public: llvm::Type* _getVoidTy ();
    public: llvm::Type* _getFuncReturnTy (ast::node::Func* func);
    public: std::vector<llvm::Type*> _getFuncParamsTy (st::Func* func);
+   public: std::string getLlvmByteCode ();
 };
 
 

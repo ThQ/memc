@@ -54,12 +54,13 @@ Compiler::compile (char* fp)
 
    if (isBuildSuccessful()) emitCode();
 
-   printBuildSummary();
 
    reset_lexer(); // Cleans up lexer global vars
 
    if (gOptions()->isSet("ast.dump.file")) dumpAst();
    dumpSt();
+
+   printBuildSummary();
 }
 
 void
@@ -99,11 +100,19 @@ Compiler::dumpSt ()
 void
 Compiler::emitCode ()
 {
-   if (gOptions()->getBool("codegen.native"))
+   if (gOptions()->isSet("codegen.llvm-bc"))
    {
       mem::codegen::llvm_::Codegen cg;
       cg._st = &symbols;
       cg.gen(&ast);
+
+      std::ofstream bc_file;
+      bc_file.open(gOptions()->getStr("codegen.llvm-bc").c_str());
+      bc_file << cg.getLlvmByteCode();
+      bc_file.close();
+
+      logger.debug("LLVM ByteCode dumped to %s",
+         gOptions()->getStr("codegen.llvm-bc").c_str());
    }
 }
 
@@ -274,7 +283,8 @@ void
 Compiler::setUpOptions ()
 {
    _opts.addStrOpt("ast.dump.file");
-      _opts.addBoolOpt("codegen.native");
+   _opts.addBoolOpt("codegen.native");
+   _opts.addStrOpt("codegen.llvm-bc");
    _opts.addIntEnumOpt("log.level")
       ->bind("unknown", log::UNKNOWN)
       ->bind("debug", log::DEBUG)

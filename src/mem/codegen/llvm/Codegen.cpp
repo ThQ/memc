@@ -67,8 +67,6 @@ Codegen::gen (ast::node::Node* root)
    {
       cgFile(static_cast<ast::node::File*>(root->getChild(i)));
    }
-
-   _module->dump();
 }
 
 void
@@ -172,5 +170,13 @@ Codegen::_getVoidTy ()
    return llvm::Type::getVoidTy(_module->getContext());
 }
 
+std::string
+Codegen::getLlvmByteCode ()
+{
+   std::string bc;
+   llvm::raw_string_ostream stream(bc);
+   _module->print(stream, NULL);
+   return bc;
+}
 
 } } }
