@@ -87,7 +87,13 @@ Codegen::gen (ast::node::Node* root)
    // ... then codegen functions by traversing files
    for (size_t i = 0; i < root->gChildCount(); ++i)
    {
-      cgFile(static_cast<ast::node::File*>(root->getChild(i)));
+      cgFile(static_cast<ast::node::File*>(root->getChild(i)), true);
+   }
+
+   // ... then codegen functions by traversing files
+   for (size_t i = 0; i < root->gChildCount(); ++i)
+   {
+      cgFile(static_cast<ast::node::File*>(root->getChild(i)), false);
    }
 }
 
@@ -113,6 +119,34 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
    return val;
 }
 
+llvm::Value*
+Codegen::cgCallExpr (ast::node::Call* node)
+{
+   st::Func* func_sym = static_cast<st::Func*>(node->gCallerNode()->gBoundSymbol());
+   std::vector<llvm::Value*> params;
+
+   if (node->gParamsNode() != NULL)
+   {
+      ast::node::Node* cur_param = node->gParamsNode()->_first_child;
+      while (cur_param != NULL)
+      {
+         params.push_back(cgExpr(cur_param));
+         cur_param = cur_param->_next;
+      }
+   }
+
+   assert (_functions[func_sym->gQualifiedName()] != NULL);
+
+   if (params.size() > 0)
+   {
+      return builder.CreateCall(_functions[func_sym->gQualifiedName()]);
+   }
+   else
+   {
+      return builder.CreateCall(_functions[func_sym->gQualifiedName()], params);
+   }
+}
+
 void
 Codegen::cgClass (st::Class* cls_sym)
 {
@@ -126,7 +160,6 @@ Codegen::cgClass (st::Class* cls_sym)
       ty->setBody(fields, false /* packed */);
    }
    addType (cls_sym, ty);
-   //this->_classes[cls_sym->gQualifiedName()] =  ty;
 }
 
 llvm::Value*
@@ -148,6 +181,9 @@ Codegen::cgExpr (ast::node::Node* node)
       case MEM_NODE_FINAL_ID:
          res = cgFinalId (static_cast<ast::node::Text*>(node));
          break;
+      case MEM_NODE_CALL:
+         res = cgCallExpr (static_cast<ast::node::Call*>(node));
+         break;
       default:
          printf("Unsupported node type %s\n", ast::node::Node::get_type_name(node->gType()));
          assert(false);
@@ -157,17 +193,32 @@ Codegen::cgExpr (ast::node::Node* node)
 }
 
 void
-Codegen::cgFile (ast::node::File* file_node)
+Codegen::cgFile (ast::node::File* file_node, bool cg_func_def)
 {
    ast::node::Node* node = NULL;
 
-   // ... then functions
-   for (size_t i = 0 ; i < file_node->gChildCount(); ++i)
+   if (cg_func_def)
    {
-      node = file_node->getChild(i);
-      if (node->isFuncNode())
+      // Codegen function definitions
+      for (size_t i = 0 ; i < file_node->gChildCount(); ++i)
       {
-         cgFunction(static_cast<ast::node::Func*>(node));
+         node = file_node->getChild(i);
+         if (node->isFuncNode())
+         {
+            cgFunctionDef(static_cast<ast::node::Func*>(node));
+         }
+      }
+   }
+   else
+   {
+      // Codegen function bodies
+      for (size_t i = 0 ; i < file_node->gChildCount(); ++i)
+      {
+         node = file_node->getChild(i);
+         if (node->isFuncNode())
+         {
+            cgFunctionBody(static_cast<ast::node::Func*>(node));
+         }
       }
    }
 }
@@ -181,10 +232,35 @@ Codegen::cgFinalId (ast::node::Text* node)
 }
 
 void
-Codegen::cgFunction (ast::node::Func* func_node)
+Codegen::cgFunctionBody (ast::node::Func* func_node)
 {
    assert(func_node->isFuncNode());
    _block_vars.clear();
+
+   st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
+   assert (func_sym != NULL);
+   llvm::Function* func = _functions[func_sym->gQualifiedName()];
+   assert (func != NULL);
+
+   llvm::BasicBlock& block = func->getEntryBlock();
+
+   builder.SetInsertPoint(&block);
+
+   ast::node::Node* cur_node = func_node->gBodyNode()->_first_child;
+   while (cur_node != NULL)
+   {
+      cgExpr(cur_node);
+      cur_node = cur_node->_next;
+   }
+   if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
+   {
+      builder.CreateRetVoid();
+   }
+}
+
+void
+Codegen::cgFunctionDef (ast::node::Func* func_node)
+{
 
    st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
    std::vector<llvm::Type*> func_ty_args;
@@ -209,22 +285,12 @@ Codegen::cgFunction (ast::node::Func* func_node)
       func_name,
       _module);
 
-   // Codegen function body
-   llvm::BasicBlock* block = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", func);
-   builder.SetInsertPoint(block);
+   llvm::BasicBlock* block = llvm::BasicBlock::Create(llvm::getGlobalContext(),
+      "entry", func);
 
-   ast::node::Node* cur_node = func_node->gBodyNode()->_first_child;
-   llvm::Value* ret_val = NULL;
-   while (cur_node != NULL)
-   {
-      ret_val = cgExpr(cur_node);
-      cur_node = cur_node->_next;
-   }
+   func->getEntryBlock();
 
-   if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
-   {
-      builder.CreateRetVoid();
-   }
+   _functions[func_sym->gQualifiedName()] = func;
 }
 
 llvm::Value*
