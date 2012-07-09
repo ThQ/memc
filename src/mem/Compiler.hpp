@@ -127,6 +127,9 @@ class Compiler
    void
    printBuildSummary ();
 
+   void
+   printUsage (std::ostream& out);
+
    /**
     * Parses each file in the parse queue until there's nothing left.
     */

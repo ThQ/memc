@@ -73,6 +73,10 @@ Compiler::compile (int argc, char** argv)
 
       printBuildSummary();
    }
+   else
+   {
+      printUsage(std::cout);
+   }
 }
 
 void
@@ -257,6 +261,25 @@ Compiler::printBuildSummary ()
 }
 
 void
+Compiler::printUsage (std::ostream& out)
+{
+   out << "USAGE: memc [OPTIONS] <input>\n\n";
+   out << "OPTIONS:\n";
+   std::map<std::string, opt::CliOption*>::iterator i;
+   for (i = gOptions()->_cli_options.begin(); i != gOptions()->_cli_options.end(); ++i)
+   {
+      if (i->second != NULL)
+      {
+         out << " --";
+         out << i->second->_cli_name;
+         out << " : ";
+         out << i->second->_description;
+         out << "\n";
+      }
+   }
+}
+
+void
 Compiler::processParseQueue ()
 {
    while (!_parse_queue.empty())
@@ -304,10 +327,12 @@ Compiler::setUpOptions ()
       ->bind("warning", log::WARNING)
       ->bind("error", log::ERROR)
       ->bind("fatal-error", log::FATAL_ERROR);
+   _opts.addBoolOpt("help.show");
    _opts.addStrOpt("st.dump.xml");
 
 
    // Set CLI options
+   _opts.addCliOpt ("help", "help.show", "Display available options");
    _opts.addCliOpt ("emit-llvm-bc", "codegen.llvm-bc", "Emit LLVM bytecode");
 }
 
