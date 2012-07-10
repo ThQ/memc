@@ -131,6 +131,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 %token T_SELF
 %token T_BANG
 %token T_HASH
+%token T_DOTDOTDOT
 
 // Lower precedence first
 %left <node> T_AND T_OR
@@ -282,7 +283,7 @@ function_name:
       func->sValue($2, strlen($2));
       $$ = func;
 
-      free($1);
+      delete $1;
    }
 
 function_declaration:
@@ -337,6 +338,29 @@ function_declaration:
       $$ = (ast::node::Node*)n;
    }
 
+
+function_declaration_parameter_list:
+   function_declaration_parameter
+   {
+      $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETERS);
+      $$->pushChild($1);
+   }
+   | function_declaration_parameter_list T_COMMA function_declaration_parameter
+   {
+      $$->pushChild($3);
+   }
+   | function_declaration_parameter_list T_COMMA T_DOTDOTDOT function_declaration_parameter
+   {
+      $$->pushChild($4);
+   }
+
+function_declaration_parameter:
+   id T_SEMICOLON type_name
+   {
+      $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETER);
+      $$->pushChildren($1, $3);
+      $$->sPosition(new fs::position::Range(@1, @3));
+   }
 
 //===========================================================================//
 // CONTROL FLOW                                                              //
@@ -444,25 +468,6 @@ member_declaration:
       field->pushChildren($1, $3);
 
       $$ = (ast::node::Node*)field;
-   }
-
-function_declaration_parameter_list:
-   function_declaration_parameter
-   {
-      $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETERS);
-      $$->pushChild($1);
-   }
-   | function_declaration_parameter_list T_COMMA function_declaration_parameter
-   {
-      $$->pushChild($3);
-   }
-
-function_declaration_parameter:
-   id T_SEMICOLON type_name
-   {
-      $$ = new ast::node::Node(MEM_NODE_FUNCTION_PARAMETER);
-      $$->pushChildren($1, $3);
-      $$->sPosition(new fs::position::Range(@1, @3));
    }
 
 type_name :
