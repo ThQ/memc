@@ -128,6 +128,9 @@ class Symbol
    inline bool
    isVarSymbol() const {return this->is(st::VAR);}
 
+   bool
+   isAnyTypeSymbol() const;
+
    /**
     * Returns true if the symbol is a type symbol (Type, Class, Primitive, ...).
     */

@@ -159,7 +159,7 @@ Util::lookupSymbol (Symbol* scope, std::string symbol_name)
          symbol_name = symbol_name.substr(0, symbol_name.size() - ptr_level);
 
          st::Symbol* base_ty = lookupSymbol(origin_scope, symbol_name);
-         if (base_ty != NULL && base_ty->is(st::CLASS))
+         if (base_ty != NULL && base_ty->isAnyTypeSymbol())
          {
             Ptr* ptr_symb = new Ptr();
             ptr_symb->sName(origin_symbol_name);
@@ -170,6 +170,10 @@ Util::lookupSymbol (Symbol* scope, std::string symbol_name)
       }
    }
 
+   if (res == NULL)
+   {
+      printf("SYMB_NOT_FOUND <%s>\n", symbol_name.c_str());
+   }
    return res;
 }
 

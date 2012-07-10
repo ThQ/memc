@@ -82,6 +82,19 @@ Symbol::gQualifiedName ()
 
    return name;
 }
+bool
+Symbol::isAnyTypeSymbol() const
+{
+   switch (_kind)
+   {
+      case st::CLASS:
+      case st::PRIMITIVE:
+      case st::POINTER:
+         return true;
+      default:
+         return false;
+   }
+}
 
 bool
 Symbol::isTypeSymbol () const

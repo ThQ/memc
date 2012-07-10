@@ -476,7 +476,28 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::Text* id_node)
    if (sym != NULL)
    {
       id_node->sBoundSymbol(sym);
-      id_node->sExprType(static_cast<st::Var*>(sym)->gType());
+      assert (id_node->hasBoundSymbol());
+
+      // FIXME This shouldn't be done here, there should be a function to get
+      // the expression type from a symbol
+      if (sym->isAnyTypeSymbol())
+      {
+         id_node->sExprType(sym);
+      }
+      else if (sym->isVarSymbol())
+      {
+         id_node->sExprType(static_cast<st::Var*>(sym)->gType());
+      }
+      else if (sym->isFuncSymbol())
+      {
+         id_node->sExprType(static_cast<st::Func*>(sym)->gReturnType());
+      }
+      else
+      {
+         assert (false && "Unsupported symbol type.");
+      }
+
+      assert (id_node->hasExprType());
    }
    else
    {
@@ -522,24 +543,32 @@ void
 BlockTypesChecker::visitVarDecl (st::Symbol* scope,
    node::VarDecl* var_decl_node)
 {
-   // Check type node
-   visitExpr(scope, var_decl_node->gTypeNode());
-   var_decl_node->sExprType(var_decl_node->gTypeNode()->gExprType());
-
    // Value is declared
    if (var_decl_node->gValueNode() != NULL)
    {
       visitExpr(scope, var_decl_node->gValueNode());
+   }
 
-      // Variable type is not explicitly declared (type inference)
-      if (var_decl_node->gTypeNode()->isPlaceHolderNode())
+   // Type is not explicitly declared (type inference)
+   if (var_decl_node->gTypeNode()->isPlaceHolderNode())
+   {
+      var_decl_node->sExprType(var_decl_node->gValueNode()->gExprType());
+      var_decl_node->gTypeNode()->sExprType(var_decl_node->gExprType());
+      var_decl_node->gTypeNode()->sBoundSymbol(var_decl_node->gExprType());
+   }
+   else
+   {
+      // Check type node
+      visitExpr(scope, var_decl_node->gTypeNode());
+      var_decl_node->sExprType(var_decl_node->gTypeNode()->gExprType());
+      if (!var_decl_node->gTypeNode()->hasExprType())
       {
-         //FIXME PlaceHolder node should be replaced ! Or removed.
-         var_decl_node->sExprType(var_decl_node->gValueNode()->gExprType());
-         var_decl_node->gTypeNode()->sExprType(var_decl_node->gExprType());
-         var_decl_node->gTypeNode()->sBoundSymbol(var_decl_node->gExprType());
+         printf("<%s>.type_node has no expr type\n",
+            var_decl_node->gNameNode()->gValue().c_str());
       }
    }
+
+   assert (var_decl_node->hasExprType());
 
    // Add the variable to the current scope
    if (var_decl_node->gTypeNode()->hasExprType())
@@ -564,6 +593,8 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
          log(err);
       }
    }
+
+   assert (var_decl_node->hasBoundSymbol());
 }
 
 void
