@@ -7,10 +7,14 @@ namespace mem { namespace opt {
 void
 Parser::parse (int argc, char** argv, log::Logger* log, Options* opts)
 {
+   assert (log != NULL);
+   assert (opts != NULL);
+
    _logger = log;
    _opts = opts;
 
-   typedef enum {VOID, OPT, OPT_NAME, OPT_VALUE, NAME, VALUE_START, VALUE_END, VALUE_EQ, VALUE_END_QUOTE, PARAM} _State;
+   typedef enum {VOID, OPT, OPT_NAME, OPT_VALUE, NAME, VALUE_START, VALUE_END,
+      VALUE_EQ, VALUE_END_QUOTE, PARAM} _State;
 
    // TODO This is ugly, how to go around quoted params that get swallowed by
    // the shell ?
@@ -33,8 +37,8 @@ Parser::parse (int argc, char** argv, log::Logger* log, Options* opts)
    }
    arg.append(1, '\0');
    //printf("PARAMS=<%s>\n", arg.c_str());
-   std::string opt_name;
-   std::string opt_value;
+   std::string opt_name="";
+   std::string opt_value="";
    int state;
    std::stack<int> stack;
    stack.push(VOID);

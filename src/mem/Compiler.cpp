@@ -6,6 +6,7 @@ namespace mem {
 
 Compiler::Compiler ()
 {
+   _logger = new log::ConsoleLogger();
    _logger->sFormatter(new log::ConsoleFormatter());
 
    setUpOptions();
