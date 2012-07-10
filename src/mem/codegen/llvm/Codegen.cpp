@@ -27,6 +27,32 @@ Codegen::_getLlvmIntTy (size_t size)
    return llvm::Type::getIntNTy(_module->getContext(), size * 8);
 }
 
+llvm::Type*
+Codegen::_getLlvmTy (st::Type* mem_ty)
+{
+   assert (mem_ty != NULL);
+   // Type is found
+   if (_classes.find(mem_ty->gQualifiedName()) != _classes.end())
+   {
+      return _classes[mem_ty->gQualifiedName()];
+   }
+   // Type is NOT found, so ?
+   else
+   {
+      // Create the pointer type
+      if (mem_ty->isPtrSymbol())
+      {
+         llvm::Type* base_ty = _getLlvmTy(static_cast<mem::st::Ptr*>(mem_ty)->gBaseType());
+         if (base_ty)
+         {
+            // TODO What is the second parameter (AddressSpace) ?
+             return llvm::PointerType::get(base_ty, 0);
+         }
+      }
+   }
+   return NULL;
+}
+
 std::vector<llvm::Type*>
 Codegen::_getFuncParamsTy (st::Func* func)
 {
@@ -35,7 +61,7 @@ Codegen::_getFuncParamsTy (st::Func* func)
 
    for (size_t i = 0; i < func->gParamCount(); ++i)
    {
-      cur_ty = _classes[func->getParam(i)->gType()->gQualifiedName()];
+      cur_ty = _getLlvmTy(func->getParam(i)->gType());
       assert (cur_ty != NULL);
       params_ty.push_back(cur_ty);
    }
@@ -207,6 +233,7 @@ Codegen::cgClass (st::Class* cls_sym)
 llvm::Value*
 Codegen::cgExpr (ast::node::Node* node)
 {
+   assert (node != NULL);
    llvm::Value* res = NULL;
 
    switch (node->gType())
@@ -330,8 +357,18 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
       _getFuncParamsTy(func_sym),
       /*isVarArg=*/false);
 
+   llvm::GlobalValue::LinkageTypes func_link;
+   if (func_sym->gMd()->has("external"))
+   {
+      func_link = llvm::GlobalValue::DLLImportLinkage;
+   }
+   else
+   {
+      func_link = llvm::GlobalValue::ExternalLinkage;
+   }
+
    llvm::Function* func = llvm::Function::Create(func_ty,
-      llvm::GlobalValue::ExternalLinkage,
+      func_link,
       func_name,
       _module);
 
@@ -380,9 +417,17 @@ Codegen::cgReturnStatement (ast::node::Node* node)
 void
 Codegen::cgVarDecl (ast::node::VarDecl* node)
 {
+   assert (node != NULL);
+   assert (node->gExprType() != NULL);
+
+   llvm::Value* var_val = NULL;
+   if (node->gValueNode() != NULL)
+   {
+      var_val = cgExpr(node->gValueNode());
+   }
    _block_vars[node->gName()] = builder.CreateAlloca(
-      _classes[node->gExprType()->gName()],
-      cgExpr(node->gValueNode()),
+      _getLlvmTy(node->gExprType()),
+      var_val,
       node->gName());
 }
 

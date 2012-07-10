@@ -13,6 +13,7 @@
 #include "mem/codegen/ICodegen.hpp"
 #include "mem/st/Class.hpp"
 #include "mem/st/Func.hpp"
+#include "mem/st/Ptr.hpp"
 
 
 namespace mem { namespace codegen { namespace llvm_ {
@@ -58,6 +59,9 @@ class Codegen : public mem::codegen::ICodegen
 
    inline llvm::Type*
    _getLlvmTy (std::string st_name) {return _classes[st_name];}
+
+   llvm::Type*
+   _getLlvmTy (st::Type* mem_ty);
 
    /**
     * Returns the void LLVM type.
