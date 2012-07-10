@@ -108,6 +108,9 @@ class BlockTypesChecker : public TypeChecker
    visitNew (st::Symbol* scope, node::New* node);
 
    void
+   visitReturn (st::Symbol* scope, node::Node* ret);
+
+   void
    visitVarLiteralNumber (st::Type*, node::Text* literal_nb);
 
    /**

@@ -96,6 +96,9 @@ class Codegen : public mem::codegen::ICodegen
    cgNumberExpr (ast::node::Number* node);
 
    void
+   cgReturnStatement (ast::node::Node* node);
+
+   void
    cgVarDecl (ast::node::VarDecl* node);
 
    virtual void

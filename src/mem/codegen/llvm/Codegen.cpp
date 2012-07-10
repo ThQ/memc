@@ -25,6 +25,46 @@ Codegen::_getLlvmIntTy (size_t size)
    */
 }
 
+std::vector<llvm::Type*>
+Codegen::_getFuncParamsTy (st::Func* func)
+{
+   std::vector<llvm::Type*> params_ty;
+   llvm::Type* cur_ty = NULL;
+
+   for (size_t i = 0; i < func->gParamCount(); ++i)
+   {
+      cur_ty = this->_classes[func->getParam(i)->gType()->gQualifiedName()];
+      assert (cur_ty != NULL);
+      params_ty.push_back(cur_ty);
+   }
+
+   return params_ty;
+}
+
+llvm::Type*
+Codegen::_getFuncReturnTy (ast::node::Func* func)
+{
+   llvm::Type* ty = NULL;
+
+   if (func->gReturnTypeNode() != NULL)
+   {
+      ty = this->_classes[func->gExprType()->gQualifiedName()];
+   }
+   else
+   {
+      ty = _getVoidTy();
+   }
+
+   assert(ty != NULL);
+   return ty;
+}
+
+llvm::Type*
+Codegen::_getVoidTy ()
+{
+   return llvm::Type::getVoidTy(_module->getContext());
+}
+
 void
 Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
 {
@@ -184,6 +224,9 @@ Codegen::cgExpr (ast::node::Node* node)
       case MEM_NODE_CALL:
          res = cgCallExpr (static_cast<ast::node::Call*>(node));
          break;
+      case MEM_NODE_RETURN:
+         cgReturnStatement (node);
+         break;
       default:
          printf("Unsupported node type %s\n", ast::node::Node::get_type_name(node->gType()));
          assert(false);
@@ -319,52 +362,19 @@ Codegen::cgNumberExpr (ast::node::Number* node)
 }
 
 void
+Codegen::cgReturnStatement (ast::node::Node* node)
+{
+   llvm::Value* ret_val = cgExpr(node->getChild(0));
+   builder.CreateRet(ret_val);
+}
+
+void
 Codegen::cgVarDecl (ast::node::VarDecl* node)
 {
    _block_vars[node->gName()] = builder.CreateAlloca(
       _classes[node->gExprType()->gName()],
       cgExpr(node->gValueNode()),
       node->gName());
-}
-
-std::vector<llvm::Type*>
-Codegen::_getFuncParamsTy (st::Func* func)
-{
-   std::vector<llvm::Type*> params_ty;
-   llvm::Type* cur_ty = NULL;
-
-   for (size_t i = 0; i < func->gParamCount(); ++i)
-   {
-      cur_ty = this->_classes[func->getParam(i)->gType()->gQualifiedName()];
-      assert (cur_ty != NULL);
-      params_ty.push_back(cur_ty);
-   }
-
-   return params_ty;
-}
-
-llvm::Type*
-Codegen::_getFuncReturnTy (ast::node::Func* func)
-{
-   llvm::Type* ty = NULL;
-
-   if (func->gReturnTypeNode() != NULL)
-   {
-      ty = this->_classes[func->gExprType()->gQualifiedName()];
-   }
-   else
-   {
-      ty = _getVoidTy();
-   }
-
-   assert(ty != NULL);
-   return ty;
-}
-
-llvm::Type*
-Codegen::_getVoidTy ()
-{
-   return llvm::Type::getVoidTy(_module->getContext());
 }
 
 std::string

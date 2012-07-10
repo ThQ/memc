@@ -381,6 +381,10 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          visitNew(scope, static_cast<node::New*>(node));
          break;
 
+      case MEM_NODE_RETURN:
+         visitReturn(scope, node);
+         break;
+
       case MEM_NODE_WHILE:
          visitWhile(scope, static_cast<node::While*>(node));
          break;
@@ -504,6 +508,14 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
             visitExpr(scope, st);
       }
    }
+}
+
+void
+BlockTypesChecker::visitReturn (st::Symbol* scope, node::Node* ret_node)
+{
+   //FIXME This should check that the expr type is the same as the function
+   // definition
+   visitExpr(scope, ret_node->getChild(0));
 }
 
 void
