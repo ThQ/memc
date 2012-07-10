@@ -10,6 +10,8 @@
 #include "mem/st/Class.hpp"
 
 
+#define NODE_ENSURE(cond) if (!(cond)){return false;}
+
 namespace mem { namespace ast { namespace node {
 
 
