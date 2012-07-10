@@ -137,6 +137,8 @@ Codegen::gen (ast::node::Node* root)
    assert (_st != NULL);
    _module = new llvm::Module("top", llvm::getGlobalContext());
 
+   _classes["void*"] = llvm::Type::getInt32PtrTy(_module->getContext());
+
    // Codegen classes first...
    st::Type* ty = NULL;
    std::map<std::string, st::Type*> types = _st->gTypes();
@@ -151,6 +153,8 @@ Codegen::gen (ast::node::Node* root)
          cgClass(static_cast<st::Class*>(ty));
       }
    }
+
+   cgMemoryFunctions();
 
    // ... then codegen functions by traversing files
    for (size_t i = 0; i < root->gChildCount(); ++i)
@@ -252,6 +256,9 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
       case MEM_NODE_CALL:
          res = cgCallExpr (static_cast<ast::node::Call*>(node));
+         break;
+      case MEM_NODE_NEW:
+         res = cgNewExpr (static_cast<ast::node::New*>(node));
          break;
       case MEM_NODE_RETURN:
          cgReturnStatement (node);
@@ -380,6 +387,43 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
    }
 
    _functions[_getCodegenFuncName(func_sym)] = func;
+}
+
+void
+Codegen::cgMemoryFunctions ()
+{
+   // MALLOC
+   std::vector<llvm::Type*> malloc_tys;
+   malloc_tys.push_back(llvm::Type::getInt32Ty(_module->getContext()));
+
+   llvm::FunctionType* malloc_ty = llvm::FunctionType::get(
+      _getLlvmTy("void*"),
+      malloc_tys,
+      /*isVarArg=*/false);
+
+   llvm::Function* malloc = llvm::Function::Create(malloc_ty,
+      llvm::GlobalValue::DLLImportLinkage,
+      "malloc",
+      _module);
+   _functions["malloc"] = malloc;
+}
+
+llvm::Value*
+Codegen::cgNewExpr (ast::node::New* node)
+{
+   // TODO This seems a bit long...
+
+   llvm::Value* obj_size_alloc = builder.CreateAlloca(_classes["int"]);
+
+   llvm::Value* obj_size_val = llvm::ConstantInt::get(_classes["int"], 2);
+
+   llvm::Value* obj_size_store = builder.CreateStore(obj_size_val, obj_size_alloc);
+
+   llvm::Value* obj_size_load = builder.CreateLoad(obj_size_alloc);
+
+   llvm::Value* malloc_call = builder.CreateCall(_functions["malloc"], obj_size_load);
+
+   return obj_size_store;
 }
 
 llvm::Value*

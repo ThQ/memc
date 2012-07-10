@@ -10,6 +10,7 @@
 #include <map>
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Func.hpp"
+#include "mem/ast/node/New.hpp"
 #include "mem/codegen/ICodegen.hpp"
 #include "mem/st/Class.hpp"
 #include "mem/st/Func.hpp"
@@ -98,6 +99,12 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgFunctionDef (ast::node::Func* func_node);
+
+   void
+   cgMemoryFunctions ();
+
+   llvm::Value*
+   cgNewExpr (ast::node::New* node);
 
    llvm::Value*
    cgNumberExpr (ast::node::Number* node);
