@@ -130,6 +130,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 %token T_WHILE
 %token T_SELF
 %token T_BANG
+%token T_HASH
 
 // Lower precedence first
 %left <node> T_AND T_OR
@@ -156,7 +157,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 %type <node> function_declaration
 %type <node> function_declaration_parameter
 %type <node> function_declaration_parameter_list
-%type <text> function_name
+%type <node> function_name
 %type <text_node> id
 %type <node> if
 %type <node> literal
@@ -172,6 +173,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 %type <node> while
 %type <text_node> qualified_id
 %type <text_node> use_file
+%type <text_node> metadata
 
 %%
 
@@ -195,7 +197,6 @@ input :
 
 
 use:
-
    T_USE use_file
    {
       $$ = new ast::node::Use();
@@ -215,11 +216,16 @@ use_file :
       $$->sValue($$->gValue() + '.' + $3);
    }
 
-/*
-=============================================================================
-  DECLARATION
-=============================================================================
-*/
+metadata :
+   T_HASH T_ID T_NEWLINE
+   {
+      $$ = new ast::node::Text();
+      $$->sValue($2, strlen($2));
+   }
+
+//=============================================================================
+// CLASS
+//=============================================================================
 
 class_declaration:
    T_CLASS id class_members
@@ -256,18 +262,99 @@ class_members:
    }
 
 
-/*
-=============================================================================
-  CONTROL FLOW
-=============================================================================
-*/
+//=============================================================================
+// FUNCTION
+//=============================================================================
+
+function_name:
+   T_ID
+   {
+      ast::node::Func* func = new ast::node::Func();
+      func->sValue($1, strlen($1));
+      $$ = func;
+
+      free($1);
+   }
+   | metadata T_ID
+   {
+      printf("METADATA\n");
+      ast::node::Func* func = new ast::node::Func();
+      func->sValue($2, strlen($2));
+      $$ = func;
+
+      free($1);
+   }
+
+function_declaration:
+   //------------------------------------------------------------------------//
+   // VIRTUAL FUNCTIONS                                                      //
+   //------------------------------------------------------------------------//
+
+   // Virtual function : no parameters, return type
+   // Ex: my_function_name() -> my_return_type
+   function_name T_OP T_CP T_RARR type_name T_NEWLINE
+   {
+      ast::node::Func* n = static_cast<ast::node::Func*>($1);
+      n->pushChild($5);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+   }
+   // Virtual function : parameters, return type
+   // Ex: my_function_name(my_variable :my_type) -> my_return_type
+   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name T_NEWLINE
+   {
+      $3->sPosition(new fs::position::Range(
+         *($3->getChild(0)->_position),
+         *($3->getChild($3->_child_count-1)->_position)));
+
+      ast::node::Func* n = static_cast<ast::node::Func*>($1);
+      n->pushChildren($3, $6);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+   }
+
+   //------------------------------------------------------------------------//
+   // NORMAL FUNCTIONS                                                       //
+   //------------------------------------------------------------------------//
+   // Ex: my_function_name() -> my_return_type
+   | function_name T_OP T_CP T_RARR type_name block
+   {
+      ast::node::Func* n = static_cast<ast::node::Func*>($1);
+      n->pushChildren($5, $6);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+   }
+   // Ex: my_function_name(my_variable :my_type) :my_return_type
+   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name block
+   {
+      $3->sPosition(new fs::position::Range(
+         *($3->getChild(0)->_position),
+         *($3->getChild($3->_child_count-1)->_position)));
+
+      ast::node::Func* n = static_cast<ast::node::Func*>($1);
+      n->pushChildren($3, $6, $7);
+      n->sPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+   }
+
+
+//===========================================================================//
+// CONTROL FLOW                                                              //
+//===========================================================================//
+
 if:
+   //------------------------------------------------------------------------//
+   // SIMPLE IF                                                              //
+   //------------------------------------------------------------------------//
    T_IF expr block
    {
       $$ = new ast::node::Node(MEM_NODE_IF);
       $$->pushChildren($2, $3);
       $$->sPosition(new fs::position::Range(@1, @2));
    }
+   //------------------------------------------------------------------------//
+   // IF / ELSE                                                              //
+   //------------------------------------------------------------------------//
    | T_IF expr block T_ELSE block
    {
       $$ = new ast::node::Node(MEM_NODE_IF_ELSE);
@@ -334,65 +421,6 @@ return_statement:
    {
       $$ = new ast::node::Node(MEM_NODE_RETURN);
       $$->pushChild($2);
-   }
-
-function_name:
-   T_ID
-   | T_STRING
-
-function_declaration:
-   // Virtual function : no parameters, return type
-   // Ex: my_function_name() -> my_return_type
-   function_name T_OP T_CP T_RARR type_name T_NEWLINE
-   {
-      ast::node::Func* n = new ast::node::Func();
-      n->sValue($1, strlen($1));
-      n->pushChild($5);
-      n->sPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-
-      free($1);
-   }
-   // Virtual function : parameters, return type
-   // Ex: my_function_name(my_variable :my_type) -> my_return_type
-   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name T_NEWLINE
-   {
-      $3->sPosition(new fs::position::Range(
-         *($3->getChild(0)->_position),
-         *($3->getChild($3->_child_count-1)->_position)));
-
-      ast::node::Func* n = new ast::node::Func();
-      n->sValue($1, strlen($1));
-      n->pushChildren($3, $6);
-      n->sPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-
-      free($1);
-   }
-   // Ex: my_function_name() -> my_return_type
-   | function_name T_OP T_CP T_RARR type_name block
-   {
-      ast::node::Func* n = new ast::node::Func();
-      n->sValue($1, strlen($1));
-      n->pushChildren($5, $6);
-      n->sPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-
-      free($1);
-   }
-   // Ex: my_function_name(my_variable :my_type) :my_return_type
-   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name block
-   {
-      $3->sPosition(new fs::position::Range(
-         *($3->getChild(0)->_position),
-         *($3->getChild($3->_child_count-1)->_position)));
-      ast::node::Func* n = new ast::node::Func();
-      n->sValue($1, strlen($1));
-      n->pushChildren($3, $6, $7);
-      n->sPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-
-      free($1);
    }
 
 

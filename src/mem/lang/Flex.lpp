@@ -248,6 +248,10 @@ ST_USE      {KW_USE}[ ]+{NS_PART_NAME}
    return T_LT;
 }
 
+"#" {
+   return T_HASH;
+}
+
 "<=" {
    return T_LARR_EQ;
 }

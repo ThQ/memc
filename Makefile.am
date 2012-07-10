@@ -159,7 +159,7 @@ src_mem_st_visitor = \
 
 CXX=clang++
 AUTOMAKE_OPTIONS = subdir-objects
-AM_YFLAGS = -d
+AM_YFLAGS = -d -v --xml=/home/thomas/bison-report.xml
 
 BUILT_SOURCES = \
  src/mem/lang/Bison.hpp
