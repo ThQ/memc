@@ -52,7 +52,10 @@ Compiler::compile (int argc, char** argv)
    opt::Parser opt_parser;
    opt_parser.parse(argc, argv, &logger, gOptions());
 
-   logger.sLevel(gOptions()->getInt("log.level"));
+   if (gOptions()->isSet("log.level"))
+   {
+      logger.sLevel(gOptions()->getInt("log.level"));
+   }
 
    if (gOptions()->isSet("version.show"))
    {

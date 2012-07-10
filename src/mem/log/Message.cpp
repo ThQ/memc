@@ -4,21 +4,19 @@ namespace mem { namespace log {
 
 Message::Message ()
 {
-   this->_position = NULL;
+   _level = UNKNOWN;
+   _position = NULL;
 }
 
 Message::Message (MessageLevel level)
 {
-   this->_position = NULL;
-   this->_level = level;
+   _position = NULL;
+   _level = level;
 }
 
 Message::~Message ()
 {
-   if (this->_position != NULL)
-   {
-      delete this->_position;
-   }
+   delete _position;
 }
 
 void
@@ -29,7 +27,7 @@ Message::formatMessage (const char* format, ...)
    char message [256] = "\0";
    vsprintf(message, format, args);
    va_end(args);
-   this->_message = message;
+   _message = message;
 }
 
 void

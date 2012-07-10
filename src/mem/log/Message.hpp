@@ -29,7 +29,7 @@ class Message
 
    // PROPERTY : Level
    public: MessageLevel _level;
-   public: inline MessageLevel gLevel() {return this->_level;}
+   public: inline MessageLevel gLevel() {return _level;}
    public: void sLevel (MessageLevel level);
 
    // PROPERTY : Message

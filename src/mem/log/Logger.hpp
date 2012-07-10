@@ -18,6 +18,7 @@ class Logger
    public: int _n_warnings;
    public: int _n_fatal_errors;
 
+
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
@@ -37,7 +38,6 @@ class Logger
     * Default constructor.
     */
    Logger();
-
 
    /**
     * Destructor.

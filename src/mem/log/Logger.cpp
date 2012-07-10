@@ -5,17 +5,15 @@ namespace mem { namespace log {
 
 Logger::Logger()
 {
-   this->_n_errors = 0;
-   this->_n_warnings = 0;
-   this->_n_fatal_errors = 0;
+   _level = log::UNKNOWN;
+   _n_errors = 0;
+   _n_warnings = 0;
+   _n_fatal_errors = 0;
 }
 
 Logger::~Logger()
 {
-   if (this->_formatter != NULL)
-   {
-      delete this->_formatter;
-   }
+   delete this->_formatter;
 }
 
 void
@@ -30,6 +28,7 @@ Logger::debug (const char* format, ...)
    va_list vargs;
    va_start(vargs, format);
    this->log(DEBUG, format, vargs);
+   va_end(vargs);
 }
 
 void
@@ -38,6 +37,7 @@ Logger::error (const char* format, ...)
    va_list vargs;
    va_start(vargs, format);
    this->log(ERROR, format, vargs);
+   va_end(vargs);
 }
 
 void
@@ -52,6 +52,7 @@ Logger::fatalError (const char* format, ...)
    va_list vargs;
    va_start(vargs, format);
    this->log(FATAL_ERROR, format, vargs);
+   va_end(vargs);
 }
 
 void
@@ -72,16 +73,17 @@ Logger::info (const char* format, ...)
    va_list vargs;
    va_start(vargs, format);
    this->log(INFO, format, vargs);
+   va_end(vargs);
 }
 
 void
 Logger::log (Message* msg)
 {
-   assert(this->_formatter != NULL);
+   assert(_formatter != NULL);
 
    if (msg != NULL)
    {
-      switch (msg->_level)
+      switch (msg->gLevel())
       {
          case ERROR: _n_errors++; break;
          case WARNING: _n_warnings++; break;
@@ -110,10 +112,16 @@ void
 Logger::log (MessageLevel level, const char* format, va_list varg)
 {
    char* fmsg = new char[300];
-   vsprintf(fmsg, format, varg);
+   fmsg[0] = '\0';
 
-   Message* msg = new Message(level);
+   if (vsprintf(fmsg, format, varg) <= 0)
+   {
+      assert(false);
+   }
+
+   Message* msg = new Message();
    msg->sMessage(fmsg);
+   msg->sLevel(level);
    this->log(msg);
 
    delete[] fmsg;
@@ -131,6 +139,7 @@ Logger::warning (const char* format, ...)
    va_list vargs;
    va_start(vargs, format);
    this->log(WARNING, format, vargs);
+   va_end(vargs);
 }
 
 
