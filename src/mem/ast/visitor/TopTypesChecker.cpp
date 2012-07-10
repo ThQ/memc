@@ -183,6 +183,14 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    assert(func_decl != NULL);
 
    st::Func* func_sym = new st::Func();
+   if (func_decl->hasMd())
+   {
+      func_sym->sMd(func_decl->gMd());
+   }
+   else
+   {
+      func_sym->sMd(new Metadata());
+   }
    func_sym->sName(func_decl->gValue());
    scope->addChild(func_sym);
 

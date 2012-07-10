@@ -7,6 +7,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <string>
+#include "mem/Metadata.hpp"
 #include "mem/fs/position/Range.hpp"
 #include "mem/st/SymbolKind.hpp"
 
@@ -39,9 +40,24 @@ class Symbol
    // -------------------------------------------------------------------------
    public:
 
+   // ---------------------
+   // PROPERTY : ChildCount
+   // ---------------------
+   size_t _child_count;
 
-   public: size_t _child_count;
-   public: inline size_t gChildCount() const {return _child_count;}
+   inline size_t
+   gChildCount() const {return _child_count;}
+
+   // --------------
+   // PROPERTY : Md
+   // -------------
+   Metadata* _md;
+
+   inline Metadata*
+   gMd() const {return _md;}
+
+   inline void
+   sMd (Metadata* md) {_md = md;}
 
    // ---------------
    // PROPERTY : Name

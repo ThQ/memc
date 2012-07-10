@@ -4,25 +4,27 @@
 namespace mem { namespace codegen { namespace llvm_ {
 
 
+std::string
+Codegen::_getCodegenFuncName (st::Func* func)
+{
+   std::string name = "";
+
+   if (func->gMd()->has("external"))
+   {
+      name = func->gName();
+   }
+   else
+   {
+      name = func->gQualifiedName();
+   }
+
+   return name;
+}
+
 llvm::Type*
 Codegen::_getLlvmIntTy (size_t size)
 {
    return llvm::Type::getIntNTy(_module->getContext(), size * 8);
-   /*
-   switch (size)
-   {
-      case 1:
-         return llvm::Type::getInt16Ty(_module->getContext());
-      case 2:
-         return llvm::Type::getInt32Ty(_module->getContext());
-      case 4:
-         return llvm::Type::getInt32Ty(_module->getContext());
-      default:
-         printf("Undefined type size : %d\n", size);
-         assert(false);
-   }
-   return NULL;
-   */
 }
 
 std::vector<llvm::Type*>
@@ -33,7 +35,7 @@ Codegen::_getFuncParamsTy (st::Func* func)
 
    for (size_t i = 0; i < func->gParamCount(); ++i)
    {
-      cur_ty = this->_classes[func->getParam(i)->gType()->gQualifiedName()];
+      cur_ty = _classes[func->getParam(i)->gType()->gQualifiedName()];
       assert (cur_ty != NULL);
       params_ty.push_back(cur_ty);
    }
@@ -48,7 +50,7 @@ Codegen::_getFuncReturnTy (ast::node::Func* func)
 
    if (func->gReturnTypeNode() != NULL)
    {
-      ty = this->_classes[func->gExprType()->gQualifiedName()];
+      ty = _classes[func->gExprType()->gQualifiedName()];
    }
    else
    {
@@ -175,15 +177,15 @@ Codegen::cgCallExpr (ast::node::Call* node)
       }
    }
 
-   assert (_functions[func_sym->gQualifiedName()] != NULL);
+   assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
 
    if (params.size() > 0)
    {
-      return builder.CreateCall(_functions[func_sym->gQualifiedName()]);
+      return builder.CreateCall(_functions[_getCodegenFuncName(func_sym)]);
    }
    else
    {
-      return builder.CreateCall(_functions[func_sym->gQualifiedName()], params);
+      return builder.CreateCall(_functions[_getCodegenFuncName(func_sym)], params);
    }
 }
 
@@ -286,7 +288,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
 
       st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
       assert (func_sym != NULL);
-      llvm::Function* func = _functions[func_sym->gQualifiedName()];
+      llvm::Function* func = _functions[_getCodegenFuncName(func_sym)];
       assert (func != NULL);
 
       llvm::BasicBlock& block = func->getEntryBlock();
@@ -320,7 +322,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
    }
    else
    {
-      func_name = func_sym->gQualifiedNameCstr();
+      func_name = _getCodegenFuncName(func_sym);
    }
 
    llvm::FunctionType* func_ty = llvm::FunctionType::get(
@@ -340,7 +342,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
          llvm::getGlobalContext(), "entry", func);
    }
 
-   _functions[func_sym->gQualifiedName()] = func;
+   _functions[_getCodegenFuncName(func_sym)] = func;
 }
 
 llvm::Value*

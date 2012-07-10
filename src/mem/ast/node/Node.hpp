@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <vector>
+#include "mem/Metadata.hpp"
 #include "mem/fs/position/Range.hpp"
 #include "mem/parser/NodeTypes.hpp"
 #include "mem/st/Class.hpp"
@@ -63,6 +64,21 @@ class Node
 
    inline void
    sExprType (st::Symbol* sym) {this->_exp_type = sym;};
+
+
+   // -----------------
+   // PROPERTY : Md
+   // -----------------
+   Metadata* _md;
+
+   inline Metadata*
+   gMd() const {return _md;}
+
+   inline bool
+   hasMd() const {return _md != NULL;}
+
+   inline void
+   sMd (Metadata* md) {_md = md;}
 
    // -----------------
    // PROPERTY : Parent

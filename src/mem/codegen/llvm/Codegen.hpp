@@ -35,6 +35,9 @@ class Codegen : public mem::codegen::ICodegen
    //--------------------------------------------------------------------------
    public:
 
+   std::string
+   _getCodegenFuncName (st::Func* func);
+
    /**
     * Returns the LLVM type associated with an AST function node.
     */

@@ -280,9 +280,12 @@ function_name:
    }
    | metadata T_ID
    {
-      printf("METADATA\n");
+      Metadata* md = new Metadata();
+      md->set($1->gValue(), "");
+
       ast::node::Func* func = new ast::node::Func();
       func->sValue($2, strlen($2));
+      func->sMd(md);
       $$ = func;
 
       delete $1;

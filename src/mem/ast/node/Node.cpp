@@ -12,6 +12,7 @@ Node::Node ()
    _exp_type = NULL;
    _first_child = NULL;
    _last_child = NULL;
+   _md = NULL;
    _next = NULL;
    _parent = NULL;
    _position = NULL;
@@ -21,17 +22,18 @@ Node::Node ()
 
 Node::Node (unsigned int type)
 {
+   _bound_type = NULL;
+   _child_count = 0;
    _depth = 0;
+   _exp_type = NULL;
    _first_child = 0;
    _last_child = 0;
+   _md = NULL;
    _next = 0;
    _parent = 0;
    _position = NULL;
    _prev = 0;
    _type = type;
-   _child_count = 0;
-   _exp_type = NULL;
-   _bound_type = NULL;
 }
 
 Node::~Node ()
