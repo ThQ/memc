@@ -278,26 +278,31 @@ void
 Codegen::cgFunctionBody (ast::node::Func* func_node)
 {
    assert(func_node->isFuncNode());
-   _block_vars.clear();
 
-   st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
-   assert (func_sym != NULL);
-   llvm::Function* func = _functions[func_sym->gQualifiedName()];
-   assert (func != NULL);
-
-   llvm::BasicBlock& block = func->getEntryBlock();
-
-   builder.SetInsertPoint(&block);
-
-   ast::node::Node* cur_node = func_node->gBodyNode()->_first_child;
-   while (cur_node != NULL)
+   // Don't try to generate body for a virtual function
+   if (func_node->gBodyNode() != NULL)
    {
-      cgExpr(cur_node);
-      cur_node = cur_node->_next;
-   }
-   if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
-   {
-      builder.CreateRetVoid();
+      _block_vars.clear();
+
+      st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
+      assert (func_sym != NULL);
+      llvm::Function* func = _functions[func_sym->gQualifiedName()];
+      assert (func != NULL);
+
+      llvm::BasicBlock& block = func->getEntryBlock();
+
+      builder.SetInsertPoint(&block);
+
+      ast::node::Node* cur_node = func_node->gBodyNode()->_first_child;
+      while (cur_node != NULL)
+      {
+         cgExpr(cur_node);
+         cur_node = cur_node->_next;
+      }
+      if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
+      {
+         builder.CreateRetVoid();
+      }
    }
 }
 
@@ -328,10 +333,12 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
       func_name,
       _module);
 
-   llvm::BasicBlock* block = llvm::BasicBlock::Create(llvm::getGlobalContext(),
-      "entry", func);
-
-   func->getEntryBlock();
+   // Don't codegen a body for a virtual/external function
+   if (func_node->gBodyNode() != NULL)
+   {
+      llvm::BasicBlock* block = llvm::BasicBlock::Create(
+         llvm::getGlobalContext(), "entry", func);
+   }
 
    _functions[func_sym->gQualifiedName()] = func;
 }
