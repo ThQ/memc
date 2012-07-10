@@ -77,7 +77,6 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 }
 }
 
-
 %code requires {
 }
 
@@ -130,18 +129,22 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 %token T_SEMICOLON
 %token T_WHILE
 %token T_SELF
+%token T_BANG
 
-%right <node> T_OP T_CP
-%right <node> T_BANG
+// Lower precedence first
+%left <node> T_AND T_OR
 %left <node> T_EQ_EQ T_GT T_RARR_EQ T_LT T_RARR T_LARR_EQ
 %left <node> T_MINUS T_PLUS
 %left <node> T_MUL T_DIV
-%left <node> T_DOT
 %left <node> T_MUL_MUL T_MODULO
 %left <node> T_MINUS_MINUS T_PLUS_PLUS
+%left <node> T_DOT
 
 %type <node> binary_expr
 %type <text_node> binary_operator
+%type <text_node> bool_operator
+%type <text_node> comp_operator
+%type <text_node> math_operator
 %type <node> block
 %type <node> call
 %type <node> class_declaration
@@ -156,8 +159,6 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
 %type <text> function_name
 %type <text_node> id
 %type <node> if
-%type <text_node> left_unary_expr
-%type <text_node> left_unary_operator
 %type <node> literal
 %type <node> members_declarations
 %type <node> member_declaration
@@ -329,7 +330,7 @@ simple_statement:
    | return_statement
 
 return_statement:
-   T_RETURN expr
+   T_RETURN expr T_NEWLINE
    {
       $$ = new ast::node::Node(MEM_NODE_RETURN);
       $$->pushChild($2);
@@ -494,11 +495,11 @@ qualified_id :
    }
 
 dot_expr :
-   expr T_DOT id
+   T_OP expr T_CP T_DOT id
    {
       $$ = new ast::node::Node(MEM_NODE_DOT);
       $$->sPosition(@$.copy_range());
-      $$->pushChildren($1, $3);
+      $$->pushChildren($2, $5);
    }
 
 expr :
@@ -511,10 +512,6 @@ expr :
       $$ = $1;
    }
    | binary_expr
-   {
-      $$ = (ast::node::Node*)$1;
-   }
-   | left_unary_expr
    {
       $$ = (ast::node::Node*)$1;
    }
@@ -539,8 +536,7 @@ expr :
       $$->pushChild($2);
    }
 
-binary_operator:
-   // ex: this.canRead() and this.bytesReceived > 0
+bool_operator:
    T_AND
    {
       $$ = new ast::node::Text(MEM_NODE_AND);
@@ -549,34 +545,51 @@ binary_operator:
    {
       $$ = new ast::node::Text(MEM_NODE_OR);
    }
-   | T_DIV
-   {
-      $$ = new ast::node::Text(MEM_NODE_DIV);
-   }
-   | T_EQ_EQ
+
+comp_operator:
+   // ex: true == false
+   T_EQ_EQ
    {
       $$ = new ast::node::Text();
-      $$->sValue("__equals__", 10);
    }
+   // ex 1 < 2
    | T_LT
    {
       $$ = new ast::node::Text();
-      $$->sValue("__lt__", 6);
    }
+   // ex: 1 <= 2
    | T_LARR_EQ
    {
       $$ = new ast::node::Text();
-      $$->sValue("__lte__", 7);
    }
+   // ex: 1 > 2
+   | T_GT
+   {
+      $$ = new ast::node::Text();
+   }
+   // ex: 1 >= 2
+   | T_RARR_EQ
+   {
+      $$ = new ast::node::Text();
+   }
+
+math_operator:
+   // ex:  8 / 2
+   T_DIV
+   {
+      $$ = new ast::node::Text(MEM_NODE_DIV);
+   }
+   // ex: 10 - 2
    | T_MINUS
    {
       $$ = new ast::node::Text(MEM_NODE_MINUS);
    }
+   // ex: 10 % 5
    | T_MODULO
    {
       $$ = new ast::node::Text();
-      $$->sValue("__modulo__", 10);
    }
+   // ex: 2 * 3
    | T_MUL
    {
       $$ = new ast::node::Text(MEM_NODE_MUL);
@@ -586,37 +599,14 @@ binary_operator:
    {
       $$ = new ast::node::Text(MEM_NODE_POW);
    }
+   // ex: 1 + 2
    | T_PLUS
    {
       $$ = new ast::node::Text(MEM_NODE_PLUS);
    }
-   | T_GT
-   {
-      $$ = new ast::node::Text();
-      $$->sValue("__gt__", 6);
-   }
-   | T_RARR_EQ
-   {
-      $$ = new ast::node::Text();
-      $$->sValue("__gte__", 7);
-   }
 
-left_unary_operator:
-   T_BANG
-   {
-      $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->sValue("__bang__");
-   }
-   | T_MINUS_MINUS
-   {
-      $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->sValue("__minus_minus__");
-   }
-   | T_PLUS_PLUS
-   {
-      $$ = new ast::node::Text(MEM_NODE_ID);
-      $$->sValue("__plus_plus__");
-   }
+binary_operator:
+   bool_operator | comp_operator | math_operator
 
 binary_expr:
    expr binary_operator expr
@@ -626,15 +616,6 @@ binary_expr:
       $$ = $2;
    }
 
-left_unary_expr:
-   left_unary_operator expr
-   {
-      ast::node::Node* func = new ast::node::Node(MEM_NODE_DOT);
-      func->pushChild ($2);
-
-      $$ = new ast::node::Text(MEM_NODE_CALL);
-      $$->pushChild(func);
-   }
 
 expr_list :
    expr
@@ -653,14 +634,14 @@ expr_list :
 
 call :
    /* ex: my_func() */
-   expr T_OP T_CP
+   qualified_id T_OP T_CP
    {
       $$ = new ast::node::Call();
       $$->sPosition(new fs::position::Range(@1, @3));
       $$->pushChild($1);
    }
    /* ex: my_func(1, 2, 3) */
-   | expr T_OP expr_list T_CP
+   | qualified_id T_OP expr_list T_CP
    {
       $3->sPosition(@3.copy_range());
       $$ = new ast::node::Call();
