@@ -77,13 +77,12 @@ Compiler::compile (int argc, char** argv)
       runAstVisitors();
       runStVisitors();
 
-      if (isBuildSuccessful()) emitCode();
-
-
       reset_lexer(); // Cleans up lexer global vars
 
-      if (gOptions()->isSet("ast.dump.file")) dumpAst();
+      dumpAst();
       dumpSt();
+
+      if (isBuildSuccessful()) emitCode();
 
       printBuildSummary();
    }
@@ -92,14 +91,16 @@ Compiler::compile (int argc, char** argv)
 void
 Compiler::dumpAst ()
 {
-   std::ofstream dump_file;
-   dump_file.open(gOptions()->getStr("ast.dump.file").c_str());
+   if (gOptions()->isSet("ast.dump.xml"))
+   {
+      std::ofstream dump_file(gOptions()->getStr("ast.dump.xml").c_str());
 
-   mem::ast::dumper::XmlDumper dumper;
-   dumper.dump_to(&ast, dump_file);
+      mem::ast::dumper::XmlDumper dumper;
+      dumper.dump_to(&ast, dump_file);
 
-   dump_file.close();
-   _logger->debug("AST dumped to %s", gOptions()->getStr("ast.dump.file").c_str());
+      dump_file.close();
+      _logger->debug("AST dumped to %s", gOptions()->getStr("ast.dump.xml").c_str());
+   }
 }
 
 void
@@ -307,7 +308,7 @@ Compiler::runStVisitors ()
 void
 Compiler::setUpOptions ()
 {
-   _opts.addStrOpt("ast.dump.file");
+   _opts.addStrOpt("ast.dump.xml");
    _opts.addBoolOpt("codegen.native");
    _opts.addStrOpt("codegen.llvm-bc");
    _opts.addIntEnumOpt("log.level")
@@ -323,6 +324,7 @@ Compiler::setUpOptions ()
 
 
    // Set CLI options
+   _opts.addCliOpt("dump-ast-xml", "ast.dump.xml", "Dump the Abstract Syntax Tree as XML");
    _opts.addCliOpt("dump-st-xml", "st.dump.xml", "Dump the Symbol Table as XML");
    _opts.addCliOpt("emit-llvm-bc", "codegen.llvm-bc", "Emit LLVM bytecode");
    _opts.addCliOpt("log-level", "log.level", "Set the minimum log level");
