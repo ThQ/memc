@@ -1,7 +1,7 @@
 %parse-param{mem::fs::FileManager& fm}
 %parse-param{mem::ast::node::Node* ast}
 %parse-param{mem::st::SymbolTable& symbols}
-%parse-param{mem::log::Logger& logger}
+%parse-param{mem::log::Logger* logger}
 %parse-param{mem::fs::File* file}
 
 %code requires{
@@ -64,7 +64,9 @@ using namespace mem;
 %code {
 extern int yylex();
 
-void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols, log::Logger& logger, fs::File* file, const char *s)
+void yyerror(fs::FileManager& fm, ast::node::Node* ast,
+   st::SymbolTable& symbols, log::Logger* logger, fs::File* file,
+   const char *s)
 {
    fs::position::Position* pos = new fs::position::Position();
    pos->sFile(file);
@@ -73,7 +75,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast, st::SymbolTable& symbols
    msg->sMessage("Syntax error");
    msg->sDescription(s);
    msg->sPosition(pos);
-   logger.log(msg);
+   logger->log(msg);
 }
 }
 

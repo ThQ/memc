@@ -34,7 +34,7 @@
 #include "mem/Util.hpp"
 
 
-extern int yyparse(mem::fs::FileManager& fm, mem::ast::node::Node* ast, mem::st::SymbolTable& symbols, mem::log::Logger& logger, mem::fs::File* file);
+extern int yyparse(mem::fs::FileManager& fm, mem::ast::node::Node* ast, mem::st::SymbolTable& symbols, mem::log::Logger* logger, mem::fs::File* file);
 extern FILE* yyin;
 extern void reset_lexer();
 extern mem::fs::File* yyfile;
@@ -51,7 +51,7 @@ class Compiler
    public: std::vector<ast::visitor::Visitor*> ast_visitors;
    public: std::vector<st::visitor::Visitor*> st_visitors;
    public: fs::FileManager fm;
-   public: log::ConsoleLogger logger;
+   public: log::ConsoleLogger* _logger;
    public: std::queue<std::string> _parse_queue;
    public: st::SymbolTable symbols;
 
@@ -114,7 +114,7 @@ class Compiler
     * Returns true if no warning nor fatal errors have been emitted.
     */
     bool
-    isBuildSuccessful () const {return logger._n_warnings == 0 && logger._n_fatal_errors ==0;}
+    isBuildSuccessful () const {return _logger->_n_warnings == 0 && _logger->_n_fatal_errors ==0;}
 
    /**
     * Parses a file given its path.

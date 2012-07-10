@@ -6,7 +6,7 @@ namespace mem {
 
 Compiler::Compiler ()
 {
-   this->logger.sFormatter(new log::ConsoleFormatter());
+   _logger->sFormatter(new log::ConsoleFormatter());
 
    setUpOptions();
 
@@ -47,14 +47,14 @@ Compiler::compile (int argc, char** argv)
 
    // Need to set this before parsing command line arguments because it can
    // raise warnings
-   logger.sLevel(log::WARNING);
+   _logger->sLevel(log::WARNING);
 
    opt::Parser opt_parser;
-   opt_parser.parse(argc, argv, &logger, gOptions());
+   opt_parser.parse(argc, argv, _logger, gOptions());
 
    if (gOptions()->isSet("log.level"))
    {
-      logger.sLevel(gOptions()->getInt("log.level"));
+      _logger->sLevel(gOptions()->getInt("log.level"));
    }
 
    if (gOptions()->isSet("version.show"))
@@ -98,7 +98,7 @@ Compiler::dumpAst ()
    dumper.dump_to(&ast, dump_file);
 
    dump_file.close();
-   logger.debug("AST dumped to %s", gOptions()->getStr("ast.dump.file").c_str());
+   _logger->debug("AST dumped to %s", gOptions()->getStr("ast.dump.file").c_str());
 }
 
 void
@@ -117,7 +117,7 @@ Compiler::dumpSt ()
       dumper->visitPreorder(symbols._root);
 
       st_dump_file.close();
-      logger.debug("SymbolTable dumped to %s (XML)",
+      _logger->debug("SymbolTable dumped to %s (XML)",
          gOptions()->getStr("st.dump.xml").c_str());
    }
 }
@@ -136,7 +136,7 @@ Compiler::emitCode ()
       bc_file << cg.getLlvmByteCode();
       bc_file.close();
 
-      logger.debug("LLVM ByteCode dumped to %s",
+      _logger->debug("LLVM ByteCode dumped to %s",
          gOptions()->getStr("codegen.llvm-bc").c_str());
    }
 }
@@ -144,7 +144,7 @@ Compiler::emitCode ()
 void
 Compiler::parse (std::string file_path)
 {
-   this->logger.debug("[%s] parsing...", file_path.c_str());
+   _logger->debug("[%s] parsing...", file_path.c_str());
 
    // @TODO Split it
    st::Namespace* file_sym = st::Util::createNamespace(this->symbols._root, Util::split(Util::stripFileExtension(file_path),'/'));
@@ -173,7 +173,7 @@ Compiler::parse (std::string file_path)
       // We could open the file only once if we used Bison++
       assert(yyin != NULL);
       yyfile = file;
-      yyparse(this->fm, file_node, this->symbols, this->logger, file);
+      yyparse(this->fm, file_node, this->symbols, _logger, file);
 
       ast::visitor::FindUse find_use;
       find_use.visit_preorder(file_node);
@@ -187,7 +187,7 @@ Compiler::parse (std::string file_path)
                "File {path:%s} is trying to include itself: include ignored.",
                file_path.c_str()
             );
-            this->logger.log(&warn);
+            _logger->log(&warn);
          }
          else
          {
@@ -211,7 +211,7 @@ Compiler::parse (std::string file_path)
       log::Message* msg = new log::Error();
       msg->formatMessage("Couldn't open file {path:%s}.", file_path.c_str());
       msg->sDescription(description);
-      this->logger.log(msg);
+      _logger->log(msg);
    }
 }
 
@@ -219,31 +219,31 @@ void
 Compiler::printBuildSummary ()
 {
    std::ostringstream sum;
-   if (this->logger._n_fatal_errors > 0)
+   if (_logger->_n_fatal_errors > 0)
    {
-      sum << this->logger._n_fatal_errors;
+      sum << _logger->_n_fatal_errors;
       sum << " fatal errors, ";
    }
-   if (this->logger._n_errors > 0)
+   if (_logger->_n_errors > 0)
    {
-      sum << this->logger._n_errors;
+      sum << _logger->_n_errors;
       sum << " errors, ";
    }
 
-   if (this->logger._n_warnings > 0)
+   if (_logger->_n_warnings > 0)
    {
-      sum << this->logger._n_warnings;
+      sum << _logger->_n_warnings;
       sum << " warnings, ";
    }
 
    if (this->isBuildSuccessful())
    {
-      this->logger.info("Build SUCCESSFUL", "");
+      _logger->info("Build SUCCESSFUL", "");
    }
    else
    {
-      this->logger.info(sum.str().c_str(), "");
-      this->logger.fatalError("Build FAILED", "");
+      _logger->info(sum.str().c_str(), "");
+      _logger->fatalError("Build FAILED", "");
    }
 }
 
@@ -282,10 +282,10 @@ void
 Compiler::runAstVisitors ()
 {
    for (size_t i=0;
-      i < ast_visitors.size() && logger._n_fatal_errors == 0; ++i)
+      i < ast_visitors.size() && _logger->_n_fatal_errors == 0; ++i)
    {
-      logger.debug("[%s] running...", ast_visitors[i]->_name.c_str());
-      ast_visitors[i]->setup(&symbols, &logger);
+      _logger->debug("[%s] running...", ast_visitors[i]->_name.c_str());
+      ast_visitors[i]->setup(&symbols, _logger);
       ast_visitors[i]->visit_preorder(&ast);
       ast_visitors[i]->tearDown();
    }
@@ -296,7 +296,7 @@ Compiler::runStVisitors ()
 {
    for (size_t i = 0; i < st_visitors.size(); ++i)
    {
-      logger.debug("[%s] running...", st_visitors[i]->gNameCstr());
+      _logger->debug("[%s] running...", st_visitors[i]->gNameCstr());
       st_visitors[i]->setup();
       st_visitors[i]->visitPreorder(symbols.gRoot());
       st_visitors[i]->tearDown();
