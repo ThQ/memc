@@ -525,6 +525,10 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
             visitVarDecl(scope, static_cast<node::VarDecl*>(st));
             break;
 
+         case MEM_NODE_VARIABLE_ASSIGNMENT:
+            visitVarAssign(scope, static_cast<node::VarAssign*>(st));
+            break;
+
          default:
             visitExpr(scope, st);
       }
@@ -537,6 +541,27 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Node* ret_node)
    //FIXME This should check that the expr type is the same as the function
    // definition
    visitExpr(scope, ret_node->getChild(0));
+}
+
+void
+BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
+{
+   assert (node != NULL);
+   assert (node->gNameNode() != NULL);
+   assert (node->gValueNode() != NULL);
+
+   visitFinalId(scope, static_cast<node::Text*>(node->gNameNode()));
+   if (node->gNameNode()->gBoundSymbol() != NULL
+      && node->gNameNode()->gBoundSymbol()->isVarSymbol())
+   {
+      st::Type* expected_ty = static_cast<st::Var*>(
+         node->gNameNode()->gBoundSymbol())->gType();
+      visitExpr(scope, node->gValueNode());
+      ensureExprType(node->gValueNode(), expected_ty);
+
+      node->sBoundSymbol(node->gNameNode()->gBoundSymbol());
+      node->sExprType(node->gNameNode()->gExprType());
+   }
 }
 
 void

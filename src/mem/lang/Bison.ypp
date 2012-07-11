@@ -19,6 +19,7 @@
 #include "mem/ast/node/Root.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Use.hpp"
+#include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
 #include "mem/ast/node/While.hpp"
 #include "mem/fs/File.hpp"
@@ -172,6 +173,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %type <node> statements
 %type <node> type_name
 %type <text_node> use
+%type <node> variable_assignment
 %type <node> variable_declaration
 %type <node> while
 %type <text_node> qualified_id
@@ -443,6 +445,7 @@ compound_statement:
 
 simple_statement:
    variable_declaration
+   | variable_assignment
    | return_statement
 
 return_statement:
@@ -479,6 +482,15 @@ type_name :
    qualified_id
    {
       $$ = static_cast<ast::node::Node*>($1);
+   }
+
+variable_assignment :
+   id T_EQ expr T_NEWLINE
+   {
+      ast::node::VarAssign* n = new ast::node::VarAssign();
+      n->sPosition(@$.copy_range());
+      n->pushChildren($1, $3);
+      $$ = (ast::node::Node*)n;
    }
 
 variable_declaration :

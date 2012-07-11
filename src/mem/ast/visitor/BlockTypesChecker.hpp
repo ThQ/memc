@@ -12,6 +12,7 @@
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
 #include "mem/ast/node/Type.hpp"
+#include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
 #include "mem/ast/node/While.hpp"
 #include "mem/ast/visitor/TypeChecker.hpp"
@@ -112,6 +113,9 @@ class BlockTypesChecker : public TypeChecker
 
    void
    visitVarLiteralNumber (st::Type*, node::Text* literal_nb);
+
+   void
+   visitVarAssign (st::Symbol* scope, node::VarAssign* var_assign_node);
 
    /**
     * Visits a MEM_NODE_VARIABLE_DECLARATION node.
