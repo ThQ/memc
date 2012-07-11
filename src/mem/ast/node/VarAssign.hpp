@@ -3,6 +3,7 @@
 
 
 #include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/Text.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -16,7 +17,7 @@ class VarAssign : public Node
    //--------------------------------------------------------------------------
    public:
 
-   Node* gNameNode() {return getChild(0);}
+   Text* gNameNode() {return static_cast<Text*>(getChild(0));}
    Node* gValueNode() {return getChild(1);}
 
    //--------------------------------------------------------------------------

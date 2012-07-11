@@ -242,29 +242,33 @@ Codegen::cgExpr (ast::node::Node* node)
 
    switch (node->gType())
    {
-      case MEM_NODE_PLUS:
-         res = cgBinaryExpr(node);
-         break;
-      case MEM_NODE_NUMBER:
-         res = cgNumberExpr(static_cast<ast::node::Number*>(node));
-         break;
-      case MEM_NODE_VARIABLE_DECLARATION:
-         cgVarDecl (static_cast<ast::node::VarDecl*>(node));
+      case MEM_NODE_CALL:
+         res = cgCallExpr (static_cast<ast::node::Call*>(node));
          break;
       case MEM_NODE_FINAL_ID:
          res = cgFinalId (static_cast<ast::node::Text*>(node));
          break;
-      case MEM_NODE_CALL:
-         res = cgCallExpr (static_cast<ast::node::Call*>(node));
-         break;
       case MEM_NODE_NEW:
          res = cgNewExpr (static_cast<ast::node::New*>(node));
+         break;
+      case MEM_NODE_NUMBER:
+         res = cgNumberExpr(static_cast<ast::node::Number*>(node));
+         break;
+      case MEM_NODE_PLUS:
+         res = cgBinaryExpr(node);
          break;
       case MEM_NODE_RETURN:
          cgReturnStatement (node);
          break;
+      case MEM_NODE_VARIABLE_ASSIGNMENT:
+         cgVarAssign (static_cast<ast::node::VarAssign*>(node));
+         break;
+      case MEM_NODE_VARIABLE_DECLARATION:
+         cgVarDecl (static_cast<ast::node::VarDecl*>(node));
+         break;
       default:
-         printf("Unsupported node type %s\n", ast::node::Node::get_type_name(node->gType()));
+         printf("Unsupported node type %s\n",
+            ast::node::Node::get_type_name(node->gType()));
          assert(false);
    }
 
@@ -456,6 +460,13 @@ Codegen::cgReturnStatement (ast::node::Node* node)
 {
    llvm::Value* ret_val = cgExpr(node->getChild(0));
    builder.CreateRet(ret_val);
+}
+
+void
+Codegen::cgVarAssign (ast::node::VarAssign* node)
+{
+   std::string var_name = node->gNameNode()->gBoundSymbol()->gName();
+   builder.CreateStore(cgExpr(node->gValueNode()), _block_vars[var_name]);
 }
 
 void

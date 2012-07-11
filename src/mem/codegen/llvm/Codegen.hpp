@@ -11,6 +11,7 @@
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/New.hpp"
+#include "mem/ast/node/VarAssign.hpp"
 #include "mem/codegen/ICodegen.hpp"
 #include "mem/st/Class.hpp"
 #include "mem/st/Func.hpp"
@@ -111,6 +112,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgReturnStatement (ast::node::Node* node);
+
+   void
+   cgVarAssign (ast::node::VarAssign* node);
 
    void
    cgVarDecl (ast::node::VarDecl* node);
