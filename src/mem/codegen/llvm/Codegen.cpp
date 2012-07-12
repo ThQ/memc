@@ -239,11 +239,11 @@ Codegen::cgCallExpr (ast::node::Call* node)
 
    if (params.size() > 0)
    {
-      return builder.CreateCall(_functions[_getCodegenFuncName(func_sym)]);
+      return builder.CreateCall(_functions[_getCodegenFuncName(func_sym)], params);
    }
    else
    {
-      return builder.CreateCall(_functions[_getCodegenFuncName(func_sym)], params);
+      return builder.CreateCall(_functions[_getCodegenFuncName(func_sym)]);
    }
 }
 
