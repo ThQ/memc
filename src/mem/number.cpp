@@ -25,12 +25,14 @@ number::getCharFromString (const char* nb, char& c_out)
    int char_max_len = number::getIntStringLength(CHAR_MAX);
    int nb_len = strlen(nb);
    c_out = 0;
-
-   // FIXME Only works when the nb lenght is < to INT_MAX length
-   if (nb_len < char_max_len)
+   if (nb_len <= char_max_len)
    {
-      c_out = static_cast<char>(atoi(nb));
-      return true;
+      int i = static_cast<char>(atoi(nb));
+      if (i <= CHAR_MAX)
+      {
+         c_out = static_cast<char>(i);
+         return true;
+      }
    }
 
    return false;
@@ -61,10 +63,14 @@ number::getShortFromString (const char* nb, short& s_out)
    s_out = 0;
 
    // FIXME Only works when the nb lenght is < to SHRT_MAX length
-   if (nb_len < short_max_len)
+   if (nb_len <= short_max_len)
    {
-      s_out = atoi(nb);
-      return true;
+      int i = static_cast<short>(atoi(nb));
+      if (i <= SHRT_MAX)
+      {
+         s_out = static_cast<short>(i);
+         return true;
+      }
    }
 
    return false;

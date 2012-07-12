@@ -718,24 +718,24 @@ literal :
       char sign_ty = $1[nb_len-2];
       if (sign_ty != 'u') nb_len--;
 
-      char* nb = static_cast<char*>(malloc(sizeof(char) * nb_len));
+      char* nb = static_cast<char*>(malloc(sizeof(char) * nb_len + 1));
       strncpy(nb, $1, nb_len);
+      nb[nb_len] = '\0';
 
       switch (int_ty)
       {
          case 'c':
-            if (mem::number::getCharFromString($1, c_val))
+            if (mem::number::getCharFromString(nb, c_val))
             {
                ast::node::Number* s_node = new ast::node::Number();
                s_node->setChar(c_val);
                s_node->sExprType(symbols._core_types.gCharTy());
                $$ = s_node;
             }
-
             break;
 
          case 's':
-            if (mem::number::getShortFromString($1, s_val))
+            if (mem::number::getShortFromString(nb, s_val))
             {
                ast::node::Number* s_node = new ast::node::Number();
                s_node->setShort(s_val);
@@ -745,7 +745,7 @@ literal :
             break;
 
          case 'i':
-            if (mem::number::getIntFromString($1, i_val))
+            if (mem::number::getIntFromString(nb, i_val))
             {
                ast::node::Number* i_node = new ast::node::Number();
                i_node->setInt(i_val);
@@ -753,10 +753,13 @@ literal :
                $$ = i_node;
             }
             break;
+
          defaut:
             printf("Strange number in source");
             assert(false);
       }
+
+      assert ($$ != NULL);
 
       if ($$ != NULL)
       {
@@ -764,6 +767,7 @@ literal :
       }
       else
       {
+         assert(false);
          //FIXME Couldnt fit this value into a numeric type, so should fail
       }
       free(nb);

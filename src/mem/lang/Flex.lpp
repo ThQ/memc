@@ -64,7 +64,7 @@ WHITE_SPACES         [ \t]+
 OPT_WHITE_SPACES     [ \t]*
 EOL                  [\r\n]|"\r\n"
 
-ANY_INT              0|[1-9][0-9]*
+ANY_INT              0|([1-9][0-9]*)
 
 SIGNED_INT           -?{ANY_INT}i
 UNSIGNED_INT         {ANY_INT}ui
