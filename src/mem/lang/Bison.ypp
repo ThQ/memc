@@ -96,6 +96,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 
 
 %locations
+%token T_AMPERSAND
 %token T_AROBASE
 %token T_AND
 %token T_CLASS
@@ -578,6 +579,11 @@ expr :
    | call
    {
       $$ = (ast::node::Node*)$1;
+   }
+   | T_AMPERSAND expr
+   {
+      $$ = new ast::node::Node(MEM_NODE_AMPERSAND);
+      $$->pushChild($2);
    }
    | T_NEW type_name
    {

@@ -170,6 +170,33 @@ Codegen::gen (ast::node::Node* root)
 }
 
 llvm::Value*
+Codegen::cgAmpersandExpr (ast::node::Node* node)
+{
+   assert(node != NULL);
+   llvm::Value* base_val = NULL;
+
+   switch (node->getChild(0)->gType())
+   {
+      case MEM_NODE_FINAL_ID:
+         base_val = _block_vars[node->getChild(0)->gBoundSymbol()->gName()];
+         break;
+      default:
+         printf("Ampersand on an unsupported AST node type.");
+         assert(false);
+         break;
+   }
+
+   assert(base_val != NULL);
+
+   cgExpr(node->getChild(0));
+   llvm::Type* dest_ty = _getLlvmTy(node->gExprType());
+   llvm::Value* tmp = builder.CreateAlloca(dest_ty);
+   builder.CreateStore(base_val, tmp);
+   llvm::Value* load = builder.CreateLoad(tmp);
+   return load;
+}
+
+llvm::Value*
 Codegen::cgBinaryExpr (ast::node::Node* node)
 {
    llvm::Value* val = NULL;
@@ -242,6 +269,9 @@ Codegen::cgExpr (ast::node::Node* node)
 
    switch (node->gType())
    {
+      case MEM_NODE_AMPERSAND:
+         res = cgAmpersandExpr (node);
+         break;
       case MEM_NODE_CALL:
          res = cgCallExpr (static_cast<ast::node::Call*>(node));
          break;
@@ -417,17 +447,28 @@ Codegen::cgNewExpr (ast::node::New* node)
 {
    // TODO This seems a bit long...
 
+   /*
    llvm::Value* obj_size_alloc = builder.CreateAlloca(_classes["int"]);
 
    llvm::Value* obj_size_val = llvm::ConstantInt::get(_classes["int"], 2);
 
-   llvm::Value* obj_size_store = builder.CreateStore(obj_size_val, obj_size_alloc);
+   llvm::Value* obj_size_store = builder.CreateStore(obj_size_val,
+      obj_size_alloc);
 
    llvm::Value* obj_size_load = builder.CreateLoad(obj_size_alloc);
+   */
 
-   llvm::Value* malloc_call = builder.CreateCall(_functions["malloc"], obj_size_load);
+   llvm::Value* malloc_call = builder.CreateCall(_functions["malloc"],
+      //obj_size_load);
+      llvm::ConstantInt::get(_classes["int"], 2));
 
-   return obj_size_store;
+   assert (_getLlvmTy(node->gExprType()) != NULL);
+
+   llvm::Value* ret = builder.CreateBitCast(malloc_call, _getLlvmTy(
+      node->gExprType()));
+
+   assert (ret != NULL);
+   return ret;
 }
 
 llvm::Value*
@@ -466,7 +507,8 @@ void
 Codegen::cgVarAssign (ast::node::VarAssign* node)
 {
    std::string var_name = node->gNameNode()->gBoundSymbol()->gName();
-   builder.CreateStore(cgExpr(node->gValueNode()), _block_vars[var_name]);
+   llvm::Value* val = cgExpr(node->gValueNode());
+   builder.CreateStore(val, _block_vars[var_name]);
 }
 
 void
@@ -475,15 +517,19 @@ Codegen::cgVarDecl (ast::node::VarDecl* node)
    assert (node != NULL);
    assert (node->gExprType() != NULL);
 
+   llvm::Value* var = builder.CreateAlloca(_getLlvmTy(node->gExprType()), NULL,
+      node->gName());
+
    llvm::Value* var_val = NULL;
    if (node->gValueNode() != NULL)
    {
       var_val = cgExpr(node->gValueNode());
+      assert (var_val != NULL);
+      builder.CreateStore(var_val, var);
    }
-   _block_vars[node->gName()] = builder.CreateAlloca(
-      _getLlvmTy(node->gExprType()),
-      var_val,
-      node->gName());
+
+
+   _block_vars[node->gName()] = var;
 }
 
 std::string

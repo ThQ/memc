@@ -189,6 +189,26 @@ BlockTypesChecker::pickFuncSign (st::Func* func_sym, node::Node* call_node,
 }
 
 void
+BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::Node* node)
+{
+   visitExpr(scope, node->getChild(0));
+
+   if (node->getChild(0)->gExprType() != NULL)
+   {
+      std::string amp_ty_name = node->getChild(0)->gExprType()->gName() + "*";
+      st::Type* amp_ty = static_cast<st::Type*>(
+         st::Util::lookupSymbol(scope, amp_ty_name));
+
+      assert (amp_ty != NULL);
+
+      node->sExprType(amp_ty);
+
+      // FIXME There should be more checks. For ex you should not be able to
+      // do : &2
+   }
+}
+
+void
 BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
 {
    // Check left node
@@ -354,6 +374,10 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       case MEM_NODE_AND:
       case MEM_NODE_OR:
          visitLogicalExpr(scope, node);
+         break;
+
+      case MEM_NODE_AMPERSAND:
+         visitAmpersand(scope, node);
          break;
 
       case MEM_NODE_CALL:

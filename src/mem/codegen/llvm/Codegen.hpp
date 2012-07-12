@@ -78,6 +78,9 @@ class Codegen : public mem::codegen::ICodegen
    addType (st::Type* mem_ty, llvm::Type* llvm_ty);
 
    llvm::Value*
+   cgAmpersandExpr (ast::node::Node* node);
+
+   llvm::Value*
    cgBinaryExpr (ast::node::Node* node);
 
    llvm::Value*

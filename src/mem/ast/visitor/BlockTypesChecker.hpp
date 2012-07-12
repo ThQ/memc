@@ -70,6 +70,9 @@ class BlockTypesChecker : public TypeChecker
 
 
    void
+   visitAmpersand (st::Symbol* scope, node::Node* node);
+
+   void
    visitArithmeticOp (st::Symbol* scope, node::Node* node);
 
    void
