@@ -20,6 +20,23 @@ number::getIntStringLength (double nb)
 }
 
 bool
+number::getCharFromString (const char* nb, char& c_out)
+{
+   int char_max_len = number::getIntStringLength(CHAR_MAX);
+   int nb_len = strlen(nb);
+   c_out = 0;
+
+   // FIXME Only works when the nb lenght is < to INT_MAX length
+   if (nb_len < char_max_len)
+   {
+      c_out = static_cast<char>(atoi(nb));
+      return true;
+   }
+
+   return false;
+}
+
+bool
 number::getIntFromString (const char* nb, int& i_out)
 {
    int int_max_len = number::getIntStringLength(INT_MAX);

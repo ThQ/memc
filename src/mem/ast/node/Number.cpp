@@ -58,6 +58,9 @@ Number::getStringFromVal ()
       case 's':
          s << (short)_sval;
          break;
+      case 'c':
+         s << (short)_cval;
+         break;
    }
 
    return s.str();

@@ -414,6 +414,7 @@ block:
 statements:
    statement
    {
+      assert ($1 != NULL);
       $$ = new ast::node::Node();
       $$->pushChild($1);
    }
@@ -708,22 +709,53 @@ call :
 literal :
    T_LITERAL_NUMBER
    {
-      int i_val = 0;
+      char c_val = 0;
       short s_val = 0;
+      int i_val = 0;
 
-      if (mem::number::getShortFromString($1, s_val))
+      size_t nb_len = strlen($1);
+      char int_ty = $1[nb_len-1];
+      char sign_ty = $1[nb_len-2];
+      if (sign_ty != 'u') nb_len--;
+
+      char* nb = static_cast<char*>(malloc(sizeof(char) * nb_len));
+      strncpy(nb, $1, nb_len);
+
+      switch (int_ty)
       {
-         ast::node::Number* s_node = new ast::node::Number();
-         s_node->setShort(s_val);
-         s_node->sExprType(symbols._core_types.gShortTy());
-         $$ = s_node;
-      }
-      else if (mem::number::getIntFromString($1, i_val))
-      {
-         ast::node::Number* i_node = new ast::node::Number();
-         i_node->setInt(i_val);
-         i_node->sExprType(symbols._core_types.gIntTy());
-         $$ = i_node;
+         case 'c':
+            if (mem::number::getCharFromString($1, c_val))
+            {
+               ast::node::Number* s_node = new ast::node::Number();
+               s_node->setChar(c_val);
+               s_node->sExprType(symbols._core_types.gCharTy());
+               $$ = s_node;
+            }
+
+            break;
+
+         case 's':
+            if (mem::number::getShortFromString($1, s_val))
+            {
+               ast::node::Number* s_node = new ast::node::Number();
+               s_node->setShort(s_val);
+               s_node->sExprType(symbols._core_types.gShortTy());
+               $$ = s_node;
+            }
+            break;
+
+         case 'i':
+            if (mem::number::getIntFromString($1, i_val))
+            {
+               ast::node::Number* i_node = new ast::node::Number();
+               i_node->setInt(i_val);
+               i_node->sExprType(symbols._core_types.gIntTy());
+               $$ = i_node;
+            }
+            break;
+         defaut:
+            printf("Strange number in source");
+            assert(false);
       }
 
       if ($$ != NULL)
@@ -734,7 +766,7 @@ literal :
       {
          //FIXME Couldnt fit this value into a numeric type, so should fail
       }
-
+      free(nb);
       free($1);
    }
 %%

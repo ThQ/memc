@@ -42,8 +42,9 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
       // Create the pointer type
       if (mem_ty->isPtrSymbol())
       {
-         llvm::Type* base_ty = _getLlvmTy(static_cast<mem::st::Ptr*>(mem_ty)->gBaseType());
-         if (base_ty)
+         llvm::Type* base_ty = _getLlvmTy(
+            static_cast<mem::st::Ptr*>(mem_ty)->gBaseType());
+         if (base_ty != NULL)
          {
             // TODO What is the second parameter (AddressSpace) ?
              return llvm::PointerType::get(base_ty, 0);
@@ -477,6 +478,10 @@ Codegen::cgNumberExpr (ast::node::Number* node)
    llvm::Value* val = NULL;
    switch (node->_format)
    {
+      case 'c':
+         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
+            llvm::APInt(sizeof(char) * 8, node->getChar(), false));
+         break;
       case 's':
          val = llvm::ConstantInt::get(llvm::getGlobalContext(),
             llvm::APInt(sizeof(short) * 8, node->getShort(), false));

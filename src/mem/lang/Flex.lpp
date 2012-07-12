@@ -64,6 +64,19 @@ WHITE_SPACES         [ \t]+
 OPT_WHITE_SPACES     [ \t]*
 EOL                  [\r\n]|"\r\n"
 
+ANY_INT              0|[1-9][0-9]*
+
+SIGNED_INT           -?{ANY_INT}i
+UNSIGNED_INT         {ANY_INT}ui
+
+SIGNED_SHORT         -?{ANY_INT}s
+UNSIGNED_SHORT       {ANY_INT}us
+
+SIGNED_CHAR          -?{ANY_INT}c
+UNSIGNED_CHAR        {ANY_INT}uc
+
+LITERAL_NUMBER       {SIGNED_INT}|{SIGNED_SHORT}|{SIGNED_CHAR}|{UNSIGNED_CHAR}|{UNSIGNED_SHORT}|{UNSIGNED_INT}
+
 VAL_INT              [0-9]+
 VAL_FLOAT            [0-9]*\.[0-9]+
 VAL_HEX              \\x[0-9]+
@@ -313,7 +326,7 @@ ST_USE      {KW_USE}[ ]+{NS_PART_NAME}
 {WHITE_SPACES} {
 }
 
-{VAL_INT} {
+{LITERAL_NUMBER} {
    yylval.text = strdup(yytext);
    return T_LITERAL_NUMBER;
 }

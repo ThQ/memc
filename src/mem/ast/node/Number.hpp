@@ -16,11 +16,14 @@ class Number : public Node
    public: long _lval;
    public: int _ival;
    public: short _sval;
+   public: char _cval;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUTOR
    //--------------------------------------------------------------------------
    public: Number ();
+
+   public: inline char getChar(){return _cval;}
 
    public: int getInt ();
    public: short getShort ();
@@ -31,6 +34,7 @@ class Number : public Node
    public: bool isValid();
    public: void setInt (int i);
    public: void setShort (short s);
+   public: inline void setChar (char c){_format='c';_cval = c;}
 };
 
 
