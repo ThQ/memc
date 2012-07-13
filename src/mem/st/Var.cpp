@@ -34,7 +34,6 @@ Var::gEvalType ()
 Symbol*
 Var::gExprType ()
 {
-   printf("VAR_gExprType\n");
    return _type;
 }
 

@@ -335,7 +335,6 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Node* dot_node)
       {
          right_node->sBoundSymbol(dot_node->gBoundSymbol());
          dot_node->sExprType(dot_node->gBoundSymbol()->gExprType());
-         printf("BOUND_SYM[%s] -> [%d]\n", dot_node->gBoundSymbol()->gNameCstr(), dot_node->gBoundSymbol()->_kind);
          assert (dot_node->gExprType() != NULL);
       }
       else
