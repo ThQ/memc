@@ -288,16 +288,13 @@ Codegen::cgDotExpr (ast::node::Node* node)
    gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, field_index)));
 
    llvm::Value* left_node = cgExpr(node->getChild(0));
-   printf("LeftNode is %s\n", node->getChild(0)->gExprType()->gNameCstr());
    if (!node->getChild(0)->gExprType()->isPtrSymbol())
    {
-      printf("NOT A Ptr[%s]\n", node->getChild(0)->gExprType()->gNameCstr());
       std::string base_ty_name = node->getChild(0)->gBoundSymbol()->gExprType()->gQualifiedName() + "*";
       st::Type* base_mem_ty = static_cast<st::Type*>(st::Util::lookupSymbol(
          node->getChild(0)->gExprType()->_parent,
          node->getChild(0)->gExprType()->gName() + "*"));
       assert (base_mem_ty != NULL);
-      printf("BaseTyName:%s\n", base_mem_ty->gNameCstr());
       llvm::Type* base_ty = _getLlvmTy(base_mem_ty);
       assert (base_ty != NULL);
       llvm::Value* tmp = builder.CreateAlloca(base_ty);

@@ -17,7 +17,6 @@ Class::~Class ()
 bool
 Class::addChild (Symbol* s)
 {
-   printf("Class.addChild(%s) / FI=%d\n", s->gNameCstr(), _cur_field_index);
    if (s->_kind == FIELD)
    {
       static_cast<Field*>(s)->_field_index = _cur_field_index;
@@ -41,15 +40,12 @@ Class::getOrderedFields ()
          if (i->second->_kind == FIELD)
          {
             field = static_cast<Field*>(i->second);
-            printf("SetField @%d\n", field->_field_index);
             v[field->_field_index] = field;
          }
       }
 
-      printf("%d fields in %s\n", _cur_field_index, gNameCstr());
       for (size_t i = 0; i < v.size(); ++i)
       {
-         printf("Check field @%d\n", i);
          assert(v[i] != NULL);
       }
    }
