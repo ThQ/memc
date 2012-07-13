@@ -25,4 +25,6 @@ INSTALL
 src/stamp-h1
 src/mem/lang/*.cpp
 src/mem/lang/*.hpp
-
+src/mem/log/errors.hpp
+src/mem/parser/NodeTypes.cpp
+src/mem/parser/NodeTypes.hpp
