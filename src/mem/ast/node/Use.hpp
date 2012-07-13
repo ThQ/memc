@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class Use: public Text
 {
    public: Use ();
-   public: bool isValid();
+   public: void isValid (NodeValidator* v);
 };
 
 

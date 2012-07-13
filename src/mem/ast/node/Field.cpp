@@ -15,19 +15,18 @@ Field::get_type_name ()
    return type->_value;
 }
 
-bool
-Field::isValid ()
+void
+Field::isValid (NodeValidator* v)
 {
-   if (!Node::isValid()) return false;
-   if (gChildCount() != 2) return false;
-   if (!hasBoundSymbol()) return false;
-   if (!hasExprType()) return false;
-   if (!getChild(0)->isIdNode()) return false;
-   if (!getChild(0)->hasBoundSymbol()) return false;
-   if (!getChild(1)->hasBoundSymbol()) return false;
-   if (!getChild(1)->hasExprType()) return false;
-
-   return true;
+   // Check SELF
+   Node::isValid(v);
+   v->ensure(gChildCount() == 2, "Field must have exactly 2 children");
+   v->ensure(hasBoundSymbol(), "Field must have a bound symbol");
+   v->ensure(hasExprType(), "Field must have an expression type");
+   v->ensure(getChild(0)->isIdNode());
+   v->ensure(getChild(0)->hasBoundSymbol());
+   v->ensure(getChild(1)->hasBoundSymbol());
+   v->ensure(getChild(1)->hasExprType());
 }
 
 

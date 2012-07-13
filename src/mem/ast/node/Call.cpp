@@ -7,14 +7,21 @@ Call::Call ()
    _type = MEM_NODE_CALL;
 }
 
-bool
-Call::isValid ()
+void
+Call::isValid (NodeValidator* v)
 {
-   if (!Node::isValid()) return false;
-   if (gChildCount() > 2) return false;
-   if (gExprType() == NULL) return false;
+   // Check SELF
+   Node::isValid(v);
+   v->ensure(gChildCount() <= 2, "Call cannot have more than 2 children");
+   v->ensure(hasExprType(), "Call must have an expression type");
 
-   return true;
+   // Check CALLER node
+   v->ensure(gCallerNode() != NULL, "Call must have a caller node");
+   if (gCallerNode() != NULL)
+   {
+      v->ensure(gCallerNode()->hasExprType(), "CallerNode must have an expression type");
+      v->ensure(gCallerNode()->hasBoundSymbol(), "Caller node must have a bound symbol");
+   }
 }
 
 } } }

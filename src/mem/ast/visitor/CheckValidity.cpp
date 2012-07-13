@@ -12,9 +12,21 @@ CheckValidity::CheckValidity ()
 bool
 CheckValidity::visit (node::Node* node)
 {
-   if (!node->isValid())
+   _node_vld.setup();
+   assert (_node_vld._is_valid == true);
+
+   node->isValid(&_node_vld);
+
+   if (!_node_vld._is_valid)
    {
+      std::string description = "";
+      for (size_t i = 0; i < _node_vld._messages.size(); ++i)
+      {
+         description += "* " + _node_vld._messages[i] + "\n";
+      }
+
       log::FatalError* err = new log::FatalError();
+      err->sDescription(description);
       err->formatMessage("[BUG] Invalid node : %s",
          node::Node::get_type_name(node->gType()));
       if (node->gPosition() != NULL)

@@ -3,6 +3,7 @@ src = \
 src_mem = \
  src/mem/Compiler.cpp \
  src/mem/Compiler.hpp \
+ src/mem/Metadata.cpp \
  src/mem/number.cpp \
  src/mem/number.hpp \
  src/mem/Util.cpp \
@@ -36,6 +37,7 @@ src_mem_ast_node = \
  src/mem/ast/node/New.hpp \
  src/mem/ast/node/Node.cpp \
  src/mem/ast/node/Node.hpp \
+ src/mem/ast/node/NodeValidator.cpp \
  src/mem/ast/node/Number.cpp \
  src/mem/ast/node/Number.hpp \
  src/mem/ast/node/Primitive.cpp \
@@ -48,6 +50,7 @@ src_mem_ast_node = \
  src/mem/ast/node/Type.hpp \
  src/mem/ast/node/Use.cpp \
  src/mem/ast/node/Use.hpp \
+ src/mem/ast/node/VarAssign.cpp \
  src/mem/ast/node/VarDecl.cpp \
  src/mem/ast/node/VarDecl.hpp \
  src/mem/ast/node/While.cpp \
@@ -157,7 +160,6 @@ src_mem_st_visitor = \
  src/mem/st/visitor/Visitor.cpp \
  src/mem/st/visitor/Visitor.hpp
 
-CXX=clang++
 AUTOMAKE_OPTIONS = subdir-objects
 AM_YFLAGS = -d -v --xml=/home/thomas/bison-report.xml
 

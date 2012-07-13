@@ -1,27 +1,28 @@
 #include "mem/ast/node/File.hpp"
 
+
 namespace mem { namespace ast { namespace node {
+
 
 File::File ()
 {
    _type = MEM_NODE_FILE;
 }
 
-bool
-File::isValid ()
+void
+File::isValid (NodeValidator* v)
 {
+   Node::isValid(v);
+
    Node* child = NULL;
-
-   if (!Node::isValid()) return false;
-
    for (size_t i = 0 ; i < gChildCount(); ++i)
    {
       child = getChild(i);
 
-      if (!child->isUseNode() && !child->isClassNode() && !child->isFuncNode()) return false;
+      v->ensure(child->isUseNode() || child->isClassNode() || child->isFuncNode(),
+         "Children of a File node must be either Use, Class or Func");
    }
-
-   return true;
 }
+
 
 } } }

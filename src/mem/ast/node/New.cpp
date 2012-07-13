@@ -9,20 +9,19 @@ New::New ()
 }
 
 
-bool
-New::isValid ()
+void
+New::isValid (NodeValidator* v)
 {
 
-   if (!Node::isValid()) return false;
-   if (gChildCount() != 1) return false;
-   if (gExprType() == NULL) return false;
+   Node::isValid(v);
+   v->ensure(gChildCount() == 1, "New must have exactly 1 child");
+   v->ensure(hasExprType() == NULL, "New must have an expression type");
 
    if (gChildCount() == 1)
    {
-      if(getChild(0)->gExprType() == NULL) return false;
+      v->ensure(getChild(0)->hasExprType() == NULL,
+         "New : first child must have an expression type");
    }
-
-   return true;
 }
 
 

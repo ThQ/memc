@@ -110,21 +110,10 @@ Node::isText ()
    return false;
 }
 
-bool
-Node::isValid ()
+void
+Node::isValid (NodeValidator* v)
 {
-   bool valid = true;
-
-   Node* cur_node = _first_child;
-   while (cur_node != NULL)
-   {
-      if (cur_node->gParent() != this)
-      {
-         return false;
-      }
-      cur_node = cur_node->_next;
-   }
-   return valid;
+   v->ensure(gParent() != this, "Node cannot have itself as parent");
 }
 
 std::vector<st::Symbol*>

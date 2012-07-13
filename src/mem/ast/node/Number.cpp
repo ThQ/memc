@@ -66,13 +66,11 @@ Number::getStringFromVal ()
    return s.str();
 }
 
-bool
-Number::isValid ()
+void
+Number::isValid (NodeValidator* v)
 {
-   if (!Node::isValid()) return false;
-   if (gChildCount() != 0) return false;
-
-   return true;
+   Node::isValid(v);
+   v->ensure(gChildCount() == 0, "Number cannot have children");
 }
 
 } } }

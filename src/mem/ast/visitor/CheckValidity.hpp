@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "mem/ast/node/NodeValidator.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 
@@ -21,6 +22,8 @@ namespace mem { namespace ast { namespace visitor {
  */
 class CheckValidity : public Visitor
 {
+   public: node::NodeValidator _node_vld;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------

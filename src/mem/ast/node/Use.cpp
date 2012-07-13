@@ -10,13 +10,11 @@ Use::Use ()
 }
 
 
-bool
-Use::isValid ()
+void
+Use::isValid (NodeValidator* v)
 {
-   if (!Node::isValid()) return false;
-   if (gChildCount() != 0) return false;
-
-   return true;
+   Node::isValid(v);
+   v->ensure(gChildCount() == 0, "Use cannot have children");
 }
 
 

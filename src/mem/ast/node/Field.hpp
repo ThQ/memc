@@ -13,7 +13,7 @@ class Field : public Text
 {
    public: Field ();
    public: std::string get_type_name ();
-   public: virtual bool isValid();
+   public: virtual void isValid(NodeValidator* v);
 };
 
 

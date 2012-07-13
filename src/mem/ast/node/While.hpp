@@ -22,8 +22,9 @@ class While : public Node
    Node*
    gBodyNode () {return this->getChild(1);}
 
+
    //--------------------------------------------------------------------------
-   // Constructors / Destrutor
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
@@ -32,12 +33,14 @@ class While : public Node
     */
    While ();
 
+
    //--------------------------------------------------------------------------
    // PUBLIC METHODS
    //--------------------------------------------------------------------------
    public:
 
-   virtual bool isValid();
+   virtual void
+   isValid (NodeValidator* v);
 };
 
 

@@ -12,7 +12,7 @@ class New : public Node
 {
    public: New ();
 
-   public: virtual bool isValid();
+   public: virtual void isValid(NodeValidator* v);
 
    public: inline Node* gTypeNode() {return getChild(0);}
 };

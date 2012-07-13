@@ -9,23 +9,27 @@ VarDecl::VarDecl ()
 }
 
 
-bool
-VarDecl::isValid ()
+void
+VarDecl::isValid (NodeValidator* v)
 {
    // Check self
-   NODE_ENSURE( Node::isValid() )
-   NODE_ENSURE( gChildCount() <= 3 )
-   NODE_ENSURE( hasExprType() )
-   NODE_ENSURE( hasBoundSymbol() )
+   Node::isValid(v);
+   v->ensure(gChildCount() <= 3, "VarDecl must have at most 3 children");
+   v->ensure(hasExprType(), "VarDecl must have an expression type");
+   v->ensure(hasBoundSymbol(), "VarDecl must have a bound symbol");
 
-   // Check NAME node
-   NODE_ENSURE( gNameNode()->hasBoundSymbol() )
+   if (gNameNode() != NULL)
+   {
+      // Check NAME node
+      v->ensure(gNameNode()->hasBoundSymbol(), "VarDecl : Name node must have a bound symbol");
+   }
 
-   // Check TYPE node
-   NODE_ENSURE( gTypeNode()->hasExprType() )
-   NODE_ENSURE( gTypeNode()->hasBoundSymbol() )
-
-   return true;
+   if (gTypeNode() != NULL)
+   {
+      // Check TYPE node
+      v->ensure(gTypeNode()->hasExprType(), "VarDecl : Type node must have an expression type");
+      v->ensure(gTypeNode()->hasBoundSymbol(), "VarDecl : Type node must have a bound symbol");
+   }
 }
 
 } } }

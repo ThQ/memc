@@ -18,7 +18,7 @@ class VarDecl : public Node
    public: inline Text* gNameNode() { return static_cast<Text*>(this->getChild(0)); }
    public: inline Node* gTypeNode() { return this->getChild(1); }
    public: inline Node* gValueNode() { return this->getChild(2); }
-   public: virtual bool isValid();
+   public: virtual void isValid (NodeValidator* v);
 };
 
 

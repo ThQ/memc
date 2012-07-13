@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <vector>
 #include "mem/Metadata.hpp"
+#include "mem/ast/node/NodeValidator.hpp"
 #include "mem/fs/position/Range.hpp"
 #include "mem/parser/NodeTypes.hpp"
 #include "mem/st/Class.hpp"
@@ -197,8 +198,8 @@ class Node
     * Returns true if the node is correctly formed after all the compiler
     * checks (but before any optimisation).
     */
-   virtual bool
-   isValid ();
+   virtual void
+   isValid (NodeValidator* vld);
 
    inline bool
    isVarDeclNode() const {return this->isType(MEM_NODE_VARIABLE_DECLARATION);}

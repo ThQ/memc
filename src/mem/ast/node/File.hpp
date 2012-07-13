@@ -30,7 +30,7 @@ class File : public Node
    //--------------------------------------------------------------------------
    public:
 
-   virtual bool isValid();
+   virtual void isValid(NodeValidator* v);
 };
 
 

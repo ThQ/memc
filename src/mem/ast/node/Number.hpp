@@ -31,7 +31,7 @@ class Number : public Node
 
    public: std::string getStringFromVal();
    public: unsigned int getUInt();
-   public: bool isValid();
+   public: void isValid(NodeValidator* vld);
    public: void setInt (int i);
    public: void setShort (short s);
    public: inline void setChar (char c){_format='c';_cval = c;}
