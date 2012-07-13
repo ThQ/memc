@@ -17,6 +17,7 @@
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/Ptr.hpp"
+#include "mem/st/Util.hpp"
 
 
 namespace mem { namespace codegen { namespace llvm_ {
@@ -116,6 +117,9 @@ class Codegen : public mem::codegen::ICodegen
 
    llvm::Value*
    cgNumberExpr (ast::node::Number* node);
+
+   void
+   cgPrimitive (st::Primitive* prim);
 
    void
    cgReturnStatement (ast::node::Node* node);

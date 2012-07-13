@@ -17,12 +17,43 @@ Class::~Class ()
 bool
 Class::addChild (Symbol* s)
 {
-   if (s->_kind = FIELD)
+   printf("Class.addChild(%s) / FI=%d\n", s->gNameCstr(), _cur_field_index);
+   if (s->_kind == FIELD)
    {
       static_cast<Field*>(s)->_field_index = _cur_field_index;
       _cur_field_index++;
    }
    return Type::addChild(s);
+}
+
+std::vector<st::Field*>
+Class::getOrderedFields ()
+{
+   std::vector<st::Field*> v;
+   if (hasFields())
+   {
+      v.resize(_cur_field_index, NULL);
+
+      Field* field = NULL;
+      SymbolCollectionIterator i;
+      for (i = _children.begin(); i != _children.end(); i++)
+      {
+         if (i->second->_kind == FIELD)
+         {
+            field = static_cast<Field*>(i->second);
+            printf("SetField @%d\n", field->_field_index);
+            v[field->_field_index] = field;
+         }
+      }
+
+      printf("%d fields in %s\n", _cur_field_index, gNameCstr());
+      for (size_t i = 0; i < v.size(); ++i)
+      {
+         printf("Check field @%d\n", i);
+         assert(v[i] != NULL);
+      }
+   }
+   return v;
 }
 
 bool

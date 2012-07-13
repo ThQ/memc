@@ -149,9 +149,13 @@ Codegen::gen (ast::node::Node* root)
    {
       ty = (*i).second;
 
-      if (ty->is(st::CLASS) || ty->is(st::PRIMITIVE))
+      if (ty->isClassSymbol())
       {
          cgClass(static_cast<st::Class*>(ty));
+      }
+      else if (ty->isPrimitiveSymbol())
+      {
+         cgPrimitive(static_cast<st::Primitive*>(ty));
       }
    }
 
@@ -250,11 +254,19 @@ Codegen::cgCallExpr (ast::node::Call* node)
 void
 Codegen::cgClass (st::Class* cls_sym)
 {
+   assert (cls_sym->isClassSymbol());
+
    std::vector<llvm::Type*> fields;
-   st::Symbol::SymbolCollectionIterator i;
-   for (i=cls_sym->_children.begin(); i != cls_sym->_children.end(); ++i)
+   if (cls_sym->_cur_field_index > 0)
    {
-      fields.push_back(_getLlvmTy(static_cast<st::Field*>(i->second)->gType()));
+      std::vector<st::Field*> f = cls_sym->getOrderedFields();
+      st::Field* field = NULL;
+      for (size_t i=0; i < f.size(); ++i)
+      {
+         assert(f[i] != NULL);
+         field = f[i];
+         fields.push_back(_getLlvmTy(field->gType()));
+      }
    }
 
    llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
@@ -269,21 +281,37 @@ Codegen::cgClass (st::Class* cls_sym)
 llvm::Value*
 Codegen::cgDotExpr (ast::node::Node* node)
 {
-   llvm::Value* left_node = cgExpr(node->getChild(0));
-   assert (left_node != NULL);
    int field_index = static_cast<st::Field*>(node->gBoundSymbol())->_field_index;
-   printf("FI=%d\n", field_index);
-
 
    std::vector<llvm::Value*> gep;
    gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0)));
    gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, field_index)));
 
+   llvm::Value* left_node = cgExpr(node->getChild(0));
+   printf("LeftNode is %s\n", node->getChild(0)->gExprType()->gNameCstr());
+   if (!node->getChild(0)->gExprType()->isPtrSymbol())
+   {
+      printf("NOT A Ptr[%s]\n", node->getChild(0)->gExprType()->gNameCstr());
+      std::string base_ty_name = node->getChild(0)->gBoundSymbol()->gExprType()->gQualifiedName() + "*";
+      st::Type* base_mem_ty = static_cast<st::Type*>(st::Util::lookupSymbol(
+         node->getChild(0)->gExprType()->_parent,
+         node->getChild(0)->gExprType()->gName() + "*"));
+      assert (base_mem_ty != NULL);
+      printf("BaseTyName:%s\n", base_mem_ty->gNameCstr());
+      llvm::Type* base_ty = _getLlvmTy(base_mem_ty);
+      assert (base_ty != NULL);
+      llvm::Value* tmp = builder.CreateAlloca(base_ty);
+      builder.CreateStore(left_node, tmp);
+      left_node = builder.CreateLoad(tmp);
+   }
+   else
+   {
+      left_node = builder.CreateLoad(left_node);
+   }
+   assert (left_node != NULL);
+
    llvm::Value* gep_inst = builder.CreateGEP(left_node, gep);
-
-   llvm::LoadInst* load_inst = builder.CreateLoad(gep_inst);
-
-   return load_inst;//load_inst;
+   return gep_inst;
 }
 
 llvm::Value*
@@ -367,9 +395,9 @@ Codegen::cgFile (ast::node::File* file_node, bool cg_func_def)
 llvm::Value*
 Codegen::cgFinalId (ast::node::Text* node)
 {
-   llvm::LoadInst* inst = builder.CreateLoad(_block_vars[node->gValue()], node->gValue());
+   //llvm::LoadInst* inst = builder.CreateLoad(_block_vars[node->gValue()], node->gValue());
 
-   return inst; //_block_vars[node->gValue()]; //inst->getPointerOperand();
+   return _block_vars[node->gValue()]; //inst->getPointerOperand();
 }
 
 void
@@ -530,10 +558,19 @@ Codegen::cgNumberExpr (ast::node::Number* node)
 }
 
 void
+Codegen::cgPrimitive (st::Primitive* prim)
+{
+   llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
+      prim->gQualifiedName());
+   addType (prim, ty);
+}
+
+void
 Codegen::cgReturnStatement (ast::node::Node* node)
 {
-   llvm::Value* ret_val = cgExpr(node->getChild(0));
-   builder.CreateRet(ret_val);
+   llvm::Value* val = cgExpr(node->getChild(0));
+   llvm::Value* load_inst = builder.CreateLoad(val);
+   builder.CreateRet(load_inst);
 }
 
 void

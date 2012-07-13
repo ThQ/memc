@@ -6,7 +6,7 @@ namespace mem { namespace st {
 
 Field::Field ()
 {
-   _field_index = -1;
+   _field_index = 0;
    _kind = FIELD;
 }
 

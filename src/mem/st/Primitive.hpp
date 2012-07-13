@@ -11,6 +11,9 @@ namespace mem { namespace st {
 class Primitive : public Type
 {
    public: Primitive ();
+
+   virtual inline bool
+   addChild (Symbol* s) {assert(false && "Cannot add child to Primitive");return false;}
 };
 
 

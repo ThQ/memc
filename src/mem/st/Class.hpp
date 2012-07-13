@@ -46,6 +46,12 @@ class Class : public Type
    gParentClass () const { return static_cast<Class*>(this->_parent);}
 
 
+   std::vector<st::Field*>
+   getOrderedFields();
+
+   inline bool
+   hasFields () {return _cur_field_index > 0;}
+
    /**
     * Checks wether a class depends on another (directly or indirectly).
     */

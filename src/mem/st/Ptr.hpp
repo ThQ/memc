@@ -46,6 +46,9 @@ class Ptr : public Type
    // -------------------------------------------------------------------------
    public:
 
+   virtual inline bool
+   addChild (Symbol* s) {assert(false && "Cannot add child to Ptr");return false;}
+
    /**
     * Returns a child by its name.
     *

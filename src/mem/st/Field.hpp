@@ -15,6 +15,9 @@ class Field : public Var
    public:
 
    Field();
+
+   virtual inline bool
+   addChild (Symbol* s) {assert(false && "Cannot add child to Primitive");return false;}
 };
 
 } }

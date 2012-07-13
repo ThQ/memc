@@ -113,19 +113,22 @@ class Symbol
     * Returns true if the symbol is of a given kind.
     */
    inline bool
-   is (SymbolKind kind) const {return this->_kind == kind;};
+   is (SymbolKind kind) const {return _kind == kind;};
 
    inline bool
-   isClassSymbol() const {return this->is(st::CLASS);}
+   isClassSymbol() const {return is(st::CLASS);}
 
    inline bool
-   isFuncSymbol() const {return this->is(st::FUNCTION);}
+   isFuncSymbol() const {return is(st::FUNCTION);}
 
    inline bool
-   isPtrSymbol() const {return this->is(st::POINTER);}
+   isPrimitiveSymbol() const {return is(st::PRIMITIVE);}
 
    inline bool
-   isVarSymbol() const {return this->is(st::VAR);}
+   isPtrSymbol() const {return is(st::POINTER);}
+
+   inline bool
+   isVarSymbol() const {return is(st::VAR);}
 
    bool
    isAnyTypeSymbol() const;
