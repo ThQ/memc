@@ -334,7 +334,9 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Node* dot_node)
       if (dot_node->hasBoundSymbol())
       {
          right_node->sBoundSymbol(dot_node->gBoundSymbol());
-         dot_node->sExprType(dot_node->gBoundSymbol());
+         dot_node->sExprType(dot_node->gBoundSymbol()->gExprType());
+         printf("BOUND_SYM[%s] -> [%d]\n", dot_node->gBoundSymbol()->gNameCstr(), dot_node->gBoundSymbol()->_kind);
+         assert (dot_node->gExprType() != NULL);
       }
       else
       {
@@ -623,8 +625,6 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
       }
    }
 
-   assert (var_decl_node->hasExprType());
-
    // Add the variable to the current scope
    if (var_decl_node->gTypeNode()->hasExprType())
    {
@@ -648,8 +648,6 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
          log(err);
       }
    }
-
-   assert (var_decl_node->hasBoundSymbol());
 }
 
 void

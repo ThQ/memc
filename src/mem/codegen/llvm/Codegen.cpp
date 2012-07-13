@@ -251,7 +251,11 @@ void
 Codegen::cgClass (st::Class* cls_sym)
 {
    std::vector<llvm::Type*> fields;
-   //fields.push_back(llvm::IntegerType::get(_module->getContext(), 8));
+   st::Symbol::SymbolCollectionIterator i;
+   for (i=cls_sym->_children.begin(); i != cls_sym->_children.end(); ++i)
+   {
+      fields.push_back(_getLlvmTy(static_cast<st::Field*>(i->second)->gType()));
+   }
 
    llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
       cls_sym->gQualifiedName());
@@ -260,6 +264,26 @@ Codegen::cgClass (st::Class* cls_sym)
       ty->setBody(fields, false /* packed */);
    }
    addType (cls_sym, ty);
+}
+
+llvm::Value*
+Codegen::cgDotExpr (ast::node::Node* node)
+{
+   llvm::Value* left_node = cgExpr(node->getChild(0));
+   assert (left_node != NULL);
+   int field_index = static_cast<st::Field*>(node->gBoundSymbol())->_field_index;
+   printf("FI=%d\n", field_index);
+
+
+   std::vector<llvm::Value*> gep;
+   gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0)));
+   gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, field_index)));
+
+   llvm::Value* gep_inst = builder.CreateGEP(left_node, gep);
+
+   llvm::LoadInst* load_inst = builder.CreateLoad(gep_inst);
+
+   return load_inst;//load_inst;
 }
 
 llvm::Value*
@@ -275,6 +299,9 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
       case MEM_NODE_CALL:
          res = cgCallExpr (static_cast<ast::node::Call*>(node));
+         break;
+      case MEM_NODE_DOT:
+         res = cgDotExpr (node);
          break;
       case MEM_NODE_FINAL_ID:
          res = cgFinalId (static_cast<ast::node::Text*>(node));

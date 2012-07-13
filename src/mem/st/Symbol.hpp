@@ -24,14 +24,10 @@ class Symbol
    public: typedef SymbolCollection::iterator SymbolCollectionIterator;
 
    public: SymbolCollection _children;
-   //public: Symbol* _first_child;
    public: SymbolKind _kind;
-   //public: Symbol* _last_child;
 
 
    public: Symbol* _parent;
-   //public: Symbol* _prev;
-   //public: Symbol* _next;
    public: fs::position::Range _pos;
    public: unsigned int _depth;
 
@@ -47,6 +43,9 @@ class Symbol
 
    inline size_t
    gChildCount() const {return _child_count;}
+
+   virtual st::Symbol*
+   gExprType ();
 
    // --------------
    // PROPERTY : Md
@@ -101,7 +100,7 @@ class Symbol
    /**
     * Appends a child symbol.
     */
-   bool
+   virtual bool
    addChild (Symbol* symb);
 
    /**

@@ -6,6 +6,7 @@ namespace mem { namespace st {
 
 Class::Class ()
 {
+   _cur_field_index = 0;
    _kind = CLASS;
 }
 
@@ -13,6 +14,16 @@ Class::~Class ()
 {
 }
 
+bool
+Class::addChild (Symbol* s)
+{
+   if (s->_kind = FIELD)
+   {
+      static_cast<Field*>(s)->_field_index = _cur_field_index;
+      _cur_field_index++;
+   }
+   return Type::addChild(s);
+}
 
 bool
 Class::isDependingOn (Class* other_cls)

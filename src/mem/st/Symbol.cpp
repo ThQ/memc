@@ -21,6 +21,13 @@ Symbol::~Symbol ()
    }
 }
 
+Symbol*
+Symbol::gExprType ()
+{
+   printf("gExprType(FROM:%d)\n", _kind);
+   return NULL;
+}
+
 bool
 Symbol::addChild (Symbol* sym)
 {

@@ -12,6 +12,9 @@ class Type: public Symbol
 {
    public: Type* _parent_type;
 
+   virtual Symbol*
+   gExprType() {return this;}
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------

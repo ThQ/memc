@@ -14,6 +14,7 @@
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/codegen/ICodegen.hpp"
 #include "mem/st/Class.hpp"
+#include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/Ptr.hpp"
 
@@ -88,6 +89,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgClass (st::Class* cls_symb);
+
+   llvm::Value*
+   cgDotExpr (ast::node::Node* node);
 
    void
    cgFile (ast::node::File* file_node, bool cg_func_def);

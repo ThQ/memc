@@ -22,6 +22,8 @@ class Var : public Symbol
    inline Type* gType() {return _type;}
    inline void sType (Symbol* type) {this->_type = static_cast<Type*>(type);}
 
+   virtual Symbol*
+   gExprType ();
 
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS

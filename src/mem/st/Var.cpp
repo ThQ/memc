@@ -31,5 +31,12 @@ Var::gEvalType ()
    return _type;
 }
 
+Symbol*
+Var::gExprType ()
+{
+   printf("VAR_gExprType\n");
+   return _type;
+}
+
 
 } }

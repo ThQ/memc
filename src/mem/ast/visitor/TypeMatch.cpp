@@ -32,7 +32,6 @@ TypeMatch::visitVarDecl (node::VarDecl* var_decl_node)
 
    node::Node* type_node = var_decl_node->gTypeNode();
    st::Type* var_ty = static_cast<st::Type*>(type_node->gBoundSymbol());
-   assert (var_ty != NULL);
 
    /*
    if (var_type != NULL && value_type != NULL

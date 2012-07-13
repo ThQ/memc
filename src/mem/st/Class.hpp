@@ -2,6 +2,7 @@
 #define _MEM__ST__CLASS__HPP
 
 
+#include "mem/st/Field.hpp"
 #include "mem/st/Type.hpp"
 #include "mem/st/Var.hpp"
 
@@ -11,6 +12,8 @@ namespace mem { namespace st {
 
 class Class : public Type
 {
+   public: int _cur_field_index;
+
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    // -------------------------------------------------------------------------
@@ -32,6 +35,9 @@ class Class : public Type
    // PUBLIC METHODS
    // -------------------------------------------------------------------------
    public:
+
+   bool
+   addChild (st::Symbol* sym);
 
    /**
     * Returns the parent class in the type hierarchy.

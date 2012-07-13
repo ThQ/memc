@@ -95,7 +95,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
       // TODO Ugly one here...
       if (!type_node->gExprType()->isClassSymbol() || !static_cast<st::Class*>(type_node->gBoundSymbol())->isDependingOn(static_cast<st::Class*>(scope)))
       {
-         st::Var* sym_field = new st::Var();
+         st::Field* sym_field = new st::Field();
          sym_field->sName(name_node->gValue());
          sym_field->sType(type_node->gExprType());
          scope->addChild(sym_field);
