@@ -6,8 +6,11 @@
 #include <string>
 
 #include "mem/st/Class.hpp"
+#include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/Namespace.hpp"
+#include "mem/st/Ptr.hpp"
+#include "mem/st/Primitive.hpp"
 #include "mem/st/Symbol.hpp"
 #include "mem/st/Var.hpp"
 #include "mem/st/visitor/Visitor.hpp"

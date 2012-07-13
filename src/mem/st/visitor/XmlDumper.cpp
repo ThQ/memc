@@ -15,16 +15,28 @@ XmlDumper::visit (st::Symbol* sym)
 {
    switch (sym->_kind)
    {
-      case NAMESPACE:
-         visitNamespace(static_cast<st::Namespace*>(sym));
+      case CLASS:
+         visitClass(static_cast<st::Class*>(sym));
+         break;
+
+      case FIELD:
+         visitField(static_cast<st::Field*>(sym));
          break;
 
       case FUNCTION:
          visitFunction(static_cast<st::Func*>(sym));
          break;
 
-      case CLASS:
-         visitClass(static_cast<st::Class*>(sym));
+      case NAMESPACE:
+         visitNamespace(static_cast<st::Namespace*>(sym));
+         break;
+
+      case POINTER:
+         visitPointer(static_cast<st::Ptr*>(sym));
+         break;
+
+      case PRIMITIVE:
+         visitPrimitive(static_cast<st::Primitive*>(sym));
          break;
 
       case VAR:
@@ -64,6 +76,19 @@ XmlDumper::visitClass (st::Class* cls_sym)
 }
 
 bool
+XmlDumper::visitField (st::Field* s)
+{
+   *_out << "<Field name=\"" + s->gName() + "\"";
+   if (s->_type != NULL)
+   {
+      *_out << " type=\"" + s->_type->gQualifiedName() + "\"";
+   }
+   *_out << " />\n";
+
+   return true;
+}
+
+bool
 XmlDumper::visitFunction (st::Func* func_sym)
 {
    *_out << "<Function name=\"" + func_sym->gName() + "\"";
@@ -73,7 +98,7 @@ XmlDumper::visitFunction (st::Func* func_sym)
    }
    if (func_sym->gReturnType() != NULL)
    {
-      *_out << " return_type=\"" + func_sym->gReturnType()->gQualifiedName() + "\"";
+      *_out << " return-type=\"" + func_sym->gReturnType()->gQualifiedName() + "\"";
    }
    *_out << ">\n";
    visitChildren(func_sym);
@@ -93,6 +118,32 @@ XmlDumper::visitNamespace (st::Namespace* ns_sym)
 }
 
 bool
+XmlDumper::visitPointer (st::Ptr* s)
+{
+   *_out << "<PointerType name=\"" + s->gName() + "\"";
+   if (s->gBaseType() != NULL)
+   {
+      *_out << " base-type=\"" + s->gBaseType()->gQualifiedName() + "\"";
+   }
+   *_out << " />\n";
+
+   return true;
+}
+
+bool
+XmlDumper::visitPrimitive (st::Primitive* s)
+{
+   *_out << "<Primitive name=\"" + s->gName() + "\"";
+   if (s->_parent_type != NULL)
+   {
+      *_out << " parent_type=\"" + s->_parent_type->gQualifiedName() + "\"";
+   }
+   *_out << " />\n";
+
+   return true;
+}
+
+bool
 XmlDumper::visitVar (st::Var* var_sym)
 {
    *_out << "<Variable name=\"" + var_sym->gName() + "\"";
@@ -100,9 +151,7 @@ XmlDumper::visitVar (st::Var* var_sym)
    {
       *_out << " type=\"" + var_sym->_type->gQualifiedName() + "\"";
    }
-   *_out << ">\n";
-   this->visitChildren(var_sym);
-   *_out << "</Variable>";
+   *_out << " />\n";
 
    return true;
 }

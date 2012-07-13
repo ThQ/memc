@@ -35,7 +35,16 @@ class XmlDumper : public IDumper
    visitFunction (st::Func* func_sym);
 
    virtual bool
+   visitField (st::Field* s);
+
+   virtual bool
    visitNamespace (st::Namespace* var_sym);
+
+   virtual bool
+   visitPointer (st::Ptr* s);
+
+   virtual bool
+   visitPrimitive (st::Primitive* s);
 
    virtual bool
    visitVar (st::Var* var_sym);
