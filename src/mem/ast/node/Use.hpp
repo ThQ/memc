@@ -10,11 +10,28 @@ namespace mem { namespace ast { namespace node {
 
 class Use: public Text
 {
-   public: Use ();
-   public: void isValid (NodeValidator* v);
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Use ();
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   void
+   isValid (NodeValidator* v);
 };
 
 
 } } }
+
 
 #endif

@@ -27,8 +27,14 @@ class Text: public Node
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
-   public: Text ();
-   public: Text (unsigned int type);
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Text ();
+
+   Text (unsigned int type);
 };
 
 

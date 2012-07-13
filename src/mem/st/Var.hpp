@@ -22,6 +22,7 @@ class Var : public Symbol
    inline Type* gType() {return _type;}
    inline void sType (Symbol* type) {this->_type = static_cast<Type*>(type);}
 
+
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    // -------------------------------------------------------------------------
@@ -43,12 +44,15 @@ class Var : public Symbol
    // -------------------------------------------------------------------------
    public:
 
-   static Var* create(std::string name, Type* ty);
+   static Var*
+   create(std::string name, Type* ty);
 
-   virtual Symbol* gEvalType ();
+   virtual Symbol*
+   gEvalType ();
 };
 
 
 } }
+
 
 #endif

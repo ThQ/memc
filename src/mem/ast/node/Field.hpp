@@ -11,9 +11,27 @@ namespace mem { namespace ast { namespace node {
 
 class Field : public Text
 {
-   public: Field ();
-   public: std::string get_type_name ();
-   public: virtual void isValid(NodeValidator* v);
+   // -------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   // -------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Field ();
+
+
+   // -------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   // -------------------------------------------------------------------------
+   public:
+
+   std::string
+   get_type_name ();
+
+   virtual void
+   isValid(NodeValidator* v);
 };
 
 

@@ -237,7 +237,9 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
    op_func_name += "_" + op_name + "_";
    op_func_name += right_node->gExprType()->gName();
 
-   st::Func* op_func = static_cast<st::Func*>(_symbols->gRoot()->getChild(op_func_name));
+   st::Func* op_func = static_cast<st::Func*>(
+      _symbols->gRoot()->getChild(op_func_name));
+
    if (op_func != NULL)
    {
       // FIXME Must check parameters type
@@ -249,7 +251,8 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
       pos->addChild(left_node->copyPosition());
       pos->addChild(right_node->copyPosition());
 
-      log::UnsupportedArithmeticOperation* err = new log::UnsupportedArithmeticOperation();
+      log::UnsupportedArithmeticOperation* err =
+         new log::UnsupportedArithmeticOperation();
       err->sLeftTypeName(left_node->gExprType()->gNameCstr());
       err->sOpName(op_name.c_str());
       err->sRightTypeName(right_node->gExprType()->gNameCstr());
@@ -257,7 +260,6 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
       err->sPosition(pos);
       log(err);
    }
-
 }
 
 void
@@ -293,7 +295,8 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
    {
       if (base_object->gBoundSymbol()->isFuncSymbol())
       {
-         st::Func* base_func = static_cast<st::Func*>(base_object->gBoundSymbol());
+         st::Func* base_func = static_cast<st::Func*>(
+            base_object->gBoundSymbol());
          call_node->sExprType(base_func->gReturnType());
          if (call_node->hasParamsNode())
          {
@@ -450,11 +453,14 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
    else
    {
       // Recover by using base type instead of pointer type
-      std::string ptr_ty_name = static_cast<st::Ptr*>(ty_node->gBoundSymbol())->gBaseType()->gName() + "*";
+      std::string ptr_ty_name = 
+         static_cast<st::Ptr*>(ty_node->gBoundSymbol())->gBaseType()->gName();
+      ptr_ty_name += "*";
       st::Symbol* ptr_ty = st::Util::lookupSymbol(scope, ptr_ty_name);
       new_node->sExprType(static_cast<st::Ptr*>(ptr_ty));
 
-      log::CannotInstantiatePointerType* err = new log::CannotInstantiatePointerType();
+      log::CannotInstantiatePointerType* err =
+         new log::CannotInstantiatePointerType();
       err->sPointerTypeName(ty_node->gBoundSymbol()->gQualifiedName());
       err->sPosition(ty_node->copyPosition());
       err->format();

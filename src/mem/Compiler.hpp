@@ -113,8 +113,8 @@ class Compiler
    /**
     * Returns true if no warning nor fatal errors have been emitted.
     */
-    bool
-    isBuildSuccessful () const {return _logger->_n_warnings == 0 && _logger->_n_fatal_errors ==0;}
+   bool
+   isBuildSuccessful () const {return _logger->_n_warnings == 0 && _logger->_n_fatal_errors ==0;}
 
    /**
     * Parses a file given its path.

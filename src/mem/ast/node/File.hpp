@@ -16,7 +16,7 @@ class File : public Node
    public: std::string _path;
 
    //--------------------------------------------------------------------------
-   // Constructors / Destrutors
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
@@ -30,7 +30,8 @@ class File : public Node
    //--------------------------------------------------------------------------
    public:
 
-   virtual void isValid(NodeValidator* v);
+   virtual void
+   isValid(NodeValidator* v);
 };
 
 

@@ -36,9 +36,10 @@ class BlockTypesChecker : public TypeChecker
    public:
 
    /**
-    * @brief Default constructor.
+    * Default constructor.
     */
    BlockTypesChecker();
+
 
    //--------------------------------------------------------------------------
    // PUBLIC METHODS
@@ -49,21 +50,21 @@ class BlockTypesChecker : public TypeChecker
    checkCallParameters (st::Func* func_sym, node::Node* params);
 
    /**
-    * @brief Checks whether a function node is compatible with a declared
+    * Checks whether a function node is compatible with a declared
     * function signature.
     */
    //public: bool isCompatibleFuncSign(st::FunctionSignature* sign_sym,
    //   node::Node* params_node);
 
    /**
-    * @brief Finds a matching function signature and binds it to a call node.
+    * Finds a matching function signature and binds it to a call node.
     */
    void
    pickFuncSign(st::Func* func_sym, node::Node* call_node,
       node::Node* params_node);
 
    /**
-    * @brief Visitor entry point.
+    * Visitor entry point.
     */
    virtual bool
    visit (node::Node* node);
@@ -82,13 +83,13 @@ class BlockTypesChecker : public TypeChecker
    visitLogicalExpr (st::Symbol* scope, node::Node* expr_node);
 
    /**
-    * @brief Visit a MEM_NODE_BLOCK node.
+    * Visit a MEM_NODE_BLOCK node.
     */
    void
    visitBlock (st::Symbol* scope, node::Node* block);
 
    /**
-    * Visits a MEM_NODE_CALL.
+    * Visits a MEM_NODE_CALL node.
     */
    void
    visitCall (st::Symbol* scope, node::Call* call_node);
@@ -135,5 +136,6 @@ class BlockTypesChecker : public TypeChecker
 
 
 } } }
+
 
 #endif

@@ -13,13 +13,31 @@ namespace mem { namespace ast { namespace visitor {
 
 class TypeMatch : public Visitor
 {
-   public: TypeMatch ();
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS/DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
-   public: virtual bool visit (node::Node* node);
-   public: void visitVarDecl (node::VarDecl* var_decl_node);
+   /**
+    * Default constructor.
+    */
+   TypeMatch ();
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual bool
+   visit (node::Node* node);
+
+   void
+   visitVarDecl (node::VarDecl* var_decl_node);
 };
 
 
 } } }
+
 
 #endif

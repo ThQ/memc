@@ -10,10 +10,19 @@ namespace mem { namespace ast { namespace node {
 
 class Block : public Node
 {
-   public: Block ();
+   // -------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   // -------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Block ();
 };
 
 
 } } }
+
 
 #endif

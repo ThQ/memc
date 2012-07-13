@@ -24,6 +24,7 @@ class Ptr : public Type
    inline void
    sBaseType (Type* base_type) {_base_type = base_type;}
 
+
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    // -------------------------------------------------------------------------
@@ -40,8 +41,13 @@ class Ptr : public Type
    virtual
    ~Ptr ();
 
+   // -------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   // -------------------------------------------------------------------------
+   public:
+
    /**
-    * Returns the child by its name.
+    * Returns a child by its name.
     *
     * We have to override Symbol::getChild here because a pointer does not have
     * children of its own, instead it returns its base type's children. It acts

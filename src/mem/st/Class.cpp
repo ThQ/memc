@@ -41,7 +41,8 @@ Class::isDependingOn (Class* other_cls)
                {
                   return true;
                }
-               else if (static_cast<st::Class*>(cls_field->gType())->isDependingOn(other_cls))
+               else if (static_cast<st::Class*>(
+                  cls_field->gType())->isDependingOn(other_cls))
                {
                   return true;
                }

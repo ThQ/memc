@@ -21,20 +21,48 @@ class Number : public Node
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUTOR
    //--------------------------------------------------------------------------
-   public: Number ();
+   public:
 
-   public: inline char getChar(){return _cval;}
+   /**
+    * Default constructor.
+    */
+   Number ();
 
-   public: int getInt ();
-   public: short getShort ();
-   public: inline long getLong () {assert(_format=='l');return _lval;}
 
-   public: std::string getStringFromVal();
-   public: unsigned int getUInt();
-   public: void isValid(NodeValidator* vld);
-   public: void setInt (int i);
-   public: void setShort (short s);
-   public: inline void setChar (char c){_format='c';_cval = c;}
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   char
+   getChar(){return _cval;}
+
+   int
+   getInt ();
+
+   short
+   getShort ();
+
+   inline long
+   getLong () {assert(_format=='l');return _lval;}
+
+   std::string
+   getStringFromVal();
+
+   unsigned int
+   getUInt();
+
+   void
+   isValid(NodeValidator* vld);
+
+   void
+   setInt (int i);
+
+   void
+   setShort (short s);
+
+   inline void
+   setChar (char c){_format='c';_cval = c;}
 };
 
 

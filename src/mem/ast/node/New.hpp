@@ -10,11 +10,27 @@ namespace mem { namespace ast { namespace node {
 
 class New : public Node
 {
-   public: New ();
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
-   public: virtual void isValid(NodeValidator* v);
+   /**
+    * Default constructor.
+    */
+   New ();
 
-   public: inline Node* gTypeNode() {return getChild(0);}
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual void
+   isValid(NodeValidator* v);
+
+   inline Node*
+   gTypeNode() {return getChild(0);}
 };
 
 

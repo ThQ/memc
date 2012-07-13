@@ -13,12 +13,23 @@ namespace mem { namespace ast { namespace visitor {
 
 class TypeChecker : public Visitor
 {
-   public: bool ensureBoolExpr (node::Node* expr);
-   public: bool ensureExprType (node::Node* expr, st::Symbol* expr_type);
-   public: bool ensureSymbolIsType (node::Node* node, st::Symbol* sym);
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   bool
+   ensureBoolExpr (node::Node* expr);
+
+   bool
+   ensureExprType (node::Node* expr, st::Symbol* expr_type);
+
+   bool
+   ensureSymbolIsType (node::Node* node, st::Symbol* sym);
 };
 
 
 } } }
+
 
 #endif

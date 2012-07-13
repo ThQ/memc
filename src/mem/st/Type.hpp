@@ -12,13 +12,34 @@ class Type: public Symbol
 {
    public: Type* _parent_type;
 
-   public: Type();
-   public: inline Type* gParentType () { return this->_parent_type; }
-   public: inline void sParentType (Type* ty) { this->_parent_type = ty;}
-   public: bool isSubclass (Type* parent);
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Type();
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   inline Type*
+   gParentType () { return this->_parent_type; }
+
+   inline void
+   sParentType (Type* ty) { this->_parent_type = ty;}
+
+   bool
+   isSubclass (Type* parent);
 };
 
 
 } }
+
 
 #endif

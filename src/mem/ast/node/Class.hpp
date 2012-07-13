@@ -11,9 +11,24 @@ namespace mem { namespace ast { namespace node {
 
 class Class : public Type
 {
-   public: Class ();
+   // -------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   // -------------------------------------------------------------------------
+   public:
 
-   public: Text* gParentTypeNode ();
+   /**
+    * Default constructor.
+    */
+   Class ();
+
+
+   // -------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   // -------------------------------------------------------------------------
+   public:
+
+   Text*
+   gParentTypeNode ();
 };
 
 

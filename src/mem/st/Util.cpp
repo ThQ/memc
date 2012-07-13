@@ -1,6 +1,8 @@
 #include "mem/st/Util.hpp"
 
+
 namespace mem { namespace st {
+
 
 st::Namespace*
 Util::createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
@@ -140,7 +142,8 @@ Util::lookupSymbol (Symbol* scope, std::string symbol_name)
    {
       int ptr_level = 0;
 
-      for (std::string::iterator i = symbol_name.end()-1; i >= symbol_name.begin(); --i)
+      std::string::iterator i;
+      for (i = symbol_name.end()-1; i >= symbol_name.begin(); --i)
       {
          if (*i == '*')
          {

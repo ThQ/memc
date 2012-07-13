@@ -18,13 +18,15 @@ TopTypesChecker::visit (node::Node* node)
       case MEM_NODE_FIELD:
       {
          assert (node->gParent()->isClassNode());
-         visitField(node->gParent()->gBoundSymbol(), static_cast<node::Field*>(node));
+         visitField(node->gParent()->gBoundSymbol(),
+            static_cast<node::Field*>(node));
          return false;
       }
       case MEM_NODE_FUNCTION_DECLARATION:
       {
          assert (node->gParent()->isFileNode());
-         visitFuncDecl(node->gParent()->gBoundSymbol(), static_cast<node::Func*>(node));
+         visitFuncDecl(node->gParent()->gBoundSymbol(),
+            static_cast<node::Func*>(node));
          return false;
       }
    }
@@ -237,7 +239,6 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
          param_sym = func_sym->addParam(name_node->gValueCstr(),
             static_cast<st::Type*>(type_node->gExprType()));
 
-
          // Add parameter to the symbol table of the block
          if (type_node->hasExprType()
             && ensureSymbolIsType(type_node, type_node->gExprType()))
@@ -257,7 +258,8 @@ void
 TopTypesChecker::visitFuncReturnType (node::Func* func_node,
    st::Func* func_sym)
 {
-   node::Text* ret_ty_node = static_cast<node::Text*>(func_node->gReturnTypeNode());
+   node::Text* ret_ty_node = static_cast<node::Text*>(
+      func_node->gReturnTypeNode());
 
    if (ret_ty_node->isDotNode())
    {

@@ -16,16 +16,22 @@ class Class : public Type
    // -------------------------------------------------------------------------
    public:
 
+   /**
+    * Default constructor.
+    */
    Class ();
 
-   virtual ~Class();
+   /**
+    * Destructor.
+    */
+   virtual
+   ~Class();
 
 
    // -------------------------------------------------------------------------
    // PUBLIC METHODS
    // -------------------------------------------------------------------------
    public:
-
 
    /**
     * Returns the parent class in the type hierarchy.
@@ -43,5 +49,6 @@ class Class : public Type
 
 
 } }
+
 
 #endif

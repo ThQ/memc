@@ -19,15 +19,36 @@ class Visitor
    public: st::SymbolTable* _symbols;
    public: st::CoreTypes* _core_types;
 
-   public: virtual ~Visitor ();
-   public: virtual void setup (st::SymbolTable* symbols, log::Logger* logger);
-   public: inline void log (log::Message* msg) {this->_logger->log(msg);}
-   public: virtual void tearDown();
-   public: virtual bool visit (node::Node* node);
-   public: virtual void visit_preorder (node::Node* node);
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS/DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual ~Visitor ();
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual void
+   setup (st::SymbolTable* symbols, log::Logger* logger);
+
+   inline void
+   log (log::Message* msg) {this->_logger->log(msg);}
+
+   virtual void
+   tearDown();
+
+   virtual bool
+   visit (node::Node* node);
+
+   virtual void
+   visit_preorder (node::Node* node);
 };
 
 
 } } }
+
 
 #endif

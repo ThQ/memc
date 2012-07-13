@@ -24,51 +24,68 @@ namespace mem { namespace ast { namespace visitor {
  */
 class TopTypesChecker : public TypeChecker
 {
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
    /**
     * @brief Default constructor.
     */
-   public: TopTypesChecker ();
+   TopTypesChecker ();
 
+
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
    //public: void checkFuncOverloading (st::Symbol* scope, node::Func* func_decl, st::Func* func_sym);
    //public: void checkFuncOverriding (st::Symbol* scope, node::Func* func_decl, st::Func* func_sym, st::FunctionSignature* func_sign_sym);
 
    /**
-    * @brief Visitor entry point.
+    * Visitor entry point.
     */
-   public: virtual bool visit (node::Node* node);
-
-   public: void visitDot (st::Symbol* scope, node::Node* dot);
+   virtual bool
+   visit (node::Node* node);
 
    /**
-    * @brief Visits a class field declaration (MEM_NODE_FIELD).
+    * Visit a DOT expression (MEM_NODE_DOT).
+    */
+   void
+   visitDot (st::Symbol* scope, node::Node* dot);
+
+   /**
+    * Visits a class field declaration (MEM_NODE_FIELD).
     *
     * Checks whether the type symbol is really one and binds it to the AST.
     *
     * @param scope A class symbol, the field's parent.
     * @param field The field node to check.
     */
-   public: virtual void visitField (st::Symbol* scope, node::Field* field);
+   virtual void
+   visitField (st::Symbol* scope, node::Field* field);
 
    /**
-    * @brief Visits a function declaration (MEM_NODE_FUNCTION_DECLARATION)
+    * Visits a function declaration (MEM_NODE_FUNCTION_DECLARATION)
     */
-   public: virtual void visitFuncDecl (st::Symbol* scope, node::Func* func_decl);
+   virtual void
+   visitFuncDecl (st::Symbol* scope, node::Func* func_decl);
 
    /**
-    * @brief Visits parameters in function declaration.
+    * Visits parameters in function declaration.
     */
-   public: virtual void visitFuncParams (st::Symbol* scope,
-      node::Node* params_node, st::Func* func);
+   virtual void
+   visitFuncParams (st::Symbol* scope, node::Node* params_node, st::Func* func);
 
    /**
-    * @brief Visits return type in function declaration.
+    * Visits return type in function declaration.
     */
-   public: virtual void visitFuncReturnType (node::Func* func_node,
-      st::Func* func_sym);
+   virtual void
+   visitFuncReturnType (node::Func* func_node, st::Func* func_sym);
 
-   public: virtual void visitQualifiedName (st::Symbol* scope,
-      node::Node* name_node);
+   virtual void
+   visitQualifiedName (st::Symbol* scope, node::Node* name_node);
 };
 
 

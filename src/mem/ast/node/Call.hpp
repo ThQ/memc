@@ -25,8 +25,9 @@ class Call : public Node
    bool
    hasParamsNode() {return this->gChildCount()==2;}
 
+
    //--------------------------------------------------------------------------
-   // Constructors / Destrutors
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
@@ -35,12 +36,14 @@ class Call : public Node
     */
    Call ();
 
+
    //--------------------------------------------------------------------------
    // PUBLIC METHODS
    //--------------------------------------------------------------------------
    public:
 
-   virtual void isValid(NodeValidator* vld);
+   virtual void
+   isValid(NodeValidator* vld);
 };
 
 
