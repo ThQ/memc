@@ -413,6 +413,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
       func_link,
       func_name,
       _module);
+   func->setCallingConv(llvm::CallingConv::C);
 
    // Don't codegen a body for a virtual/external function
    if (func_node->gBodyNode() != NULL)
