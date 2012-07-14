@@ -10,6 +10,14 @@ Dep::Dep ()
    _symbol = NULL;
 }
 
+Dep::~Dep ()
+{
+   for (std::map<st::Type*, Dep*>::iterator i = _deps.begin(); i!=_deps.end(); ++i)
+   {
+      delete i->second;
+   }
+}
+
 bool
 Dep::addDependency (Dep* dep)
 {

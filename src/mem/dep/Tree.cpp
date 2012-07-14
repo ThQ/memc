@@ -11,6 +11,10 @@ Tree::Tree ()
 
 Tree::~Tree ()
 {
+   for (std::map<st::Type*, Dep*>::iterator i=_dep_list.begin(); i != _dep_list.end(); ++i)
+   {
+      delete i->second;
+   }
    delete _root;
 }
 

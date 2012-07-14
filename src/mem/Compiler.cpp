@@ -28,6 +28,7 @@ Compiler::Compiler ()
 
 Compiler::~Compiler ()
 {
+   delete _logger;
    // Delete AST visitors
    for (size_t i = 0; i < ast_visitors.size(); ++i)
    {
@@ -113,10 +114,10 @@ Compiler::dumpSt ()
       // give one
       std::ofstream st_dump_file(gOptions()->getStr("st.dump.xml").c_str());
 
-      st::visitor::IDumper* dumper = new st::visitor::XmlDumper;
-      dumper->_out = &st_dump_file;
-      dumper->setup();
-      dumper->visitPreorder(symbols._root);
+      st::visitor::IDumper dumper;
+      dumper._out = &st_dump_file;
+      dumper.setup();
+      dumper.visitPreorder(symbols._root);
 
       st_dump_file.close();
       _logger->debug("SymbolTable dumped to %s (XML)",

@@ -15,8 +15,7 @@ Func::~Func ()
 {
    for (size_t i = 0; i < _params.size(); ++i)
    {
-      assert (_params[i] != NULL);
-      //delete _params[i];
+      delete _params[i];
    }
 }
 

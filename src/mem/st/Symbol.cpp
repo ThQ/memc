@@ -5,10 +5,11 @@ namespace mem { namespace st {
 
 Symbol::Symbol ()
 {
+   _child_count = 0;
    _depth = 0;
    _kind = UNKNOWN;
+   _md = NULL;
    _parent = NULL;
-   _child_count = 0;
    _size = 0;
 }
 
@@ -19,6 +20,7 @@ Symbol::~Symbol ()
    {
       delete i->second;
    }
+   delete _md;
 }
 
 Symbol*

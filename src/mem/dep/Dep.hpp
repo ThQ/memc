@@ -27,6 +27,8 @@ class Dep
 
    Dep();
 
+   ~Dep();
+
    bool
    addDependency (Dep* dep);
 
