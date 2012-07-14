@@ -10,10 +10,10 @@
 
 # *Hello, World !*
 
-> use io
-> 
-> main () 
->    io.print("Hello, World !")
+    use io
+    
+    main ()
+    io.print("Hello, World !")
 
 
 # Dependencies
