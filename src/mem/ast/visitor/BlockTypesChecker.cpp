@@ -569,9 +569,23 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
 void
 BlockTypesChecker::visitReturn (st::Symbol* scope, node::Node* ret_node)
 {
-   //FIXME This should check that the expr type is the same as the function
-   // definition
+   st::Func* parent_func = util::getParentFunction(ret_node);
+   assert (parent_func);
+   assert (parent_func->isFuncSymbol());
+
    visitExpr(scope, ret_node->getChild(0));
+
+   if (ret_node->getChild(0)->gExprType() != parent_func->gReturnType())
+   {
+      log::ReturnTypeDiffersFromPrototype* err = new
+         log::ReturnTypeDiffersFromPrototype();
+      err->sFuncName(parent_func->gQualifiedName());
+      err->sRetTy(ret_node->getChild(0)->gExprType()->gQualifiedName());
+      err->sExpectedRetTy(parent_func->gReturnType()->gQualifiedName());
+      err->sPosition(ret_node->getChild(0)->copyPosition());
+      err->format();
+      log(err);
+   }
 }
 
 void

@@ -107,5 +107,18 @@
          "OpName": "std::string",
          "RightTypeName": "std::string"
       }
+   },
+
+   "ReturnTypeDiffersFromPrototype":
+   {
+      "type": "Error",
+      "message": "Return type differs from function prototype",
+      "description": "Function $FuncName is expected to return $ExpectedRetTy, but got $RetTy",
+      "params":
+      {
+         "FuncName": "std::string",
+         "ExpectedRetTy": "std::string",
+         "RetTy": "std::string"
+      }
    }
 }

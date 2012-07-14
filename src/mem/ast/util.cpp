@@ -9,7 +9,7 @@ getFileNode (node::Node* cur_node)
 {
    while (cur_node != NULL)
    {
-      if (cur_node->isType(MEM_NODE_FILE))
+      if (cur_node->isFileNode())
       {
          return static_cast<node::File*>(cur_node);
       }
@@ -18,6 +18,24 @@ getFileNode (node::Node* cur_node)
    return NULL;
 }
 
+st::Func*
+getParentFunction (node::Node* cur_node)
+{
+   while (cur_node != NULL)
+   {
+      if (cur_node->isFuncNode())
+      {
+         if (cur_node->hasBoundSymbol())
+         {
+            assert (cur_node->gBoundSymbol()->isFuncSymbol());
+         }
+         return static_cast<st::Func*>(cur_node->gBoundSymbol());
+      }
+      cur_node = cur_node->_parent;
+   }
+   return NULL;
+}
+/*
 st::Symbol*
 find_local_variable_type(node::Node* start_at, std::string var_name)
 {
@@ -78,6 +96,6 @@ find_self_type (node::Node* start_at)
    }
    return NULL;
 }
-
+*/
 
 } } }

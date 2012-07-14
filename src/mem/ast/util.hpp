@@ -9,14 +9,17 @@
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/st/Class.hpp"
+#include "mem/st/Func.hpp"
 
 
 namespace mem { namespace ast { namespace util {
 
 
-node::File* getFileNode (node::Node* cur_node);
-st::Symbol* find_local_variable_type (node::Node* start_at, std::string var_name);
-st::Symbol* find_self_type(node::Node* start_at);
+node::File*
+getFileNode (node::Node* cur_node);
+
+st::Func*
+getParentFunction (node::Node* cur_node);
 
 
 } } }
