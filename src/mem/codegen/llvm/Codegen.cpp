@@ -178,6 +178,8 @@ llvm::Value*
 Codegen::cgAmpersandExpr (ast::node::Node* node)
 {
    assert(node != NULL);
+   assert(node->isAmpersandNode());
+
    llvm::Value* base_val = NULL;
 
    switch (node->getChild(0)->gType())
@@ -281,6 +283,8 @@ Codegen::cgClass (st::Class* cls_sym)
 llvm::Value*
 Codegen::cgDotExpr (ast::node::Node* node)
 {
+   assert(node->isDotNode());
+
    int field_index = static_cast<st::Field*>(node->gBoundSymbol())->_field_index;
 
    std::vector<llvm::Value*> gep;
@@ -288,6 +292,7 @@ Codegen::cgDotExpr (ast::node::Node* node)
    gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, field_index)));
 
    llvm::Value* left_node = cgExpr(node->getChild(0));
+   assert (left_node != NULL);
    if (!node->getChild(0)->gExprType()->isPtrSymbol())
    {
       std::string base_ty_name = node->getChild(0)->gBoundSymbol()->gExprType()->gQualifiedName() + "*";
@@ -298,6 +303,7 @@ Codegen::cgDotExpr (ast::node::Node* node)
       llvm::Type* base_ty = _getLlvmTy(base_mem_ty);
       assert (base_ty != NULL);
       llvm::Value* tmp = builder.CreateAlloca(base_ty);
+      assert (tmp != NULL);
       builder.CreateStore(left_node, tmp);
       left_node = builder.CreateLoad(tmp);
    }
@@ -336,6 +342,7 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
       case MEM_NODE_NUMBER:
          res = cgNumberExpr(static_cast<ast::node::Number*>(node));
+         assert (res != NULL);
          break;
       case MEM_NODE_PLUS:
          res = cgBinaryExpr(node);
@@ -393,8 +400,9 @@ llvm::Value*
 Codegen::cgFinalId (ast::node::Text* node)
 {
    //llvm::LoadInst* inst = builder.CreateLoad(_block_vars[node->gValue()], node->gValue());
-
-   return _block_vars[node->gValue()]; //inst->getPointerOperand();
+   llvm::Value* ty = _block_vars[node->gValue()]; //inst->getPointerOperand();
+   assert(ty != NULL);
+   return ty;
 }
 
 void
@@ -529,44 +537,60 @@ llvm::Value*
 Codegen::cgNumberExpr (ast::node::Number* node)
 {
    llvm::Value* val = NULL;
+
    switch (node->_format)
    {
       case 'c':
          val = llvm::ConstantInt::get(llvm::getGlobalContext(),
             llvm::APInt(sizeof(char) * 8, node->getChar(), false));
          break;
+
       case 's':
          val = llvm::ConstantInt::get(llvm::getGlobalContext(),
             llvm::APInt(sizeof(short) * 8, node->getShort(), false));
          break;
+
       case 'i':
          val = llvm::ConstantInt::get(llvm::getGlobalContext(),
             llvm::APInt(sizeof(int) * 8, node->getInt(), false));
          break;
+
       case 'l':
          val = llvm::ConstantInt::get(llvm::getGlobalContext(),
             llvm::APInt(sizeof(long) * 8, node->getLong(), false));
          break;
+
       default:
          assert (false && "Invalid constant type.");
    }
+
    assert (val != NULL);
+
    return val;
 }
 
 void
 Codegen::cgPrimitive (st::Primitive* prim)
 {
+   assert(prim != NULL);
+
    llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
       prim->gQualifiedName());
+   assert(ty != NULL);
    addType (prim, ty);
 }
 
 void
 Codegen::cgReturnStatement (ast::node::Node* node)
 {
+   assert(node != NULL);
+   assert(node->isReturnNode());
+   assert(node->getChild(0) != NULL);
+
    llvm::Value* val = cgExpr(node->getChild(0));
+   assert(val != NULL);
    llvm::Value* load_inst = builder.CreateLoad(val);
+   assert(load_inst != NULL);
    builder.CreateRet(load_inst);
 }
 
@@ -581,8 +605,9 @@ Codegen::cgVarAssign (ast::node::VarAssign* node)
 void
 Codegen::cgVarDecl (ast::node::VarDecl* node)
 {
-   assert (node != NULL);
-   assert (node->gExprType() != NULL);
+   assert(node != NULL);
+   assert(node->isVarDeclNode());
+   assert(node->gExprType() != NULL);
 
    llvm::Value* var = builder.CreateAlloca(_getLlvmTy(node->gExprType()), NULL,
       node->gName());

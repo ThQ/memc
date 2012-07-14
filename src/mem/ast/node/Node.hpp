@@ -152,6 +152,9 @@ class Node
    inline bool
    hasExprType () const {return this->_exp_type != NULL;}
 
+   inline bool
+   isAmpersandNode() const {return isType(MEM_NODE_AMPERSAND);}
+
    /**
     * true if the node is of type MEM_NODE_AND.
     */
@@ -189,6 +192,9 @@ class Node
    isPlaceHolderNode() const {return isType(MEM_NODE_PLACE_HOLDER);}
 
    inline bool
+   isReturnNode() const {return isType(MEM_NODE_RETURN);}
+
+   inline bool
    isRootNode() const {return isType(MEM_NODE_ROOT);}
 
    inline bool
@@ -202,7 +208,7 @@ class Node
    isValid (NodeValidator* vld);
 
    inline bool
-   isVarDeclNode() const {return this->isType(MEM_NODE_VARIABLE_DECLARATION);}
+   isVarDeclNode() const {return isType(MEM_NODE_VARIABLE_DECLARATION);}
 
    void
    eat (Node* n);
