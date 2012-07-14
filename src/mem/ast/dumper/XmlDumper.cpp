@@ -28,14 +28,14 @@ XmlDumper::dump_node (std::ostringstream& dump, node::Node* node, unsigned int l
 
    if (node->gBoundSymbol() != NULL)
    {
-      dump << " bound_type=\"";
+      dump << " bound=\"";
       dump << node->gBoundSymbol()->gQualifiedName();
       dump << "\"";
    }
 
    if (node->gExprType() != NULL)
    {
-      dump << " expr_type=\"";
+      dump << " type=\"";
       dump << node->gExprType()->gQualifiedName();
       dump << "\"";
    }
