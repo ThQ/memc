@@ -17,7 +17,7 @@ class Field : public Var
    Field();
 
    virtual inline bool
-   addChild (Symbol* s) {assert(false && "Cannot add child to Primitive");return false;}
+   addChild (Symbol* s) {assert(false && "Cannot add child to Ptr");return false;}
 };
 
 } }

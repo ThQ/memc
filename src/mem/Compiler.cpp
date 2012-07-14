@@ -138,6 +138,8 @@ Compiler::emitCode ()
       bc_file << cg.getLlvmByteCode();
       bc_file.close();
 
+      // TODO This should be moved elsewhere
+      llvm::llvm_shutdown();
       _logger->debug("LLVM ByteCode dumped to %s",
          gOptions()->getStr("codegen.llvm-bc").c_str());
    }

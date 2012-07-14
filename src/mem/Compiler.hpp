@@ -3,6 +3,7 @@
 
 
 #include <iostream>
+#include <llvm/Support/ManagedStatic.h>
 #include <fstream>
 #include <stdio.h>
 #include <string>
