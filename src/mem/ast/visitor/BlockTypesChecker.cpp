@@ -389,7 +389,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case MEM_NODE_IF:
-         visitIf(scope, node);
+         visitIf(scope, static_cast<node::If*>(node));
          break;
 
       case MEM_NODE_FINAL_ID:
@@ -424,14 +424,19 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 }
 
 void
-BlockTypesChecker::visitIf (st::Symbol* scope, node::Node* if_node)
+BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
 {
    // Check condition expression
-   visitExpr(scope, if_node->getChild(0));
-   ensureBoolExpr(if_node->getChild(0));
+   visitExpr(scope, if_node->gConditionNode());
+   ensureBoolExpr(if_node->gConditionNode());
 
    // Check block statements
-   visitBlock(scope, if_node->getChild(1));
+   visitBlock(scope, if_node->gIfBlockNode());
+
+   if (if_node->hasElseBlockNode())
+   {
+      visitBlock(scope, if_node->gElseBlockNode());
+   }
 }
 
 void

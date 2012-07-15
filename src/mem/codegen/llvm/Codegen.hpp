@@ -10,6 +10,7 @@
 #include <map>
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Func.hpp"
+#include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/codegen/ICodegen.hpp"
@@ -28,7 +29,8 @@ static llvm::IRBuilder<> builder(llvm::getGlobalContext());
 class Codegen : public mem::codegen::ICodegen
 {
    private: std::map<std::string, llvm::Value*> _block_vars;
-
+   private: llvm::Function* _cur_func;
+   private: llvm::BasicBlock* _cur_bb;
    private: std::map<std::string, llvm::Type*> _classes;
    private: std::map<std::string, llvm::Function*> _functions;
 
@@ -85,6 +87,9 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Value*
    cgBinaryExpr (ast::node::Node* node);
 
+   void
+   cgBlock (ast::node::Block* block);
+
    llvm::Value*
    cgCallExpr (ast::node::Call* node);
 
@@ -98,7 +103,7 @@ class Codegen : public mem::codegen::ICodegen
    cgFile (ast::node::File* file_node, bool cg_func_def);
 
    llvm::Value*
-   cgFinalId (ast::node::Text* node);
+   cgFinalIdExpr (ast::node::Text* node);
 
    llvm::Value*
    cgExpr (ast::node::Node* node);
@@ -108,6 +113,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgFunctionDef (ast::node::Func* func_node);
+
+   void
+   cgIfStatement (ast::node::If* node);
 
    void
    cgMemoryFunctions ();
@@ -125,10 +133,10 @@ class Codegen : public mem::codegen::ICodegen
    cgReturnStatement (ast::node::Node* node);
 
    void
-   cgVarAssign (ast::node::VarAssign* node);
+   cgVarAssignStatement (ast::node::VarAssign* node);
 
    void
-   cgVarDecl (ast::node::VarDecl* node);
+   cgVarDeclStatement (ast::node::VarDecl* node);
 
    virtual void
    gen (ast::node::Node* root);

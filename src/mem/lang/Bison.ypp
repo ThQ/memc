@@ -380,7 +380,7 @@ if:
    //------------------------------------------------------------------------//
    T_IF expr block
    {
-      $$ = new ast::node::Node(MEM_NODE_IF);
+      $$ = new ast::node::If();
       $$->pushChildren($2, $3);
       $$->sPosition(new fs::position::Range(@1, @2));
    }
@@ -389,7 +389,7 @@ if:
    //------------------------------------------------------------------------//
    | T_IF expr block T_ELSE block
    {
-      $$ = new ast::node::Node(MEM_NODE_IF_ELSE);
+      $$ = new ast::node::If();
       $$->pushChildren($2, $3, $5);
       $$->sPosition(new fs::position::Range(@1, @5));
    }

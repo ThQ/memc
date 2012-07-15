@@ -9,6 +9,7 @@
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
+#include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
 #include "mem/ast/node/Type.hpp"
@@ -107,7 +108,7 @@ class BlockTypesChecker : public TypeChecker
    visitFinalId (st::Symbol* scope, node::Text* node);
 
    void
-   visitIf (st::Symbol* scope, node::Node* node);
+   visitIf (st::Symbol* scope, node::If* node);
 
    void
    visitNew (st::Symbol* scope, node::New* node);
