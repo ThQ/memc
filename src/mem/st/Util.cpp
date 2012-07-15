@@ -83,6 +83,50 @@ Util::listFuncSigns (st::Class* cls_sym, std::string func_name)
 }
 */
 
+size_t
+Util::getIndirectionCount (std::string ty_name)
+{
+   size_t indir_count = 0;
+   std::string::iterator i;
+
+   for (i = ty_name.end()-1; i >= ty_name.begin(); --i)
+   {
+      if (*i == '*')
+      {
+         indir_count ++;
+      }
+      else
+      {
+         break;
+      }
+   }
+
+   return indir_count;
+}
+
+Symbol*
+Util::getSymbol (Symbol* scope, std::string sym_name)
+{
+   Symbol* res = NULL;
+
+   if (scope != NULL && sym_name.size() != 0)
+   {
+      Symbol* origin_scope = scope;
+
+      while (scope != NULL)
+      {
+         res = scope->getChild(sym_name);
+         if (res != NULL)
+         {
+            break;
+         }
+         scope = scope->_parent;
+      }
+   }
+
+   return res;
+}
+
 Class*
 Util::lookupClass (Symbol* scope, std::string cls_name)
 {
@@ -123,61 +167,73 @@ Util::lookupMember (Symbol* scope, std::string symbol_name)
 Symbol*
 Util::lookupSymbol (Symbol* scope, std::string symbol_name)
 {
-   Symbol* res = NULL;
-   Symbol* origin_scope = scope;
+   assert(scope != NULL);
+   assert(symbol_name.size() != 0);
 
-   // Lookup the symbol regardless of whether it's a pointer
-   while (scope != NULL)
-   {
-      res = scope->getChild(symbol_name);
-      if (res != NULL)
-      {
-         break;
-      }
-      scope = scope->_parent;
-   }
+   Symbol* res = getSymbol(scope, symbol_name);
 
    // Symbol is not found, maybe it is a pointer
    if (res == NULL)
    {
-      int ptr_level = 0;
-
-      std::string::iterator i;
-      for (i = symbol_name.end()-1; i >= symbol_name.begin(); --i)
-      {
-         if (*i == '*')
-         {
-            ptr_level ++;
-         }
-         else
-         {
-            break;
-         }
-      }
+      size_t ptr_level = getIndirectionCount(symbol_name);
 
       // It is a pointer, look the base type up
       if (ptr_level > 0)
       {
-         std::string origin_symbol_name = symbol_name;
-         symbol_name = symbol_name.substr(0, symbol_name.size() - ptr_level);
-
-         st::Symbol* base_ty = lookupSymbol(origin_scope, symbol_name);
-         if (base_ty != NULL && base_ty->isAnyTypeSymbol())
-         {
-            Ptr* ptr_symb = new Ptr();
-            ptr_symb->sName(origin_symbol_name);
-            ptr_symb->sBaseType(static_cast<Class*>(base_ty));
-            base_ty->_parent->addChild(ptr_symb);
-            res = ptr_symb;
-         }
+         std::string base_ty_name = symbol_name.substr(0, symbol_name.size() - ptr_level);
+         res = lookupPointer(scope, base_ty_name, ptr_level);
       }
    }
 
    if (res == NULL)
    {
-      printf("SYMB_NOT_FOUND <%s>\n", symbol_name.c_str());
+      printf("SYMB_NOT_FOUND <%s:%s>\n", scope->gQualifiedNameCstr(), symbol_name.c_str());
    }
    return res;
+}
+
+st::Ptr*
+Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
+{
+   assert(ptr_level > 0);
+
+   st::Type* tmp_ptr = NULL;
+   st::Type* cur_sym = NULL;
+   std::string cur_ptr_name = base_ty_name;
+
+   for (int i = 0; i <= ptr_level; ++i)
+   {
+      if (i == 0)
+      {
+         cur_sym = static_cast<st::Class*>(lookupSymbol(scope, base_ty_name));
+         assert(cur_sym->isClassSymbol());
+      }
+      else
+      {
+         tmp_ptr = static_cast<st::Ptr*>(getSymbol(scope, cur_ptr_name));
+
+         if (tmp_ptr != NULL)
+         {
+            cur_sym = tmp_ptr;
+         }
+         else
+         {
+            // Create the pointer type
+            Ptr* ptr_symb = new Ptr();
+            ptr_symb->sName(cur_ptr_name);
+            ptr_symb->sBaseType(cur_sym);
+
+            // Add the pointer at the same level as the base type
+            cur_sym->_parent->addChild(ptr_symb);
+
+            cur_sym = ptr_symb;
+         }
+      }
+      cur_ptr_name += "*";
+   }
+
+   assert(cur_sym->isPtrSymbol());
+   return static_cast<Ptr*>(cur_sym);
 }
 
 void

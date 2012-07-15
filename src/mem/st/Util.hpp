@@ -14,22 +14,49 @@
 #include "mem/st/Type.hpp"
 #include "mem/st/Var.hpp"
 
+
 namespace mem { namespace st {
 
 
 class Util
 {
-   public: static st::Namespace* createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts);
-   //public: static std::vector<st::FunctionSignature*> listFuncSigns(st::Class* cls_sym, std::string func_name);
-   //public: static st::FunctionSignature* lookupFunctionSignature(Symbol* scope, Func* func, std::vector<st::Symbol*> params);
-   public: static Class* lookupClass (Symbol* scope, std::string cls_name);
-   public: static Func* lookupFunction (Symbol* scope, std::string func_name);
-   public: static Symbol* lookupMember (Symbol* scope, std::string symbol_name);
-   public: static Symbol* lookupSymbol (Symbol* scope, std::string symbol_name);
-   public: static void registerType (SymbolTable* st, Symbol* scope, Type* ty);
-   public: static void setupBool (SymbolTable& st, CoreTypes& core_types);
-   public: static void setupInts (SymbolTable& st, CoreTypes& core_types);
-   public: static void setupVoid (SymbolTable& st, CoreTypes& core_types);
+   public:
+
+   static st::Namespace*
+   createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts);
+
+   static Symbol*
+   getSymbol (Symbol* scope, std::string symbol_name);
+
+   static size_t
+   getIndirectionCount (std::string type_name);
+
+   static Class*
+   lookupClass (Symbol* scope, std::string cls_name);
+
+   static Func*
+   lookupFunction (Symbol* scope, std::string func_name);
+
+   static Ptr*
+   lookupPointer(Symbol* scope, std::string base_ty_name, size_t ptr_level);
+
+   static Symbol*
+   lookupMember (Symbol* scope, std::string symbol_name);
+
+   static Symbol*
+   lookupSymbol (Symbol* scope, std::string symbol_name);
+
+   static void
+   registerType (SymbolTable* st, Symbol* scope, Type* ty);
+
+   static void
+   setupBool (SymbolTable& st, CoreTypes& core_types);
+
+   static void
+   setupInts (SymbolTable& st, CoreTypes& core_types);
+
+   static void
+   setupVoid (SymbolTable& st, CoreTypes& core_types);
 };
 
 
