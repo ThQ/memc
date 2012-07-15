@@ -120,5 +120,10 @@
          "ExpectedRetTy": "std::string",
          "RetTy": "std::string"
       }
+   },
+   "NotAssignable":
+   {
+      "type": "Error",
+      "message": "Expression is not assignable"
    }
 }

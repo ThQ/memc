@@ -611,17 +611,24 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
    assert (node->gNameNode() != NULL);
    assert (node->gValueNode() != NULL);
 
-   visitFinalId(scope, static_cast<node::Text*>(node->gNameNode()));
-   if (node->gNameNode()->gBoundSymbol() != NULL
-      && node->gNameNode()->gBoundSymbol()->isVarSymbol())
-   {
-      st::Type* expected_ty = static_cast<st::Var*>(
-         node->gNameNode()->gBoundSymbol())->gType();
-      visitExpr(scope, node->gValueNode());
-      ensureExprType(node->gValueNode(), expected_ty);
+   visitExpr(scope, static_cast<node::Text*>(node->gNameNode()));
 
-      node->sBoundSymbol(node->gNameNode()->gBoundSymbol());
-      node->sExprType(node->gNameNode()->gExprType());
+   if (node->gNameNode()->isAssignable())
+   {
+      if (node->gNameNode()->hasBoundSymbol())
+      {
+         visitExpr(scope, node->gValueNode());
+         ensureExprType(node->gNameNode(), node->gValueNode()->gExprType());
+
+         node->sExprType(node->gNameNode()->gExprType());
+      }
+   }
+   else
+   {
+      log::NotAssignable* e = new log::NotAssignable();
+      e->sPosition(node->gNameNode()->copyPosition());
+      e->format();
+      log(e);
    }
 }
 

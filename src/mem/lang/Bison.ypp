@@ -487,7 +487,7 @@ type_name :
    }
 
 variable_assignment :
-   id T_EQ expr T_NEWLINE
+   expr T_EQ expr T_NEWLINE
    {
       ast::node::VarAssign* n = new ast::node::VarAssign();
       n->sPosition(@$.copy_range());

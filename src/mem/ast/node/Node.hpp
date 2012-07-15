@@ -161,6 +161,9 @@ class Node
    inline bool
    isAndNode() const {return isType(MEM_NODE_AND);}
 
+   bool
+   isAssignable ();
+
    inline bool
    isBlockNode() {return isType(MEM_NODE_BLOCK);}
 

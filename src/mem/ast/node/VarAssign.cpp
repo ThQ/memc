@@ -16,7 +16,6 @@ VarAssign::isValid (NodeValidator* v)
    Node::isValid(v);
    v->ensure(gChildCount() == 2, "VarAssign must have exactly 2 children");
    v->ensure(hasExprType(), "VarAssign must have an expression type");
-   v->ensure(hasBoundSymbol(), "VarAssign must have an expression type");
 
    // Check NAME node
    if (gNameNode() != NULL)

@@ -96,6 +96,19 @@ Node::get_type_name (unsigned int type)
 }
 
 bool
+Node::isAssignable ()
+{
+   switch (_type)
+   {
+      case MEM_NODE_FINAL_ID:
+      case MEM_NODE_DOT:
+      case MEM_NODE_AMPERSAND:
+         return true;
+   }
+   return false;
+}
+
+bool
 Node::isText ()
 {
    switch (_type)
