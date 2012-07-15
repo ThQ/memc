@@ -114,7 +114,7 @@ Compiler::dumpSt ()
       // give one
       std::ofstream st_dump_file(gOptions()->getStr("st.dump.xml").c_str());
 
-      st::visitor::IDumper dumper;
+      st::visitor::XmlDumper dumper;
       dumper._out = &st_dump_file;
       dumper.setup();
       dumper.visitPreorder(symbols._root);
