@@ -213,7 +213,9 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
    switch (node->gType())
    {
       case MEM_NODE_PLUS:
-         val = builder.CreateAdd(left_val, right_val);
+         //val = _builder.CreateAdd(left_val, right_val);
+         val = llvm::BinaryOperator::Create(llvm::Instruction::Add, left_val,
+            right_val, "", _cur_bb);
          break;
 
       default:
@@ -490,13 +492,14 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
       llvm::BasicBlock& block = func->getEntryBlock();
       _cur_bb = &block;
 
-      builder.SetInsertPoint(&block);
+      //_builder.SetInsertPoint(&block);
 
       cgBlock(static_cast<ast::node::Block*>(func_node->gBodyNode()));
 
       if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
       {
-         builder.CreateRetVoid();
+         llvm::ReturnInst* t = llvm::ReturnInst::Create(_module->getContext(),
+            NULL, _cur_bb);
       }
 
    }
@@ -507,7 +510,6 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
 void
 Codegen::cgFunctionDef (ast::node::Func* func_node)
 {
-
    st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
    std::vector<llvm::Type*> func_ty_args;
    std::string func_name;

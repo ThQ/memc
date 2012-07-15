@@ -25,18 +25,20 @@
 namespace mem { namespace codegen { namespace llvm_ {
 
 
-static llvm::IRBuilder<> builder(llvm::getGlobalContext());
-
 class Codegen : public mem::codegen::ICodegen
 {
-   private: TStack<llvm::Value*> _stack;
-   private: llvm::Function* _cur_func;
-   private: llvm::BasicBlock* _cur_bb;
-   private: std::map<std::string, llvm::Type*> _classes;
-   private: std::map<std::string, llvm::Function*> _functions;
+   //--------------------------------------------------------------------------
+   // PRIVATE FIELDS
+   //--------------------------------------------------------------------------
+   private:
 
-   private: llvm::Module* _module;
-   public: st::SymbolTable* _st;
+   std::map<std::string, llvm::Type*> _classes;
+   llvm::BasicBlock* _cur_bb;
+   llvm::Function* _cur_func;
+   std::map<std::string, llvm::Function*> _functions;
+   llvm::Module* _module;
+   st::SymbolTable* _st;
+   TStack<llvm::Value*> _stack;
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
