@@ -131,7 +131,7 @@ Compiler::emitCode ()
    if (gOptions()->isSet("codegen.llvm-bc"))
    {
       mem::codegen::llvm_::Codegen cg;
-      cg._st = &symbols;
+      cg.SymbolTable(&symbols);
       cg.gen(&ast);
 
       std::ofstream bc_file;
