@@ -91,6 +91,15 @@ Symbol::gQualifiedName ()
 
    return name;
 }
+
+void
+Symbol::hintName (Symbol* parent, std::string hint)
+{
+   std::ostringstream id;
+   id << hint << "#" << parent->gChildCount() + 1;
+   sName(id.str());
+}
+
 bool
 Symbol::isAnyTypeSymbol() const
 {

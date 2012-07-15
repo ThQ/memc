@@ -42,7 +42,7 @@ class Symbol
    size_t _child_count;
 
    inline size_t
-   gChildCount() const {return _child_count;}
+   gChildCount() const {return _children.size();}
 
    virtual st::Symbol*
    gExprType ();
@@ -108,6 +108,9 @@ class Symbol
     */
    virtual Symbol*
    getChild (std::string name);
+
+   void
+   hintName (Symbol* parent, std::string hint);
 
    /**
     * Returns true if the symbol is of a given kind.

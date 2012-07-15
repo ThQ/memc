@@ -431,11 +431,22 @@ BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
    ensureBoolExpr(if_node->gConditionNode());
 
    // Check block statements
-   visitBlock(scope, if_node->gIfBlockNode());
+   // FIXME Should create a special type of Symbol here
+   st::Symbol* if_block = new st::Symbol();
+   if_block->hintName(scope, "~if");
+   scope->addChild(if_block);
+   if_node->gIfBlockNode()->sBoundSymbol(if_block);
+
+   visitBlock(if_block, if_node->gIfBlockNode());
 
    if (if_node->hasElseBlockNode())
    {
-      visitBlock(scope, if_node->gElseBlockNode());
+      st::Symbol* else_block = new st::Symbol();
+      else_block->hintName(scope, "~else");
+      scope->addChild(else_block);
+      if_node->gElseBlockNode()->sBoundSymbol(else_block);
+
+      visitBlock(else_block, if_node->gElseBlockNode());
    }
 }
 
