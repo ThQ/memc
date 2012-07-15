@@ -19,7 +19,7 @@ Compiler::Compiler ()
    addAstVisitor(new ast::visitor::CheckValidity());
    addAstVisitor(new ast::visitor::FindEntryPoint());
 
-   addStVisitor(new st::visitor::DepBuilder());
+   //addStVisitor(new st::visitor::DepBuilder());
 
    st::Util::setupBool(this->symbols, this->symbols.gCoreTypes());
    st::Util::setupInts(this->symbols, this->symbols.gCoreTypes());
