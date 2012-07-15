@@ -31,6 +31,7 @@ src_mem_ast_node = \
  src/mem/ast/node/File.hpp \
  src/mem/ast/node/Func.cpp \
  src/mem/ast/node/Func.hpp \
+ src/mem/ast/node/If.cpp \
  src/mem/ast/node/LeftUnary.cpp \
  src/mem/ast/node/LeftUnary.hpp \
  src/mem/ast/node/New.cpp \
@@ -130,6 +131,7 @@ src_mem_st = \
  src/mem/st/Class.cpp \
  src/mem/st/Class.hpp \
  src/mem/st/CoreTypes.hpp \
+ src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \
  src/mem/st/Func.hpp \
  src/mem/st/Namespace.cpp \

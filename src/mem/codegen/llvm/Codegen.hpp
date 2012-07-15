@@ -14,6 +14,7 @@
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/codegen/ICodegen.hpp"
+#include "mem/codegen/TStack.hpp"
 #include "mem/st/Class.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
@@ -28,7 +29,7 @@ static llvm::IRBuilder<> builder(llvm::getGlobalContext());
 
 class Codegen : public mem::codegen::ICodegen
 {
-   private: std::map<std::string, llvm::Value*> _block_vars;
+   private: TStack<llvm::Value*> _stack;
    private: llvm::Function* _cur_func;
    private: llvm::BasicBlock* _cur_bb;
    private: std::map<std::string, llvm::Type*> _classes;

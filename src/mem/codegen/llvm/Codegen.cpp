@@ -141,6 +141,8 @@ Codegen::gen (ast::node::Node* root)
 
    _classes["void*"] = llvm::Type::getInt32PtrTy(_module->getContext());
 
+   _stack.push();
+
    // Codegen classes first...
    st::Type* ty = NULL;
    std::map<std::string, st::Type*> types = _st->gTypes();
@@ -226,12 +228,16 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
 void
 Codegen::cgBlock (ast::node::Block* block)
 {
+   _stack.push();
+
    ast::node::Node* cur_node = block->_first_child;
    while (cur_node != NULL)
    {
       cgExpr(cur_node);
       cur_node = cur_node->_next;
    }
+
+   _stack.pop();
 }
 
 llvm::Value*
@@ -435,12 +441,7 @@ Codegen::cgFile (ast::node::File* file_node, bool cg_func_def)
 llvm::Value*
 Codegen::cgFinalIdExpr (ast::node::Text* node)
 {
-   /*
-   llvm::LoadInst* load = new llvm::LoadInst(_block_vars[node->gValue()],
-      "FinalId." + node->gValue(), _cur_bb);
-   assert(load != NULL);
-   */
-   llvm::Value* ty = _block_vars[node->gValue()]; //inst->getPointerOperand();
+   llvm::Value* ty = _stack.get(node->gValue());
    return ty;
 }
 
@@ -452,10 +453,10 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
    // Don't try to generate body for a virtual function
    if (func_node->gBodyNode() != NULL)
    {
-      _block_vars.clear();
 
       st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
       assert (func_sym != NULL);
+
       llvm::Function* func = _functions[_getCodegenFuncName(func_sym)];
       assert (func != NULL);
 
@@ -470,6 +471,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
       {
          builder.CreateRetVoid();
       }
+
    }
 
    _cur_bb = NULL;
@@ -660,7 +662,7 @@ Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
    std::string var_name = node->gNameNode()->gBoundSymbol()->gName();
    llvm::Value* val = cgExpr(node->gValueNode());
-   new llvm::StoreInst(val, _block_vars[var_name], _cur_bb);
+   new llvm::StoreInst(val, _stack.get(var_name), _cur_bb);
 }
 
 void
@@ -682,7 +684,7 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 
    //var = new llvm::LoadInst(var, "", _cur_bb);
 
-   _block_vars[node->gName()] = var;
+   _stack.set(node->gName(), var);
 }
 
 std::string
