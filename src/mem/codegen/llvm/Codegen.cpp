@@ -207,8 +207,8 @@ llvm::Value*
 Codegen::cgBinaryExpr (ast::node::Node* node)
 {
    llvm::Value* val = NULL;
-   llvm::Value* left_val = cgExpr(node->getChild(0));
-   llvm::Value* right_val = cgExpr(node->getChild(1));
+   llvm::Value* left_val = cgExprAndLoad(node->getChild(0));
+   llvm::Value* right_val = cgExprAndLoad(node->getChild(1));
 
    switch (node->gType())
    {
@@ -243,7 +243,8 @@ Codegen::cgBlock (ast::node::Block* block)
 llvm::Value*
 Codegen::cgCallExpr (ast::node::Call* node)
 {
-   st::Func* func_sym = static_cast<st::Func*>(node->gCallerNode()->gBoundSymbol());
+   st::Func* func_sym = static_cast<st::Func*>(
+      node->gCallerNode()->gBoundSymbol());
    std::vector<llvm::Value*> params;
 
    if (node->gParamsNode() != NULL)
@@ -251,7 +252,7 @@ Codegen::cgCallExpr (ast::node::Call* node)
       ast::node::Node* cur_param = node->gParamsNode()->_first_child;
       while (cur_param != NULL)
       {
-         params.push_back(cgExpr(cur_param));
+         params.push_back(cgExprAndLoad(cur_param));
          cur_param = cur_param->_next;
       }
    }
@@ -261,12 +262,12 @@ Codegen::cgCallExpr (ast::node::Call* node)
    if (params.size() > 0)
    {
       return llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
-         params, "", _cur_bb);
+         params, "call." + func_sym->gQualifiedName(), _cur_bb);
    }
    else
    {
       return llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
-         "", _cur_bb);
+         "call." + func_sym->gQualifiedName(), _cur_bb);
    }
 }
 
@@ -339,10 +340,10 @@ Codegen::cgDotExpr (ast::node::Node* node)
       _cur_bb);
    assert(gep_inst != NULL);
 
-   llvm::LoadInst* load_inst = new llvm::LoadInst(gep_inst, "dot", _cur_bb);
-   assert(load_inst != NULL);
+   //llvm::LoadInst* load_inst = new llvm::LoadInst(gep_inst, "dot", _cur_bb);
+   //assert(load_inst != NULL);
 
-   return load_inst;
+   return gep_inst;
 }
 
 llvm::Value*
@@ -405,6 +406,32 @@ Codegen::cgExpr (ast::node::Node* node)
    }
 
    return res;
+}
+
+llvm::Value*
+Codegen::cgExprAndLoad (ast::node::Node* node)
+{
+   llvm::Value* val = cgExpr(node);
+
+   bool must_load = false;
+
+   switch (node->gType())
+   {
+
+      case MEM_NODE_AMPERSAND:
+      case MEM_NODE_CALL:
+      case MEM_NODE_DOT:
+      case MEM_NODE_FINAL_ID:
+         must_load = true;
+         break;
+   }
+
+   if (must_load)
+   {
+      llvm::LoadInst* load_inst = new llvm::LoadInst(val, "", _cur_bb);
+      return load_inst;
+   }
+   return val;
 }
 
 void
@@ -641,17 +668,18 @@ Codegen::cgPrimitive (st::Primitive* prim)
    llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
       prim->gQualifiedName());
    assert(ty != NULL);
-   addType (prim, ty);
+   addType(prim, ty);
 }
 
 void
 Codegen::cgReturnStatement (ast::node::Node* node)
 {
+   assert(_cur_bb != NULL);
    assert(node != NULL);
    assert(node->isReturnNode());
    assert(node->getChild(0) != NULL);
 
-   llvm::Value* val = cgExpr(node->getChild(0));
+   llvm::Value* val = cgExprAndLoad(node->getChild(0));
    assert(val != NULL);
 
    llvm::ReturnInst::Create(_module->getContext(), val, _cur_bb);
@@ -660,9 +688,9 @@ Codegen::cgReturnStatement (ast::node::Node* node)
 void
 Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
-   std::string var_name = node->gNameNode()->gBoundSymbol()->gName();
-   llvm::Value* val = cgExpr(node->gValueNode());
-   new llvm::StoreInst(val, _stack.get(var_name), _cur_bb);
+   llvm::Value* left_val = cgExpr(node->gNameNode());
+   llvm::Value* right_val = cgExprAndLoad(node->gValueNode());
+   new llvm::StoreInst(right_val, left_val, _cur_bb);
 }
 
 void
@@ -677,7 +705,7 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 
    if (node->gValueNode() != NULL)
    {
-      llvm::Value* var_val = cgExpr(node->gValueNode());
+      llvm::Value* var_val = cgExprAndLoad(node->gValueNode());
       assert (var_val != NULL);
       new llvm::StoreInst(var_val, var, _cur_bb);
    }
@@ -695,6 +723,5 @@ Codegen::getLlvmByteCode ()
    _module->print(stream, NULL);
    return bc;
 }
-
 
 } } }

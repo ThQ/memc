@@ -109,6 +109,9 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Value*
    cgExpr (ast::node::Node* node);
 
+   llvm::Value*
+   cgExprAndLoad (ast::node::Node* node);
+
    void
    cgFunctionBody (ast::node::Func* func_node);
 
