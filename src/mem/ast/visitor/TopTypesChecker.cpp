@@ -71,8 +71,8 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
    assert(field!=NULL);
 
    //printf("Scope<%s @%x> / Field<%s @%x>\n", scope->gQualifiedNameCstr(), scope, static_cast<node::Text*>(field->getChild(0))->gValueCstr(), field);
-   node::Text* name_node = static_cast<node::Text*>(field->getChild(0));
-   node::Node* type_node = field->getChild(1);
+   node::Text* name_node = static_cast<node::Text*>(field->NameNode());
+   node::Node* type_node = field->ValueNode();
    assert (name_node != NULL);
    assert (type_node != NULL);
 
@@ -81,17 +81,6 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
    if (type_node->hasExprType()
       && ensureSymbolIsType(type_node, type_node->gExprType()))
    {
-      /*
-      printf("   -> Class<%s [%s] @%x> : + Field<%s> :%s(%d) @%x\n",
-         scope->gNameCstr(),
-         scope->gQualifiedNameCstr(),
-         scope,
-         name_node->gValueCstr(),
-         type_node->gBoundSymbol()->gNameCstr(),
-         type_node->gBoundSymbol()->_kind,
-         type_node->gBoundSymbol());
-      */
-
       // TODO Ugly one here...
       if (!type_node->gExprType()->isClassSymbol() || !static_cast<st::Class*>(type_node->gBoundSymbol())->isDependingOn(static_cast<st::Class*>(scope)))
       {
@@ -196,7 +185,7 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    func_sym->sName(func_decl->gValue());
    scope->addChild(func_sym);
 
-   if (func_decl->gReturnTypeNode() != NULL)
+   if (func_decl->ReturnTypeNode() != NULL)
    {
       this->visitFuncReturnType (func_decl, func_sym);
    }
@@ -206,7 +195,7 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    }
 
    // Visit function parameters
-   node::Node* func_params = func_decl->gParamsNode();
+   node::Node* func_params = func_decl->ParamsNode();
    if (func_params != NULL)
    {
       visitFuncParams(scope, func_params, func_sym);
@@ -259,7 +248,7 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
    st::Func* func_sym)
 {
    node::Text* ret_ty_node = static_cast<node::Text*>(
-      func_node->gReturnTypeNode());
+      func_node->ReturnTypeNode());
 
    if (ret_ty_node->isDotNode())
    {
@@ -274,7 +263,7 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
 
    func_node->sBoundSymbol(func_sym);
 
-   if (func_node->gReturnTypeNode()->hasExprType())
+   if (func_node->ReturnTypeNode()->hasExprType())
    {
       func_sym->sReturnType(static_cast<st::Class*>(ret_ty_node->gExprType()));
       func_node->sExprType(func_sym->gReturnType());

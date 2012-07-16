@@ -12,21 +12,33 @@ namespace mem { namespace ast { namespace visitor {
 
 
 /**
- * @brief Checks basic sign of correctness before any other visitor is run.
+ * Checks basic signs of correctness before any other visitor is run.
  *
  * @FIXME It should be run before every visitor. At least in debug mode.
  */
 class Prechecker : public Visitor
 {
-   /**
-    * @brief Default constructor.
-    */
-   public: Prechecker ();
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
    /**
-    * @brief Visitor entry point.
+    * Default constructor.
     */
-   public: virtual bool visit (node::Node* node);
+   Prechecker ();
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Visitor entry point.
+    */
+   virtual bool
+   visit (node::Node* node);
 };
 
 

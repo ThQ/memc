@@ -10,7 +10,7 @@ Func::Func()
 }
 
 Block*
-Func::gBodyNode ()
+Func::BodyNode ()
 {
    for (size_t i = 0 ; i < gChildCount() ; ++i)
    {
@@ -23,7 +23,7 @@ Func::gBodyNode ()
 }
 
 Node*
-Func::gParamsNode ()
+Func::ParamsNode ()
 {
    for (size_t i = 0 ; i < gChildCount() ; ++i)
    {
@@ -36,7 +36,7 @@ Func::gParamsNode ()
 }
 
 Node*
-Func::gReturnTypeNode ()
+Func::ReturnTypeNode ()
 {
    for (size_t i = 0 ; i < gChildCount() ; ++i)
    {
@@ -51,7 +51,7 @@ Func::gReturnTypeNode ()
 bool
 Func::isVirtual ()
 {
-   return gBodyNode() == NULL;
+   return BodyNode() == NULL;
 }
 
 

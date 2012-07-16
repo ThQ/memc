@@ -22,7 +22,6 @@ char* INDENT_UNIT = NULL;
 unsigned int INDENT_UNIT_LEN = 0;
 unsigned int INDENT_LEVEL = 0;
 unsigned int ML_COMMENT_DEPTH = 0;
-//define lexical_error(line, msg, args...) printf("[??:%d] TokenizerError: ", line); printf(msg, args)
 
 char* str_sub(const char* source, size_t start, size_t end)
 {
@@ -144,45 +143,34 @@ ST_USE      {KW_USE}[ ]+{NS_PART_NAME}
 
 
 
+"&"   {return T_AMPERSAND;}
 "@"   {return T_AROBASE;}
-":"   {return T_SEMICOLON;}
-","   {return T_COMMA;}
-"+"   {return T_PLUS;}
-"..." {return T_DOTDOTDOT;}
-"."   {return T_DOT;}
-"-"   {return T_MINUS;}
 "!"   {return T_BANG;}
-"*"   {return T_MUL;}
+","   {return T_COMMA;}
+")"   {return T_CP;}
 "/"   {return T_DIV;}
+"."   {return T_DOT;}
+"..." {return T_DOTDOTDOT;}
 "="   {return T_EQ;}
 "=="  {return T_EQ_EQ;}
-">="  {return T_RARR_EQ;}
 ">"   {return T_GT;}
-"->"  {return T_RARR;}
-"<"   {return T_LT;}
 "#"   {return T_HASH;}
-"&"   {return T_AMPERSAND;}
+"["   {return T_LBRACKET;}
+"<"   {return T_LT;}
+"-"   {return T_MINUS;}
+"*"   {return T_MUL;}
+"("   {return T_OP;}
+"+"   {return T_PLUS;}
+"->"  {return T_RARR;}
+">="  {return T_RARR_EQ;}
+"]"   {return T_RBRACKET;}
+":"   {return T_SEMICOLON;}
 
 {ID} {
    yylval.text = strdup(yytext);
    return T_ID;
 }
 
-"(" {
-   return T_OP;
-}
-
-")" {
-   return T_CP;
-}
-
-"[" {
-   return T_LBRACKET;
-}
-
-"]" {
-   return T_RBRACKET;
-}
 "/*" {
    BEGIN(ML_COMMENT);
    ML_COMMENT_DEPTH ++;

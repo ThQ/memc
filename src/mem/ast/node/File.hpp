@@ -11,9 +11,15 @@ namespace mem { namespace ast { namespace node {
 
 class File : public Node
 {
-   public: std::string _id;
-   public: std::string _include_path;
-   public: std::string _path;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   std::string _id;
+   std::string _include_path;
+   std::string _path;
+
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -25,8 +31,9 @@ class File : public Node
     */
    File ();
 
+
    //--------------------------------------------------------------------------
-   // PUBLIC METHODS
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 

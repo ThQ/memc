@@ -48,13 +48,19 @@ class Compiler
 {
    public: typedef enum {NO, XML} StDumpFormat;
 
-   public: ast::node::Root ast;
-   public: std::vector<ast::visitor::Visitor*> ast_visitors;
-   public: std::vector<st::visitor::Visitor*> st_visitors;
-   public: fs::FileManager fm;
-   public: log::ConsoleLogger* _logger;
-   public: std::queue<std::string> _parse_queue;
-   public: st::SymbolTable symbols;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   ast::node::Root ast;
+   std::vector<ast::visitor::Visitor*> ast_visitors;
+   std::vector<st::visitor::Visitor*> st_visitors;
+   fs::FileManager fm;
+   log::ConsoleLogger* _logger;
+   std::queue<std::string> _parse_queue;
+   st::SymbolTable symbols;
+
 
    //--------------------------------------------------------------------------
    // PROPERTIES
@@ -85,19 +91,19 @@ class Compiler
    public:
 
    /**
-    * Appends an AST visitor to the visitor list (FIFO).
+    * Append an AST visitor to the visitor list (FIFO).
     */
    inline void
    addAstVisitor (ast::visitor::Visitor* visitor){ast_visitors.push_back(visitor);}
 
    /**
-    * Appends an ST visitor to the visitor list (FIFO).
+    * Append an ST visitor to the visitor list (FIFO).
     */
    inline void
    addStVisitor (st::visitor::Visitor* visitor){st_visitors.push_back(visitor);}
 
    /**
-    * Starts a compiling job starting with an entry file.
+    * Start a compiling job starting with an entry file.
     */
    void
    compile (int argc, char** argv);
@@ -112,19 +118,19 @@ class Compiler
    emitCode ();
 
    /**
-    * Returns true if no warning nor fatal errors have been emitted.
+    * Return true if no warning nor fatal errors have been emitted.
     */
    bool
    isBuildSuccessful () const {return _logger->_n_warnings == 0 && _logger->_n_fatal_errors ==0;}
 
    /**
-    * Parses a file given its path.
+    * Parse a file given its path.
     */
    void
    parse (std::string file_path);
 
    /**
-    * Prints a compilation summary to stdout.
+    * Print a compilation summary to stdout.
     */
    void
    printBuildSummary ();
@@ -133,7 +139,7 @@ class Compiler
    printUsage (std::ostream& out);
 
    /**
-    * Parses each file in the parse queue until there's nothing left.
+    * Parse each file in the parse queue until there's nothing left.
     */
    void
    processParseQueue ();

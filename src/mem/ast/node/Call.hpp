@@ -12,21 +12,6 @@ namespace mem { namespace ast { namespace node {
 class Call : public Node
 {
    //--------------------------------------------------------------------------
-   // PROPERTIES
-   //--------------------------------------------------------------------------
-   public:
-
-   Node*
-   gCallerNode () {return this->getChild(0);}
-
-   Node*
-   gParamsNode () {return this->getChild(1);}
-
-   bool
-   hasParamsNode() {return this->gChildCount()==2;}
-
-
-   //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -38,9 +23,24 @@ class Call : public Node
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC METHODS
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
+
+   Node*
+   CallerNode () {return this->getChild(0);}
+
+   Node*
+   ParamsNode () {return this->getChild(1);}
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   bool
+   hasParamsNode() {return this->gChildCount()==2;}
 
    virtual void
    isValid(NodeValidator* vld);

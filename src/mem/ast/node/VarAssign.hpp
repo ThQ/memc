@@ -11,15 +11,6 @@ namespace mem { namespace ast { namespace node {
 
 class VarAssign : public Node
 {
-
-   //--------------------------------------------------------------------------
-   // PROPERTIES
-   //--------------------------------------------------------------------------
-   public:
-
-   Text* gNameNode() {return static_cast<Text*>(getChild(0));}
-   Node* gValueNode() {return getChild(1);}
-
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -29,6 +20,17 @@ class VarAssign : public Node
     * Default constructor.
     */
    VarAssign ();
+
+   //--------------------------------------------------------------------------
+   // PUBLIC PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   inline Text*
+   NameNode() {return static_cast<Text*>(getChild(0));}
+
+   inline Node*
+   ValueNode() {return getChild(1);}
 
 
    //--------------------------------------------------------------------------

@@ -13,12 +13,21 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+/**
+ * A base class for AST dumpers.
+ */
 class Dumper : public Visitor
 {
-   public: std::ostream* _out;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   std::ostream* _out;
+
 
    //--------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 

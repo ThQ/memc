@@ -22,15 +22,21 @@ class New : public Node
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   inline Node*
+   TypeNode () {return getChild(0);}
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
    virtual void
-   isValid(NodeValidator* v);
-
-   inline Node*
-   gTypeNode() {return getChild(0);}
+   isValid (NodeValidator* v);
 };
 
 

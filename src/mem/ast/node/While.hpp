@@ -12,18 +12,6 @@ namespace mem { namespace ast { namespace node {
 class While : public Node
 {
    //--------------------------------------------------------------------------
-   // PROPERTIES
-   //--------------------------------------------------------------------------
-   public:
-
-   Node*
-   gConditionNode () {return this->getChild(0);}
-
-   Node*
-   gBodyNode () {return this->getChild(1);}
-
-
-   //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -32,6 +20,18 @@ class While : public Node
     * Default constructor.
     */
    While ();
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   Node*
+   ConditionNode () {return this->getChild(0);}
+
+   Node*
+   BodyNode () {return this->getChild(1);}
 
 
    //--------------------------------------------------------------------------

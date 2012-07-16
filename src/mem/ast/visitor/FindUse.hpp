@@ -12,7 +12,7 @@ namespace mem { namespace ast { namespace visitor {
 
 
 /**
- * @brief Finds <use> statements.
+ * Finds <use> statements.
  *
  * Once a file is successfully parsed and syntacticaly correct, this visitor
  * looks for <use> statements in the AST and remembers them so as to inform
@@ -25,18 +25,35 @@ namespace mem { namespace ast { namespace visitor {
  */
 class FindUse : public Visitor
 {
-   //! A vector of file names to be included
-   public: std::vector<std::string> _uses;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   std::vector<std::string> _uses; //! A vector of file names to be included
+
+
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
    /**
-    * @brief Default constructor
+    * Default constructor
     */
-   public: FindUse();
+   FindUse();
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
 
    /**
-    * @brief Visitor entry point.
+    * Visitor entry point.
     */
-   public: virtual bool visit (node::Node* node);
+   virtual bool
+   visit (node::Node* node);
 };
 
 

@@ -11,26 +11,27 @@
 #include "mem/st/Class.hpp"
 
 
-#define NODE_ENSURE(cond) if (!(cond)){return false;}
-
 namespace mem { namespace ast { namespace node {
 
 
 class Node
 {
-   //public: bool _accept_children;
-   public: unsigned int _child_count;
-   //public: long _expected_child_count;
-   public: Node* _first_child;
-   public: Node* _last_child;
-   public: Node* _next;
-   public: fs::position::Range* _position;
-   public: Node* _prev;
-   public: st::Symbol* _exp_type;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   unsigned int _child_count;
+   st::Symbol* _exp_type;
+   Node* _first_child;
+   Node* _last_child;
+   Node* _next;
+   fs::position::Range* _position;
+   Node* _prev;
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC properties
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
@@ -133,7 +134,7 @@ class Node
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC methods
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 

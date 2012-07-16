@@ -18,17 +18,17 @@ VarDecl::isValid (NodeValidator* v)
    v->ensure(hasExprType(), "VarDecl must have an expression type");
    v->ensure(hasBoundSymbol(), "VarDecl must have a bound symbol");
 
-   if (gNameNode() != NULL)
+   if (NameNode() != NULL)
    {
       // Check NAME node
-      v->ensure(gNameNode()->hasBoundSymbol(), "VarDecl : Name node must have a bound symbol");
+      v->ensure(NameNode()->hasBoundSymbol(), "VarDecl : Name node must have a bound symbol");
    }
 
-   if (gTypeNode() != NULL)
+   if (TypeNode() != NULL)
    {
       // Check TYPE node
-      v->ensure(gTypeNode()->hasExprType(), "VarDecl : Type node must have an expression type");
-      v->ensure(gTypeNode()->hasBoundSymbol(), "VarDecl : Type node must have a bound symbol");
+      v->ensure(TypeNode()->hasExprType(), "VarDecl : Type node must have an expression type");
+      v->ensure(TypeNode()->hasBoundSymbol(), "VarDecl : Type node must have a bound symbol");
    }
 }
 

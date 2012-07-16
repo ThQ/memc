@@ -16,11 +16,11 @@ Call::isValid (NodeValidator* v)
    v->ensure(hasExprType(), "Call must have an expression type");
 
    // Check CALLER node
-   v->ensure(gCallerNode() != NULL, "Call must have a caller node");
-   if (gCallerNode() != NULL)
+   v->ensure(CallerNode() != NULL, "Call must have a caller node");
+   if (CallerNode() != NULL)
    {
-      v->ensure(gCallerNode()->hasExprType(), "CallerNode must have an expression type");
-      v->ensure(gCallerNode()->hasBoundSymbol(), "Caller node must have a bound symbol");
+      v->ensure(CallerNode()->hasExprType(), "CallerNode must have an expression type");
+      v->ensure(CallerNode()->hasBoundSymbol(), "Caller node must have a bound symbol");
    }
 }
 

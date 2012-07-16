@@ -45,9 +45,9 @@ BlockTypesChecker::visit (node::Node* node)
    {
       node::Func* func = static_cast<node::Func*>(node);
 
-      if (func->gBodyNode() != NULL)
+      if (func->BodyNode() != NULL)
       {
-         visitBlock(node->gBoundSymbol(), func->gBodyNode());
+         visitBlock(node->gBoundSymbol(), func->BodyNode());
       }
       return false;
    }
@@ -283,12 +283,12 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
    assert (scope != NULL);
    assert (call_node != NULL);
 
-   node::Node* base_object = call_node->gCallerNode();
+   node::Node* base_object = call_node->CallerNode();
    this->visitExpr(scope, base_object);
 
    if (call_node->hasParamsNode())
    {
-      visitExprList(scope, call_node->gParamsNode());
+      visitExprList(scope, call_node->ParamsNode());
    }
 
    if (base_object->hasBoundSymbol())
@@ -300,7 +300,7 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
          call_node->sExprType(base_func->gReturnType());
          if (call_node->hasParamsNode())
          {
-            checkCallParameters(base_func, call_node->gParamsNode());
+            checkCallParameters(base_func, call_node->ParamsNode());
          }
       }
       else
@@ -427,26 +427,26 @@ void
 BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
 {
    // Check condition expression
-   visitExpr(scope, if_node->gConditionNode());
-   ensureBoolExpr(if_node->gConditionNode());
+   visitExpr(scope, if_node->ConditionNode());
+   ensureBoolExpr(if_node->ConditionNode());
 
    // Check block statements
    // FIXME Should create a special type of Symbol here
    st::Symbol* if_block = new st::Symbol();
    if_block->hintName(scope, "~if");
    scope->addChild(if_block);
-   if_node->gIfBlockNode()->sBoundSymbol(if_block);
+   if_node->IfBlockNode()->sBoundSymbol(if_block);
 
-   visitBlock(if_block, if_node->gIfBlockNode());
+   visitBlock(if_block, if_node->IfBlockNode());
 
    if (if_node->hasElseBlockNode())
    {
       st::Symbol* else_block = new st::Symbol();
       else_block->hintName(scope, "~else");
       scope->addChild(else_block);
-      if_node->gElseBlockNode()->sBoundSymbol(else_block);
+      if_node->ElseBlockNode()->sBoundSymbol(else_block);
 
-      visitBlock(else_block, if_node->gElseBlockNode());
+      visitBlock(else_block, if_node->ElseBlockNode());
    }
 }
 
@@ -455,7 +455,7 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
 {
    assert(new_node != NULL);
 
-   node::Node* ty_node = new_node->gTypeNode();
+   node::Node* ty_node = new_node->TypeNode();
 
    visitExpr(scope, ty_node);
    ensureSymbolIsType(ty_node, ty_node->gBoundSymbol());
@@ -611,22 +611,22 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
    assert (node->gNameNode() != NULL);
    assert (node->gValueNode() != NULL);
 
-   visitExpr(scope, static_cast<node::Text*>(node->gNameNode()));
+   visitExpr(scope, static_cast<node::Text*>(node->NameNode()));
 
-   if (node->gNameNode()->isAssignable())
+   if (node->NameNode()->isAssignable())
    {
-      if (node->gNameNode()->hasBoundSymbol())
+      if (node->NameNode()->hasBoundSymbol())
       {
-         visitExpr(scope, node->gValueNode());
-         ensureExprType(node->gNameNode(), node->gValueNode()->gExprType());
+         visitExpr(scope, node->ValueNode());
+         ensureExprType(node->NameNode(), node->ValueNode()->gExprType());
 
-         node->sExprType(node->gNameNode()->gExprType());
+         node->sExprType(node->NameNode()->gExprType());
       }
    }
    else
    {
       log::NotAssignable* e = new log::NotAssignable();
-      e->sPosition(node->gNameNode()->copyPosition());
+      e->sPosition(node->NameNode()->copyPosition());
       e->format();
       log(e);
    }
@@ -636,42 +636,47 @@ void
 BlockTypesChecker::visitVarDecl (st::Symbol* scope,
    node::VarDecl* var_decl_node)
 {
+   node::Text* name_node = var_decl_node->NameNode();
+   node::Node* type_node = var_decl_node->TypeNode();
+   node::Node* value_node = var_decl_node->ValueNode();
+
    // Value is declared
-   if (var_decl_node->gValueNode() != NULL)
+   if (value_node != NULL)
    {
-      visitExpr(scope, var_decl_node->gValueNode());
+      visitExpr(scope, value_node);
    }
 
    // Type is not explicitly declared (type inference)
-   if (var_decl_node->gTypeNode()->isPlaceHolderNode())
+   if (type_node->isPlaceHolderNode())
    {
-      var_decl_node->sExprType(var_decl_node->gValueNode()->gExprType());
-      var_decl_node->gTypeNode()->sExprType(var_decl_node->gExprType());
-      var_decl_node->gTypeNode()->sBoundSymbol(var_decl_node->gExprType());
+      var_decl_node->sExprType(value_node->gExprType());
+      type_node->sExprType(var_decl_node->gExprType());
+      type_node->sBoundSymbol(var_decl_node->gExprType());
    }
    else
    {
       // Check type node
-      visitExpr(scope, var_decl_node->gTypeNode());
-      var_decl_node->sExprType(var_decl_node->gTypeNode()->gExprType());
-      if (!var_decl_node->gTypeNode()->hasExprType())
+      visitExpr(scope, type_node);
+      var_decl_node->sExprType(type_node->gExprType());
+      if (!type_node->hasExprType())
       {
          printf("<%s>.type_node has no expr type\n",
-            var_decl_node->gNameNode()->gValue().c_str());
+            name_node->gValue().c_str());
+         assert(false);
       }
    }
 
    // Add the variable to the current scope
-   if (var_decl_node->gTypeNode()->hasExprType())
+   if (type_node->hasExprType())
    {
       if (scope->getChild(var_decl_node->gName()) == NULL)
       {
          st::Var* var = new st::Var();
          var->sName(var_decl_node->gName());
-         var->sType(var_decl_node->gTypeNode()->gExprType());
+         var->sType(type_node->gExprType());
 
          var_decl_node->sBoundSymbol(var);
-         var_decl_node->gNameNode()->sBoundSymbol(var);
+         name_node->sBoundSymbol(var);
 
          scope->addChild(var);
       }
@@ -690,11 +695,11 @@ void
 BlockTypesChecker::visitWhile (st::Symbol* scope, node::While* while_node)
 {
    // Check condition node
-   visitExpr(scope, while_node->gConditionNode());
-   ensureBoolExpr(while_node->gConditionNode());
+   visitExpr(scope, while_node->ConditionNode());
+   ensureBoolExpr(while_node->ConditionNode());
 
    // Check block node
-   visitBlock(scope, while_node->gBodyNode());
+   visitBlock(scope, while_node->BodyNode());
 }
 
 

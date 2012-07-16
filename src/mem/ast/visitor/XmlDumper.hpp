@@ -10,8 +10,14 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+/**
+ * Dumps the AST as XML.
+ */
 class XmlDumper : public Dumper
 {
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
    public:
 
    virtual bool

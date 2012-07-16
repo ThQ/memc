@@ -11,7 +11,7 @@ Field::Field ()
 std::string
 Field::get_type_name ()
 {
-   node::Type* type = static_cast<node::Type*>(getChild(1));
+   node::Type* type = static_cast<node::Type*>(ValueNode());
    return type->_value;
 }
 
@@ -23,10 +23,22 @@ Field::isValid (NodeValidator* v)
    v->ensure(gChildCount() == 2, "Field must have exactly 2 children");
    v->ensure(hasBoundSymbol(), "Field must have a bound symbol");
    v->ensure(hasExprType(), "Field must have an expression type");
-   v->ensure(getChild(0)->isIdNode());
-   v->ensure(getChild(0)->hasBoundSymbol());
-   v->ensure(getChild(1)->hasBoundSymbol());
-   v->ensure(getChild(1)->hasExprType());
+
+   // Check NAME node
+   v->ensure(NameNode() != NULL);
+   if (NameNode() != NULL)
+   {
+      v->ensure(NameNode()->isIdNode());
+      v->ensure(NameNode()->hasBoundSymbol());
+   }
+
+   // Check VALUE node
+   v->ensure(ValueNode() != NULL);
+   if (ValueNode() != NULL)
+   {
+      v->ensure(ValueNode()->hasBoundSymbol());
+      v->ensure(ValueNode()->hasExprType());
+   }
 }
 
 

@@ -23,24 +23,30 @@ class VarDecl : public Node
 
 
    //--------------------------------------------------------------------------
+   // PUBLIC PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   inline Text*
+   NameNode() { return static_cast<Text*>(getChild(0)); }
+
+   inline Node*
+   TypeNode() { return getChild(1); }
+
+   inline Node*
+   ValueNode() { return getChild(2); }
+
+
+   //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
    inline std::string
-   gName() { return this->gNameNode()->_value; }
+   gName() { return this->NameNode()->_value; }
 
    inline const char*
    gNameCstr() {return this->gName().c_str();}
-
-   inline Text*
-   gNameNode() { return static_cast<Text*>(this->getChild(0)); }
-
-   inline Node*
-   gTypeNode() { return this->getChild(1); }
-
-   inline Node*
-   gValueNode() { return this->getChild(2); }
 
    virtual void
    isValid (NodeValidator* v);

@@ -41,9 +41,9 @@ namespace mem { namespace codegen { namespace llvm_ {
 class Codegen : public mem::codegen::ICodegen
 {
    //--------------------------------------------------------------------------
-   // PRIVATE FIELDS
+   // FIELDS
    //--------------------------------------------------------------------------
-   private:
+   protected:
 
    std::map<std::string, llvm::Type*> _classes;
    llvm::BasicBlock* _cur_bb;
@@ -55,7 +55,7 @@ class Codegen : public mem::codegen::ICodegen
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
@@ -64,7 +64,7 @@ class Codegen : public mem::codegen::ICodegen
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 

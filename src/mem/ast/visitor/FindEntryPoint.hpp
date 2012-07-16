@@ -11,13 +11,42 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+/**
+ * Visits the AST in order to find an entry point (a function declaration for
+ * main, ie :
+ * >   main () -> int
+ */
 class FindEntryPoint : public Visitor
 {
-   public: st::Symbol* _entry_point;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
 
-   public: FindEntryPoint();
-   public: virtual bool tearDown ();
-   public: virtual bool visit (node::Node* node);
+   st::Symbol* _entry_point;
+
+
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   FindEntryPoint();
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual bool
+   tearDown ();
+
+   virtual bool
+   visit (node::Node* node);
 };
 
 

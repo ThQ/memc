@@ -32,24 +32,30 @@ class If: public Node
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
    inline node::Node*
-   gConditionNode () {return getChild(0);}
+   ConditionNode () {return getChild(0);}
 
    inline node::Node*
-   gIfBlockNode () {return static_cast<Block*>(getChild(1));}
+   IfBlockNode () {return static_cast<Block*>(getChild(1));}
 
    inline node::Block*
-   gElseBlockNode () {return static_cast<Block*>(getChild(2));}
+   ElseBlockNode () {return static_cast<Block*>(getChild(2));}
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
 
    inline bool
-   hasConditionNode () {return gConditionNode() != NULL;}
+   hasConditionNode () {return ConditionNode() != NULL;}
 
    inline bool
-   hasElseBlockNode () {return gElseBlockNode() != NULL;}
+   hasElseBlockNode () {return ElseBlockNode() != NULL;}
 
    virtual void
    isValid (NodeValidator* v);

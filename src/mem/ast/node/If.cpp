@@ -18,12 +18,12 @@ If::isValid (NodeValidator* v)
 
    if (hasConditionNode())
    {
-      v->ensure(gConditionNode()->hasExprType(),
+      v->ensure(ConditionNode()->hasExprType(),
          "If : condition node must have an expression type");
 
-      if (gConditionNode()->hasExprType())
+      if (ConditionNode()->hasExprType())
       {
-         v->ensure(gConditionNode()->gExprType()->gName() == "bool",
+         v->ensure(ConditionNode()->gExprType()->gName() == "bool",
             "If : condition node must have bool type");
       }
    }

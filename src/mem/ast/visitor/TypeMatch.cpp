@@ -27,10 +27,10 @@ TypeMatch::visit (node::Node* node)
 void
 TypeMatch::visitVarDecl (node::VarDecl* var_decl_node)
 {
-   node::Node* value_node = var_decl_node->gValueNode();
+   node::Node* value_node = var_decl_node->ValueNode();
    st::Type* value_ty = static_cast<st::Type*>(value_node->gExprType());
 
-   node::Node* type_node = var_decl_node->gTypeNode();
+   node::Node* type_node = var_decl_node->TypeNode();
    st::Type* var_ty = static_cast<st::Type*>(type_node->gBoundSymbol());
 
    /*

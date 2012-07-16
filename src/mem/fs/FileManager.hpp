@@ -14,8 +14,14 @@ namespace mem { namespace fs {
 
 class FileManager
 {
-   public: std::map<std::string, File*> _files;
-   public: std::vector<std::string> _path;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   std::map<std::string, File*> _files;
+   std::vector<std::string> _path;
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -34,25 +40,25 @@ class FileManager
    public:
 
    /**
-    * Appends the include path.
+    * Append the include path.
     */
    inline void
    appendPath (std::string dir_path) {_path.push_back(dir_path);}
 
    /**
-    * Returns the Nth line in a given previously opened file.
+    * Return the Nth line in a given previously opened file.
     */
    std::string
    getLineOf (std::string file_path, unsigned int line);
 
    /**
-    * Opens a file.
+    * Open a file.
     */
    File*
    openFile (std::string file_path);
 
    /**
-    * Tries to open a file.
+    * Try to open a file.
     */
    File*
    tryOpenFile (std::string file_path, std::vector<std::string>& paths_tried);

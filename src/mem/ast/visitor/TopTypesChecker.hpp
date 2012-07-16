@@ -19,8 +19,9 @@
 
 namespace mem { namespace ast { namespace visitor {
 
+
 /**
- * @brief Checks correctness of types in high level declarations : functions
+ * Checks correctness of types in high level declarations : functions
  * and fields.
  */
 class TopTypesChecker : public TypeChecker
@@ -31,18 +32,15 @@ class TopTypesChecker : public TypeChecker
    public:
 
    /**
-    * @brief Default constructor.
+    * Default constructor.
     */
    TopTypesChecker ();
 
 
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTOR
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
-
-   //public: void checkFuncOverloading (st::Symbol* scope, node::Func* func_decl, st::Func* func_sym);
-   //public: void checkFuncOverriding (st::Symbol* scope, node::Func* func_decl, st::Func* func_sym, st::FunctionSignature* func_sign_sym);
 
    /**
     * Visitor entry point.

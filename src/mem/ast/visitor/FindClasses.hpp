@@ -14,11 +14,29 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+/**
+ * Visits the AST in order to find MEM_NODE_CLASS nodes.
+ */
 class FindClasses : public Visitor
 {
-   public: FindClasses ();
-   public: virtual bool visit (node::Node* node);
-   public: void visitClassDecl (node::Class* cls_node);
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   FindClasses ();
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual bool
+   visit (node::Node* node);
+
+   void
+   visitClassDecl (node::Class* cls_node);
 };
 
 

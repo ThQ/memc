@@ -75,7 +75,7 @@ Codegen::_getFuncReturnTy (ast::node::Func* func)
 {
    llvm::Type* ty = NULL;
 
-   if (func->gReturnTypeNode() != NULL)
+   if (func->ReturnTypeNode() != NULL)
    {
       ty = _classes[func->gExprType()->gQualifiedName()];
    }
@@ -246,12 +246,12 @@ llvm::Value*
 Codegen::cgCallExpr (ast::node::Call* node)
 {
    st::Func* func_sym = static_cast<st::Func*>(
-      node->gCallerNode()->gBoundSymbol());
+      node->CallerNode()->gBoundSymbol());
    std::vector<llvm::Value*> params;
 
-   if (node->gParamsNode() != NULL)
+   if (node->ParamsNode() != NULL)
    {
-      ast::node::Node* cur_param = node->gParamsNode()->_first_child;
+      ast::node::Node* cur_param = node->ParamsNode()->_first_child;
       while (cur_param != NULL)
       {
          params.push_back(cgExprAndLoad(cur_param));
@@ -483,9 +483,8 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
    assert(func_node->isFuncNode());
 
    // Don't try to generate body for a virtual function
-   if (func_node->gBodyNode() != NULL)
+   if (func_node->BodyNode() != NULL)
    {
-
       st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
       assert (func_sym != NULL);
 
@@ -497,7 +496,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
 
       //_builder.SetInsertPoint(&block);
 
-      cgBlock(static_cast<ast::node::Block*>(func_node->gBodyNode()));
+      cgBlock(static_cast<ast::node::Block*>(func_node->BodyNode()));
 
       if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
       {
@@ -549,7 +548,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
    _cur_func = func;
 
    // Don't codegen a body for a virtual/external function
-   if (func_node->gBodyNode() != NULL)
+   if (func_node->BodyNode() != NULL)
    {
       llvm::BasicBlock* block = llvm::BasicBlock::Create(
          llvm::getGlobalContext(), "entry", func);
@@ -570,18 +569,18 @@ Codegen::cgIfStatement (ast::node::If* node)
    llvm::BasicBlock* true_block = llvm::BasicBlock::Create(
       llvm::getGlobalContext(), "if_true", _cur_func);
    _cur_bb = true_block;
-   cgBlock(static_cast<ast::node::Block*>(node->gIfBlockNode()));
+   cgBlock(static_cast<ast::node::Block*>(node->IfBlockNode()));
    true_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
 
    // FALSE block
    llvm::BasicBlock* false_block = llvm::BasicBlock::Create(
       llvm::getGlobalContext(), "if_false", _cur_func);
    _cur_bb = false_block;
-   cgBlock(static_cast<ast::node::Block*>(node->gElseBlockNode()));
+   cgBlock(static_cast<ast::node::Block*>(node->ElseBlockNode()));
    false_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
 
    // BRANCH
-   llvm::Value* cond = cgExpr(node->gConditionNode());
+   llvm::Value* cond = cgExpr(node->ConditionNode());
    llvm::LoadInst* load = new llvm::LoadInst(cond, "ifcond", false, cur_bb);
 
    if (node->hasElseBlockNode())
@@ -693,8 +692,8 @@ Codegen::cgReturnStatement (ast::node::Node* node)
 void
 Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
-   llvm::Value* left_val = cgExpr(node->gNameNode());
-   llvm::Value* right_val = cgExprAndLoad(node->gValueNode());
+   llvm::Value* left_val = cgExpr(node->NameNode());
+   llvm::Value* right_val = cgExprAndLoad(node->ValueNode());
    new llvm::StoreInst(right_val, left_val, _cur_bb);
 }
 
@@ -708,9 +707,9 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
    llvm::Value* var = new llvm::AllocaInst(_getLlvmTy(node->gExprType()), NULL,
       node->gName(), _cur_bb);
 
-   if (node->gValueNode() != NULL)
+   if (node->ValueNode() != NULL)
    {
-      llvm::Value* var_val = cgExprAndLoad(node->gValueNode());
+      llvm::Value* var_val = cgExprAndLoad(node->ValueNode());
       assert (var_val != NULL);
       new llvm::StoreInst(var_val, var, _cur_bb);
    }

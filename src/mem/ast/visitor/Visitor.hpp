@@ -12,15 +12,24 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+/**
+ * A base class for all AST visitors.
+ */
 class Visitor
 {
-   public: log::Logger* _logger;
-   public: std::string _name;
-   public: st::SymbolTable* _symbols;
-   public: st::CoreTypes* _core_types;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   st::CoreTypes* _core_types;
+   log::Logger* _logger;
+   std::string _name;
+   st::SymbolTable* _symbols;
+
 
    //--------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
@@ -28,15 +37,17 @@ class Visitor
 
    void Logger (log::Logger* logger) { _logger = logger; }
 
+
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS/DESTRUCTOR
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
    virtual ~Visitor ();
 
+
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 

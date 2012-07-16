@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace visitor {
 class TypeChecker : public Visitor
 {
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 

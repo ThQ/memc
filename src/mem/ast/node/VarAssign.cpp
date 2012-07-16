@@ -18,16 +18,16 @@ VarAssign::isValid (NodeValidator* v)
    v->ensure(hasExprType(), "VarAssign must have an expression type");
 
    // Check NAME node
-   if (gNameNode() != NULL)
+   if (NameNode() != NULL)
    {
-      v->ensure(gNameNode()->hasBoundSymbol(), "VarAssign : Name node must have a bound symbol");
-      v->ensure(gNameNode()->hasExprType(), "VarAssign : Name node must have an expression type");
+      v->ensure(NameNode()->hasBoundSymbol(), "VarAssign : Name node must have a bound symbol");
+      v->ensure(NameNode()->hasExprType(), "VarAssign : Name node must have an expression type");
    }
 
-   if (gValueNode() != NULL)
+   if (ValueNode() != NULL)
    {
       // Check VALUE node
-      v->ensure(gValueNode()->hasExprType(), "VarAssign : Value node must have an expression type");
+      v->ensure(ValueNode()->hasExprType(), "VarAssign : Value node must have an expression type");
 
       // TODO Should check that the var type and the value type have the expr type.
       // Take care of pointers.
