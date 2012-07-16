@@ -315,10 +315,10 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
 }
 
 void
-BlockTypesChecker::visitDot (st::Symbol* scope, node::Node* dot_node)
+BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 {
-   node::Node* left_node = dot_node->getChild(0);
-   node::Node* right_node = dot_node->getChild(1);
+   node::Node* left_node = dot_node->LeftNode();
+   node::Node* right_node = dot_node->RightNode();
 
    visitExpr(scope, left_node);
    visitExpr(scope, right_node);
@@ -418,7 +418,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case MEM_NODE_DOT:
-         visitDot(scope, node);
+         visitDot(scope, static_cast<node::Dot*>(node));
          break;
    }
 }

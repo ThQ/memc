@@ -302,29 +302,32 @@ Codegen::cgClass (st::Class* cls_sym)
 }
 
 llvm::Value*
-Codegen::cgDotExpr (ast::node::Node* node)
+Codegen::cgDotExpr (ast::node::Dot* node)
 {
    assert(node->isDotNode());
 
    int field_index = static_cast<st::Field*>(node->gBoundSymbol())->_field_index;
 
    std::vector<llvm::Value*> gep;
-   gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0)));
-   gep.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, field_index)));
+   gep.push_back(llvm::ConstantInt::get(_module->getContext(),
+      llvm::APInt(32, 0)));
+   gep.push_back(llvm::ConstantInt::get(_module->getContext(),
+      llvm::APInt(32, field_index)));
 
-   llvm::Value* left_node = cgExpr(node->getChild(0));
+   llvm::Value* left_node = cgExpr(node->LeftNode());
    assert (left_node != NULL);
 
-   if (!node->getChild(0)->gExprType()->isPtrSymbol())
+   if (!node->LeftNode()->gExprType()->isPtrSymbol())
    {
       st::Type* base_mem_ty = static_cast<st::Type*>(st::Util::lookupSymbol(
-         node->getChild(0)->gExprType()->_parent,
-         node->getChild(0)->gExprType()->gName() + "*"));
+         node->LeftNode()->gExprType()->_parent,
+         node->LeftNode()->gExprType()->gName() + "*"));
 
       llvm::Type* base_ty = _getLlvmTy(base_mem_ty);
       assert(base_ty != NULL);
 
-      llvm::AllocaInst* tmp = new llvm::AllocaInst(base_ty, NULL, "dot", _cur_bb);
+      llvm::AllocaInst* tmp = new llvm::AllocaInst(base_ty, NULL, "dot",
+         _cur_bb);
       assert(tmp != NULL);
 
       llvm::StoreInst* store = new llvm::StoreInst(left_node, tmp, _cur_bb);
@@ -338,8 +341,8 @@ Codegen::cgDotExpr (ast::node::Node* node)
    }
    assert (left_node != NULL);
 
-   llvm::Value* gep_inst = llvm::GetElementPtrInst::Create(left_node, gep, "dot",
-      _cur_bb);
+   llvm::Value* gep_inst = llvm::GetElementPtrInst::Create(left_node, gep,
+      "dot", _cur_bb);
    assert(gep_inst != NULL);
 
    //llvm::LoadInst* load_inst = new llvm::LoadInst(gep_inst, "dot", _cur_bb);
@@ -361,23 +364,23 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
 
       case MEM_NODE_CALL:
-         res = cgCallExpr (static_cast<ast::node::Call*>(node));
+         res = cgCallExpr(static_cast<ast::node::Call*>(node));
          break;
 
       case MEM_NODE_DOT:
-         res = cgDotExpr (node);
+         res = cgDotExpr(static_cast<ast::node::Dot*>(node));
          break;
 
       case MEM_NODE_IF:
-         cgIfStatement (static_cast<ast::node::If*>(node));
+         cgIfStatement(static_cast<ast::node::If*>(node));
          break;
 
       case MEM_NODE_FINAL_ID:
-         res = cgFinalIdExpr (static_cast<ast::node::Text*>(node));
+         res = cgFinalIdExpr(static_cast<ast::node::Text*>(node));
          break;
 
       case MEM_NODE_NEW:
-         res = cgNewExpr (static_cast<ast::node::New*>(node));
+         res = cgNewExpr(static_cast<ast::node::New*>(node));
          break;
 
       case MEM_NODE_NUMBER:

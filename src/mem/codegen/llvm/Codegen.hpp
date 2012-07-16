@@ -9,6 +9,7 @@
 #include <llvm/Support/raw_ostream.h>
 #include <map>
 #include "mem/ast/node/Call.hpp"
+#include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
@@ -122,7 +123,7 @@ class Codegen : public mem::codegen::ICodegen
    cgClass (st::Class* cls_symb);
 
    llvm::Value*
-   cgDotExpr (ast::node::Node* node);
+   cgDotExpr (ast::node::Dot* node);
 
    void
    cgFile (ast::node::File* file_node, bool cg_func_def);

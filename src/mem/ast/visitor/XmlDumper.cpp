@@ -1,4 +1,4 @@
-#include "mem/ast/dumper/XmlDumper.hpp"
+#include "mem/ast/visitor/XmlDumper.hpp"
 
 namespace mem { namespace ast { namespace visitor {
 
@@ -16,7 +16,7 @@ XmlDumper::tearDown ()
    return true;
 }
 
-void
+bool
 XmlDumper::visit (node::Node* node)
 {
    *_out << "<";
@@ -83,6 +83,8 @@ XmlDumper::visit (node::Node* node)
    {
       *_out << " />\n";
    }
+
+   return false;
 }
 
 

@@ -293,7 +293,9 @@ Compiler::runAstVisitors ()
       i < ast_visitors.size() && _logger->_n_fatal_errors == 0; ++i)
    {
       _logger->debug("[%s] running...", ast_visitors[i]->_name.c_str());
-      ast_visitors[i]->setup(&symbols, _logger);
+      ast_visitors[i]->SymbolTable(&symbols);
+      ast_visitors[i]->Logger(_logger);
+      ast_visitors[i]->setup();
       ast_visitors[i]->visit_preorder(&ast);
       ast_visitors[i]->tearDown();
    }

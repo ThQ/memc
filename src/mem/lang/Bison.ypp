@@ -12,6 +12,7 @@
 #include "mem/ast/node/Block.hpp"
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Class.hpp"
+#include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/LeftUnary.hpp"
 #include "mem/ast/node/New.hpp"
@@ -177,7 +178,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %type <node> variable_assignment
 %type <node> variable_declaration
 %type <node> while
-%type <text_node> qualified_id
+%type <node> qualified_id
 %type <text_node> use_file
 %type <text_node> metadata
 
@@ -541,7 +542,7 @@ qualified_id :
    }
    | qualified_id T_DOT id
    {
-      $$ = new ast::node::Text(MEM_NODE_DOT);
+      $$ = new ast::node::Dot();
       $$->pushChildren($1, $3);
       $$->sPosition(@$.copy_range());
    }
@@ -549,7 +550,7 @@ qualified_id :
 dot_expr :
    T_OP expr T_CP T_DOT id
    {
-      $$ = new ast::node::Node(MEM_NODE_DOT);
+      $$ = new ast::node::Dot();
       $$->sPosition(@$.copy_range());
       $$->pushChildren($2, $5);
    }

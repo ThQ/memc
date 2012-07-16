@@ -19,8 +19,7 @@ src_mem_ast_node = \
  src/mem/ast/node/Call.cpp \
  src/mem/ast/node/Call.hpp \
  src/mem/ast/node/Class.cpp \
- src/mem/ast/node/Class.hpp \
- src/mem/ast/node/Dumper.cpp \
+ src/mem/ast/node/Dot.cpp \
  src/mem/ast/node/Field.cpp \
  src/mem/ast/node/Field.hpp \
  src/mem/ast/node/File.cpp \
@@ -51,8 +50,7 @@ src_mem_ast_node = \
  src/mem/ast/node/VarDecl.cpp \
  src/mem/ast/node/VarDecl.hpp \
  src/mem/ast/node/While.cpp \
- src/mem/ast/node/While.hpp \
- src/mem/ast/node/XmlDumper.cpp
+ src/mem/ast/node/While.hpp
 src_mem_ast_visitor = \
  src/mem/ast/visitor/BlockTypesChecker.cpp \
  src/mem/ast/visitor/BlockTypesChecker.hpp \
@@ -73,7 +71,8 @@ src_mem_ast_visitor = \
  src/mem/ast/visitor/TypeMatch.cpp \
  src/mem/ast/visitor/TypeMatch.hpp \
  src/mem/ast/visitor/Visitor.cpp \
- src/mem/ast/visitor/Visitor.hpp
+ src/mem/ast/visitor/Visitor.hpp \
+ src/mem/ast/visitor/XmlDumper.cpp
 src_mem_codegen = \
  src/mem/codegen/ICodegen.hpp
 src_mem_codegen_llvm = \
@@ -184,7 +183,7 @@ memc_SOURCES = $(src) \
 		$(src_mem_parser) \
 		$(src_mem_st) \
 		$(src_mem_st_visitor)
-memc_LDADD = $(LLVM_LDADD)
+memc_LDADD = $(LLVM_LDADD) -ldl
 memc_CPPFLAGS=$(LLVM_CPPFLAGS)
 
 

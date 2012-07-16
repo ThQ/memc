@@ -7,6 +7,7 @@
 #include <vector>
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Class.hpp"
+#include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
@@ -96,7 +97,7 @@ class BlockTypesChecker : public TypeChecker
    visitCall (st::Symbol* scope, node::Call* call_node);
 
    void
-   visitDot (st::Symbol* scope, node::Node* dot_node);
+   visitDot (st::Symbol* scope, node::Dot* dot_node);
 
    void
    visitExpr (st::Symbol* scope, node::Node* node);

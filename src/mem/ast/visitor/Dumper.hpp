@@ -24,15 +24,6 @@ class Dumper : public Visitor
 
    void
    Out (std::ostream* out) {_out = out;}
-
-
-   //--------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
-   //--------------------------------------------------------------------------
-   public:
-
-   virtual bool
-   visit (node::Node* node);
 };
 
 

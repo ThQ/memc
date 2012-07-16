@@ -41,13 +41,13 @@ class Visitor
    public:
 
    virtual bool
-   setup (st::SymbolTable* symbols, log::Logger* logger);
+   setup (){return true;};
 
    inline void
    log (log::Message* msg) {this->_logger->log(msg);}
 
    virtual bool
-   tearDown();
+   tearDown() {return true;};
 
    virtual bool
    visit (node::Node* node);
