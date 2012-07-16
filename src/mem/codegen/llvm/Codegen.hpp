@@ -25,6 +25,18 @@
 namespace mem { namespace codegen { namespace llvm_ {
 
 
+/**
+ * Emit LLVM assembly from an AST and a ST.
+ *
+ * References :
+ * - LLVM assembly language reference
+     <http://http://llvm.org/docs/LangRef.html>
+ * - Try LLVM online (can generate C++ or LLVM assembly from C/C++)
+     <http://llvm.org/demo/>
+ * - API documentation for llvm::IRBuilder (an helper class to generate LLVM
+     instructions)
+     <http://llvm.org/docs/doxygen/html/classllvm_1_1IRBuilder.html>
+ */
 class Codegen : public mem::codegen::ICodegen
 {
    //--------------------------------------------------------------------------
@@ -118,9 +130,15 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Value*
    cgFinalIdExpr (ast::node::Text* node);
 
+   /**
+    * Codegen a node.
+    */
    llvm::Value*
    cgExpr (ast::node::Node* node);
 
+   /**
+    * Codegen a node and generate a LLVM Load instruction if necessary.
+    */
    llvm::Value*
    cgExprAndLoad (ast::node::Node* node);
 

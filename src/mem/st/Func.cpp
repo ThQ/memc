@@ -13,10 +13,8 @@ Func::Func ()
 
 Func::~Func ()
 {
-   for (size_t i = 0; i < _params.size(); ++i)
-   {
-      delete _params[i];
-   }
+   // We don't delete the parameters here because they are added as st::Func
+   // children and will be deleted from st::Symbol.
 }
 
 st::Var*
@@ -24,9 +22,9 @@ Func::addParam (std::string name, st::Type* ty)
 {
    assert (ty != NULL);
 
-   // FIXME Who deletes that ?
    st::Var* param = new st::Var(name, ty);
    _params.push_back(param);
+
    return param;
 }
 
