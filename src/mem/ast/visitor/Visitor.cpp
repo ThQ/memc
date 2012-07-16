@@ -7,22 +7,6 @@ Visitor::~Visitor ()
 {
 }
 
-void
-Visitor::setup (st::SymbolTable* symbols, log::Logger* logger)
-{
-   assert(symbols != NULL);
-   assert(logger != NULL);
-
-   _core_types = &symbols->gCoreTypes();
-   _symbols = symbols;
-   _logger = logger;
-}
-
-void
-Visitor::tearDown ()
-{
-}
-
 bool
 Visitor::visit (node::Node* node)
 {

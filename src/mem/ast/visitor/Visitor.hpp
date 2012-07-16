@@ -20,6 +20,15 @@ class Visitor
    public: st::CoreTypes* _core_types;
 
    //--------------------------------------------------------------------------
+   // PUBLIC PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   void SymbolTable (st::SymbolTable* st) { _symbols = st; _core_types=&(st->gCoreTypes()); }
+
+   void Logger (log::Logger* logger) { _logger = logger; }
+
+   //--------------------------------------------------------------------------
    // CONSTRUCTORS/DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -31,13 +40,13 @@ class Visitor
    //--------------------------------------------------------------------------
    public:
 
-   virtual void
+   virtual bool
    setup (st::SymbolTable* symbols, log::Logger* logger);
 
    inline void
    log (log::Message* msg) {this->_logger->log(msg);}
 
-   virtual void
+   virtual bool
    tearDown();
 
    virtual bool

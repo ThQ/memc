@@ -96,8 +96,11 @@ Compiler::dumpAst ()
    {
       std::ofstream dump_file(gOptions()->getStr("ast.dump.xml").c_str());
 
-      mem::ast::dumper::XmlDumper dumper;
-      dumper.dump_to(&ast, dump_file);
+      mem::ast::visitor::XmlDumper dumper;
+      dumper.Out(&dump_file);
+      dumper.setup();
+      dumper.visit(&ast);
+      dumper.tearDown();
 
       dump_file.close();
       _logger->debug("AST dumped to %s", gOptions()->getStr("ast.dump.xml").c_str());

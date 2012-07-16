@@ -11,11 +11,6 @@ src_mem = \
 src_mem_ast = \
  src/mem/ast/util.cpp \
  src/mem/ast/util.hpp
-src_mem_ast_dumper = \
- src/mem/ast/dumper/Dumper.cpp \
- src/mem/ast/dumper/Dumper.hpp \
- src/mem/ast/dumper/XmlDumper.cpp \
- src/mem/ast/dumper/XmlDumper.hpp
 src_mem_ast_node = \
  src/mem/ast/node/BinaryExpression.cpp \
  src/mem/ast/node/BinaryExpression.hpp \
@@ -25,6 +20,7 @@ src_mem_ast_node = \
  src/mem/ast/node/Call.hpp \
  src/mem/ast/node/Class.cpp \
  src/mem/ast/node/Class.hpp \
+ src/mem/ast/node/Dumper.cpp \
  src/mem/ast/node/Field.cpp \
  src/mem/ast/node/Field.hpp \
  src/mem/ast/node/File.cpp \
@@ -55,7 +51,8 @@ src_mem_ast_node = \
  src/mem/ast/node/VarDecl.cpp \
  src/mem/ast/node/VarDecl.hpp \
  src/mem/ast/node/While.cpp \
- src/mem/ast/node/While.hpp
+ src/mem/ast/node/While.hpp \
+ src/mem/ast/node/XmlDumper.cpp
 src_mem_ast_visitor = \
  src/mem/ast/visitor/BlockTypesChecker.cpp \
  src/mem/ast/visitor/BlockTypesChecker.hpp \
@@ -188,6 +185,7 @@ memc_SOURCES = $(src) \
 		$(src_mem_st) \
 		$(src_mem_st_visitor)
 memc_LDADD = $(LLVM_LDADD)
+memc_CPPFLAGS=$(LLVM_CPPFLAGS)
 
 
 .errors-in.hpp :

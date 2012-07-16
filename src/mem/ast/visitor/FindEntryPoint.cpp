@@ -10,7 +10,7 @@ FindEntryPoint::FindEntryPoint ()
    _entry_point = NULL;
 }
 
-void
+bool
 FindEntryPoint::tearDown ()
 {
    if (_entry_point == NULL)
@@ -18,7 +18,9 @@ FindEntryPoint::tearDown ()
       log::EntryPointNotFound* err = new log::EntryPointNotFound();
       err->format();
       _logger->log(err);
+      return true;
    }
+   return false;
 }
 
 bool

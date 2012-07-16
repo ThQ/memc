@@ -16,7 +16,7 @@ class FindEntryPoint : public Visitor
    public: st::Symbol* _entry_point;
 
    public: FindEntryPoint();
-   public: virtual void tearDown ();
+   public: virtual bool tearDown ();
    public: virtual bool visit (node::Node* node);
 };
 
