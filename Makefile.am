@@ -74,6 +74,7 @@ src_mem_opt = \
  src/mem/opt/Options.cpp \
  src/mem/opt/Parser.cpp
 src_mem_st = \
+ src/mem/st/Arg.cpp \
  src/mem/st/Class.cpp \
  src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \

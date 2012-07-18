@@ -7,8 +7,11 @@ kOUT = sys.argv[2] #"./src/mem/log/errors.hpp"
 
 kINDENT = "   "
 kTYPES = ["Error", "Warning", "FatalError"]
-converters = {"int" : ["%d", "@"],
-    "std::string": ["%s", "@.c_str()"] }
+converters = {
+    "int" :           ["%d", "@"],
+    "std::string" :   ["%s", "@.c_str()"],
+    "st::Symbol*" :   ["%s", "( (@)!=NULL ? @->gQualifiedNameCstr() : \"<?>\")"]
+}
 
 
 class ErrorTypeNotFoundError (Exception):
@@ -69,7 +72,7 @@ class Err:
             if is_param:
                 if c not in string.ascii_letters:
                     buff += converters[self.params[param_name]][0] + c
-                    params += ", _" + converters[self.params[param_name]][1].replace("@", param_name)
+                    params += ", " + converters[self.params[param_name]][1].replace("@", "_" + param_name)
                     param_name = ""
                     is_param = False
                 else:

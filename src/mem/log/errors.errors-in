@@ -117,8 +117,8 @@
       "params":
       {
          "FuncName": "std::string",
-         "ExpectedRetTy": "std::string",
-         "RetTy": "std::string"
+         "ExpectedRetTy": "st::Symbol*",
+         "RetTy": "st::Symbol*"
       }
    },
    "NotAssignable":

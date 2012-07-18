@@ -3,8 +3,8 @@
 
 
 #include <vector>
+#include "mem/st/Arg.hpp"
 #include "mem/st/Type.hpp"
-#include "mem/st/Var.hpp"
 
 
 namespace mem { namespace st {
@@ -27,7 +27,7 @@ class Func: public Type
    public:
 
    bool _is_entry_point;
-   std::vector<Var*> _params;
+   std::vector<Arg*> _params;
    //Func* _overloaded_func;
    Symbol* _return_type;
 
@@ -80,7 +80,7 @@ class Func: public Type
    /**
     * Adds a function parameter given its name and type.
     */
-   st::Var*
+   st::Arg*
    addParam (std::string name, st::Type* ty);
 
    /**

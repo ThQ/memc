@@ -93,10 +93,10 @@ class Codegen : public mem::codegen::ICodegen
    _getLlvmIntTy (size_t size);
 
    inline llvm::Type*
-   _getLlvmTy (std::string st_name) {return _classes[st_name];}
+   _getLlvmTy (std::string st_name) {llvm::Type* ty= _classes[st_name];assert(ty != NULL);return ty;}
 
    llvm::Type*
-   _getLlvmTy (st::Symbol* mem_ty) {return _getLlvmTy(static_cast<st::Symbol*>(mem_ty));}
+   _getLlvmTy (st::Symbol* mem_ty) {return _getLlvmTy(static_cast<st::Type*>(mem_ty));}
 
    llvm::Type*
    _getLlvmTy (st::Type* mem_ty);

@@ -153,6 +153,9 @@ class Node
    isFuncParamsNode() const {return isKind(Kind::FUNCTION_PARAMETERS);}
 
    inline bool
+   isLastChild (Node* s) {return _last_child == s;}
+
+   inline bool
    isIdNode() const {return isKind(Kind::ID);}
 
    inline bool

@@ -653,6 +653,16 @@ math_operator:
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::OP_PLUS);
    }
+   | T_MINUS
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_MINUS);
+   }
+   | T_MUL
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_MUL);
+   }
 
 binary_operator:
    bool_operator | comp_operator | math_operator

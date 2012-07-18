@@ -60,7 +60,7 @@ XmlDumper::visit (node::Node* node)
 
       case node::Kind::FILE:
          *_out << " id=\"";
-         *_out << static_cast<node::File*>(node)->_id;
+         *_out << static_cast<node::File*>(node)->Id();
          *_out << "\"";
          break;
 

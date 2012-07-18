@@ -14,7 +14,8 @@ namespace mem { namespace st
       VAR=7,
       INSTANCE=8,
       FUNCTION_SIGNATURE=9,
-      POINTER=10
+      POINTER=10,
+      ARG=11
    } SymbolKind;
 }
 }

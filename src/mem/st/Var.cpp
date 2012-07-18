@@ -37,10 +37,4 @@ Var::gExprType ()
    return _type;
 }
 
-bool
-Var::isFuncArg ()
-{
-   return _parent != NULL && _parent->isFuncSymbol();
-}
-
 } }

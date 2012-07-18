@@ -208,7 +208,7 @@ void
 TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
    st::Func* func_sym)
 {
-   st::Var* param_sym = NULL;
+   st::Arg* param_sym = NULL;
    node::Node* param_node = NULL;
    node::Text* name_node = NULL;
    node::Text* type_node = NULL;

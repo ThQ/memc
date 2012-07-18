@@ -52,9 +52,6 @@ class Var : public Symbol
 
    virtual Symbol*
    gEvalType ();
-
-   bool
-   isFuncArg ();
 };
 
 

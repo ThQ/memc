@@ -31,10 +31,13 @@ llvm::Type*
 Codegen::_getLlvmTy (st::Type* mem_ty)
 {
    assert (mem_ty != NULL);
+   llvm::Type* ty = NULL;
+
    // Type is found
    if (_classes.find(mem_ty->gQualifiedName()) != _classes.end())
    {
-      return _classes[mem_ty->gQualifiedName()];
+      ty = _classes[mem_ty->gQualifiedName()];
+      assert(ty != NULL);
    }
    // Type is NOT found, so ?
    else
@@ -47,11 +50,12 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
          if (base_ty != NULL)
          {
             // TODO What is the second parameter (AddressSpace) ?
-             return llvm::PointerType::get(base_ty, 0);
+             ty = llvm::PointerType::get(base_ty, 0);
          }
       }
    }
-   return NULL;
+   assert(ty != NULL);
+   return ty;
 }
 
 std::vector<llvm::Type*>
@@ -97,12 +101,13 @@ Codegen::_getVoidTy ()
 void
 Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
 {
-   if (mem_ty->is(st::PRIMITIVE))
+   if (mem_ty->isPrimitiveSymbol())
    {
       // TODO This is very ugly...
       if (mem_ty == _st->_core_types.gIntTy())
       {
          _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(int));
+         assert(_classes[mem_ty->gQualifiedName()] != NULL);
       }
       else if (mem_ty == _st->_core_types.gBoolTy())
       {
@@ -213,13 +218,22 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
    switch (node->Kind())
    {
       case ast::node::Kind::OP_PLUS:
-         //val = _builder.CreateAdd(left_val, right_val);
          val = llvm::BinaryOperator::Create(llvm::Instruction::Add, left_val,
             right_val, "", _cur_bb);
          break;
 
+      case ast::node::Kind::OP_MINUS:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::Sub, left_val,
+            right_val, "", _cur_bb);
+         break;
+
+      case ast::node::Kind::OP_MUL:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::Mul, left_val,
+            right_val, "", _cur_bb);
+         break;
+
       default:
-         printf("Unsupported arithmetic operation\n");
+         DEBUG_PRINTF("Unsupported arithmetic operation : %s\n", node->KindName().c_str());
          assert (false);
    }
 
@@ -315,15 +329,16 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
    switch (n->Kind())
    {
       case ast::node::Kind::OP_EQ_EQ:
-         //comp_inst = new llvm::ICmpInst(*_cur_bb, llvm::ICmpInst::ICMP_EQ, left_val,
-           // right_val, "");
+         comp_inst = new llvm::ICmpInst(*_cur_bb, llvm::ICmpInst::ICMP_EQ, left_val,
+           right_val, "");
          break;
       default:
-         printf("Unsupported comparison operator.");
+         DEBUG_PRINTF("Unsupported comparison operator (%s)\n", n->KindName().c_str());
          assert(false);
 
    }
 
+   assert(comp_inst != NULL);
    return comp_inst;
 }
 
@@ -398,7 +413,7 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
 
       case ast::node::Kind::OP_EQ_EQ:
-         cgCompOp(static_cast<ast::node::BinaryOp*>(node));
+         res = cgCompOp(static_cast<ast::node::BinaryOp*>(node));
          break;
 
       case ast::node::Kind::IF:
@@ -419,6 +434,8 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
 
       case ast::node::Kind::OP_PLUS:
+      case ast::node::Kind::OP_MINUS:
+      case ast::node::Kind::OP_MUL:
          res = cgBinaryExpr(node);
          break;
 
@@ -435,7 +452,7 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
 
       default:
-         printf("Unsupported node type %s\n", node->KindName().c_str());
+         DEBUG_PRINTF("Unsupported node type (%s)\n", node->KindName().c_str());
          assert(false);
    }
 
@@ -446,35 +463,34 @@ llvm::Value*
 Codegen::cgExprAndLoad (ast::node::Node* node)
 {
    llvm::Value* val = cgExpr(node);
+   assert(val != NULL);
 
    bool must_load = false; //node->ExprType()->isPtrSymbol();
 
    switch (node->Kind())
    {
-
       case ast::node::Kind::AMPERSAND:
-      case ast::node::Kind::CALL:
+      //case ast::node::Kind::CALL:
       case ast::node::Kind::DOT:
          must_load = true;
          break;
 
       case ast::node::Kind::FINAL_ID:
-         // FIXME This is a quick fix, when do we actually load ?
          assert (node->hasBoundSymbol());
-         if (!node->BoundSymbol()->isVarSymbol() || !static_cast<st::Var*>(node->BoundSymbol())->isFuncArg())
+         if (node->BoundSymbol()->isVarSymbol())
          {
             must_load = true;
          }
          break;
    }
 
-   assert (val != NULL);
-
    if (must_load)
    {
       llvm::LoadInst* load_inst = new llvm::LoadInst(val, "", _cur_bb);
+      assert (load_inst != NULL);
       return load_inst;
    }
+
    return val;
 }
 
@@ -532,11 +548,13 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
 
       llvm::BasicBlock& block = func->getEntryBlock();
       _cur_bb = &block;
-
-      //_builder.SetInsertPoint(&block);
+      _cur_func = func;
 
       _stack.push();
 
+      // Set parameters
+      // We set this here instead of cgFunctionDef because we can append the
+      // parameters to the stack of the body of the function.
       st::Var* func_param = NULL;
       llvm::Argument* arg = NULL;
       for (size_t i = 0; i < func_sym->ParamCount(); ++i)
@@ -577,8 +595,20 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
       func_name = _getCodegenFuncName(func_sym);
    }
 
+   // External function
+   std::vector<llvm::Type*> params;
+   if (func_sym->Metadata()->has("external"))
+   {
+      st::Var* func_param = NULL;
+      for (size_t i = 0; i < func_sym->ParamCount(); ++i)
+      {
+         func_param = func_sym->_params[i];
+         params.push_back(_getLlvmTy(func_param->Type()));
+      }
+   }
+
    llvm::FunctionType* func_ty = llvm::FunctionType::get(
-      _getFuncReturnTy(func_node), false);
+      _getFuncReturnTy(func_node), params, false);
 
    llvm::GlobalValue::LinkageTypes func_link;
    if (func_sym->Metadata()->has("external"))
@@ -611,10 +641,15 @@ void
 Codegen::cgIfStatement (ast::node::If* node)
 {
    llvm::BasicBlock* cur_bb = _cur_bb;
+   bool if_is_last_child = node->Parent()->isLastChild(node);
 
    // After if
-   llvm::BasicBlock* after_block = llvm::BasicBlock::Create(
-      llvm::getGlobalContext(), "after_cont", _cur_func);
+   llvm::BasicBlock* after_block = NULL;
+   if (!if_is_last_child)
+   {
+      after_block = llvm::BasicBlock::Create(
+         llvm::getGlobalContext(), "after_cont", _cur_func);
+   }
 
    // TRUE block
    llvm::BasicBlock* true_block = llvm::BasicBlock::Create(
@@ -622,7 +657,10 @@ Codegen::cgIfStatement (ast::node::If* node)
    _cur_bb = true_block;
    assert(node->IfBlockNode() != NULL);
    cgBlock(static_cast<ast::node::Block*>(node->IfBlockNode()));
-   true_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
+   if (!if_is_last_child)
+   {
+      true_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
+   }
 
    // FALSE block
    llvm::BasicBlock* false_block = NULL;
@@ -632,18 +670,27 @@ Codegen::cgIfStatement (ast::node::If* node)
          "if_false", _cur_func);
       _cur_bb = false_block;
       cgBlock(static_cast<ast::node::Block*>(node->ElseBlockNode()));
-      false_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
+      if (!if_is_last_child)
+      {
+         false_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
+      }
    }
 
    // BRANCH
    assert (node->ConditionNode() != NULL);
-   llvm::Value* cond = cgExpr(node->ConditionNode());
-   llvm::LoadInst* load = new llvm::LoadInst(cond, "ifcond", false, cur_bb);
+   _cur_bb = cur_bb;
+   llvm::Value* cond = cgExprAndLoad(node->ConditionNode());
+   //llvm::LoadInst* load = new llvm::LoadInst(cond, "ifcond", false, cur_bb);
 
+   // IF/ELSE
    if (node->hasElseBlockNode())
    {
-      llvm::BranchInst* br = llvm::BranchInst::Create(true_block, false_block,
-         load, cur_bb);
+      llvm::BranchInst::Create(true_block, false_block, cond, cur_bb);
+   }
+   // Only If
+   else
+   {
+      llvm::BranchInst::Create(true_block, after_block, cond, cur_bb);
    }
 
    _cur_bb = after_block;
@@ -759,9 +806,12 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 {
    assert(node != NULL);
    assert(node->isVarDeclNode());
-   assert(node->ExprType() != NULL);
+   assert(node->hasExprType());
 
-   llvm::Value* var = new llvm::AllocaInst(_getLlvmTy(node->ExprType()), NULL,
+   llvm::Type* var_ty = _getLlvmTy(node->ExprType());
+   assert(var_ty != NULL);
+
+   llvm::Value* var = new llvm::AllocaInst(var_ty, NULL,
       node->Name(), _cur_bb);
 
    if (node->ValueNode() != NULL)

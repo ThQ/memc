@@ -109,6 +109,9 @@ class Symbol
    is (SymbolKind kind) const {return _kind == kind;};
 
    inline bool
+   isArgSymbol() const {return is(st::ARG);}
+
+   inline bool
    isClassSymbol() const {return is(st::CLASS);}
 
    inline bool

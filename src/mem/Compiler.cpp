@@ -171,9 +171,9 @@ Compiler::parse (std::string file_path)
 
       ast::node::File* file_node = new ast::node::File();
       file_node->setBoundSymbol(file_sym);
-      file_node->_id = ns;
-      file_node->_include_path = file->_include_path;
-      file_node->_path = file_path;
+      file_node->setId(ns);
+      file_node->setIncludePath(file->_include_path);
+      file_node->setPath(file_path);
       ast.pushChild(file_node);
 
       // Used by yyparse
@@ -228,11 +228,13 @@ void
 Compiler::printBuildSummary ()
 {
    std::ostringstream sum;
+
    if (_logger->FatalErrorCount() > 0)
    {
       sum << _logger->FatalErrorCount();
       sum << " fatal errors, ";
    }
+
    if (_logger->ErrorCount() > 0)
    {
       sum << _logger->ErrorCount();
@@ -245,7 +247,7 @@ Compiler::printBuildSummary ()
       sum << " warnings, ";
    }
 
-   if (this->isBuildSuccessful())
+   if (isBuildSuccessful())
    {
       _logger->info("Build SUCCESSFUL", "");
    }

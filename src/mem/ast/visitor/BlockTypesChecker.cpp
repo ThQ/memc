@@ -226,24 +226,25 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
          op_name = "plus";
          break;
 
+      case node::Kind::OP_MINUS:
+         op_name = "minus";
+         break;
+
+      case node::Kind::OP_MUL:
+         op_name = "mul";
+         break;
+
       default:
-         // FIXME Must fail properly if op is not found.
-         assert (false && "Unknown arithmetic operator.");
+         DEBUG_PRINTF("Unsupported arithmetic operator (%s)",
+            node->KindName().c_str());
+         assert (false);
 
    }
 
-   std::string op_func_name;
-   op_func_name += left_node->ExprType()->Name();
-   op_func_name += "_" + op_name + "_";
-   op_func_name += right_node->ExprType()->Name();
-
-   st::Func* op_func = static_cast<st::Func*>(
-      _symbols->gRoot()->getChild(op_func_name));
-
-   if (op_func != NULL)
+   if (op_name.size() != 0)
    {
-      // FIXME Must check parameters type
-      node->setExprType(op_func->ReturnType());
+      // FIXME Must check operand types
+      node->setExprType(node->getChild(0)->ExprType());
    }
    else
    {
@@ -390,7 +391,9 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 
    switch (node->Kind())
    {
+      case node::Kind::OP_MUL:
       case node::Kind::OP_PLUS:
+      case node::Kind::OP_MINUS:
          visitArithmeticOp(scope, node);
          break;
 
@@ -412,7 +415,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::Kind::IF:
-         visitIf(scope, util::castTo<node::If*, node::Kind::FINAL_ID>(node));
+         visitIf(scope, util::castTo<node::If*, node::Kind::IF>(node));
          break;
 
       case node::Kind::FINAL_ID:
@@ -554,6 +557,10 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
       {
          id_node->setExprType(sym);
       }
+      else if (sym->isArgSymbol())
+      {
+         id_node->setExprType(static_cast<st::Arg*>(sym)->Type());
+      }
       else if (sym->isVarSymbol())
       {
          id_node->setExprType(static_cast<st::Var*>(sym)->Type());
@@ -622,8 +629,8 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
       log::ReturnTypeDiffersFromPrototype* err = new
          log::ReturnTypeDiffersFromPrototype();
       err->sFuncName(parent_func->gQualifiedName());
-      err->sRetTy(value_node->ExprType()->gQualifiedName());
-      err->sExpectedRetTy(parent_func->ReturnType()->gQualifiedName());
+      err->sRetTy(value_node->ExprType());
+      err->sExpectedRetTy(parent_func->ReturnType());
       err->sPosition(value_node->copyPosition());
       err->format();
       log(err);

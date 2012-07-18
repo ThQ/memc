@@ -14,7 +14,7 @@ class File : public Node
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
-   public:
+   protected:
 
    std::string _id;
    std::string _include_path;
@@ -30,6 +30,22 @@ class File : public Node
     * Default constructor.
     */
    File ();
+
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   // Id
+   GETTER(Id, std::string) {return _id;}
+   SETTER(Id, std::string) {_id = val;}
+
+   // IncludePath
+   SETTER(IncludePath, std::string) {_include_path = val;}
+
+   // Path
+   SETTER(Path, std::string) {_path = val;}
 
 
    //--------------------------------------------------------------------------
