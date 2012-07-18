@@ -8,12 +8,23 @@
 * Static typing
 * Low level (in a C++ sense)
 
-# *Hello, World !*
+# Examples
+## *Hello, World !*
 
     use io
     
     main ()
         io.print("Hello, World !")
+
+## Factorial
+    fact (n :int) -> int
+        if n == 0i
+            return 1i
+        else
+            return n * fact(n - 1i)
+    
+    main (argc :int) -> int
+        return fact(10)
 
 
 # Dependencies
