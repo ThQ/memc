@@ -7,7 +7,7 @@ namespace mem {
 Compiler::Compiler ()
 {
    _logger = new log::ConsoleLogger();
-   _logger->sFormatter(new log::ConsoleFormatter());
+   _logger->setFormatter(new log::ConsoleFormatter());
 
    setUpOptions();
 
@@ -49,19 +49,20 @@ Compiler::compile (int argc, char** argv)
 
    // Need to set this before parsing command line arguments because it can
    // raise warnings
-   _logger->sLevel(log::WARNING);
+   _logger->setLevel(log::WARNING);
 
    opt::Parser opt_parser;
    opt_parser.parse(argc, argv, _logger, gOptions());
 
    if (gOptions()->isSet("log.level"))
    {
-      _logger->sLevel(gOptions()->getInt("log.level"));
+      _logger->setLevel(gOptions()->getInt("log.level"));
    }
 
    if (gOptions()->isSet("version.show"))
    {
-      std::cout << PACKAGE_NAME " version " PACKAGE_VERSION "\n";
+      std::cout << PACKAGE_NAME " version " PACKAGE_VERSION;
+      std::cout << " (" __DATE__ " " __TIME__ ")\n";
    }
 
    else if (gOptions()->isSet("help.show"))
@@ -169,7 +170,7 @@ Compiler::parse (std::string file_path)
       mem::Util::path_to_namespace(ns);
 
       ast::node::File* file_node = new ast::node::File();
-      file_node->sBoundSymbol(file_sym);
+      file_node->setBoundSymbol(file_sym);
       file_node->_id = ns;
       file_node->_include_path = file->_include_path;
       file_node->_path = file_path;
@@ -227,20 +228,20 @@ void
 Compiler::printBuildSummary ()
 {
    std::ostringstream sum;
-   if (_logger->_n_fatal_errors > 0)
+   if (_logger->FatalErrorCount() > 0)
    {
-      sum << _logger->_n_fatal_errors;
+      sum << _logger->FatalErrorCount();
       sum << " fatal errors, ";
    }
-   if (_logger->_n_errors > 0)
+   if (_logger->ErrorCount() > 0)
    {
-      sum << _logger->_n_errors;
+      sum << _logger->ErrorCount();
       sum << " errors, ";
    }
 
-   if (_logger->_n_warnings > 0)
+   if (_logger->WarningCount() > 0)
    {
-      sum << _logger->_n_warnings;
+      sum << _logger->WarningCount();
       sum << " warnings, ";
    }
 
@@ -290,7 +291,7 @@ void
 Compiler::runAstVisitors ()
 {
    for (size_t i=0;
-      i < ast_visitors.size() && _logger->_n_fatal_errors == 0; ++i)
+      i < ast_visitors.size() && _logger->FatalErrorCount() == 0; ++i)
    {
       _logger->debug("[%s] running...", ast_visitors[i]->_name.c_str());
       ast_visitors[i]->SymbolTable(&symbols);

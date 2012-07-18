@@ -6,7 +6,7 @@ namespace mem { namespace ast { namespace node {
 
 Number::Number ()
 {
-   _type = MEM_NODE_NUMBER;
+   _type = Kind::NUMBER;
    _format = ' ';
    _sval = 0;
    _ival = 0;
@@ -70,7 +70,7 @@ void
 Number::isValid (NodeValidator* v)
 {
    Node::isValid(v);
-   v->ensure(gChildCount() == 0, "Number cannot have children");
+   v->ensure(ChildCount() == 0, "Number cannot have children");
 }
 
 } } }

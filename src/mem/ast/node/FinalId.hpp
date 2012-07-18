@@ -1,16 +1,14 @@
-#ifndef _MEM__LOG__FORMATTER__HPP_
-#define _MEM__LOG__FORMATTER__HPP_
+#ifndef _MEM__AST__NODE__FINAL_ID__HPP_
+#define _MEM__AST__NODE__FINAL_ID__HPP_
 
 
-#include <string>
-#include <string.h>
-#include "mem/log/Message.hpp"
+#include "mem/ast/node/Text.hpp"
 
 
-namespace mem { namespace log {
+namespace mem { namespace ast { namespace node {
 
 
-class Formatter
+class FinalId : public Text
 {
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -18,24 +16,21 @@ class Formatter
    public:
 
    /**
-    * Destructor.
+    * Default constructor.
     */
-   virtual ~Formatter();
+   FinalId ();
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
+   // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
-   virtual std::string
-   format (Message* msg);
-
-   virtual const char*
-   format_string (const char* message);
+   virtual void
+   isValid (NodeValidator* v);
 };
 
 
-} }
+} } }
 
 #endif

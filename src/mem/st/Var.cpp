@@ -9,7 +9,7 @@ Var::Var ()
    _type = NULL;
 }
 
-Var::Var (std::string name, Type* type)
+Var::Var (std::string name, class Type* type)
 {
    _kind = VAR;
    _name.assign(name);
@@ -17,11 +17,11 @@ Var::Var (std::string name, Type* type)
 }
 
 Var*
-Var::create (std::string name, Type* ty)
+Var::create (std::string name, class Type* ty)
 {
    Var* var = new st::Var();
-   var->sName(name);
-   var->sType(ty);
+   var->setName(name);
+   var->setType(ty);
    return var;
 }
 
@@ -37,5 +37,10 @@ Var::gExprType ()
    return _type;
 }
 
+bool
+Var::isFuncArg ()
+{
+   return _parent != NULL && _parent->isFuncSymbol();
+}
 
 } }

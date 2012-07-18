@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <vector>
 #include "mem/Metadata.hpp"
+#include "mem/ss.hpp"
+#include "mem/ast/node/Kind.hpp"
 #include "mem/ast/node/NodeValidator.hpp"
 #include "mem/fs/position/Range.hpp"
-#include "mem/parser/NodeTypes.hpp"
 #include "mem/st/Class.hpp"
 
 
@@ -21,13 +22,18 @@ class Node
    //--------------------------------------------------------------------------
    public:
 
+   st::Symbol* _bound_type;
    unsigned int _child_count;
+   unsigned long _depth;
    st::Symbol* _exp_type;
    Node* _first_child;
    Node* _last_child;
    Node* _next;
+   Node* _parent;
    fs::position::Range* _position;
    Node* _prev;
+   Metadata* _md;
+   unsigned int _type;
 
 
    //--------------------------------------------------------------------------
@@ -35,80 +41,37 @@ class Node
    //--------------------------------------------------------------------------
    public:
 
-   // ----------------------
-   // PROPERTY : BoundSymbol
-   // ----------------------
-   st::Symbol*
-   _bound_type;
+   // BoundSymbol
+   GETTER(BoundSymbol, st::Symbol*) {return _bound_type;}
+   SETTER(BoundSymbol, st::Symbol*) {_bound_type = val;}
 
-   inline st::Symbol*
-   gBoundSymbol () const {return this->_bound_type;}
+   // ChildCount
+   GETTER(ChildCount, size_t) {return this->_child_count;}
 
-   inline void
-   sBoundSymbol (st::Symbol* sym) {this->_bound_type = sym;}
+   // Depth
+   void Depth (unsigned long depth);
 
-   // ---------------------
-   // PROPERTY : ChildCount
-   // ---------------------
-   size_t
-   gChildCount() {return this->_child_count;}
+   // ExprType
+   GETTER(ExprType, st::Symbol*) {return _exp_type;}
+   SETTER(ExprType, st::Symbol*) {_exp_type = val;}
 
-   // PROPERTY : Depth
-   unsigned long
-   _depth;
+   // Kind
+   GETTER(Kind, unsigned int) {return _type;}
+   SETTER(Kind, unsigned int) {_type = val;}
 
-   void
-   sDepth (unsigned long depth);
+   // KindName
+   GETTER(KindName, std::string) {return get_type_name(_type);}
 
-   // -------------------
-   // PROPERTY : ExprType
-   // -------------------
-   inline st::Type*
-   gExprType () {return static_cast<st::Type*>(this->_exp_type);}
+   // Metadata
+   GETTER(Metadata, class Metadata*) {return _md;}
+   SETTER(Metadata, class Metadata*) {_md = val;}
 
-   inline void
-   sExprType (st::Symbol* sym) {this->_exp_type = sym;};
+   // Parent
+   GETTER(Parent, Node*) {return _parent;}
 
-
-   // -----------------
-   // PROPERTY : Md
-   // -----------------
-   Metadata* _md;
-
-   inline Metadata*
-   gMd() const {return _md;}
-
-   inline bool
-   hasMd() const {return _md != NULL;}
-
-   inline void
-   sMd (Metadata* md) {_md = md;}
-
-   // -----------------
-   // PROPERTY : Parent
-   // -----------------
-   Node*
-   _parent;
-
-   inline Node*
-   gParent () const {return this->_parent;}
-
-   // -------------------
-   // PROPERTY : Position
-   // -------------------
-   inline fs::position::Range*
-   gPosition() {return this->_position;}
-
-   void
-   sPosition(fs::position::Range* pos);
-
-   // ---------------
-   // PROPERTY : Type
-   // ---------------
-   unsigned int _type;
-
-   inline unsigned int
-   gType() {return this->_type;}
+   // Position
+   GETTER(Position, fs::position::Range*) {return _position;}
+   SETTER(Position, fs::position::Range*) {_position = val;}
 
 
    //--------------------------------------------------------------------------
@@ -139,70 +102,73 @@ class Node
    public:
 
    inline fs::position::Range*
-   copyPosition() { return this->_position->copy_range();}
+   copyPosition() { return _position->copy_range();}
 
    /**
     * true if it has a symbol bound.
     */
    inline bool
-   hasBoundSymbol () const {return this->_bound_type != NULL;}
+   hasBoundSymbol () const {return _bound_type != NULL;}
 
    /**
     * true if it has an expression type.
     */
    inline bool
-   hasExprType () const {return this->_exp_type != NULL;}
+   hasExprType () const {return _exp_type != NULL;}
 
    inline bool
-   isAmpersandNode() const {return isType(MEM_NODE_AMPERSAND);}
+   hasMetadata() const {return _md != NULL;}
+
+   inline bool
+   isAmpersandNode() const {return isKind(Kind::AMPERSAND);}
 
    /**
     * true if the node is of type MEM_NODE_AND.
     */
    inline bool
-   isAndNode() const {return isType(MEM_NODE_AND);}
+   isAndNode() const {return isKind(Kind::OP_AND);}
 
    bool
    isAssignable ();
 
    inline bool
-   isBlockNode() {return isType(MEM_NODE_BLOCK);}
+   isBlockNode() {return isKind(Kind::BLOCK);}
 
    inline bool
-   isClassNode() const {return isType(MEM_NODE_CLASS);}
+   isClassNode() const {return isKind(Kind::CLASS);}
 
    inline bool
-   isDotNode() const {return isType(MEM_NODE_DOT);}
+   isDotNode() const {return isKind(Kind::DOT);}
 
    inline bool
-   isFileNode() const {return isType(MEM_NODE_FILE);}
+   isFileNode() const {return isKind(Kind::FILE);}
 
    inline bool
-   isFinalIdNode() const {return isType(MEM_NODE_FINAL_ID);}
+   isFinalIdNode() const {return isKind(Kind::FINAL_ID);}
 
    inline bool
-   isFuncNode() const {return isType(MEM_NODE_FUNCTION_DECLARATION);}
+   isFuncNode() const {return isKind(Kind::FUNCTION);}
 
    inline bool
-   isFuncParamsNode() const {return isType(MEM_NODE_FUNCTION_PARAMETERS);}
+   isFuncParamsNode() const {return isKind(Kind::FUNCTION_PARAMETERS);}
 
    inline bool
-   isIdNode() const {return isType(MEM_NODE_ID);}
+   isIdNode() const {return isKind(Kind::ID);}
 
    inline bool
-   isOrNode() const {return isType(MEM_NODE_OR);}
+   isOrNode() const {return isKind(Kind::OP_OR);}
 
    inline bool
-   isPlaceHolderNode() const {return isType(MEM_NODE_PLACE_HOLDER);}
+   isPlaceHolderNode() const {return isKind(Kind::PLACE_HOLDER);}
 
    inline bool
-   isReturnNode() const {return isType(MEM_NODE_RETURN);}
+   isReturnNode() const {return isKind(Kind::RETURN);}
 
    inline bool
-   isRootNode() const {return isType(MEM_NODE_ROOT);}
+   isRootNode() const {return isKind(Kind::ROOT);}
 
    inline bool
-   isUseNode() const {return isType(MEM_NODE_USE);}
+   isUseNode() const {return isKind(Kind::USE);}
 
    /**
     * Returns true if the node is correctly formed after all the compiler
@@ -212,7 +178,7 @@ class Node
    isValid (NodeValidator* vld);
 
    inline bool
-   isVarDeclNode() const {return isType(MEM_NODE_VARIABLE_DECLARATION);}
+   isVarDeclNode() const {return isKind(Kind::VARIABLE_DECLARATION);}
 
    void
    eat (Node* n);
@@ -227,13 +193,13 @@ class Node
     * Returns the Nth child.
     */
    Node*
-   getChild (unsigned int i);
+   getChild (unsigned int i) const;
 
    /**
     * Returns true if the node has children.
     */
    inline bool
-   hasChildren () { return this->_child_count > 0; }
+   hasChildren () { return _child_count > 0; }
 
    /**
     * Returns true if the node is of any text type.
@@ -245,7 +211,7 @@ class Node
     * Returns true if the node is of a given type.
     */
    inline bool
-   isType (unsigned int type) const { return this->_type == type; }
+   isKind (unsigned int kind) const { return _type == kind; }
 
    /**
     * Returns a vector of the node's children types.

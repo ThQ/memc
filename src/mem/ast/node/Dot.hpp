@@ -27,11 +27,11 @@ class Dot: public Node
    //--------------------------------------------------------------------------
    public:
 
-   inline node::Node*
-   LeftNode() {return getChild(0);}
+   // LeftNode
+   GETTER(LeftNode, node::Node*) {return getChild(0);}
 
-   inline node::Node*
-   RightNode() {return getChild(1);}
+   // RightNode
+   GETTER(RightNode, node::Node*) {return getChild(1);}
 
 
    //--------------------------------------------------------------------------

@@ -6,13 +6,13 @@ namespace mem { namespace ast { namespace node {
 
 Class::Class ()
 {
-   _type = MEM_NODE_CLASS;
+   _type = Kind::CLASS;
 }
 
 Text*
 Class::gParentTypeNode ()
 {
-   for (size_t i = 0 ; i < gChildCount() ; ++i)
+   for (size_t i = 0 ; i < ChildCount() ; ++i)
    {
       assert (getChild(i) != NULL);
 

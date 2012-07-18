@@ -35,7 +35,7 @@ SymbolTable::create_type (Type* type, std::string full_type_name)
    std::string ns_name;
    std::string type_name;
    mem::Util::partition_full_type_name(full_type_name, ns_name, type_name);
-   type->sName(type_name);
+   type->setName(type_name);
 
    Namespace* ns = 0;
    if (ns_name.size() == 0)
@@ -71,7 +71,7 @@ SymbolTable::create_namespace (std::string name)
          if (child_namespace == NULL)
          {
             Namespace* ns_to_create = new Namespace();
-            ns_to_create->sName(buffer, buffer_len);
+            ns_to_create->setName(std::string(buffer, buffer_len));
             ns_to_create = cur_namespace->push(ns_to_create);
             /**if (ns_to_create != 0)
             {
@@ -99,7 +99,7 @@ SymbolTable::create_namespace (std::string name)
    if (buffer_len != 0)
    {
       ns = new Namespace();
-      ns->sName((char*)buffer, buffer_len);
+      ns->setName(std::string((char*)buffer, buffer_len));
       ns = cur_namespace->push(ns);
    }
 
@@ -215,7 +215,7 @@ SymbolTable::register_function (std::string func_full_name)
    }
 
    Func* func = new Func();
-   func->sName(func_name);
+   func->setName(func_name);
 
    ns->addChild(func);
 

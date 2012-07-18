@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string>
 #include "mem/Metadata.hpp"
+#include "mem/ss.hpp"
 #include "mem/fs/position/Range.hpp"
 #include "mem/st/SymbolKind.hpp"
 
@@ -20,59 +21,48 @@ namespace mem { namespace st {
  */
 class Symbol
 {
-   public: typedef std::map<std::string, Symbol*> SymbolCollection;
-   public: typedef SymbolCollection::iterator SymbolCollectionIterator;
+   public:
+   typedef std::map<std::string, Symbol*> SymbolCollection;
+   typedef SymbolCollection::iterator SymbolCollectionIterator;
 
-   public: SymbolCollection _children;
-   public: SymbolKind _kind;
-
-
-   public: Symbol* _parent;
-   public: fs::position::Range _pos;
-   public: unsigned int _depth;
-
-   // -------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
-   // -------------------------------------------------------------------------
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
    public:
 
-   // ---------------------
-   // PROPERTY : ChildCount
-   // ---------------------
    size_t _child_count;
+   SymbolCollection _children;
+   unsigned int _depth;
+   SymbolKind _kind;
+   Metadata* _md;
+   std::string _name;
+   Symbol* _parent;
+   fs::position::Range _pos;
+   int _size;
 
-   inline size_t
-   gChildCount() const {return _children.size();}
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   // ChildCount
+   GETTER(ChildCount, size_t) {return _children.size();}
 
    virtual st::Symbol*
    gExprType ();
 
-   // --------------
-   // PROPERTY : Md
-   // -------------
-   Metadata* _md;
+   // Metadata
+   GETTER(Metadata, class Metadata*) {return _md;}
+   SETTER(Metadata, class Metadata*) {_md = val;}
 
-   inline Metadata*
-   gMd() const {return _md;}
+   // Name
+   GETTER(Name, std::string) {return _name;}
+   SETTER(Name, std::string) {_name = val;}
 
-   inline void
-   sMd (Metadata* md) {_md = md;}
-
-   // ---------------
-   // PROPERTY : Name
-   // ---------------
-   std::string _name;
-   inline std::string gName() const {return this->_name;}
-   inline const char* gNameCstr() const {return this->_name.c_str();}
-   void sName (char* name, size_t len);
-   void sName (std::string name);
-
-   // ---------------
-   // PROPERTY : Size
-   // ---------------
-   int _size;
-   inline int gSize() const {return this->_size;}
-   inline void sSize(int size) {this->_size = size;}
+   // NameCstr
+   GETTER(NameCstr, const char*) {return Name().c_str();}
+   //void sName (char* name, size_t len);
 
 
    // -------------------------------------------------------------------------

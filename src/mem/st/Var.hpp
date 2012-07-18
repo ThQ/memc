@@ -11,16 +11,17 @@ namespace mem { namespace st {
 
 class Var : public Symbol
 {
+   Type* _type;
+
    // -------------------------------------------------------------------------
    // PROPERTIES
    // -------------------------------------------------------------------------
    public:
 
    // PROPERTY : Type
-   Type* _type;
-
-   inline Type* gType() {return _type;}
-   inline void sType (Symbol* type) {this->_type = static_cast<Type*>(type);}
+   GETTER(Type, class Type*) {return _type;}
+   SETTER(Type, class Type*) {_type = val;}
+   SETTER(Type, class Symbol*) {_type = static_cast<class Type*>(val);}
 
    virtual Symbol*
    gExprType ();
@@ -38,7 +39,7 @@ class Var : public Symbol
    /**
     * Creates a Var based on its name and type.
     */
-   Var (std::string name, Type* type);
+   Var (std::string name, class Type* type);
 
 
    // -------------------------------------------------------------------------
@@ -47,10 +48,13 @@ class Var : public Symbol
    public:
 
    static Var*
-   create(std::string name, Type* ty);
+   create(std::string name, class Type* ty);
 
    virtual Symbol*
    gEvalType ();
+
+   bool
+   isFuncArg ();
 };
 
 

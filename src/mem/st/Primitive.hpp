@@ -10,7 +10,21 @@ namespace mem { namespace st {
 
 class Primitive : public Type
 {
-   public: Primitive ();
+   // -------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   // -------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Primitive ();
+
+
+   // -------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   // -------------------------------------------------------------------------
+   public:
 
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Primitive");return false;}

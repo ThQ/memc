@@ -27,26 +27,26 @@ class VarDecl : public Node
    //--------------------------------------------------------------------------
    public:
 
-   inline Text*
-   NameNode() { return static_cast<Text*>(getChild(0)); }
+   // Name
+   GETTER(Name, std::string) {return NameNode()->_value;}
 
-   inline Node*
-   TypeNode() { return getChild(1); }
+   // NameCstr
+   GETTER(NameCstr, const char*) {return Name().c_str();}
 
-   inline Node*
-   ValueNode() { return getChild(2); }
+   // NameNode
+   GETTER(NameNode, Text*) { return static_cast<Text*>(getChild(0)); }
+
+   // TypeNode
+   GETTER(TypeNode, Node*) { return getChild(1); }
+
+   // ValueNode
+   GETTER(ValueNode, Node*) { return getChild(2); }
 
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
-
-   inline std::string
-   gName() { return this->NameNode()->_value; }
-
-   inline const char*
-   gNameCstr() {return this->gName().c_str();}
 
    virtual void
    isValid (NodeValidator* v);

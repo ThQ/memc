@@ -6,7 +6,7 @@ namespace mem { namespace ast { namespace node
 
 Type::Type ()
 {
-   _type = 0;
+   _type = Kind::UNKNOWN;
 }
 
 

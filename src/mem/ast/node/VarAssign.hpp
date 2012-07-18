@@ -22,15 +22,15 @@ class VarAssign : public Node
    VarAssign ();
 
    //--------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
-   inline Text*
-   NameNode() {return static_cast<Text*>(getChild(0));}
+   // NameNode
+   GETTER(NameNode, Text*) {return static_cast<Text*>(getChild(0));}
 
-   inline Node*
-   ValueNode() {return getChild(1);}
+   // ValueNode
+   GETTER(ValueNode, Node*) {return getChild(1);}
 
 
    //--------------------------------------------------------------------------

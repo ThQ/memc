@@ -11,11 +11,11 @@ TypeChecker::ensureBoolExpr (node::Node* expr)
 bool
 TypeChecker::ensureExprType (node::Node* expr, st::Symbol* expr_type)
 {
-   if (expr->hasExprType() && expr->gExprType() != expr_type)
+   if (expr->hasExprType() && expr->ExprType() != expr_type)
    {
       // @FIXME Prints the same types, why ?
       log::SpecificTypeExpected* err = new log::SpecificTypeExpected();
-      err->sExpectedTypeName(expr->gExprType()->gQualifiedName());
+      err->sExpectedTypeName(expr->ExprType()->gQualifiedName());
       err->sTypeName(expr_type->gQualifiedName());
       err->sPosition(expr->copyPosition());
       err->format();
@@ -31,7 +31,7 @@ TypeChecker::ensureSymbolIsType (node::Node* node, st::Symbol* sym)
    if (!sym->isTypeSymbol())
    {
       log::TypeExpected* err = new log::TypeExpected();
-      err->sSymbolName(sym->gName());
+      err->sSymbolName(sym->Name());
       err->sPosition(node->copyPosition());
       err->format();
       log(err);

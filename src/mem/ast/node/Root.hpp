@@ -10,7 +10,15 @@ namespace mem { namespace ast { namespace node {
 
 class Root : public Node
 {
-   public: Root ();
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Root ();
 };
 
 

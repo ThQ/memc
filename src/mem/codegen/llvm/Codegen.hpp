@@ -8,8 +8,10 @@
 #include <llvm/Support/IRBuilder.h>
 #include <llvm/Support/raw_ostream.h>
 #include <map>
+#include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Dot.hpp"
+#include "mem/ast/node/FinalId.hpp"
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
@@ -21,6 +23,7 @@
 #include "mem/st/Func.hpp"
 #include "mem/st/Ptr.hpp"
 #include "mem/st/Util.hpp"
+#include "mem/st/Var.hpp"
 
 
 namespace mem { namespace codegen { namespace llvm_ {
@@ -93,6 +96,9 @@ class Codegen : public mem::codegen::ICodegen
    _getLlvmTy (std::string st_name) {return _classes[st_name];}
 
    llvm::Type*
+   _getLlvmTy (st::Symbol* mem_ty) {return _getLlvmTy(static_cast<st::Symbol*>(mem_ty));}
+
+   llvm::Type*
    _getLlvmTy (st::Type* mem_ty);
 
    /**
@@ -121,6 +127,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgClass (st::Class* cls_symb);
+
+   llvm::Value*
+   cgCompOp (ast::node::BinaryOp* node);
 
    llvm::Value*
    cgDotExpr (ast::node::Dot* node);

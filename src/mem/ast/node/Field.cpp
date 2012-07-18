@@ -5,7 +5,7 @@ namespace mem { namespace ast { namespace node {
 
 Field::Field ()
 {
-   _type = MEM_NODE_FIELD;
+   _type = Kind::FIELD;
 }
 
 std::string
@@ -20,7 +20,7 @@ Field::isValid (NodeValidator* v)
 {
    // Check SELF
    Node::isValid(v);
-   v->ensure(gChildCount() == 2, "Field must have exactly 2 children");
+   v->ensure(ChildCount() == 2, "Field must have exactly 2 children");
    v->ensure(hasBoundSymbol(), "Field must have a bound symbol");
    v->ensure(hasExprType(), "Field must have an expression type");
 

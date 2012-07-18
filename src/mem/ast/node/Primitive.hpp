@@ -10,7 +10,15 @@ namespace mem { namespace ast { namespace node {
 
 class Primitive : public Type
 {
-   public: Primitive ();
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Primitive ();
 };
 
 

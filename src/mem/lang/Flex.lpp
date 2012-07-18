@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <ios>
-#include "mem/parser/Bison.hpp"
+#include "mem/lang/Bison.h"
 
 int yycolumn = 0;
 

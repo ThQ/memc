@@ -26,8 +26,8 @@ class New : public Node
    //--------------------------------------------------------------------------
    public:
 
-   inline Node*
-   TypeNode () {return getChild(0);}
+   // TypeNode
+   GETTER(TypeNode, Node*) {return getChild(0);}
 
 
    //--------------------------------------------------------------------------

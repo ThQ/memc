@@ -5,7 +5,7 @@ namespace mem { namespace ast { namespace node {
 
 VarDecl::VarDecl ()
 {
-   _type = MEM_NODE_VARIABLE_DECLARATION;
+   _type = Kind::VARIABLE_DECLARATION;
 }
 
 
@@ -14,7 +14,7 @@ VarDecl::isValid (NodeValidator* v)
 {
    // Check self
    Node::isValid(v);
-   v->ensure(gChildCount() <= 3, "VarDecl must have at most 3 children");
+   v->ensure(ChildCount() <= 3, "VarDecl must have at most 3 children");
    v->ensure(hasExprType(), "VarDecl must have an expression type");
    v->ensure(hasBoundSymbol(), "VarDecl must have a bound symbol");
 

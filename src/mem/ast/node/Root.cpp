@@ -5,7 +5,7 @@ namespace mem { namespace ast { namespace node {
 
 Root::Root ()
 {
-   _type = MEM_NODE_ROOT;
+   _type = Kind::ROOT;
 }
 
 

@@ -21,7 +21,7 @@ XmlDumper::visit (node::Node* node)
 {
    *_out << "<";
 
-   *_out << node::Node::get_type_name(node->gType());
+   *_out << node->KindName();
    if (node->isText())
    {
       *_out << " text=\"";
@@ -29,36 +29,36 @@ XmlDumper::visit (node::Node* node)
       *_out << "\"";
    }
 
-   if (node->gBoundSymbol() != NULL)
+   if (node->BoundSymbol() != NULL)
    {
       *_out << " bound=\"";
-      *_out << node->gBoundSymbol()->gQualifiedName();
+      *_out << node->BoundSymbol()->gQualifiedName();
       *_out << "\"";
    }
 
-   if (node->gExprType() != NULL)
+   if (node->ExprType() != NULL)
    {
       *_out << " type=\"";
-      *_out << node->gExprType()->gQualifiedName();
+      *_out << node->ExprType()->gQualifiedName();
       *_out << "\"";
    }
 
-   if (node->gPosition() != NULL)
+   if (node->Position() != NULL)
    {
       *_out << " line=\"";
-      *_out << node->gPosition()->gLine();
+      *_out << node->Position()->gLine();
       *_out << "\"";
    }
 
-   switch (node->gType())
+   switch (node->Kind())
    {
-      case MEM_NODE_NUMBER:
+      case node::Kind::NUMBER:
          *_out << " val=\"";
          *_out << static_cast<node::Number*>(node)->getStringFromVal();
          *_out << "\"";
          break;
 
-      case MEM_NODE_FILE:
+      case node::Kind::FILE:
          *_out << " id=\"";
          *_out << static_cast<node::File*>(node)->_id;
          *_out << "\"";
@@ -71,12 +71,12 @@ XmlDumper::visit (node::Node* node)
    if (node->hasChildren())
    {
       *_out << ">\n";
-      for (size_t i = 0 ; i < node->gChildCount() ; ++i)
+      for (size_t i = 0 ; i < node->ChildCount() ; ++i)
       {
          visit(node->getChild(i));
       }
       *_out << "</";
-      *_out << node::Node::get_type_name(node->_type);
+      *_out << node->KindName();
       *_out << ">\n";
    }
    else

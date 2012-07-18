@@ -6,7 +6,7 @@ namespace mem { namespace ast { namespace node {
 
 If::If ()
 {
-   _type = MEM_NODE_IF;
+   _type = Kind::IF;
 }
 
 void
@@ -23,7 +23,7 @@ If::isValid (NodeValidator* v)
 
       if (ConditionNode()->hasExprType())
       {
-         v->ensure(ConditionNode()->gExprType()->gName() == "bool",
+         v->ensure(ConditionNode()->ExprType()->Name() == "bool",
             "If : condition node must have bool type");
       }
    }

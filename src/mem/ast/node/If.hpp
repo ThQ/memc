@@ -36,14 +36,14 @@ class If: public Node
    //--------------------------------------------------------------------------
    public:
 
-   inline node::Node*
-   ConditionNode () {return getChild(0);}
+   // ConditionNode
+   GETTER(ConditionNode, node::Node*) {return getChild(0);}
 
-   inline node::Node*
-   IfBlockNode () {return static_cast<Block*>(getChild(1));}
+   // IfBlockNode
+   GETTER(IfBlockNode, node::Node*) {return static_cast<Block*>(getChild(1));}
 
-   inline node::Block*
-   ElseBlockNode () {return static_cast<Block*>(getChild(2));}
+   // ElseBlockNode
+   GETTER(ElseBlockNode, node::Node*) {return static_cast<Block*>(getChild(2));}
 
 
    //--------------------------------------------------------------------------

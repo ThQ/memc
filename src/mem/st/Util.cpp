@@ -17,7 +17,7 @@ Util::createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
       if (existing_ns == NULL)
       {
          cur_ns = new st::Namespace();
-         cur_ns->sName(ns_name_parts[i]);
+         cur_ns->setName(ns_name_parts[i]);
          cur_scope->addChild(cur_ns);
       }
       else
@@ -220,8 +220,8 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
          {
             // Create the pointer type
             Ptr* ptr_symb = new Ptr();
-            ptr_symb->sName(cur_ptr_name);
-            ptr_symb->sBaseType(cur_sym);
+            ptr_symb->setName(cur_ptr_name);
+            ptr_symb->setBaseType(cur_sym);
 
             // Add the pointer at the same level as the base type
             cur_sym->_parent->addChild(ptr_symb);
@@ -247,7 +247,7 @@ void
 Util::setupBool (SymbolTable& st, CoreTypes& core_types)
 {
    core_types._bool = new st::Primitive();
-   core_types._bool->sName("bool");
+   core_types._bool->setName("bool");
    Util::registerType(&st, st.gRoot(), core_types._bool);
 
    st.gRoot()->addChild(new st::Var("true", core_types._bool));
@@ -259,41 +259,41 @@ Util::setupInts (SymbolTable& st, CoreTypes& core_types)
 {
    // Type : char
    core_types._char = new st::Primitive();
-   core_types._char->sName("char");
+   core_types._char->setName("char");
    Util::registerType(&st, st.gRoot(), core_types._char);
 
    // Type : short
    core_types._short = new st::Primitive();
-   core_types._short->sName("short");
+   core_types._short->setName("short");
    Util::registerType(&st, st.gRoot(), core_types._short);
 
    // Function : short_add_short
    st::Func* func_s_add_s = new st::Func();
-   func_s_add_s->sName("short_plus_short");
+   func_s_add_s->setName("short_plus_short");
    func_s_add_s->addParam("base_short", core_types._short);
    func_s_add_s->addParam("short_to_add", core_types._short);
-   func_s_add_s->sReturnType(core_types._short);
+   func_s_add_s->setReturnType(core_types._short);
    st.gRoot()->addChild(func_s_add_s);
 
    // Type : int
    core_types._int = new st::Primitive();
-   core_types._int->sName("int");
+   core_types._int->setName("int");
    Util::registerType(&st, st.gRoot(), core_types._int);
 
    // Function : int_add_int
    st::Func* func_i_add_i = new st::Func();
-   func_i_add_i->sName("int_plus_int");
+   func_i_add_i->setName("int_plus_int");
    func_i_add_i->addParam("base_int", core_types._int);
    func_i_add_i->addParam("int_to_add", core_types._int);
-   func_i_add_i->sReturnType(core_types._int);
+   func_i_add_i->setReturnType(core_types._int);
    st.gRoot()->addChild(func_i_add_i);
 
    // Function : int_add_short
    st::Func* func_i_add_s = new st::Func();
-   func_i_add_s->sName("int_plus_short");
+   func_i_add_s->setName("int_plus_short");
    func_i_add_s->addParam("base_int", core_types._int);
    func_i_add_s->addParam("short_to_add", core_types._short);
-   func_i_add_s->sReturnType(core_types._int);
+   func_i_add_s->setReturnType(core_types._int);
    st.gRoot()->addChild(func_i_add_s);
 }
 
@@ -301,7 +301,7 @@ void
 Util::setupVoid (SymbolTable& st, CoreTypes& core_types)
 {
    core_types._void = new st::Primitive();
-   core_types._void->sName("void");
+   core_types._void->setName("void");
    Util::registerType(&st, st.gRoot(), core_types._void);
 
    st.gRoot()->addChild(new st::Var("null", core_types._void));

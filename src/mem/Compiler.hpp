@@ -24,7 +24,7 @@
 #include "mem/codegen/llvm/Codegen.hpp"
 #include "mem/fs/File.hpp"
 #include "mem/fs/FileManager.hpp"
-#include "mem/lang/Bison.hpp"
+#include "mem/lang/Bison.h"
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
 #include "mem/opt/Options.hpp"
@@ -58,6 +58,7 @@ class Compiler
    std::vector<st::visitor::Visitor*> st_visitors;
    fs::FileManager fm;
    log::ConsoleLogger* _logger;
+   opt::Options _opts;
    std::queue<std::string> _parse_queue;
    st::SymbolTable symbols;
 
@@ -66,8 +67,7 @@ class Compiler
    // PROPERTIES
    //--------------------------------------------------------------------------
 
-   public: opt::Options _opts;
-   public: opt::Options* gOptions () {return &_opts;}
+   public: opt::Options* gOptions() {return &_opts;}
 
 
    //--------------------------------------------------------------------------
@@ -84,6 +84,7 @@ class Compiler
     * Destructor.
     */
    ~Compiler();
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -114,14 +115,17 @@ class Compiler
    void
    dumpSt ();
 
+   /**
+    * Emit code depending on what the user requested.
+    */
    void
    emitCode ();
 
    /**
-    * Return true if no warning nor fatal errors have been emitted.
+    * Return true if no warnings nor fatal errors have been emitted.
     */
    bool
-   isBuildSuccessful () const {return _logger->_n_warnings == 0 && _logger->_n_fatal_errors ==0;}
+   isBuildSuccessful () const {return _logger->WarningCount() == 0 && _logger->FatalErrorCount() ==0;}
 
    /**
     * Parse a file given its path.

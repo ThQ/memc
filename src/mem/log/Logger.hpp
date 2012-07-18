@@ -7,26 +7,41 @@
 #include "mem/log/Formatter.hpp"
 #include "mem/log/Message.hpp"
 #include "mem/log/MessageLevel.hpp"
-
+#include "mem/ss.hpp"
 
 namespace mem { namespace log {
 
 
 class Logger
 {
-   public: int _n_errors;
-   public: int _n_warnings;
-   public: int _n_fatal_errors;
+   protected:
+
+   Formatter* _formatter;
+   int _level;
+   int _n_errors;
+   int _n_warnings;
+   int _n_fatal_errors;
 
 
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
-   public: int _level;
-   public: inline void sLevel (int lvl) {_level = lvl;}
+   public:
 
-   public: Formatter* _formatter;
-   public: inline void sFormatter (Formatter* fmt) {_formatter = fmt;}
+   // ErrorCount
+   GETTER(ErrorCount, int) {return _n_errors;}
+
+   // FatalErrorCount
+   GETTER(FatalErrorCount, int) {return _n_fatal_errors;}
+
+   // Formatter
+   SETTER(Formatter, Formatter*) {_formatter = val;}
+
+   // Level
+   SETTER(Level, int) {_level = val;}
+
+   // WarningCount
+   GETTER(WarningCount, int) {return _n_warnings;}
 
 
    //--------------------------------------------------------------------------
@@ -49,22 +64,49 @@ class Logger
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
-   public: void error (const char* message);
-   public: void error (const char* format, ...);
-   public: void fatalError (const char* message);
-   public: void fatalError (const char* format, ...);
-   public: void log (Message* msg);
-   public: void log (MessageLevel level, const char* message);
-   public: void log (MessageLevel level, const char* format, va_list arg);
-   public: void info (const char* message);
-   public: void info (const char* format, ...);
-   public: void debug (const char* message);
-   public: void debug (const char* format, ...);
-   public: void warning (const char* message);
-   public: void warning (const char* format, ...);
+   public:
 
-   //protected: void _printf(const char* message, ...);
-   protected: virtual void write (std::string str){}
+   void
+   error (const char* message);
+
+   void
+   error (const char* format, ...);
+
+   void
+   fatalError (const char* message);
+
+   void
+   fatalError (const char* format, ...);
+
+   void
+   log (Message* msg);
+
+   void
+   log (MessageLevel level, const char* message);
+
+   void
+   log (MessageLevel level, const char* format, va_list arg);
+
+   void
+   info (const char* message);
+
+   void
+   info (const char* format, ...);
+
+   void
+   debug (const char* message);
+
+   void
+   debug (const char* format, ...);
+
+   void
+   warning (const char* message);
+
+   void
+   warning (const char* format, ...);
+
+   virtual void
+   write (std::string str){}
 };
 
 

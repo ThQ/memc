@@ -12,7 +12,7 @@ Prechecker::Prechecker ()
 bool
 Prechecker::visit (node::Node* node)
 {
-   if (node->gPosition() == NULL && node->isRootNode() && node->isFileNode())
+   if (node->Position() == NULL && node->isRootNode() && node->isFileNode())
    {
       log::Message* warn = new log::Warning();
       warn->formatMessage("Node (%s) has no position.",
@@ -20,15 +20,14 @@ Prechecker::visit (node::Node* node)
       _logger->log(warn);
    }
 
-   if (node->gType() == 0)
+   if (node->Kind() == node::Kind::UNKNOWN)
    {
       _logger->warning("Node has an unknown type", "");
    }
 
-   if (!node->isRootNode() && node->gParent() == NULL)
+   if (!node->isRootNode() && node->Parent() == NULL)
    {
-      _logger->warning("Node(%s) has no parent",
-         node::Node::get_type_name(node->gType()));
+      _logger->warning("Node(%s) has no parent",node->KindName().c_str());
    }
    return true;
 }

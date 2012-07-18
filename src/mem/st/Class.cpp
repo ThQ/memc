@@ -73,14 +73,14 @@ Class::isDependingOn (Class* other_cls)
          if ((*i).second->isVarSymbol())
          {
             cls_field = static_cast<st::Var*>(i->second);
-            if (cls_field->gType()->isClassSymbol())
+            if (cls_field->Type()->isClassSymbol())
             {
-               if (cls_field->gType() == other_cls)
+               if (cls_field->Type() == other_cls)
                {
                   return true;
                }
                else if (static_cast<st::Class*>(
-                  cls_field->gType())->isDependingOn(other_cls))
+                  cls_field->Type())->isDependingOn(other_cls))
                {
                   return true;
                }

@@ -27,11 +27,11 @@ class Field : public Text
    //--------------------------------------------------------------------------
    public:
 
-   node::Node*
-   NameNode () {return getChild(0);}
+   // NameNode
+   GETTER(NameNode, node::Node*) {return getChild(0);}
 
-   node::Node*
-   ValueNode () {return getChild(1);}
+   // ValueNode
+   GETTER(ValueNode, node::Node*) {return getChild(1);}
 
 
    //--------------------------------------------------------------------------

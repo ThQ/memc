@@ -33,8 +33,6 @@ class Text: public Node
     * Default constructor.
     */
    Text ();
-
-   Text (unsigned int type);
 };
 
 

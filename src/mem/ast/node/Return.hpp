@@ -1,15 +1,14 @@
-#ifndef _MEM__AST__NODE__CALL__HPP_
-#define _MEM__AST__NODE__CALL__HPP_
+#ifndef _MEM__AST__NODE__RETURN__HPP_
+#define _MEM__AST__NODE__RETURN__HPP_
 
 
-#include <string>
 #include "mem/ast/node/Node.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class Call : public Node
+class Return : public Node
 {
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -19,7 +18,7 @@ class Call : public Node
    /**
     * Default constructor.
     */
-   Call ();
+   Return ();
 
 
    //--------------------------------------------------------------------------
@@ -27,11 +26,8 @@ class Call : public Node
    //--------------------------------------------------------------------------
    public:
 
-   // CallerNode
-   GETTER(CallerNode, Node*) {return getChild(0);}
-
-   // ParamsNode
-   GETTER(ParamsNode, Node*) {return getChild(1);}
+   // ValueNode
+   GETTER(ValueNode, Node*) {return getChild(0);}
 
 
    //--------------------------------------------------------------------------
@@ -39,15 +35,11 @@ class Call : public Node
    //--------------------------------------------------------------------------
    public:
 
-   bool
-   hasParamsNode() {return ChildCount()==2;}
-
    virtual void
-   isValid(NodeValidator* vld);
+   isValid (NodeValidator* v);
 };
 
 
 } } }
-
 
 #endif

@@ -1,16 +1,16 @@
-#include "mem/ast/node/Dot.hpp"
+#include "mem/ast/node/BinaryOp.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-Dot::Dot ()
+BinaryOp::BinaryOp ()
 {
-   _type = Kind::DOT;
+   _type = Kind::UNKNOWN;
 }
 
 void
-Dot::isValid (NodeValidator* v)
+BinaryOp::isValid (NodeValidator* v)
 {
    Node::isValid(v);
 

@@ -63,7 +63,7 @@ XmlDumper::visitChildren (st::Symbol* sym)
 bool
 XmlDumper::visitClass (st::Class* cls_sym)
 {
-   *_out << "<Class name=\"" + cls_sym->gName() + "\"";
+   *_out << "<Class name=\"" + cls_sym->Name() + "\"";
    if (cls_sym->_parent_type != NULL)
    {
       *_out << " parent_type=\"" + cls_sym->_parent_type->gQualifiedName() + "\"";
@@ -78,10 +78,10 @@ XmlDumper::visitClass (st::Class* cls_sym)
 bool
 XmlDumper::visitField (st::Field* s)
 {
-   *_out << "<Field name=\"" + s->gName() + "\"";
-   if (s->_type != NULL)
+   *_out << "<Field name=\"" + s->Name() + "\"";
+   if (s->Type() != NULL)
    {
-      *_out << " type=\"" + s->_type->gQualifiedName() + "\"";
+      *_out << " type=\"" + s->Type()->gQualifiedName() + "\"";
    }
    *_out << " />\n";
 
@@ -91,14 +91,10 @@ XmlDumper::visitField (st::Field* s)
 bool
 XmlDumper::visitFunction (st::Func* func_sym)
 {
-   *_out << "<Function name=\"" + func_sym->gName() + "\"";
-   if (func_sym->gOverloadedFunc() != NULL)
+   *_out << "<Function name=\"" + func_sym->Name() + "\"";
+   if (func_sym->ReturnType() != NULL)
    {
-      *_out << " overload=\"" + func_sym->gOverloadedFunc()->gQualifiedName() + "\"";
-   }
-   if (func_sym->gReturnType() != NULL)
-   {
-      *_out << " return-type=\"" + func_sym->gReturnType()->gQualifiedName() + "\"";
+      *_out << " return-type=\"" + func_sym->ReturnType()->gQualifiedName() + "\"";
    }
    *_out << ">\n";
    visitChildren(func_sym);
@@ -120,10 +116,10 @@ XmlDumper::visitNamespace (st::Namespace* ns_sym)
 bool
 XmlDumper::visitPointer (st::Ptr* s)
 {
-   *_out << "<PointerType name=\"" + s->gName() + "\"";
-   if (s->gBaseType() != NULL)
+   *_out << "<PointerType name=\"" + s->Name() + "\"";
+   if (s->BaseType() != NULL)
    {
-      *_out << " base-type=\"" + s->gBaseType()->gQualifiedName() + "\"";
+      *_out << " base-type=\"" + s->BaseType()->gQualifiedName() + "\"";
    }
    *_out << " />\n";
 
@@ -133,7 +129,7 @@ XmlDumper::visitPointer (st::Ptr* s)
 bool
 XmlDumper::visitPrimitive (st::Primitive* s)
 {
-   *_out << "<Primitive name=\"" + s->gName() + "\"";
+   *_out << "<Primitive name=\"" + s->Name() + "\"";
    if (s->_parent_type != NULL)
    {
       *_out << " parent_type=\"" + s->_parent_type->gQualifiedName() + "\"";
@@ -146,10 +142,10 @@ XmlDumper::visitPrimitive (st::Primitive* s)
 bool
 XmlDumper::visitVar (st::Var* var_sym)
 {
-   *_out << "<Variable name=\"" + var_sym->gName() + "\"";
-   if (var_sym->_type != NULL)
+   *_out << "<Variable name=\"" + var_sym->Name() + "\"";
+   if (var_sym->Type() != NULL)
    {
-      *_out << " type=\"" + var_sym->_type->gQualifiedName() + "\"";
+      *_out << " type=\"" + var_sym->Type()->gQualifiedName() + "\"";
    }
    *_out << " />\n";
 
@@ -159,7 +155,7 @@ XmlDumper::visitVar (st::Var* var_sym)
 bool
 XmlDumper::visitUnknown (st::Symbol* sym)
 {
-   *_out << "<Unknown name=\"" + sym->gName() + "\">\n";
+   *_out << "<Unknown name=\"" + sym->Name() + "\">\n";
    visitChildren(sym);
    *_out << "</Unknown>";
 

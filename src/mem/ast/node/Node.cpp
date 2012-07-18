@@ -17,7 +17,7 @@ Node::Node ()
    _parent = NULL;
    _position = NULL;
    _prev = 0;
-   _type = 0;
+   _type = Kind::UNKNOWN;
 }
 
 Node::Node (unsigned int type)
@@ -79,7 +79,7 @@ Node::eat (Node* n)
 }
 
 Node*
-Node::getChild (unsigned int i)
+Node::getChild (unsigned int i) const
 {
    Node* res = _first_child;
    for(unsigned int j = 0; j < i && res != NULL; ++j)
@@ -92,17 +92,17 @@ Node::getChild (unsigned int i)
 const char*
 Node::get_type_name (unsigned int type)
 {
-    return mem::parser::node_names[type];
+    return kKIND_NAMES[type];
 }
 
 bool
 Node::isAssignable ()
 {
-   switch (_type)
+   switch (Kind())
    {
-      case MEM_NODE_FINAL_ID:
-      case MEM_NODE_DOT:
-      case MEM_NODE_AMPERSAND:
+      case Kind::FINAL_ID:
+      case Kind::DOT:
+      case Kind::AMPERSAND:
          return true;
    }
    return false;
@@ -111,13 +111,13 @@ Node::isAssignable ()
 bool
 Node::isText ()
 {
-   switch (_type)
+   switch (Kind())
    {
-      case MEM_NODE_TEXT:
-      case MEM_NODE_FUNCTION:
-      case MEM_NODE_CLASS:
-      case MEM_NODE_ID:
-      case MEM_NODE_FINAL_ID:
+      case Kind::TEXT:
+      case Kind::FUNCTION:
+      case Kind::CLASS:
+      case Kind::ID:
+      case Kind::FINAL_ID:
          return true;
    }
    return false;
@@ -126,17 +126,17 @@ Node::isText ()
 void
 Node::isValid (NodeValidator* v)
 {
-   v->ensure(gParent() != this, "Node cannot have itself as parent");
+   v->ensure(Parent() != this, "Node cannot have itself as parent");
 }
 
 std::vector<st::Symbol*>
 Node::packChildrenExprTypes ()
 {
    std::vector<st::Symbol*> expr_types;
-   for (size_t i = 0 ; i < gChildCount() ; ++i)
+   for (size_t i = 0 ; i < ChildCount() ; ++i)
    {
-      assert(getChild(i)->gExprType() != NULL);
-      expr_types.push_back(getChild(i)->gExprType());
+      assert(getChild(i)->ExprType() != NULL);
+      expr_types.push_back(getChild(i)->ExprType());
    }
    return expr_types;
 }
@@ -157,28 +157,21 @@ Node::pushChild (Node* n)
       n->_parent = this;
       n->_prev = _last_child;
       _last_child = n;
-      n->sDepth(_depth + 1);
+      n->Depth(_depth + 1);
       ++_child_count;
    }
 }
 
 void
-Node::sDepth (unsigned long depth)
+Node::Depth (unsigned long depth)
 {
    _depth = depth;
    Node* node = _first_child;
    while (node != NULL)
    {
-      node->sDepth(depth + 1);
+      node->Depth(depth + 1);
       node = node->_next;
    }
-}
-
-void
-Node::sPosition (fs::position::Range* pos)
-{
-   assert(pos != NULL);
-   _position = pos;
 }
 
 bool

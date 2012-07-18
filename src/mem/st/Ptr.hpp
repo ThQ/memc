@@ -13,16 +13,23 @@ namespace mem { namespace st {
  */
 class Ptr : public Type
 {
+   // -------------------------------------------------------------------------
+   // FIELDS
+   // -------------------------------------------------------------------------
    public:
 
-   int _ptr_level;
    Type* _base_type;
+   int _ptr_level;
 
-   inline Type*
-   gBaseType() {return _base_type;}
 
-   inline void
-   sBaseType (Type* base_type) {_base_type = base_type;}
+   // -------------------------------------------------------------------------
+   // PROPERTIES
+   // -------------------------------------------------------------------------
+   public:
+
+   // BaseType
+   GETTER(BaseType, Type*) {return _base_type;}
+   SETTER(BaseType, Type*) {_base_type = val;}
 
 
    // -------------------------------------------------------------------------
@@ -40,6 +47,7 @@ class Ptr : public Type
     */
    virtual
    ~Ptr ();
+
 
    // -------------------------------------------------------------------------
    // PUBLIC FUNCTIONS

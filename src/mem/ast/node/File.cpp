@@ -6,7 +6,7 @@ namespace mem { namespace ast { namespace node {
 
 File::File ()
 {
-   _type = MEM_NODE_FILE;
+   _type = Kind::FILE;
 }
 
 void
@@ -15,7 +15,7 @@ File::isValid (NodeValidator* v)
    Node::isValid(v);
 
    Node* child = NULL;
-   for (size_t i = 0 ; i < gChildCount(); ++i)
+   for (size_t i = 0 ; i < ChildCount(); ++i)
    {
       child = getChild(i);
 

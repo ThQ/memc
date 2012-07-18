@@ -30,12 +30,12 @@ FindClasses::visitClassDecl (node::Class* cls_node)
 
    node::File* file_node = util::getFileNode(cls_node);
    assert(file_node != NULL);
-   st::Namespace* file_sym = static_cast<st::Namespace*>(file_node->gBoundSymbol());
+   st::Namespace* file_sym = static_cast<st::Namespace*>(file_node->BoundSymbol());
    assert(file_sym != NULL);
 
    st::Class* cls = new st::Class();
-   cls->sName(cls_node->gValue());
-   cls_node->sBoundSymbol(cls);
+   cls->setName(cls_node->gValue());
+   cls_node->setBoundSymbol(cls);
 
    st::Util::registerType(_symbols, file_sym, cls);
 }

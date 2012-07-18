@@ -1,15 +1,15 @@
-#ifndef _MEM__AST__NODE__CALL__HPP_
-#define _MEM__AST__NODE__CALL__HPP_
+#ifndef _MEM__AST__NODE__COMP_OP__HPP_
+#define _MEM__AST__NODE__COMP_OP__HPP_
 
 
-#include <string>
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/Block.hpp"
+#include "mem/ast/node/Text.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class Call : public Node
+class BinaryOp: public Text // FIXME Inherit from Text so as to please bison
 {
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -19,7 +19,7 @@ class Call : public Node
    /**
     * Default constructor.
     */
-   Call ();
+   BinaryOp();
 
 
    //--------------------------------------------------------------------------
@@ -27,11 +27,11 @@ class Call : public Node
    //--------------------------------------------------------------------------
    public:
 
-   // CallerNode
-   GETTER(CallerNode, Node*) {return getChild(0);}
+   inline node::Node*
+   LeftNode() {return getChild(0);}
 
-   // ParamsNode
-   GETTER(ParamsNode, Node*) {return getChild(1);}
+   inline node::Node*
+   RightNode() {return getChild(1);}
 
 
    //--------------------------------------------------------------------------
@@ -39,15 +39,10 @@ class Call : public Node
    //--------------------------------------------------------------------------
    public:
 
-   bool
-   hasParamsNode() {return ChildCount()==2;}
-
    virtual void
-   isValid(NodeValidator* vld);
+   isValid (NodeValidator* v);
 };
 
-
 } } }
-
 
 #endif

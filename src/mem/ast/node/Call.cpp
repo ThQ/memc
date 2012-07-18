@@ -4,7 +4,7 @@ namespace mem { namespace ast { namespace node {
 
 Call::Call ()
 {
-   _type = MEM_NODE_CALL;
+   _type = Kind::CALL;
 }
 
 void
@@ -12,7 +12,7 @@ Call::isValid (NodeValidator* v)
 {
    // Check SELF
    Node::isValid(v);
-   v->ensure(gChildCount() <= 2, "Call cannot have more than 2 children");
+   v->ensure(ChildCount() <= 2, "Call cannot have more than 2 children");
    v->ensure(hasExprType(), "Call must have an expression type");
 
    // Check CALLER node

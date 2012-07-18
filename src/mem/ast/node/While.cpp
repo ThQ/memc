@@ -6,14 +6,14 @@ namespace mem { namespace ast { namespace node {
 
 While::While ()
 {
-   _type = MEM_NODE_WHILE;
+   _type = Kind::WHILE;
 }
 
 void
 While::isValid (NodeValidator* v)
 {
    Node::isValid(v);
-   v->ensure(gChildCount() == 2, "While must have exactly 2 children");
+   v->ensure(ChildCount() == 2, "While must have exactly 2 children");
 }
 
 

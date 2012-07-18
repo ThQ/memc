@@ -5,13 +5,7 @@ namespace mem { namespace ast { namespace node {
 
 Text::Text ()
 {
-   _type = MEM_NODE_TEXT;
-   _value.assign("");
-}
-
-Text::Text (unsigned int type)
-{
-   _type = type;
+   _type = Kind::TEXT;
    _value.assign("");
 }
 

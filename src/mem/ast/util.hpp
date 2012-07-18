@@ -5,15 +5,21 @@
 #include <string>
 
 
+#include "mem/ast/node/Class.hpp"
+#include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/While.hpp"
 #include "mem/st/Class.hpp"
 #include "mem/st/Func.hpp"
 
 
 namespace mem { namespace ast { namespace util {
 
+template<class T, unsigned int NodeKind>
+T
+castTo (node::Node* n){assert(n->isKind(NodeKind));return static_cast<T>(n);}
 
 node::File*
 getFileNode (node::Node* cur_node);

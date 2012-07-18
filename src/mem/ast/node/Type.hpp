@@ -10,7 +10,15 @@ namespace mem { namespace ast { namespace node {
 
 class Type : public Text
 {
-   public: Type ();
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Type ();
 };
 
 

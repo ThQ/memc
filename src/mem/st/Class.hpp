@@ -32,19 +32,22 @@ class Class : public Type
 
 
    // -------------------------------------------------------------------------
+   // PROPERTIES
+   // -------------------------------------------------------------------------
+
+   /**
+    * Returns the parent class in the type hierarchy.
+    */
+   GETTER(ParentClass, st::Class*) { return static_cast<st::Class*>(_parent);}
+
+
+   // -------------------------------------------------------------------------
    // PUBLIC METHODS
    // -------------------------------------------------------------------------
    public:
 
    bool
    addChild (st::Symbol* sym);
-
-   /**
-    * Returns the parent class in the type hierarchy.
-    */
-   Class*
-   gParentClass () const { return static_cast<Class*>(this->_parent);}
-
 
    std::vector<st::Field*>
    getOrderedFields();

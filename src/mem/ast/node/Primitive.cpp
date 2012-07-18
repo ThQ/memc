@@ -5,7 +5,7 @@ namespace mem { namespace ast { namespace node {
 
 Primitive::Primitive ()
 {
-   this->_type = MEM_NODE_PRIMITIVE;
+   _type = Kind::PRIMITIVE;
 }
 
 

@@ -1,3 +1,5 @@
+/src/mem/ast/node/Kind.hpp
+/src/mem/ast/node/Kind.cpp
 /src/mem/lang/Bison.h
 build/
 libs/*

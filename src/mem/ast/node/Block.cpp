@@ -5,7 +5,7 @@ namespace mem { namespace ast { namespace node {
 
 Block::Block ()
 {
-   _type = MEM_NODE_BLOCK;
+   _type = Kind::BLOCK;
 }
 
 

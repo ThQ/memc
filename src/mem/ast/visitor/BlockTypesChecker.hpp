@@ -5,14 +5,17 @@
 #include <map>
 #include <stdlib.h>
 #include <vector>
+#include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/File.hpp"
+#include "mem/ast/node/FinalId.hpp"
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
+#include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
@@ -82,6 +85,9 @@ class BlockTypesChecker : public TypeChecker
    visitBinaryExpr (st::Symbol* scope, node::Node* expr_node);
 
    void
+   visitCompOp (st::Symbol* scope, node::BinaryOp* n);
+
+   void
    visitLogicalExpr (st::Symbol* scope, node::Node* expr_node);
 
    /**
@@ -106,7 +112,7 @@ class BlockTypesChecker : public TypeChecker
    visitExprList (st::Symbol* scope, node::Node* node);
 
    void
-   visitFinalId (st::Symbol* scope, node::Text* node);
+   visitFinalId (st::Symbol* scope, node::FinalId* node);
 
    void
    visitIf (st::Symbol* scope, node::If* node);
@@ -115,7 +121,7 @@ class BlockTypesChecker : public TypeChecker
    visitNew (st::Symbol* scope, node::New* node);
 
    void
-   visitReturn (st::Symbol* scope, node::Node* ret);
+   visitReturn (st::Symbol* scope, node::Return* ret);
 
    void
    visitVarLiteralNumber (st::Type*, node::Text* literal_nb);

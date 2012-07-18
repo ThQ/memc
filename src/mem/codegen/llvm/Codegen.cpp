@@ -9,9 +9,9 @@ Codegen::_getCodegenFuncName (st::Func* func)
 {
    std::string name = "";
 
-   if (func->gMd()->has("external"))
+   if (func->Metadata()->has("external"))
    {
-      name = func->gName();
+      name = func->Name();
    }
    else
    {
@@ -43,7 +43,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
       if (mem_ty->isPtrSymbol())
       {
          llvm::Type* base_ty = _getLlvmTy(
-            static_cast<mem::st::Ptr*>(mem_ty)->gBaseType());
+            static_cast<mem::st::Ptr*>(mem_ty)->BaseType());
          if (base_ty != NULL)
          {
             // TODO What is the second parameter (AddressSpace) ?
@@ -60,9 +60,9 @@ Codegen::_getFuncParamsTy (st::Func* func)
    std::vector<llvm::Type*> params_ty;
    llvm::Type* cur_ty = NULL;
 
-   for (size_t i = 0; i < func->gParamCount(); ++i)
+   for (size_t i = 0; i < func->ParamCount(); ++i)
    {
-      cur_ty = _getLlvmTy(func->getParam(i)->gType());
+      cur_ty = _getLlvmTy(func->getParam(i)->Type());
       assert (cur_ty != NULL);
       params_ty.push_back(cur_ty);
    }
@@ -77,7 +77,7 @@ Codegen::_getFuncReturnTy (ast::node::Func* func)
 
    if (func->ReturnTypeNode() != NULL)
    {
-      ty = _classes[func->gExprType()->gQualifiedName()];
+      ty = _classes[func->ExprType()->gQualifiedName()];
    }
    else
    {
@@ -165,13 +165,13 @@ Codegen::gen (ast::node::Node* root)
    cgMemoryFunctions();
 
    // ... then codegen functions by traversing files
-   for (size_t i = 0; i < root->gChildCount(); ++i)
+   for (size_t i = 0; i < root->ChildCount(); ++i)
    {
       cgFile(static_cast<ast::node::File*>(root->getChild(i)), true);
    }
 
    // ... then codegen functions by traversing files
-   for (size_t i = 0; i < root->gChildCount(); ++i)
+   for (size_t i = 0; i < root->ChildCount(); ++i)
    {
       cgFile(static_cast<ast::node::File*>(root->getChild(i)), false);
    }
@@ -210,9 +210,9 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
    llvm::Value* left_val = cgExprAndLoad(node->getChild(0));
    llvm::Value* right_val = cgExprAndLoad(node->getChild(1));
 
-   switch (node->gType())
+   switch (node->Kind())
    {
-      case MEM_NODE_PLUS:
+      case ast::node::Kind::OP_PLUS:
          //val = _builder.CreateAdd(left_val, right_val);
          val = llvm::BinaryOperator::Create(llvm::Instruction::Add, left_val,
             right_val, "", _cur_bb);
@@ -230,6 +230,7 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
 void
 Codegen::cgBlock (ast::node::Block* block)
 {
+   assert (block != NULL);
    _stack.push();
 
    ast::node::Node* cur_node = block->_first_child;
@@ -246,7 +247,7 @@ llvm::Value*
 Codegen::cgCallExpr (ast::node::Call* node)
 {
    st::Func* func_sym = static_cast<st::Func*>(
-      node->CallerNode()->gBoundSymbol());
+      node->CallerNode()->BoundSymbol());
    std::vector<llvm::Value*> params;
 
    if (node->ParamsNode() != NULL)
@@ -287,7 +288,7 @@ Codegen::cgClass (st::Class* cls_sym)
       {
          assert(f[i] != NULL);
          field = f[i];
-         fields.push_back(_getLlvmTy(field->gType()));
+         fields.push_back(_getLlvmTy(field->Type()));
       }
    }
 
@@ -302,11 +303,36 @@ Codegen::cgClass (st::Class* cls_sym)
 }
 
 llvm::Value*
+Codegen::cgCompOp (ast::node::BinaryOp* n)
+{
+   assert (n != NULL);
+   assert (_cur_bb != NULL);
+
+   llvm::CmpInst* comp_inst = NULL;
+   llvm::Value* left_val = cgExprAndLoad(n->LeftNode());
+   llvm::Value* right_val = cgExprAndLoad(n->RightNode());
+
+   switch (n->Kind())
+   {
+      case ast::node::Kind::OP_EQ_EQ:
+         //comp_inst = new llvm::ICmpInst(*_cur_bb, llvm::ICmpInst::ICMP_EQ, left_val,
+           // right_val, "");
+         break;
+      default:
+         printf("Unsupported comparison operator.");
+         assert(false);
+
+   }
+
+   return comp_inst;
+}
+
+llvm::Value*
 Codegen::cgDotExpr (ast::node::Dot* node)
 {
    assert(node->isDotNode());
 
-   int field_index = static_cast<st::Field*>(node->gBoundSymbol())->_field_index;
+   int field_index = static_cast<st::Field*>(node->BoundSymbol())->_field_index;
 
    std::vector<llvm::Value*> gep;
    gep.push_back(llvm::ConstantInt::get(_module->getContext(),
@@ -317,11 +343,11 @@ Codegen::cgDotExpr (ast::node::Dot* node)
    llvm::Value* left_node = cgExpr(node->LeftNode());
    assert (left_node != NULL);
 
-   if (!node->LeftNode()->gExprType()->isPtrSymbol())
+   if (!node->LeftNode()->ExprType()->isPtrSymbol())
    {
       st::Type* base_mem_ty = static_cast<st::Type*>(st::Util::lookupSymbol(
-         node->LeftNode()->gExprType()->_parent,
-         node->LeftNode()->gExprType()->gName() + "*"));
+         node->LeftNode()->ExprType()->_parent,
+         node->LeftNode()->ExprType()->Name() + "*"));
 
       llvm::Type* base_ty = _getLlvmTy(base_mem_ty);
       assert(base_ty != NULL);
@@ -357,56 +383,59 @@ Codegen::cgExpr (ast::node::Node* node)
    assert (node != NULL);
    llvm::Value* res = NULL;
 
-   switch (node->gType())
+   switch (node->Kind())
    {
-      case MEM_NODE_AMPERSAND:
+      case ast::node::Kind::AMPERSAND:
          res = cgAmpersandExpr (node);
          break;
 
-      case MEM_NODE_CALL:
+      case ast::node::Kind::CALL:
          res = cgCallExpr(static_cast<ast::node::Call*>(node));
          break;
 
-      case MEM_NODE_DOT:
+      case ast::node::Kind::DOT:
          res = cgDotExpr(static_cast<ast::node::Dot*>(node));
          break;
 
-      case MEM_NODE_IF:
+      case ast::node::Kind::OP_EQ_EQ:
+         cgCompOp(static_cast<ast::node::BinaryOp*>(node));
+         break;
+
+      case ast::node::Kind::IF:
          cgIfStatement(static_cast<ast::node::If*>(node));
          break;
 
-      case MEM_NODE_FINAL_ID:
-         res = cgFinalIdExpr(static_cast<ast::node::Text*>(node));
+      case ast::node::Kind::FINAL_ID:
+         res = cgFinalIdExpr(static_cast<ast::node::FinalId*>(node));
          break;
 
-      case MEM_NODE_NEW:
+      case ast::node::Kind::NEW:
          res = cgNewExpr(static_cast<ast::node::New*>(node));
          break;
 
-      case MEM_NODE_NUMBER:
+      case ast::node::Kind::NUMBER:
          res = cgNumberExpr(static_cast<ast::node::Number*>(node));
          assert (res != NULL);
          break;
 
-      case MEM_NODE_PLUS:
+      case ast::node::Kind::OP_PLUS:
          res = cgBinaryExpr(node);
          break;
 
-      case MEM_NODE_RETURN:
+      case ast::node::Kind::RETURN:
          cgReturnStatement (node);
          break;
 
-      case MEM_NODE_VARIABLE_ASSIGNMENT:
+      case ast::node::Kind::VARIABLE_ASSIGNMENT:
          cgVarAssignStatement (static_cast<ast::node::VarAssign*>(node));
          break;
 
-      case MEM_NODE_VARIABLE_DECLARATION:
+      case ast::node::Kind::VARIABLE_DECLARATION:
          cgVarDeclStatement (static_cast<ast::node::VarDecl*>(node));
          break;
 
       default:
-         printf("Unsupported node type %s\n",
-            ast::node::Node::get_type_name(node->gType()));
+         printf("Unsupported node type %s\n", node->KindName().c_str());
          assert(false);
    }
 
@@ -418,18 +447,28 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
 {
    llvm::Value* val = cgExpr(node);
 
-   bool must_load = false;
+   bool must_load = false; //node->ExprType()->isPtrSymbol();
 
-   switch (node->gType())
+   switch (node->Kind())
    {
 
-      case MEM_NODE_AMPERSAND:
-      case MEM_NODE_CALL:
-      case MEM_NODE_DOT:
-      case MEM_NODE_FINAL_ID:
+      case ast::node::Kind::AMPERSAND:
+      case ast::node::Kind::CALL:
+      case ast::node::Kind::DOT:
          must_load = true;
          break;
+
+      case ast::node::Kind::FINAL_ID:
+         // FIXME This is a quick fix, when do we actually load ?
+         assert (node->hasBoundSymbol());
+         if (!node->BoundSymbol()->isVarSymbol() || !static_cast<st::Var*>(node->BoundSymbol())->isFuncArg())
+         {
+            must_load = true;
+         }
+         break;
    }
+
+   assert (val != NULL);
 
    if (must_load)
    {
@@ -447,7 +486,7 @@ Codegen::cgFile (ast::node::File* file_node, bool cg_func_def)
    if (cg_func_def)
    {
       // Codegen function definitions
-      for (size_t i = 0 ; i < file_node->gChildCount(); ++i)
+      for (size_t i = 0 ; i < file_node->ChildCount(); ++i)
       {
          node = file_node->getChild(i);
          if (node->isFuncNode())
@@ -459,7 +498,7 @@ Codegen::cgFile (ast::node::File* file_node, bool cg_func_def)
    else
    {
       // Codegen function bodies
-      for (size_t i = 0 ; i < file_node->gChildCount(); ++i)
+      for (size_t i = 0 ; i < file_node->ChildCount(); ++i)
       {
          node = file_node->getChild(i);
          if (node->isFuncNode())
@@ -485,7 +524,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
    // Don't try to generate body for a virtual function
    if (func_node->BodyNode() != NULL)
    {
-      st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
+      st::Func* func_sym = static_cast<st::Func*>(func_node->BoundSymbol());
       assert (func_sym != NULL);
 
       llvm::Function* func = _functions[_getCodegenFuncName(func_sym)];
@@ -496,9 +535,22 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
 
       //_builder.SetInsertPoint(&block);
 
-      cgBlock(static_cast<ast::node::Block*>(func_node->BodyNode()));
+      _stack.push();
 
-      if (func_sym->gReturnType() == _st->_core_types.gVoidTy())
+      st::Var* func_param = NULL;
+      llvm::Argument* arg = NULL;
+      for (size_t i = 0; i < func_sym->ParamCount(); ++i)
+      {
+         func_param = func_sym->_params[i];
+         arg = new llvm::Argument(_getLlvmTy(func_param->Type()),
+            func_param->Name(), func);
+         _stack.set(func_param->Name(), arg);
+      }
+
+      cgBlock(static_cast<ast::node::Block*>(func_node->BodyNode()));
+      _stack.pop();
+
+      if (func_sym->ReturnType() == _st->_core_types.gVoidTy())
       {
          llvm::ReturnInst* t = llvm::ReturnInst::Create(_module->getContext(),
             NULL, _cur_bb);
@@ -512,11 +564,11 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
 void
 Codegen::cgFunctionDef (ast::node::Func* func_node)
 {
-   st::Func* func_sym = static_cast<st::Func*>(func_node->gBoundSymbol());
+   st::Func* func_sym = static_cast<st::Func*>(func_node->BoundSymbol());
    std::vector<llvm::Type*> func_ty_args;
    std::string func_name;
 
-   if (func_sym->gIsEntryPoint())
+   if (func_sym->IsEntryPoint())
    {
       func_name = "main";
    }
@@ -526,12 +578,10 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
    }
 
    llvm::FunctionType* func_ty = llvm::FunctionType::get(
-      _getFuncReturnTy(func_node),
-      _getFuncParamsTy(func_sym),
-      /*isVarArg=*/false);
+      _getFuncReturnTy(func_node), false);
 
    llvm::GlobalValue::LinkageTypes func_link;
-   if (func_sym->gMd()->has("external"))
+   if (func_sym->Metadata()->has("external"))
    {
       func_link = llvm::GlobalValue::DLLImportLinkage;
    }
@@ -553,6 +603,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
       llvm::BasicBlock* block = llvm::BasicBlock::Create(
          llvm::getGlobalContext(), "entry", func);
    }
+
    _functions[_getCodegenFuncName(func_sym)] = func;
 }
 
@@ -569,17 +620,23 @@ Codegen::cgIfStatement (ast::node::If* node)
    llvm::BasicBlock* true_block = llvm::BasicBlock::Create(
       llvm::getGlobalContext(), "if_true", _cur_func);
    _cur_bb = true_block;
+   assert(node->IfBlockNode() != NULL);
    cgBlock(static_cast<ast::node::Block*>(node->IfBlockNode()));
    true_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
 
    // FALSE block
-   llvm::BasicBlock* false_block = llvm::BasicBlock::Create(
-      llvm::getGlobalContext(), "if_false", _cur_func);
-   _cur_bb = false_block;
-   cgBlock(static_cast<ast::node::Block*>(node->ElseBlockNode()));
-   false_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
+   llvm::BasicBlock* false_block = NULL;
+   if (node->ElseBlockNode() != NULL)
+   {
+      false_block = llvm::BasicBlock::Create(llvm::getGlobalContext(),
+         "if_false", _cur_func);
+      _cur_bb = false_block;
+      cgBlock(static_cast<ast::node::Block*>(node->ElseBlockNode()));
+      false_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
+   }
 
    // BRANCH
+   assert (node->ConditionNode() != NULL);
    llvm::Value* cond = cgExpr(node->ConditionNode());
    llvm::LoadInst* load = new llvm::LoadInst(cond, "ifcond", false, cur_bb);
 
@@ -620,9 +677,9 @@ Codegen::cgNewExpr (ast::node::New* node)
    assert(malloc_call != NULL);
 
    // Cast the return pointer to the appropriate pointer type
-   assert (_getLlvmTy(node->gExprType()) != NULL);
+   assert (_getLlvmTy(node->ExprType()) != NULL);
    llvm::Value* ret = new llvm::BitCastInst(malloc_call, _getLlvmTy(
-      node->gExprType()), "new_cast", _cur_bb);
+      node->ExprType()), "new_cast", _cur_bb);
 
    assert (ret != NULL);
    return ret;
@@ -702,10 +759,10 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 {
    assert(node != NULL);
    assert(node->isVarDeclNode());
-   assert(node->gExprType() != NULL);
+   assert(node->ExprType() != NULL);
 
-   llvm::Value* var = new llvm::AllocaInst(_getLlvmTy(node->gExprType()), NULL,
-      node->gName(), _cur_bb);
+   llvm::Value* var = new llvm::AllocaInst(_getLlvmTy(node->ExprType()), NULL,
+      node->Name(), _cur_bb);
 
    if (node->ValueNode() != NULL)
    {
@@ -716,7 +773,7 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 
    //var = new llvm::LoadInst(var, "", _cur_bb);
 
-   _stack.set(node->gName(), var);
+   _stack.set(node->Name(), var);
 }
 
 std::string

@@ -21,32 +21,40 @@ namespace mem { namespace st {
  */
 class Func: public Type
 {
-   public: std::vector<Var*> _params;
-   protected: Func* _overloaded_func;
+   // -------------------------------------------------------------------------
+   // FIELDS
+   // -------------------------------------------------------------------------
+   public:
+
+   bool _is_entry_point;
+   std::vector<Var*> _params;
+   //Func* _overloaded_func;
+   Symbol* _return_type;
 
 
    // -------------------------------------------------------------------------
    // PROPERTIES
    // -------------------------------------------------------------------------
+   public:
 
-   // PROPERTY : IsEntryPoint
-   public: bool _is_entry_point;
-   public: inline bool gIsEntryPoint() const {return _is_entry_point;}
-   public: inline void sIsEntryPoint(bool is) {_is_entry_point = is;}
+   // IsEntryPoint
+   GETTER(IsEntryPoint, bool) {return _is_entry_point;}
+   SETTER(IsEntryPoint, bool) {_is_entry_point = val;}
 
-   // PROPERTY : ParamCount
-   public: inline size_t gParamCount() const {return this->_params.size();}
+   // ParamCount
+   GETTER(ParamCount, size_t) {return _params.size();}
 
-   // PROPERTY : ReturnType
-   public: Symbol* _return_type;
-   public: inline Symbol* gReturnType () const { return this->_return_type;}
-   public: inline void sReturnType (Symbol* ret_type) {this->_return_type = ret_type;}
+   // ReturnType
+   GETTER(ReturnType, Symbol*) {return _return_type;}
+   SETTER(ReturnType, Symbol*) {_return_type = val;}
 
+   /*
    public: inline Func* gOverloadedFunc() { return this->_overloaded_func;}
    public: inline void sOverloadedFunc(Func* overloaded_func) {
       assert(overloaded_func->is(st::FUNCTION));
       this->_overloaded_func = overloaded_func;
       }
+      */
 
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS

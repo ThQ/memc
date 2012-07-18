@@ -6,13 +6,13 @@ namespace mem { namespace ast { namespace node {
 
 Func::Func()
 {
-   _type = MEM_NODE_FUNCTION_DECLARATION;
+   _type = Kind::FUNCTION;
 }
 
 Block*
 Func::BodyNode ()
 {
-   for (size_t i = 0 ; i < gChildCount() ; ++i)
+   for (size_t i = 0 ; i < ChildCount() ; ++i)
    {
       if (getChild(i)->isBlockNode())
       {
@@ -25,7 +25,7 @@ Func::BodyNode ()
 Node*
 Func::ParamsNode ()
 {
-   for (size_t i = 0 ; i < gChildCount() ; ++i)
+   for (size_t i = 0 ; i < ChildCount() ; ++i)
    {
       if (getChild(i)->isFuncParamsNode())
       {
@@ -38,7 +38,7 @@ Func::ParamsNode ()
 Node*
 Func::ReturnTypeNode ()
 {
-   for (size_t i = 0 ; i < gChildCount() ; ++i)
+   for (size_t i = 0 ; i < ChildCount() ; ++i)
    {
       if (!getChild(i)->isFuncParamsNode() && !getChild(i)->isBlockNode())
       {

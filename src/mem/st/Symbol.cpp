@@ -33,20 +33,20 @@ Symbol::gExprType ()
 bool
 Symbol::addChild (Symbol* sym)
 {
-   if (sym->gName() == "")
+   if (sym->Name() == "")
    {
       std::ostringstream id;
-      id << gName();
+      id << Name();
       id << "#";
-      id << gChildCount() + 1;
+      id << ChildCount() + 1;
 
-      sym->sName(id.str());
+      sym->setName(id.str());
    }
 
-   if (!getChild(sym->_name))
+   if (!getChild(sym->Name()))
    {
       sym->_parent = this;
-      _children[sym->_name] = sym;
+      _children[sym->Name()] = sym;
       sym->_depth = _depth + 1;
       return true;
    }
@@ -78,13 +78,13 @@ Symbol::gQualifiedName ()
    Symbol* sym = this;
    while (sym != NULL)
    {
-      if (sym->gName().size() != 0)
+      if (sym->Name().size() != 0)
       {
          if (name.size() != 0)
          {
             name.insert(0, ".");
          }
-         name.insert(0, sym->gName());
+         name.insert(0, sym->Name());
       }
       sym = sym->_parent;
    }
@@ -96,8 +96,8 @@ void
 Symbol::hintName (Symbol* parent, std::string hint)
 {
    std::ostringstream id;
-   id << hint << "#" << parent->gChildCount() + 1;
-   sName(id.str());
+   id << hint << "#" << parent->ChildCount() + 1;
+   setName(id.str());
 }
 
 bool
@@ -128,17 +128,13 @@ Symbol::isTypeSymbol () const
    }
 }
 
+/*
 void
 Symbol::sName (char* name, size_t name_len)
 {
    _name.assign(name, name_len);
 }
-
-void
-Symbol::sName (std::string name)
-{
-   _name = name;
-}
+*/
 
 
 } }

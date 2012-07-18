@@ -10,11 +10,27 @@ namespace mem { namespace st {
 
 class Field : public Var
 {
-   public: int _field_index;
-
+   // -------------------------------------------------------------------------
+   // FIELDS
+   // -------------------------------------------------------------------------
    public:
 
+   int _field_index;
+
+   // -------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTORS
+   // -------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
    Field();
+
+   // -------------------------------------------------------------------------
+   // PUBLIC METHODS
+   // -------------------------------------------------------------------------
+   public:
 
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Ptr");return false;}

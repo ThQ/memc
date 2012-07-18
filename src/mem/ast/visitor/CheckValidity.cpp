@@ -27,9 +27,8 @@ CheckValidity::visit (node::Node* node)
 
       log::FatalError* err = new log::FatalError();
       err->sDescription(description);
-      err->formatMessage("[BUG] Invalid node : %s",
-         node::Node::get_type_name(node->gType()));
-      if (node->gPosition() != NULL)
+      err->formatMessage("[BUG] Invalid node : %s", node->KindName().c_str());
+      if (node->Position() != NULL)
       {
          err->sPosition(node->copyPosition());
       }

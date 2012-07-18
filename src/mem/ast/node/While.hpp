@@ -27,11 +27,11 @@ class While : public Node
    //--------------------------------------------------------------------------
    public:
 
-   Node*
-   ConditionNode () {return this->getChild(0);}
+   // ConditionNode
+   GETTER(ConditionNode, Node*) {return this->getChild(0);}
 
-   Node*
-   BodyNode () {return this->getChild(1);}
+   // BodyNode
+   GETTER(BodyNode, Node*) {return this->getChild(1);}
 
 
    //--------------------------------------------------------------------------
