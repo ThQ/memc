@@ -10,11 +10,8 @@
 
 # Examples
 ## *Hello, World !*
-
-    use io
-    
     main ()
-        io.print("Hello, World !")
+        println("Hello, World !")
 
 ## Factorial
     fact (n :int) -> int
@@ -24,7 +21,7 @@
             return n * fact(n - 1i)
     
     main (argc :int) -> int
-        return fact(10)
+        return fact(10i)
 
 
 # Dependencies
