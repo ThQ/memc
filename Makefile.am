@@ -20,7 +20,6 @@ src_mem_ast_node = \
  src/mem/ast/node/Func.cpp \
  src/mem/ast/node/If.cpp \
  src/mem/ast/node/Kind.cpp \
- src/mem/ast/node/Kind.kind-in \
  src/mem/ast/node/New.cpp \
  src/mem/ast/node/Node.cpp \
  src/mem/ast/node/NodeValidator.cpp \
@@ -122,5 +121,5 @@ memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 .errors-in.hpp :
 	$(PYTHON) utils/GenErrorClasses.py $< $@
 
-.kind-in.hpp :
-	$(PYTHON) utils/GenNodeTypes.py $< $@
+src/mem/ast/node/Kind.cpp :
+	$(PYTHON) utils/GenNodeTypes.py src/mem/ast/node/Kind.kind-in src/mem/ast/node/Kind.hpp
