@@ -32,7 +32,7 @@ class Node
    Node* _parent;
    fs::position::Range* _position;
    Node* _prev;
-   Metadata* _md;
+   mem::Metadata* _md;
    unsigned int _type;
 
 
@@ -63,7 +63,7 @@ class Node
    GETTER(KindName, std::string) {return get_type_name(_type);}
 
    // Metadata
-   GETTER(Metadata, class Metadata*) {return _md;}
+   GETTER(Metadata, class mem::Metadata*) {return _md;}
    SETTER(Metadata, class Metadata*) {_md = val;}
 
    // Parent

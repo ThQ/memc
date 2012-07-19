@@ -34,7 +34,7 @@ class Symbol
    SymbolCollection _children;
    unsigned int _depth;
    SymbolKind _kind;
-   Metadata* _md;
+   ::mem::Metadata* _md;
    std::string _name;
    Symbol* _parent;
    fs::position::Range _pos;
@@ -53,8 +53,8 @@ class Symbol
    gExprType ();
 
    // Metadata
-   GETTER(Metadata, class Metadata*) {return _md;}
-   SETTER(Metadata, class Metadata*) {_md = val;}
+   GETTER(Metadata, ::mem::Metadata*) {return _md;}
+   SETTER(Metadata, ::mem::Metadata*) {_md = val;}
 
    // Name
    GETTER(Name, std::string) {return _name;}

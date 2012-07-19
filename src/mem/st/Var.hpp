@@ -11,7 +11,7 @@ namespace mem { namespace st {
 
 class Var : public Symbol
 {
-   Type* _type;
+   st::Type* _type;
 
    // -------------------------------------------------------------------------
    // PROPERTIES
@@ -19,7 +19,7 @@ class Var : public Symbol
    public:
 
    // PROPERTY : Type
-   GETTER(Type, class Type*) {return _type;}
+   GETTER(Type, class st::Type*) {return _type;}
    SETTER(Type, class Type*) {_type = val;}
    SETTER(Type, class Symbol*) {_type = static_cast<class Type*>(val);}
 
