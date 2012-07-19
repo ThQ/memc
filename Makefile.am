@@ -1,3 +1,6 @@
+AM_YFLAGS = -d
+AUTOMAKE_OPTIONS = subdir-objects
+
 src = \
  src/memc.cpp
 src_mem = \
@@ -91,8 +94,6 @@ src_mem_st_visitor = \
  src/mem/st/visitor/XmlDumper.cpp \
  src/mem/st/visitor/Visitor.cpp
 
-AUTOMAKE_OPTIONS = subdir-objects
-AM_YFLAGS = -d -v
 BUILT_SOURCES = \
  src/mem/lang/Bison.h \
  src/mem/ast/node/Kind.cpp \
@@ -120,7 +121,9 @@ memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 
 
 src/mem/log/errors.hpp:
-	$(PYTHON) utils/GenErrorClasses.py src/mem/log/errors.errors-in src/mem/log/errors.hpp
+	$(PYTHON) utils/GenErrorClasses.py src/mem/log/errors.errors-in \
+		src/mem/log/errors.hpp
 
 src/mem/ast/node/Kind.cpp :
-	$(PYTHON) utils/GenNodeTypes.py src/mem/ast/node/Kind.kind-in src/mem/ast/node/Kind.hpp
+	$(PYTHON) utils/GenNodeTypes.py src/mem/ast/node/Kind.kind-in \
+		src/mem/ast/node/Kind.hpp
