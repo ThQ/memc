@@ -95,7 +95,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_YFLAGS = -d -v
 BUILT_SOURCES = \
  src/mem/lang/Bison.h \
- src/mem/ast/node/Kind.cpp
+ src/mem/ast/node/Kind.cpp \
+ src/mem/log/errors.hpp
 
 bin_PROGRAMS = memc
 memc_SOURCES = $(src) \
@@ -118,8 +119,8 @@ memc_LDADD = $(LLVM_LDADD) -ldl
 memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 
 
-.errors-in.hpp :
-	$(PYTHON) utils/GenErrorClasses.py $< $@
+src/mem/log/errors.hpp:
+	$(PYTHON) utils/GenErrorClasses.py src/mem/log/errors.errors-in src/mem/log/errors.hpp
 
 src/mem/ast/node/Kind.cpp :
 	$(PYTHON) utils/GenNodeTypes.py src/mem/ast/node/Kind.kind-in src/mem/ast/node/Kind.hpp
