@@ -63,7 +63,7 @@ src_mem_fs_position = \
  src/mem/fs/position/Range.cpp
 src_mem_lang = \
  src/mem/lang/Flex.lpp \
- src/mem/lang/Bison.ypp
+ src/mem/lang/Bison.y
 src_mem_log = \
  src/mem/log/ConsoleFormatter.cpp \
  src/mem/log/ConsoleLogger.cpp \
@@ -121,7 +121,10 @@ memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 
 # This is needed by ArchLinux and FreeBSD : otherwise they will complain that
 # there is no rule to build Bison.h
-src/mem/lang/Bison.h src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
+src/mem/lang/Bison.h src/mem/lang/Bison.c: src/mem/lang/Bison.y
+
+src/mem/lang/Bison.y:
+	$(YACC) -d src/mem/lang/Bison.y -o src/mem/lang/Bison.c
 
 src/mem/log/errors.hpp:
 	$(PYTHON) utils/GenErrorClasses.py src/mem/log/errors.errors-in \
