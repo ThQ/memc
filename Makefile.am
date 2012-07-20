@@ -119,6 +119,9 @@ memc_SOURCES = $(src) \
 memc_LDADD = $(LLVM_LDADD) -ldl
 memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 
+# This is needed by ArchLinux and FreeBSD : otherwise they will complain that
+# there is no rule to build Bison.h
+src/mem/lang/Bison.h src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
 
 src/mem/log/errors.hpp:
 	$(PYTHON) utils/GenErrorClasses.py src/mem/log/errors.errors-in \
