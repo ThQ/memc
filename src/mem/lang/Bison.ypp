@@ -68,7 +68,9 @@ using namespace mem;
 extern int yylex();
 
 void yyerror(fs::FileManager& fm, ast::node::Node* ast,
-   st::SymbolTable& symbols, log::Logger* logger, fs::File* file,
+   st::SymbolTable& symbols,
+   ::mem::log::Logger* logger, // Type ambiguity for gcc-c++ 4.2.1 on FreeBSD
+   fs::File* file,
    const char *s)
 {
    fs::position::Position* pos = new fs::position::Position();

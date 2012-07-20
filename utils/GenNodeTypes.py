@@ -20,7 +20,7 @@ if src:
    hpp += "\n};};\n"
    hpp += "extern const char* kKIND_NAMES[];\n"
    hpp += "} } }\n"
-   hpp += "#endif"
+   hpp += "#endif\n"
 
    cpp = "#include \"" + kOut + "\"\n"
    cpp += "namespace mem { namespace ast { namespace node {\n"
@@ -28,7 +28,7 @@ if src:
    cpp += "   \"UNKNOWN\",\n   \""
    cpp += "\",\n   \"".join(lines)
    cpp += "\"\n};\n"
-   cpp += "} } }"
+   cpp += "} } }\n"
 
    dest = open(kOut, "w")
    if dest:
