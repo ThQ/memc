@@ -95,7 +95,8 @@ src_mem_st_visitor = \
  src/mem/st/visitor/Visitor.cpp
 
 BUILT_SOURCES = \
- src/mem/lang/Bison.h \
+ src/mem/lang/Bison.hpp \
+ src/mem/lang/TokenKind.hpp \
  src/mem/ast/node/Kind.cpp \
  src/mem/log/errors.hpp
 
@@ -122,7 +123,7 @@ memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 #<fix>
 # This is needed by ArchLinux and FreeBSD : otherwise they will complain that
 # there is no rule to build Bison.h
-src/mem/lang/Bison.h src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
+src/mem/lang/Bison.hpp src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
 	$(YACC) -d src/mem/lang/Bison.ypp -o src/mem/lang/Bison.cpp
 #</fix>
 
@@ -133,3 +134,6 @@ src/mem/log/errors.hpp:
 src/mem/ast/node/Kind.cpp :
 	$(PYTHON) utils/GenNodeTypes.py src/mem/ast/node/Kind.kind-in \
 		src/mem/ast/node/Kind.hpp
+
+src/mem/lang/TokenKind.hpp: src/mem/lang/Bison.hpp
+	$(PYTHON) utils/GenTokenKind.py src/mem/lang/Bison.hpp src/mem/lang/TokenKind.hpp

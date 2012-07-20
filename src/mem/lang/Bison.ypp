@@ -140,6 +140,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %token T_BANG
 %token T_HASH
 %token T_DOTDOTDOT
+%token T_SPACE
 
 // Lower precedence first
 %left <node> T_AND T_OR
