@@ -116,7 +116,7 @@ memc_SOURCES = $(src) \
 		$(src_mem_opt) \
 		$(src_mem_st) \
 		$(src_mem_st_visitor)
-memc_LDADD = $(LLVM_LDADD) -ldl
+memc_LDADD = $(LLVM_LDADD)
 memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 
 #<fix>

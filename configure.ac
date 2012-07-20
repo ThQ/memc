@@ -7,7 +7,8 @@ AC_SUBST(LLVM_LDADD, $($llvm --ldflags --libs nativecodegen | tr '\n' ' '))
 CPPFLAGS="-D __STDC_LIMIT_MACROS=1 -D __STDC_CONSTANT_MACROS=1 -O0"
 AM_PATH_PYTHON(,,[:])
 AM_PROG_CC_C_O
-#AC_PROG_CC
+# Search for libdl (Ubuntu requires explicity linking against it)
+AC_SEARCH_LIBS([dlopen], [dl dld])
 AC_PROG_CXX
 AC_PROG_YACC
 AC_PROG_LEX
