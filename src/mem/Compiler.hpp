@@ -24,7 +24,7 @@
 #include "mem/codegen/llvm/Codegen.hpp"
 #include "mem/fs/File.hpp"
 #include "mem/fs/FileManager.hpp"
-#include "mem/lang/Bison.h"
+#include "mem/lang/Bison.hpp"
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
 #include "mem/opt/Options.hpp"

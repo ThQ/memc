@@ -122,10 +122,7 @@ memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 #<fix>
 # This is needed by ArchLinux and FreeBSD : otherwise they will complain that
 # there is no rule to build Bison.h
-src/mem/lang/Bison.h: src/mem/lang/Bison.ypp
-src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
-
-src/mem/lang/Bison.ypp:
+src/mem/lang/Bison.h src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
 	$(YACC) -d src/mem/lang/Bison.ypp -o src/mem/lang/Bison.cpp
 #</fix>
 
