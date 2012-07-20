@@ -3,8 +3,8 @@ import sys
 
 kIn = sys.argv[1]
 kOut = sys.argv[2]
-print "KOUT = " + kOut
 src = open(kIn)
+
 if src:
    content = src.read()
    src.close()
