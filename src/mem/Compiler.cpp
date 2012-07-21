@@ -9,6 +9,8 @@ Compiler::Compiler ()
    _logger = new log::ConsoleLogger();
    _logger->setFormatter(new log::ConsoleFormatter());
 
+   gTOKENIZER.setLogger(_logger);
+
    setUpOptions();
 
    addAstVisitor(new ast::visitor::Prechecker());
@@ -79,7 +81,7 @@ Compiler::compile (int argc, char** argv)
       runAstVisitors();
       runStVisitors();
 
-      reset_lexer(); // Cleans up lexer global vars
+      //reset_lexer(); // Cleans up lexer global vars
 
       dumpAst();
       dumpSt();
@@ -159,7 +161,7 @@ Compiler::parse (std::string file_path)
    st::Namespace* file_sym = st::Util::createNamespace(this->symbols._root, Util::split(Util::stripFileExtension(file_path),'/'));
    assert(file_sym != NULL);
 
-   reset_lexer();
+   //reset_lexer();
    std::vector<std::string> paths_tried;
 
    fs::File* file = fm.tryOpenFile(file_path, paths_tried);
@@ -177,11 +179,15 @@ Compiler::parse (std::string file_path)
       ast.pushChild(file_node);
 
       // Used by yyparse
-      yyin = fopen(file_path.c_str(), "rb");
+      //yyin = fopen(file_path.c_str(), "rb");
       // TODO The file was opened ms before
       // We could open the file only once if we used Bison++
-      assert(yyin != NULL);
-      yyfile = file;
+      //assert(yyin != NULL);
+      //yyfile = file;
+      // TODO We are actually reading each file twice, lang::Tokenizer should 
+      // populate fs::File
+      gTOKENIZER.setInputFile(file->gPath());
+      gTOKENIZER.reset();
       yyparse(this->fm, file_node, this->symbols, _logger, file);
 
       ast::visitor::FindUse find_use;
@@ -206,7 +212,7 @@ Compiler::parse (std::string file_path)
             this->_parse_queue.push(rel_file_path);
          }
       }
-      fclose(yyin);
+      //fclose(yyin);
    }
    else
    {

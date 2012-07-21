@@ -51,17 +51,8 @@ Util::path_to_namespace (std::string& path)
 std::string
 Util::stripFileExtension(std::string path)
 {
-   size_t last_dot_pos = 0;
+   size_t last_dot_pos = path.find_last_of('.');
    std::string stripped_path = "";
-
-   for (size_t i = path.size()-1; i >= 0; --i)
-   {
-      if (path[i] == '.')
-      {
-         last_dot_pos = i;
-         break;
-      }
-   }
 
    if (last_dot_pos != 0)
    {

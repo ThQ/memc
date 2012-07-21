@@ -27,6 +27,7 @@
 #include "mem/fs/File.hpp"
 #include "mem/fs/FileManager.hpp"
 #include "mem/fs/position/Range.hpp"
+#include "mem/lang/Tokenizer.hpp"
 #include "mem/log/Logger.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/Compiler.hpp"
@@ -62,10 +63,21 @@ using namespace mem;
       } \
    } \
    while (YYID (0))
+
+extern mem::lang::Tokenizer gTOKENIZER;
 }
 
 %code {
-extern int yylex();
+
+mem::lang::Tokenizer gTOKENIZER;
+
+int yylex()
+{
+   mem::lang::Token t = gTOKENIZER.getNextToken();
+   yylval.text = new std::string();
+   yylval.text->assign(t.Value());
+   return t.Kind();
+}
 
 void yyerror(fs::FileManager& fm, ast::node::Node* ast,
    st::SymbolTable& symbols,
@@ -89,7 +101,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 
 %union {
    int integer;
-   char* text;
+   std::string* text; // We can't have a non-trivial type here (std::string)
    ast::node::Node* binary_node;
    ast::node::Node* node;
    ast::node::Text* text_node;
@@ -220,18 +232,19 @@ use_file :
    T_ID
    {
       $$ = new ast::node::Text();
-      $$->sValue($1);
+      $$->sValue($1->c_str());
+      delete $1;
    }
    | use_file T_DOT T_ID
    {
-      $$->sValue($$->gValue() + '.' + $3);
+      $$->sValue($$->gValue() + '.' + $3->c_str());
    }
 
 metadata :
    T_HASH T_ID T_NEWLINE
    {
       $$ = new ast::node::Text();
-      $$->sValue($2, strlen($2));
+      $$->sValue($2->c_str());
    }
 
 //=============================================================================
@@ -281,10 +294,10 @@ function_name:
    T_ID
    {
       ast::node::Func* func = new ast::node::Func();
-      func->sValue($1, strlen($1));
+      func->sValue($1->c_str());
       $$ = func;
 
-      free($1);
+      delete $1;
    }
    | metadata T_ID
    {
@@ -292,11 +305,12 @@ function_name:
       md->set($1->gValue(), "");
 
       ast::node::Func* func = new ast::node::Func();
-      func->sValue($2, strlen($2));
+      func->sValue($2->c_str());
       func->setMetadata(md);
       $$ = func;
 
       delete $1;
+      delete $2;
    }
 
 function_declaration:
@@ -538,9 +552,9 @@ id :
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::ID);
       $$->setPosition(@$.copy_range());
-      $$->sValue($1, strlen($1));
+      $$->sValue($1->c_str());
 
-      free($1);
+      delete $1;
    }
 
 qualified_id :
@@ -720,13 +734,15 @@ literal :
       short s_val = 0;
       int i_val = 0;
 
-      size_t nb_len = strlen($1);
-      char int_ty = $1[nb_len-1];
-      char sign_ty = $1[nb_len-2];
+      size_t nb_len = $1->size();
+      char int_ty = $1->data()[nb_len-1];
+      char sign_ty = $1->data()[nb_len-2];
       if (sign_ty != 'u') nb_len--;
 
+      // FIXME No need to malloc explicitly here, change the get*FromString to
+      // accept std::string instead of char*
       char* nb = static_cast<char*>(malloc(sizeof(char) * nb_len + 1));
-      strncpy(nb, $1, nb_len);
+      $1->copy(nb, $1->size(), 0);
       nb[nb_len] = '\0';
 
       switch (int_ty)
@@ -778,7 +794,7 @@ literal :
          //FIXME Couldnt fit this value into a numeric type, so should fail
       }
       free(nb);
-      free($1);
+      delete $1;
    }
 %%
 
