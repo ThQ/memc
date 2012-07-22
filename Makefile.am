@@ -1,8 +1,5 @@
-AM_YFLAGS = -d
 AUTOMAKE_OPTIONS = subdir-objects
 
-src = \
- src/memc.cpp
 src_mem = \
  src/mem/Compiler.cpp \
  src/mem/Metadata.cpp \
@@ -62,8 +59,8 @@ src_mem_fs_position = \
  src/mem/fs/position/Position.cpp \
  src/mem/fs/position/Range.cpp
 src_mem_lang = \
- src/mem/lang/Flex.lpp \
- src/mem/lang/Bison.ypp
+ src/mem/lang/Bison.ypp \
+ src/mem/lang/Tokenizer.cpp
 src_mem_log = \
  src/mem/log/ConsoleFormatter.cpp \
  src/mem/log/ConsoleLogger.cpp \
@@ -73,8 +70,7 @@ src_mem_log = \
  src/mem/log/Message.cpp
 src_mem_opt = \
  src/mem/opt/Option.cpp \
- src/mem/opt/Options.cpp \
- src/mem/opt/Parser.cpp
+ src/mem/opt/Options.cpp
 src_mem_st = \
  src/mem/st/Arg.cpp \
  src/mem/st/Class.cpp \
@@ -100,32 +96,17 @@ BUILT_SOURCES = \
  src/mem/ast/node/Kind.cpp \
  src/mem/log/errors.hpp
 
-bin_PROGRAMS = memc
-memc_SOURCES = $(src) \
-		$(src_mem) \
-		$(src_mem_ast) \
-		$(src_mem_ast_dumper) \
-		$(src_mem_ast_node) \
-		$(src_mem_ast_visitor) \
-		$(src_mem_codegen) \
-		$(src_mem_codegen_llvm) \
-		$(src_mem_dep) \
-		$(src_mem_fs) \
-		$(src_mem_fs_position) \
-		$(src_mem_lang) \
-		$(src_mem_log) \
-		$(src_mem_opt) \
-		$(src_mem_st) \
-		$(src_mem_st_visitor)
-memc_LDADD = $(LLVM_LDADD)
-memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
 
-#<fix>
+###############################################################################
+# Custom rules
+###############################################################################
+
+# <fix>
 # This is needed by ArchLinux and FreeBSD : otherwise they will complain that
-# there is no rule to build Bison.h
+# there is no rule to build Bison.hpp
 src/mem/lang/Bison.hpp src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
 	$(YACC) -d src/mem/lang/Bison.ypp -o src/mem/lang/Bison.cpp
-#</fix>
+# </fix>
 
 src/mem/log/errors.hpp:
 	$(PYTHON) utils/GenErrorClasses.py src/mem/log/errors.errors-in \
@@ -136,4 +117,35 @@ src/mem/ast/node/Kind.cpp :
 		src/mem/ast/node/Kind.hpp
 
 src/mem/lang/TokenKind.hpp: src/mem/lang/Bison.hpp
-	$(PYTHON) utils/GenTokenKind.py src/mem/lang/Bison.hpp src/mem/lang/TokenKind.hpp
+	$(PYTHON) utils/GenTokenKind.py src/mem/lang/Bison.hpp \
+		src/mem/lang/TokenKind.hpp
+
+
+###############################################################################
+# Programs
+###############################################################################
+
+bin_PROGRAMS = mem_compile
+
+#------------------------------------------------------------------------------
+# mem-compile
+#------------------------------------------------------------------------------
+mem_compile_SOURCES =  \
+ bin/mem-compile/main.cpp \
+ $(src_mem) \
+ $(src_mem_ast) \
+ $(src_mem_ast_dumper) \
+ $(src_mem_ast_node) \
+ $(src_mem_ast_visitor) \
+ $(src_mem_codegen) \
+ $(src_mem_codegen_llvm) \
+ $(src_mem_dep) \
+ $(src_mem_fs) \
+ $(src_mem_fs_position) \
+ $(src_mem_lang) \
+ $(src_mem_log) \
+ $(src_mem_opt) \
+ $(src_mem_st) \
+ $(src_mem_st_visitor)
+mem_compile_LDADD = $(LLVM_LDADD)
+mem_compile_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG

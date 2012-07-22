@@ -3,8 +3,10 @@
 
 
 #include <map>
+#include <stack>
 #include <string>
-#include "mem/opt/CliOption.hpp"
+#include <string.h>
+#include <vector>
 #include "mem/opt/Option.hpp"
 
 
@@ -13,10 +15,18 @@ namespace mem { namespace opt {
 
 class Options
 {
-   public: std::string name;
-   public: std::map<std::string, CliOption*> _cli_options;
-   public: std::map<std::string, _Option*> _options;
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
 
+   std::map<std::string, _Option*> _options;
+   std::vector<std::string> _params;
+
+
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
    public:
 
    ~Options ();
@@ -24,73 +34,87 @@ class Options
    _Option*
    _getOptObject (std::string opt_name);
 
-   BoolOption*
-   _getBoolOptObject (std::string opt_name);
 
-   StringOption*
-   _getStrOptObject (std::string opt_name);
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
 
    void
    addOpt (_Option*);
 
-   template <class T>
-   EnumOption<T>*
-   addEnumOpt (std::string name)
-   {
-      opt::EnumOption<T>* opt = new opt::EnumOption<T>();
-      opt->_name = name;
-      _options[name] = opt;
-      return opt;
-   }
-
    EnumOption<int>*
-   addIntEnumOpt (std::string name)
+   addIntEnumOpt (std::string long_name, std::string short_name, std::string desc)
    {
-      EnumOption<int>* opt = addEnumOpt<int>(name);
-      opt->_type = _Option::INT_ENUM;
+      EnumOption<int>* opt = new opt::EnumOption<int>();
+      opt->setType(_Option::INT_ENUM);
+      opt->setLongName(long_name);
+      opt->setShortName(short_name);
+      opt->setDescription(desc);
+
+      addOpt(opt);
+
       return opt;
    }
 
    void
-   addBoolOpt (std::string name);
+   addBoolOpt (std::string long_name, std::string short_name, std::string desc);
 
    void
-   addStrOpt (std::string name);
+   addStrOpt (std::string long_name, std::string short_name, std::string desc);
 
-   bool
-   addCliOpt (std::string cli_name, std::string name, std::string desc);
+   inline std::string
+   getArgument (size_t i) {return _params[i];}
 
-   bool
-   getBool (std::string name);
+   inline bool
+   getBool (std::string name)
+   {
+      return getValue<bool, _Option::BOOL>(name, false);
+   }
 
-   std::string
-   getStr (std::string name);
+   int
+   getEnumInt (std::string opt_name)
+   {
+      return getValue<int, _Option::INT_ENUM>(opt_name, 0);
+   }
 
    int
    getInt (std::string opt_name)
    {
+      return getValue<int, _Option::INT>(opt_name, 0);
+   }
+
+   inline std::string
+   getStr (std::string name)
+   {
+      return getValue<std::string, _Option::STRING>(name, "");
+   }
+
+   template<class T, _Option::OptionType opt_ty> T
+   getValue (std::string opt_name, T default_val)
+   {
       _Option* opt = _getOptObject(opt_name);
-      if (opt != NULL && opt->_type == _Option::INT_ENUM)
+      if (opt != NULL && opt->_type == opt_ty)
       {
-         return static_cast<EnumOption<int>*>(opt)->_val;
+         return static_cast< Option<T>* >(opt)->_val;
       }
-      return 0;
+      return default_val;
    }
 
    inline bool
-   hasCliOpt (std::string name) {return _cli_options[name] != NULL;}
+   has (std::string name) {return _getOptObject(name)!=NULL;}
 
    inline bool
-   hasOpt (std::string name) {return _getOptObject(name)!=NULL;}
+   hasArguments () {return _params.size() > 0;}
 
    bool
    isSet (std::string name);
 
-   bool
-   set (std::string opt_name, std::string opt_value);
+   void
+   parse (int argc, char** argv);
 
    bool
-   setCli (std::string opt_name, std::string opt_value);
+   set (std::string opt_name, std::string opt_value);
 };
 
 } }

@@ -28,7 +28,6 @@
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
 #include "mem/opt/Options.hpp"
-#include "mem/opt/Parser.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/visitor/DepBuilder.hpp"
 #include "mem/st/visitor/XmlDumper.hpp"
@@ -58,16 +57,17 @@ class Compiler
    std::vector<st::visitor::Visitor*> st_visitors;
    fs::FileManager fm;
    log::ConsoleLogger* _logger;
-   opt::Options _opts;
+   opt::Options* _opts;
    std::queue<std::string> _parse_queue;
    st::SymbolTable symbols;
-
 
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
+   public:
 
-   public: opt::Options* gOptions() {return &_opts;}
+   GETTER(Options, opt::Options*) {return _opts;}
+   SETTER(Options, opt::Options*) {_opts = val;}
 
 
    //--------------------------------------------------------------------------
@@ -153,9 +153,6 @@ class Compiler
 
    void
    runStVisitors ();
-
-   void
-   setUpOptions ();
 };
 
 

@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <map>
 #include <string>
+#include "mem/ss.hpp"
 
 
 namespace mem { namespace opt {
@@ -13,13 +14,26 @@ namespace mem { namespace opt {
 class _Option
 {
    public: typedef enum {NONE, STRING, BOOL, INT, INT_ENUM} OptionType;
-
-   public: std::string _name;
+   public: std::string _long_name;
+   public: std::string _short_name;
+   public: std::string _desc;
    public: bool _is_set;
    public: OptionType _type;
 
    public: _Option();
    public: virtual ~_Option() {};
+
+   GETTER(Description, std::string) {return _desc;}
+   SETTER(Description, std::string) {_desc = val;}
+
+   GETTER(LongName, std::string) {return _long_name;}
+   SETTER(LongName, std::string) {_long_name = val;}
+
+   GETTER(Type, _Option::OptionType) {return _type;}
+   SETTER(Type, _Option::OptionType) {_type = val;}
+
+   GETTER(ShortName, std::string) {return _short_name;}
+   SETTER(ShortName, std::string) {_short_name = val;}
 };
 
 
@@ -35,6 +49,16 @@ class Option <std::string> : public _Option
 {
    public: std::string _val;
    public: Option() {_type = STRING;}
+   public: Option (std::string long_name, std::string short_name, std::string description)
+   {
+
+   }
+   public: bool setVal (std::string val, bool is_set=true)
+   {
+      _val = val;
+      _is_set = is_set;
+      return true;
+   }
 };
 
 template <>
@@ -63,6 +87,7 @@ class EnumOption : public _Option
       if (_enum.find(str_val) != _enum.end())
       {
          _val = _enum[str_val];
+         _is_set = true;
          return true;
       }
       return false;

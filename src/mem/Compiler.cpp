@@ -9,9 +9,9 @@ Compiler::Compiler ()
    _logger = new log::ConsoleLogger();
    _logger->setFormatter(new log::ConsoleFormatter());
 
-   gTOKENIZER.setLogger(_logger);
+   _opts = NULL;
 
-   setUpOptions();
+   gTOKENIZER.setLogger(_logger);
 
    addAstVisitor(new ast::visitor::Prechecker());
    addAstVisitor(new ast::visitor::FindClasses());
@@ -20,8 +20,6 @@ Compiler::Compiler ()
    addAstVisitor(new ast::visitor::TypeMatch());
    addAstVisitor(new ast::visitor::CheckValidity());
    addAstVisitor(new ast::visitor::FindEntryPoint());
-
-   //addStVisitor(new st::visitor::DepBuilder());
 
    st::Util::setupBool(this->symbols, this->symbols.gCoreTypes());
    st::Util::setupInts(this->symbols, this->symbols.gCoreTypes());
@@ -51,37 +49,32 @@ Compiler::compile (int argc, char** argv)
 
    // Need to set this before parsing command line arguments because it can
    // raise warnings
-   _logger->setLevel(log::WARNING);
+   _logger->setLevel(log::INFO);
 
-   opt::Parser opt_parser;
-   opt_parser.parse(argc, argv, _logger, gOptions());
-
-   if (gOptions()->isSet("log.level"))
+   if (_opts->isSet("--log-level"))
    {
-      _logger->setLevel(gOptions()->getInt("log.level"));
+      _logger->setLevel(_opts->getInt("--log-level"));
    }
 
-   if (gOptions()->isSet("version.show"))
+   if (_opts->isSet("--version"))
    {
       std::cout << PACKAGE_NAME " version " PACKAGE_VERSION;
       std::cout << " (" __DATE__ " " __TIME__ ")\n";
    }
 
-   else if (gOptions()->isSet("help.show"))
+   else if (_opts->isSet("--help"))
    {
       printUsage(std::cout);
    }
 
-   if (opt_parser._params.size() >= 1)
+   else if (_opts->hasArguments())
    {
-      _parse_queue.push(opt_parser._params[0]);
+      _parse_queue.push(_opts->getArgument(0));
 
       processParseQueue();
 
       runAstVisitors();
       runStVisitors();
-
-      //reset_lexer(); // Cleans up lexer global vars
 
       dumpAst();
       dumpSt();
@@ -90,14 +83,18 @@ Compiler::compile (int argc, char** argv)
 
       printBuildSummary();
    }
+
+   llvm::llvm_shutdown();
 }
 
 void
 Compiler::dumpAst ()
 {
-   if (gOptions()->isSet("ast.dump.xml"))
+   if (_opts->isSet("--dump-ast-xml"))
    {
-      std::ofstream dump_file(gOptions()->getStr("ast.dump.xml").c_str());
+      std::string dump_path = _opts->getStr("ast.dump.xml");
+
+      std::ofstream dump_file(dump_path.c_str());
 
       mem::ast::visitor::XmlDumper dumper;
       dumper.Out(&dump_file);
@@ -106,19 +103,20 @@ Compiler::dumpAst ()
       dumper.tearDown();
 
       dump_file.close();
-      _logger->debug("AST dumped to %s", gOptions()->getStr("ast.dump.xml").c_str());
+      _logger->debug("AST dumped to %s", dump_path.c_str());
    }
 }
 
 void
 Compiler::dumpSt ()
 {
-   if (gOptions()->isSet("st.dump.xml"))
+   if (_opts->isSet("--dump-st-xml"))
    {
+      std::string dump_path = _opts->getStr("--dump-st-xml");
       // Open dump file
       // TODO We should have a default output file in case the user did not
       // give one
-      std::ofstream st_dump_file(gOptions()->getStr("st.dump.xml").c_str());
+      std::ofstream st_dump_file(dump_path.c_str());
 
       st::visitor::XmlDumper dumper;
       dumper._out = &st_dump_file;
@@ -126,29 +124,28 @@ Compiler::dumpSt ()
       dumper.visitPreorder(symbols._root);
 
       st_dump_file.close();
-      _logger->debug("SymbolTable dumped to %s (XML)",
-         gOptions()->getStr("st.dump.xml").c_str());
+      _logger->debug("SymbolTable dumped to %s (XML)", dump_path.c_str());
    }
 }
 
 void
 Compiler::emitCode ()
 {
-   if (gOptions()->isSet("codegen.llvm-bc"))
+   std::string out_path;
+
+   if (_opts->isSet("--emit-llvm-bc"))
    {
+      out_path = _opts->getStr("--emit-llvm-bc");
       mem::codegen::llvm_::Codegen cg;
       cg.SymbolTable(&symbols);
       cg.gen(&ast);
 
       std::ofstream bc_file;
-      bc_file.open(gOptions()->getStr("codegen.llvm-bc").c_str());
+      bc_file.open(out_path.c_str());
       bc_file << cg.getLlvmByteCode();
       bc_file.close();
 
-      // TODO This should be moved elsewhere
-      llvm::llvm_shutdown();
-      _logger->debug("LLVM ByteCode dumped to %s",
-         gOptions()->getStr("codegen.llvm-bc").c_str());
+      _logger->debug("LLVM ByteCode dumped to %s", out_path.c_str());
    }
 }
 
@@ -271,8 +268,9 @@ Compiler::printUsage (std::ostream& out)
    out << PACKAGE_NAME;
    out << " [OPTIONS] <input>\n\n";
    out << "OPTIONS:\n";
+   /*
    std::map<std::string, opt::CliOption*>::iterator i;
-   for (i = gOptions()->_cli_options.begin(); i != gOptions()->_cli_options.end(); ++i)
+   for (i = _opts->_cli_options.begin(); i != _opts->_cli_options.end(); ++i)
    {
       if (i->second != NULL)
       {
@@ -283,6 +281,7 @@ Compiler::printUsage (std::ostream& out)
          out << "\n";
       }
    }
+   */
 }
 
 void
@@ -322,31 +321,5 @@ Compiler::runStVisitors ()
    }
 }
 
-void
-Compiler::setUpOptions ()
-{
-   _opts.addStrOpt("ast.dump.xml");
-   _opts.addBoolOpt("codegen.native");
-   _opts.addStrOpt("codegen.llvm-bc");
-   _opts.addIntEnumOpt("log.level")
-      ->bind("unknown", log::UNKNOWN)
-      ->bind("debug", log::DEBUG)
-      ->bind("info", log::INFO)
-      ->bind("warning", log::WARNING)
-      ->bind("error", log::ERROR)
-      ->bind("fatal-error", log::FATAL_ERROR);
-   _opts.addBoolOpt("help.show");
-   _opts.addBoolOpt("version.show");
-   _opts.addStrOpt("st.dump.xml");
-
-
-   // Set CLI options
-   _opts.addCliOpt("dump-ast-xml", "ast.dump.xml", "Dump the Abstract Syntax Tree as XML");
-   _opts.addCliOpt("dump-st-xml", "st.dump.xml", "Dump the Symbol Table as XML");
-   _opts.addCliOpt("emit-llvm-bc", "codegen.llvm-bc", "Emit LLVM bytecode");
-   _opts.addCliOpt("log-level", "log.level", "Set the minimum log level");
-   _opts.addCliOpt("help", "help.show", "Display available options");
-   _opts.addCliOpt("version", "version.show", "Display " PACKAGE_NAME " version");
-}
 
 }

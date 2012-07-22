@@ -1,6 +1,9 @@
 #ifndef _MEM__SS__HPP_
 #define _MEM__SS__HPP_
 
+#ifndef NDEBUG
+#include <stdio.h>
+#endif
 
 #define GETTER(name, type) public: type name() const
 #define SETTER(name, type) public: void set ## name(type val)

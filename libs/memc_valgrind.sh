@@ -5,4 +5,4 @@ valgrind \
 	--log-file=valgrind-log \
 	--suppressions=valgrind-suppressions \
 	memc \
-	$1
+	$1 $2 $3
