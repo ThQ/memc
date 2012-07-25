@@ -443,6 +443,10 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::Kind::OP_EQ_EQ:
+      case node::Kind::OP_LT:
+      case node::Kind::OP_LTE:
+      case node::Kind::OP_GT:
+      case node::Kind::OP_GTE:
          visitCompOp(scope, static_cast<node::BinaryOp*>(node));
          break;
 

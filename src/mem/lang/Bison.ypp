@@ -158,7 +158,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 
 // Lower precedence first
 %left <node> T_AND T_OR
-%left <node> T_EQ_EQ T_GT T_RARR_EQ T_LT T_RARR T_LARR_EQ
+%left <node> T_EQ_EQ T_GT T_GT_EQ T_LT T_RARR T_LT_EQ
 %left <node> T_MINUS T_PLUS
 %left <node> T_MUL T_DIV
 %left <node> T_MUL_MUL T_MODULO
@@ -665,22 +665,26 @@ comp_operator:
    // ex 1 < 2
    | T_LT
    {
-      $$ = new ast::node::Text();
+      $$ = new ast::node::BinaryOp();
+      $$->setKind(ast::node::Kind::OP_LT);
    }
    // ex: 1 <= 2
-   | T_LARR_EQ
+   | T_LT_EQ
    {
-      $$ = new ast::node::Text();
+      $$ = new ast::node::BinaryOp();
+      $$->setKind(ast::node::Kind::OP_LTE);
    }
    // ex: 1 > 2
    | T_GT
    {
-      $$ = new ast::node::Text();
+      $$ = new ast::node::BinaryOp();
+      $$->setKind(ast::node::Kind::OP_GT);
    }
    // ex: 1 >= 2
-   | T_RARR_EQ
+   | T_GT_EQ
    {
-      $$ = new ast::node::Text();
+      $$ = new ast::node::BinaryOp();
+      $$->setKind(ast::node::Kind::OP_GTE);
    }
 
 math_operator:

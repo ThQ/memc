@@ -202,6 +202,48 @@ Tokenizer::_processTokenStart (char c)
          }
          break;
       }
+      case '>':
+      {
+         c2 = _get1Char();
+         if (c2 == '=')
+         {
+            _cur_tok = T_GT_EQ;
+            _state = T_YACC_UNDEFINED;
+            _tokenBuffer = c;
+            _tokenBuffer += c2;
+            emit_token = true;
+         }
+         else
+         {
+            _cur_tok = T_GT;
+            _state = T_YACC_UNDEFINED;
+            _tokenBuffer = c;
+            _backtrack();
+            emit_token = true;
+         }
+         break;
+      }
+      case '<':
+      {
+         c2 = _get1Char();
+         if (c2 == '=')
+         {
+            _cur_tok = T_LT_EQ;
+            _state = T_YACC_UNDEFINED;
+            _tokenBuffer = c;
+            _tokenBuffer += c2;
+            emit_token = true;
+         }
+         else
+         {
+            _cur_tok = T_LT;
+            _state = T_YACC_UNDEFINED;
+            _tokenBuffer = c;
+            _backtrack();
+            emit_token = true;
+         }
+         break;
+      }
       case '=':
       {
          c2 = _get1Char();

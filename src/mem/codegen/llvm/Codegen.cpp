@@ -344,23 +344,28 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
    assert (n != NULL);
    assert (_cur_bb != NULL);
 
-   llvm::CmpInst* comp_inst = NULL;
    llvm::Value* left_val = cgExprAndLoad(n->LeftNode());
    llvm::Value* right_val = cgExprAndLoad(n->RightNode());
 
+   llvm::ICmpInst::Predicate pred;
+
    switch (n->Kind())
    {
-      case ast::node::Kind::OP_EQ_EQ:
-         comp_inst = new llvm::ICmpInst(*_cur_bb, llvm::ICmpInst::ICMP_EQ, left_val,
-           right_val, "");
-         break;
+      case ast::node::Kind::OP_EQ_EQ: pred = llvm::ICmpInst::ICMP_EQ; break;
+      case ast::node::Kind::OP_LT:    pred = llvm::ICmpInst::ICMP_SLT; break;
+      case ast::node::Kind::OP_LTE:   pred = llvm::ICmpInst::ICMP_SLE; break;
+      case ast::node::Kind::OP_GT:    pred = llvm::ICmpInst::ICMP_SGT; break;
+      case ast::node::Kind::OP_GTE:   pred = llvm::ICmpInst::ICMP_SGE; break;
+
       default:
          DEBUG_PRINTF("Unsupported comparison operator (%s)\n", n->KindName().c_str());
          assert(false);
 
    }
 
-   assert(comp_inst != NULL);
+   llvm::CmpInst* comp_inst = new llvm::ICmpInst(*_cur_bb, pred, left_val,
+      right_val, "");
+
    return comp_inst;
 }
 
@@ -439,6 +444,10 @@ Codegen::cgExpr (ast::node::Node* node)
          break;
 
       case ast::node::Kind::OP_EQ_EQ:
+      case ast::node::Kind::OP_LT:
+      case ast::node::Kind::OP_LTE:
+      case ast::node::Kind::OP_GT:
+      case ast::node::Kind::OP_GTE:
          res = cgCompOp(static_cast<ast::node::BinaryOp*>(node));
          break;
 
