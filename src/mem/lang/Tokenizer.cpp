@@ -120,32 +120,64 @@ Tokenizer::_processTokenStart (char c)
       case '(':
       {
         _cur_tok = T_OP;
-        _tokenBuffer = c;
         _state = T_YACC_UNDEFINED;
+        _tokenBuffer = c;
         emit_token = true;
         break;
       }
       case ')':
       {
          _cur_tok = T_CP;
-         _tokenBuffer = c;
          _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
+      }
+      case '[':
+      {
+         _cur_tok = T_LBRACKET;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
+      }
+      case ']':
+      {
+         _cur_tok = T_RBRACKET;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
          emit_token = true;
          break;
       }
       case ':':
       {
          _cur_tok = T_SEMICOLON;
-         _tokenBuffer = c;
          _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
+      }
+      case ',':
+      {
+         _cur_tok = T_COMMA;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
          emit_token = true;
          break;
       }
       case '*':
       {
          _cur_tok = T_MUL;
-         _tokenBuffer = c;
          _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
+      }
+      case '+':
+      {
+         _cur_tok = T_PLUS;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
          emit_token = true;
          break;
       }
@@ -155,17 +187,17 @@ Tokenizer::_processTokenStart (char c)
          if (c2 == '>')
          {
             _cur_tok = T_RARR;
+            _state = T_YACC_UNDEFINED;
             _tokenBuffer = c;
             _tokenBuffer += c2;
-            _state = T_YACC_UNDEFINED;
             emit_token = true;
          }
          else
          {
             _cur_tok = T_MINUS;
+            _state = T_YACC_UNDEFINED;
             _tokenBuffer = c;
             _backtrack();
-            _state = T_YACC_UNDEFINED;
             emit_token = true;
          }
          break;
@@ -236,7 +268,7 @@ Tokenizer::_processTokenStart (char c)
 Token
 Tokenizer::getNextToken ()
 {
-   //printf("========= getNextToken ==========\n");
+   //DEBUG_PRINTF("========= getNextToken ==========\n", "");
    Token t = _getNextToken();
 
    // There cannot be 2 consecutive T_SPACE, no need to loop here
@@ -245,7 +277,7 @@ Tokenizer::getNextToken ()
       t = _getNextToken();
    }
 
-   //printf("=> TOKEN[%d] = <%s>\n", t.Kind(), t.Value().c_str());
+   DEBUG_PRINTF("=> TOKEN[%d] = <%s>\n", t.Kind(), t.Value().c_str());
    return t;
 }
 
@@ -284,8 +316,10 @@ Tokenizer::_getIndentTokenKind (std::string indent)
       }
       else
       {
-         //printf("INDENT IS ONLY NEWLINE (indent_level=%d, cur_indent_level=%d)\n", indent_level, _indent_level);
-         return T_NEWLINE;
+         // We are simply indenting in the same block (not an indentation, nor
+         // a dedentation, we then just skip the token since a T_NEWLINE has
+         // been just emited the token before.
+         return T_YACC_UNDEFINED;
       }
    }
    else
@@ -360,7 +394,7 @@ Tokenizer::_getNextToken ()
    while (!_isFileConsumed())
    {
       c = _get1Char();
-      //printf("CHAR <%c>(%d)\n", c, c);
+      //DEBUG_PRINTF("CHAR <%c>(%d)\n", c, c);
       if (c == 0)
       {
          _state = T_YACC_END;
@@ -406,7 +440,14 @@ Tokenizer::_getNextToken ()
                _cur_tok = _getIndentTokenKind(_tokenBuffer);
                _backtrack();
                _state = T_YACC_UNDEFINED;
-               goto ret;
+               if (_cur_tok != T_YACC_UNDEFINED)
+               {
+                  goto ret;
+               }
+               else
+               {
+                  _tokenBuffer = "";
+               }
             }
             break;
          }

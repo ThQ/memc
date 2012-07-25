@@ -8,9 +8,11 @@ src_mem = \
 src_mem_ast = \
  src/mem/ast/util.cpp
 src_mem_ast_node = \
+ src/mem/ast/node/Array.cpp \
  src/mem/ast/node/BinaryExpression.cpp \
  src/mem/ast/node/BinaryOp.cpp \
  src/mem/ast/node/Block.cpp \
+ src/mem/ast/node/BracketOp.cpp \
  src/mem/ast/node/Call.cpp \
  src/mem/ast/node/Class.cpp \
  src/mem/ast/node/Dot.cpp \
@@ -73,6 +75,7 @@ src_mem_opt = \
  src/mem/opt/Options.cpp
 src_mem_st = \
  src/mem/st/Arg.cpp \
+ src/mem/st/Array.cpp \
  src/mem/st/Class.cpp \
  src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \

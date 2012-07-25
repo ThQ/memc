@@ -132,6 +132,9 @@ class Node
    isAssignable ();
 
    inline bool
+   isArrayNode() {return isKind(Kind::ARRAY);}
+
+   inline bool
    isBlockNode() {return isKind(Kind::BLOCK);}
 
    inline bool

@@ -8,7 +8,9 @@
 #include <llvm/Support/IRBuilder.h>
 #include <llvm/Support/raw_ostream.h>
 #include <map>
+#include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
+#include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/FinalId.hpp"
@@ -16,6 +18,7 @@
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/VarAssign.hpp"
+#include "mem/ast/node/While.hpp"
 #include "mem/codegen/ICodegen.hpp"
 #include "mem/codegen/TStack.hpp"
 #include "mem/st/Class.hpp"
@@ -123,6 +126,9 @@ class Codegen : public mem::codegen::ICodegen
    cgBlock (ast::node::Block* block);
 
    llvm::Value*
+   cgBracketOpExpr (ast::node::BracketOp* n);
+
+   llvm::Value*
    cgCallExpr (ast::node::Call* node);
 
    void
@@ -181,6 +187,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgVarDeclStatement (ast::node::VarDecl* node);
+
+   void
+   cgWhileStatement (ast::node::While* n);
 
    virtual void
    gen (ast::node::Node* root);

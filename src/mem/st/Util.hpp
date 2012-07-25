@@ -7,6 +7,7 @@
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/node/Text.hpp"
+#include "mem/st/Array.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/Primitive.hpp"
@@ -30,6 +31,9 @@ class Util
 
    static size_t
    getIndirectionCount (std::string type_name);
+
+   static Array*
+   lookupArrayType (Symbol* scope, std::string base_ty_name);
 
    static Class*
    lookupClass (Symbol* scope, std::string cls_name);

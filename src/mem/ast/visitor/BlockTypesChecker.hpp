@@ -5,7 +5,9 @@
 #include <map>
 #include <stdlib.h>
 #include <vector>
+#include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
+#include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
@@ -79,10 +81,16 @@ class BlockTypesChecker : public TypeChecker
    visitAmpersand (st::Symbol* scope, node::Node* node);
 
    void
+   visitArray (st::Symbol* scope, node::Array* node);
+
+   void
    visitArithmeticOp (st::Symbol* scope, node::Node* node);
 
    void
    visitBinaryExpr (st::Symbol* scope, node::Node* expr_node);
+
+   void
+   visitBracketOp (st::Symbol* scope, node::BracketOp* n);
 
    void
    visitCompOp (st::Symbol* scope, node::BinaryOp* n);

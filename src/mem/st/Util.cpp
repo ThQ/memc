@@ -127,6 +127,24 @@ Util::getSymbol (Symbol* scope, std::string sym_name)
    return res;
 }
 
+Array*
+Util::lookupArrayType (Symbol* scope, std::string base_ty_name)
+{
+   Array* arr_ty = NULL;
+   Symbol* base_ty = Util::lookupSymbol(scope, base_ty_name);
+
+   if (base_ty != NULL && base_ty->isAnyTypeSymbol())
+   {
+      arr_ty = new Array();
+      arr_ty->setBaseType(static_cast<Type*>(base_ty));
+      arr_ty->setName("[" + base_ty->Name() + "]");
+
+      base_ty->_parent->addChild(arr_ty);
+   }
+
+   return arr_ty;
+}
+
 Class*
 Util::lookupClass (Symbol* scope, std::string cls_name)
 {

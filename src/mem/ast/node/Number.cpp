@@ -16,7 +16,15 @@ Number::Number ()
 int
 Number::getInt ()
 {
-   return _ival;
+   switch (_format)
+   {
+      case 's':
+         return (int)_sval;
+
+      case 'i':
+         return _ival;
+   }
+   return 0;
 }
 
 unsigned int

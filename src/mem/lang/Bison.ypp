@@ -8,9 +8,11 @@
 #define PASS (0);
 #include <stdio.h>
 #include <string.h>
+#include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryExpression.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/Block.hpp"
+#include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
@@ -501,10 +503,23 @@ member_declaration:
       $$ = (ast::node::Node*)field;
    }
 
-type_name :
+type_name:
    qualified_id
    {
       $$ = static_cast<ast::node::Node*>($1);
+   }
+   | T_LBRACKET qualified_id T_RBRACKET
+   {
+      ast::node::Array* arr = new ast::node::Array();
+      arr->pushChild($2);
+      $$ = static_cast<ast::node::Node*>(arr);
+   }
+   | T_LBRACKET qualified_id T_COMMA literal T_RBRACKET
+   {
+      // FIXME $4 should be only a literal number, or, even better, any expr
+      ast::node::Array* arr = new ast::node::Array();
+      arr->pushChildren($2, $4);
+      $$ = static_cast<ast::node::Node*>(arr);
    }
 
 variable_assignment :
@@ -619,6 +634,11 @@ expr :
       $$ = new ast::node::New();
       $$->setPosition(@$.copy_range());
       $$->pushChild($2);
+   }
+   | expr T_LBRACKET expr T_RBRACKET
+   {
+      $$ = new ast::node::BracketOp();
+      $$->pushChildren($1, $3);
    }
 
 bool_operator:

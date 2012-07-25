@@ -42,9 +42,9 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
    // Type is NOT found, so ?
    else
    {
-      // Create the pointer type
       if (mem_ty->isPtrSymbol())
       {
+         // Create the pointer type
          llvm::Type* base_ty = _getLlvmTy(
             static_cast<mem::st::Ptr*>(mem_ty)->BaseType());
          if (base_ty != NULL)
@@ -233,7 +233,8 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
          break;
 
       default:
-         DEBUG_PRINTF("Unsupported arithmetic operation : %s\n", node->KindName().c_str());
+         DEBUG_PRINTF("Unsupported arithmetic operation : %s\n",
+            node->KindName().c_str());
          assert (false);
    }
 
@@ -255,6 +256,27 @@ Codegen::cgBlock (ast::node::Block* block)
    }
 
    _stack.pop();
+}
+
+llvm::Value*
+Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
+{
+   assert (n != NULL);
+   llvm::Value* val = cgExpr(n->ValueNode());
+   assert (val != NULL);
+
+   llvm::Value* index = cgExprAndLoad(n->IndexNode());
+   assert (index != NULL);
+
+   std::vector<llvm::Value*> idx;
+   idx.push_back(llvm::ConstantInt::get(_module->getContext(),
+      llvm::APInt(32, 0)));
+   idx.push_back(index);
+
+   llvm::GetElementPtrInst* inst = llvm::GetElementPtrInst::Create(val, idx, "", _cur_bb);
+   inst->setIsInBounds(true);
+
+   return inst;
 }
 
 llvm::Value*
@@ -404,6 +426,10 @@ Codegen::cgExpr (ast::node::Node* node)
          res = cgAmpersandExpr (node);
          break;
 
+      case ast::node::Kind::BRACKET_OP:
+         res = cgBracketOpExpr(static_cast<ast::node::BracketOp*>(node));
+         break;
+
       case ast::node::Kind::CALL:
          res = cgCallExpr(static_cast<ast::node::Call*>(node));
          break;
@@ -451,6 +477,10 @@ Codegen::cgExpr (ast::node::Node* node)
          cgVarDeclStatement (static_cast<ast::node::VarDecl*>(node));
          break;
 
+      case ast::node::Kind::WHILE:
+         cgWhileStatement (static_cast<ast::node::While*>(node));
+         break;
+
       default:
          DEBUG_PRINTF("Unsupported node type (%s)\n", node->KindName().c_str());
          assert(false);
@@ -472,6 +502,7 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
       case ast::node::Kind::AMPERSAND:
       //case ast::node::Kind::CALL:
       case ast::node::Kind::DOT:
+      case ast::node::Kind::BRACKET_OP:
          must_load = true;
          break;
 
@@ -808,10 +839,26 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
    assert(node->isVarDeclNode());
    assert(node->hasExprType());
 
-   llvm::Type* var_ty = _getLlvmTy(node->ExprType());
+   llvm::Type* var_ty = NULL;
+   llvm::Value* var_len = NULL;
+
+   if (node->TypeNode()->isArrayNode())
+   {
+      ast::node::Array* arr = static_cast<ast::node::Array*>(node->TypeNode());
+      assert (arr->LengthNode() != NULL);
+
+      var_len = cgExpr(arr->LengthNode());
+      var_ty = llvm::ArrayType::get(_getLlvmTy(arr->TypeNode()->ExprType()),
+         static_cast<ast::node::Number*>(arr->LengthNode())->getInt());
+   }
+   else
+   {
+      var_ty = _getLlvmTy(node->ExprType());
+   }
+
    assert(var_ty != NULL);
 
-   llvm::Value* var = new llvm::AllocaInst(var_ty, NULL,
+   llvm::Value* var = new llvm::AllocaInst(var_ty, var_len,
       node->Name(), _cur_bb);
 
    if (node->ValueNode() != NULL)
@@ -824,6 +871,35 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
    //var = new llvm::LoadInst(var, "", _cur_bb);
 
    _stack.set(node->Name(), var);
+}
+
+void
+Codegen::cgWhileStatement (ast::node::While* n)
+{
+   assert (n != NULL);
+
+   llvm::BasicBlock* origin_block = _cur_bb;
+
+   llvm::BasicBlock* while_head = llvm::BasicBlock::Create(
+      llvm::getGlobalContext(), "while_head", _cur_func);
+   _cur_bb = while_head;
+   llvm::Value* cond = cgExpr(n->ConditionNode());
+   assert(cond != NULL);
+
+   llvm::BasicBlock* while_body = llvm::BasicBlock::Create(
+      llvm::getGlobalContext(), "while_body", _cur_func);
+   assert (while_body != NULL);
+   _cur_bb = while_body;
+   cgBlock(static_cast<ast::node::Block*>(n->BodyNode()));
+   while_body->getInstList().push_back(llvm::BranchInst::Create(while_head));
+
+   llvm::BasicBlock* while_after = llvm::BasicBlock::Create(
+      llvm::getGlobalContext(), "while_after", _cur_func);
+   assert (while_after != NULL);
+   _cur_bb = while_after;
+
+   origin_block->getInstList().push_back(llvm::BranchInst::Create(while_head));
+   llvm::BranchInst::Create(while_body, while_after, cond, while_head);
 }
 
 std::string

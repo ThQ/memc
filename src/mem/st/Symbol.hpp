@@ -112,6 +112,9 @@ class Symbol
    isArgSymbol() const {return is(st::ARG);}
 
    inline bool
+   isArraySymbol() const {return is(st::ARRAY);}
+
+   inline bool
    isClassSymbol() const {return is(st::CLASS);}
 
    inline bool

@@ -103,6 +103,7 @@ Node::isAssignable ()
       case Kind::FINAL_ID:
       case Kind::DOT:
       case Kind::AMPERSAND:
+      case Kind::BRACKET_OP:
          return true;
    }
    return false;

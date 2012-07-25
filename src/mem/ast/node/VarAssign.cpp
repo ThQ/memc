@@ -20,7 +20,6 @@ VarAssign::isValid (NodeValidator* v)
    // Check NAME node
    if (NameNode() != NULL)
    {
-      v->ensure(NameNode()->hasBoundSymbol(), "VarAssign : Name node must have a bound symbol");
       v->ensure(NameNode()->hasExprType(), "VarAssign : Name node must have an expression type");
    }
 

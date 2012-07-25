@@ -264,6 +264,51 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
 }
 
 void
+BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
+{
+   assert (scope != NULL);
+   assert (n != NULL);
+
+   printf("visitArray\n");
+   if (n->TypeNode() != NULL)
+   {
+      printf("Arr.Ty is not null\n");
+      visitExpr(scope, n->TypeNode());
+      if (n->LengthNode() != NULL)
+      {
+         visitExpr(scope, n->LengthNode());
+      }
+
+      if (n->TypeNode()->hasBoundSymbol())
+      {
+         printf("Arr.Ty has bound symbol\n");
+         st::Symbol* arr_sym = st::Util::lookupArrayType(scope, n->TypeNode()->BoundSymbol()->Name());
+         n->setBoundSymbol(arr_sym);
+         n->setExprType(arr_sym);
+      }
+   }
+}
+
+void
+BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
+{
+   assert (scope != NULL);
+   assert (n != NULL);
+   visitExpr (scope, n->ValueNode());
+   visitExpr (scope, n->IndexNode());
+
+   if (n->ValueNode()->hasExprType() && n->ValueNode()->ExprType()->isArraySymbol())
+   {
+      st::Array* arr = static_cast<st::Array*>(n->ValueNode()->ExprType());
+      n->setExprType(arr->BaseType());
+   }
+   else
+   {
+      assert (false);
+   }
+}
+
+void
 BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
 {
    assert (scope != NULL);
@@ -399,6 +444,15 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 
       case node::Kind::OP_EQ_EQ:
          visitCompOp(scope, static_cast<node::BinaryOp*>(node));
+         break;
+
+      case node::Kind::ARRAY:
+         visitArray (scope, util::castTo<node::Array*, node::Kind::ARRAY>(node));
+         break;
+
+      case node::Kind::BRACKET_OP:
+         visitBracketOp(scope, util::castTo<node::BracketOp*,
+            node::Kind::BRACKET_OP>(node));
          break;
 
       case node::Kind::OP_AND:
@@ -648,7 +702,7 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
 
    if (node->NameNode()->isAssignable())
    {
-      if (node->NameNode()->hasBoundSymbol())
+      if (node->NameNode()->hasExprType())
       {
          visitExpr(scope, node->ValueNode());
          ensureExprType(node->NameNode(), node->ValueNode()->ExprType());
