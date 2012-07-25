@@ -17,6 +17,23 @@ namespace mem { namespace log {
  *
  * Message texts should follow the GNOME Human Interface Guidelines
  * http://developer.gnome.org/hig-book/3.0/windows-alert.html.en#alert-text
+ *
+ * Primary text :
+ *    The primary text provides the user with a one sentence summary of the
+ *    information or suggested action. This summary should concisely contain
+ *    the essential details of the problem or suggestion. Every [message] has
+ *    primary text, displayed in a bold font slightly larger than the default.
+ *    The primary text is punctuated in 'newspaper headline' style, that is, it
+ *    has no terminating period, but it may have a terminating question mark.
+ *
+ * Seconday text :
+ *    Secondary text provides a more in-depth description of the problem and
+ *    suggested action, including possible side effects. Secondary text can
+ *    also provide information that may be helpful in allowing the user to make
+ *    an informed decision. In most situations the user should only need the
+ *    primary text to make a quick decision, but they may read the secondary
+ *    text if they are unsure of the proper course of action, or require extra
+ *    details. Secondary text is optional [...].
  */
 class Message
 {
@@ -35,7 +52,6 @@ class Message
    public:
 
    // PROPERTY : Description
-   //:public: void sDescription(const char* desc);
    GETTER(SecondaryText, std::string) {return _description;}
    SETTER(SecondaryText, std::string) { _description.assign(val); }
 
