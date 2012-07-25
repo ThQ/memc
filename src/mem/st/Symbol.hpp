@@ -52,6 +52,9 @@ class Symbol
    virtual st::Symbol*
    gExprType ();
 
+   // Kind
+   GETTER(Kind, SymbolKind) {return _kind;}
+
    // Metadata
    GETTER(Metadata, ::mem::Metadata*) {return _md;}
    SETTER(Metadata, ::mem::Metadata*) {_md = val;}

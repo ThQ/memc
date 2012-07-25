@@ -282,7 +282,9 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
       if (n->TypeNode()->hasBoundSymbol())
       {
          printf("Arr.Ty has bound symbol\n");
-         st::Symbol* arr_sym = st::Util::lookupArrayType(scope, n->TypeNode()->BoundSymbol()->Name());
+         st::Symbol* arr_sym = st::Util::lookupArrayType(scope,
+            n->TypeNode()->BoundSymbol()->Name(),
+            static_cast<ast::node::Number*>(n->LengthNode())->getInt());
          n->setBoundSymbol(arr_sym);
          n->setExprType(arr_sym);
       }
@@ -294,6 +296,7 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 {
    assert (scope != NULL);
    assert (n != NULL);
+
    visitExpr (scope, n->ValueNode());
    visitExpr (scope, n->IndexNode());
 
@@ -673,6 +676,9 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
 void
 BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
 {
+   assert (scope != NULL);
+   assert (n != NULL);
+
    st::Func* parent_func = util::getParentFunction(n);
    assert (parent_func);
    assert (parent_func->isFuncSymbol());
@@ -682,7 +688,11 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
 
    visitExpr(scope, value_node);
 
-   if (value_node->ExprType() != parent_func->ReturnType())
+   if (value_node->ExprType() == parent_func->ReturnType())
+   {
+      n->setExprType(parent_func->ReturnType());
+   }
+   else
    {
       log::ReturnTypeDiffersFromPrototype* err = new
          log::ReturnTypeDiffersFromPrototype();

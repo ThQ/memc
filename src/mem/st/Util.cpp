@@ -31,6 +31,21 @@ Util::createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
    return static_cast<st::Namespace*>(cur_ns);
 }
 
+Type*
+Util::getPointerBaseType (Ptr* ptr)
+{
+   Type* base_ty = NULL;
+   while (ptr->isPtrSymbol())
+   {
+      ptr = static_cast<st::Ptr*>(ptr->BaseType());
+   }
+   if (!ptr->isPtrSymbol())
+   {
+      base_ty = ptr;
+   }
+   return base_ty;
+}
+
 /*
 st::FunctionSignature*
 Util::lookupFunctionSignature(Symbol* scope, Func* base_func, std::vector<st::Symbol*> params)
@@ -128,16 +143,24 @@ Util::getSymbol (Symbol* scope, std::string sym_name)
 }
 
 Array*
-Util::lookupArrayType (Symbol* scope, std::string base_ty_name)
+Util::lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
 {
    Array* arr_ty = NULL;
    Symbol* base_ty = Util::lookupSymbol(scope, base_ty_name);
 
    if (base_ty != NULL && base_ty->isAnyTypeSymbol())
    {
+      std::stringstream str;
+      str << "[";
+      str << base_ty->Name();
+      str << ",";
+      str << size;
+      str << "]";
+
       arr_ty = new Array();
       arr_ty->setBaseType(static_cast<Type*>(base_ty));
-      arr_ty->setName("[" + base_ty->Name() + "]");
+      arr_ty->setName(str.str());
+      arr_ty->setArrayLength(size);
 
       base_ty->_parent->addChild(arr_ty);
    }
@@ -203,9 +226,13 @@ Util::lookupSymbol (Symbol* scope, std::string symbol_name)
       }
    }
 
-   if (res == NULL)
+   IF_DEBUG
    {
-      printf("SYMB_NOT_FOUND <%s:%s>\n", scope->gQualifiedNameCstr(), symbol_name.c_str());
+      if (res == NULL)
+      {
+         DEBUG_PRINTF("Symbol <%s> not found in <%s>.\n",
+            scope->gQualifiedNameCstr(), symbol_name.c_str());
+      }
    }
    return res;
 }
@@ -223,8 +250,7 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
    {
       if (i == 0)
       {
-         cur_sym = static_cast<st::Class*>(lookupSymbol(scope, base_ty_name));
-         assert(cur_sym->isClassSymbol());
+         cur_sym = static_cast<st::Type*>(lookupSymbol(scope, base_ty_name));
       }
       else
       {
@@ -252,6 +278,31 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
 
    assert(cur_sym->isPtrSymbol());
    return static_cast<Ptr*>(cur_sym);
+}
+
+bool
+Util::parseArrayTypeName (std::string name, std::string& base_ty_name,
+   int& array_len)
+{
+   base_ty_name = "";
+   array_len = -1;
+
+   if (name[0] == ']' && name[name.size()-1] == ']')
+   {
+      size_t comma_pos = name.find_first_of(',');
+      if (comma_pos != std::string::npos)
+      {
+         base_ty_name = name[1, comma_pos];
+         // FIXME This may fail badly
+         array_len = atoi(name.substr(comma_pos+1,name.size()-2).c_str());
+      }
+      else
+      {
+         base_ty_name = name[1, name.size()-2];
+      }
+      return true;
+   }
+   return false;
 }
 
 void

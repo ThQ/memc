@@ -74,8 +74,14 @@ class Codegen : public mem::codegen::ICodegen
    //--------------------------------------------------------------------------
    public:
 
+   void
+   _dumpTypes ();
+
    std::string
    _getCodegenFuncName (st::Func* func);
+
+   st::Type*
+   _getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty);
 
    /**
     * Returns the LLVM type associated with an AST function node.
@@ -156,7 +162,7 @@ class Codegen : public mem::codegen::ICodegen
     * Codegen a node and generate a LLVM Load instruction if necessary.
     */
    llvm::Value*
-   cgExprAndLoad (ast::node::Node* node);
+   cgExprAndLoad (ast::node::Node* node, st::Symbol* source_ty, st::Symbol* dest_ty);
 
    void
    cgFunctionBody (ast::node::Func* func_node);

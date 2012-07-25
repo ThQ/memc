@@ -119,11 +119,11 @@ Tokenizer::_processTokenStart (char c)
    {
       case '(':
       {
-        _cur_tok = T_OP;
-        _state = T_YACC_UNDEFINED;
-        _tokenBuffer = c;
-        emit_token = true;
-        break;
+         _cur_tok = T_OP;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
       }
       case ')':
       {
@@ -160,6 +160,14 @@ Tokenizer::_processTokenStart (char c)
       case ',':
       {
          _cur_tok = T_COMMA;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
+      }
+      case '&':
+      {
+         _cur_tok = T_AMPERSAND;
          _state = T_YACC_UNDEFINED;
          _tokenBuffer = c;
          emit_token = true;
@@ -258,9 +266,9 @@ Tokenizer::_processTokenStart (char c)
          else
          {
             _cur_tok = T_EQ;
+            _state = T_YACC_UNDEFINED;
             _tokenBuffer = c;
             _backtrack();
-            _state = T_YACC_UNDEFINED;
             emit_token = true;
          }
          break;

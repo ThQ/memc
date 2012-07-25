@@ -4,6 +4,16 @@
 namespace mem { namespace codegen { namespace llvm_ {
 
 
+void
+Codegen::_dumpTypes ()
+{
+   std::map<std::string, llvm::Type*>::iterator i;
+   for (i = _classes.begin() ; i != _classes.end(); ++i)
+   {
+      printf("%s\n", (*i).first.c_str());
+   }
+}
+
 std::string
 Codegen::_getCodegenFuncName (st::Func* func)
 {
@@ -19,6 +29,27 @@ Codegen::_getCodegenFuncName (st::Func* func)
    }
 
    return name;
+}
+
+st::Type*
+Codegen::_getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty)
+{
+   st::Type* common_ty = NULL;
+   if (!left_ty->isPtrSymbol())
+   {
+      common_ty = static_cast<st::Type*>(left_ty);
+   }
+   else if (!right_ty->isPtrSymbol())
+   {
+      common_ty = static_cast<st::Type*>(right_ty);
+   }
+   // Both operands are pointers
+   else
+   {
+      common_ty = st::Util::getPointerBaseType(static_cast<st::Ptr*>(left_ty));
+   }
+
+   return common_ty;
 }
 
 llvm::Type*
@@ -53,8 +84,25 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
              ty = llvm::PointerType::get(base_ty, 0);
          }
       }
+      else if (mem_ty->isArraySymbol())
+      {
+         st::Array* arr = static_cast<mem::st::Array*>(mem_ty);
+         llvm::Type* base_ty = _getLlvmTy(arr->BaseType());
+         if (base_ty != NULL)
+         {
+            ty = llvm::ArrayType::get(base_ty, arr->ArrayLength());
+         }
+      }
    }
-   assert(ty != NULL);
+
+   IF_DEBUG
+   {
+      if (ty == NULL)
+      {
+         DEBUG_PRINTF("Type <%s> not found.\n", mem_ty->NameCstr());
+         assert(ty != NULL);
+      }
+   }
    return ty;
 }
 
@@ -199,21 +247,25 @@ Codegen::cgAmpersandExpr (ast::node::Node* node)
    llvm::Value* load = new llvm::LoadInst(tmp, amp_label + ".Load", _cur_bb);
    */
    //llvm::LoadInst* load = new llvm::LoadInst(base_val, "", _cur_bb);
-   /*
-   llvm::GetElementPtrInst* gep = llvm::GetElementPtrInst::Create(load,
+   llvm::GetElementPtrInst* gep = llvm::GetElementPtrInst::Create(base_val,
       llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0)),
       "dot", _cur_bb);
-   */
 
-   return base_val;
+   return gep;
 }
 
 llvm::Value*
 Codegen::cgBinaryExpr (ast::node::Node* node)
 {
    llvm::Value* val = NULL;
-   llvm::Value* left_val = cgExprAndLoad(node->getChild(0));
-   llvm::Value* right_val = cgExprAndLoad(node->getChild(1));
+   ast::node::Node* left_node = node->getChild(0);
+   ast::node::Node* right_node = node->getChild(1);
+
+   st::Type* ty = _getLowestCommonType(left_node->ExprType(),
+      right_node->ExprType());
+
+   llvm::Value* left_val = cgExprAndLoad(left_node, left_node->ExprType(), ty);
+   llvm::Value* right_val = cgExprAndLoad(right_node, right_node->ExprType(), ty);
 
    switch (node->Kind())
    {
@@ -265,7 +317,8 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    llvm::Value* val = cgExpr(n->ValueNode());
    assert (val != NULL);
 
-   llvm::Value* index = cgExprAndLoad(n->IndexNode());
+   llvm::Value* index = cgExprAndLoad(n->IndexNode(),
+      n->IndexNode()->ExprType(), _st->gCoreTypes().gIntTy());
    assert (index != NULL);
 
    std::vector<llvm::Value*> idx;
@@ -288,11 +341,19 @@ Codegen::cgCallExpr (ast::node::Call* node)
 
    if (node->ParamsNode() != NULL)
    {
-      ast::node::Node* cur_param = node->ParamsNode()->_first_child;
-      while (cur_param != NULL)
+      ast::node::Node* cur_param_node = NULL;
+      st::Var* cur_param = NULL;
+      llvm::Value* param_value = NULL;
+      for (size_t i = 0; i < node->ParamsNode()->ChildCount(); ++i)
       {
-         params.push_back(cgExprAndLoad(cur_param));
-         cur_param = cur_param->_next;
+         cur_param_node = node->ParamsNode()->getChild(i);
+         cur_param = func_sym->getParam(i);
+
+         param_value = cgExprAndLoad(cur_param_node,
+            static_cast<st::Type*>(cur_param_node->ExprType()),
+            cur_param->Type());
+
+         params.push_back(param_value);
       }
    }
 
@@ -344,8 +405,16 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
    assert (n != NULL);
    assert (_cur_bb != NULL);
 
-   llvm::Value* left_val = cgExprAndLoad(n->LeftNode());
-   llvm::Value* right_val = cgExprAndLoad(n->RightNode());
+   ast::node::Node* left_val_node = n->LeftNode();
+   ast::node::Node* right_val_node = n->RightNode();
+
+   st::Type* expected_operand_ty = _getLowestCommonType(
+      left_val_node->ExprType(), right_val_node->ExprType());
+
+   llvm::Value* left_val = cgExprAndLoad(left_val_node,
+      left_val_node->ExprType(), expected_operand_ty);
+   llvm::Value* right_val = cgExprAndLoad(right_val_node,
+      right_val_node->ExprType(), expected_operand_ty);
 
    llvm::ICmpInst::Predicate pred;
 
@@ -499,29 +568,39 @@ Codegen::cgExpr (ast::node::Node* node)
 }
 
 llvm::Value*
-Codegen::cgExprAndLoad (ast::node::Node* node)
+Codegen::cgExprAndLoad (ast::node::Node* node, st::Symbol* src_ty, st::Symbol* dst_ty)
 {
+   assert(node != NULL);
+   assert(src_ty != NULL);
+   assert (dst_ty != NULL);
+
    llvm::Value* val = cgExpr(node);
    assert(val != NULL);
 
-   bool must_load = false; //node->ExprType()->isPtrSymbol();
+   bool must_load = false;
 
-   switch (node->Kind())
+   if (!src_ty->isPtrSymbol() && dst_ty->isPtrSymbol())
    {
-      case ast::node::Kind::AMPERSAND:
-      //case ast::node::Kind::CALL:
-      case ast::node::Kind::DOT:
-      case ast::node::Kind::BRACKET_OP:
-         must_load = true;
-         break;
+      must_load = true;
+   }
+   else if (src_ty->isPtrSymbol() && !dst_ty->isPtrSymbol())
+   {
+      st::Ptr* src_ptr = static_cast<st::Ptr*>(src_ty);
+      st::Ptr* dst_ptr = static_cast<st::Ptr*>(dst_ty);
 
-      case ast::node::Kind::FINAL_ID:
-         assert (node->hasBoundSymbol());
-         if (node->BoundSymbol()->isVarSymbol())
-         {
+      if (src_ptr->IndirectionLevel() > dst_ptr->IndirectionLevel())
+      {
+         must_load = true;
+      }
+   }
+   else
+   {
+      switch (node->Kind())
+      {
+         case ast::node::Kind::FINAL_ID:
             must_load = true;
-         }
-         break;
+            break;
+      }
    }
 
    if (must_load)
@@ -712,15 +791,16 @@ Codegen::cgIfStatement (ast::node::If* node)
       cgBlock(static_cast<ast::node::Block*>(node->ElseBlockNode()));
       if (!if_is_last_child)
       {
-         false_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
+         false_block->getInstList().push_back(
+            llvm::BranchInst::Create(after_block));
       }
    }
 
    // BRANCH
    assert (node->ConditionNode() != NULL);
    _cur_bb = cur_bb;
-   llvm::Value* cond = cgExprAndLoad(node->ConditionNode());
-   //llvm::LoadInst* load = new llvm::LoadInst(cond, "ifcond", false, cur_bb);
+   llvm::Value* cond = cgExprAndLoad(node->ConditionNode(), node->ExprType(),
+      node->ConditionNode()->ExprType());
 
    // IF/ELSE
    if (node->hasElseBlockNode())
@@ -827,7 +907,9 @@ Codegen::cgReturnStatement (ast::node::Node* node)
    assert(node->isReturnNode());
    assert(node->getChild(0) != NULL);
 
-   llvm::Value* val = cgExprAndLoad(node->getChild(0));
+   // FIXME Not null
+   llvm::Value* val = cgExprAndLoad(node->getChild(0),
+      node->getChild(0)->ExprType(), node->ExprType());
    assert(val != NULL);
 
    llvm::ReturnInst::Create(_module->getContext(), val, _cur_bb);
@@ -837,7 +919,7 @@ void
 Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
    llvm::Value* left_val = cgExpr(node->NameNode());
-   llvm::Value* right_val = cgExprAndLoad(node->ValueNode());
+   llvm::Value* right_val = cgExpr(node->ValueNode());
    new llvm::StoreInst(right_val, left_val, _cur_bb);
 }
 
@@ -872,7 +954,8 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 
    if (node->ValueNode() != NULL)
    {
-      llvm::Value* var_val = cgExprAndLoad(node->ValueNode());
+      llvm::Value* var_val = cgExprAndLoad(node->ValueNode(),
+         node->ValueNode()->ExprType(), node->TypeNode()->ExprType());
       assert (var_val != NULL);
       new llvm::StoreInst(var_val, var, _cur_bb);
    }

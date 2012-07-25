@@ -59,7 +59,12 @@ Compiler::compile (int argc, char** argv)
    if (_opts->isSet("--version"))
    {
       std::cout << PACKAGE_NAME " version " PACKAGE_VERSION;
-      std::cout << " (" __DATE__ " " __TIME__ ")\n";
+      std::cout << " (" __DATE__ " " __TIME__ ")";
+      IF_DEBUG
+      {
+         std::cout << " [DEBUG]";
+      }
+      std::cout << "\n";
    }
 
    else if (_opts->isSet("--help"))

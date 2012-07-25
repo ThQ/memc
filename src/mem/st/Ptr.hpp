@@ -31,6 +31,10 @@ class Ptr : public Type
    GETTER(BaseType, Type*) {return _base_type;}
    SETTER(BaseType, Type*) {_base_type = val;}
 
+   // IndirectionLevel
+   GETTER(IndirectionLevel, int) {return _ptr_level;}
+   SETTER(IndirectionLevel, int) {_ptr_level = val;}
+
 
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

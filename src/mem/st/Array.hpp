@@ -13,6 +13,7 @@ class Array : public Type
    protected:
 
    st::Type* _base_type;
+   int _array_length;
 
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
@@ -27,6 +28,10 @@ class Array : public Type
 
    GETTER(BaseType, st::Type*) {return _base_type;}
    SETTER(BaseType, st::Type*) {_base_type = val;}
+
+   GETTER (ArrayLength, int) {return _array_length;}
+   SETTER (ArrayLength, int) {_array_length = val;}
+
 
    // -------------------------------------------------------------------------
    // PUBLIC METHODS

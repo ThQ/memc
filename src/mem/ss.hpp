@@ -9,10 +9,10 @@
 #define SETTER(name, type) public: void set ## name(type val)
 
 #ifdef NDEBUG
-   #define IF_DEBUG if(0)
+   #define IF_DEBUG if(false)
 #endif
 #ifndef NDEBUG
-   #define IF_DEBUG if(1)
+   #define IF_DEBUG if(true)
 #endif
 
 #ifdef NDEBUG

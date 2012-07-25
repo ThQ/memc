@@ -26,6 +26,9 @@ class Util
    static st::Namespace*
    createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts);
 
+   static Type*
+   getPointerBaseType(Ptr* ptr);
+
    static Symbol*
    getSymbol (Symbol* scope, std::string symbol_name);
 
@@ -33,7 +36,7 @@ class Util
    getIndirectionCount (std::string type_name);
 
    static Array*
-   lookupArrayType (Symbol* scope, std::string base_ty_name);
+   lookupArrayType (Symbol* scope, std::string base_ty_name, int size);
 
    static Class*
    lookupClass (Symbol* scope, std::string cls_name);
@@ -49,6 +52,9 @@ class Util
 
    static Symbol*
    lookupSymbol (Symbol* scope, std::string symbol_name);
+
+   static bool
+   parseArrayTypeName (std::string name, std::string& base_ty_name, int& array_len);
 
    static void
    registerType (SymbolTable* st, Symbol* scope, Type* ty);
