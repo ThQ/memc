@@ -12,34 +12,44 @@
 
 namespace mem { namespace log {
 
-
+/**
+ * A message to log.
+ *
+ * Message texts should follow the GNOME Human Interface Guidelines
+ * http://developer.gnome.org/hig-book/3.0/windows-alert.html.en#alert-text
+ */
 class Message
 {
-   public: std::string _file_path;
-   public: std::string _source_line;
+   protected:
+
+   std::string _description;
+   std::string _file_path;
+   MessageLevel _level;
+   std::string _message;
+   fs::position::Position* _position;
+   std::string _source_line;
 
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
+   public:
 
    // PROPERTY : Description
-   public: std::string _description;
-   public: void sDescription(const char* desc);
-   public: inline void sDescription (std::string desc) { _description.assign(desc); }
+   //:public: void sDescription(const char* desc);
+   GETTER(SecondaryText, std::string) {return _description;}
+   SETTER(SecondaryText, std::string) { _description.assign(val); }
 
    // PROPERTY : Level
-   public: MessageLevel _level;
-   public: inline MessageLevel gLevel() {return _level;}
-   public: void sLevel (MessageLevel level);
+   GETTER(Level, MessageLevel) {return _level;}
+   SETTER(Level, MessageLevel) {_level = val;}
 
    // PROPERTY : Message
-   public: std::string _message;
-   public: void sMessage (const char* message);
+   GETTER(PrimaryText, std::string) {return _message;}
+   SETTER(PrimaryText, std::string) {_message = val;}
 
    // PROPERTY : Position
-   public: fs::position::Position* _position;
-   public: fs::position::Position* gPosition() {return _position;}
-   public: void sPosition (fs::position::Position* position);
+   GETTER(Position, fs::position::Position*) {return _position;}
+   SETTER(Position, fs::position::Position*) {_position = val;}
 
 
    //--------------------------------------------------------------------------

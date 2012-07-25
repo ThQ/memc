@@ -29,21 +29,21 @@ ConsoleFormatter::format (Message* msg)
 
    this->format_message(res, msg);
 
-   bool has_details = msg->_description != "" || msg->gPosition() != NULL;
+   bool has_details = msg->SecondaryText() != "" || msg->Position() != NULL;
 
 
    /*if (has_details)
    {
       res << "           --------------------------------------------------------------------\n";
    }*/
-   if (msg->_description != "")
+   if (msg->SecondaryText() != "")
    {
       this->format_description(res, msg);
    }
 
-   if (msg->_position != NULL)
+   if (msg->Position() != NULL)
    {
-      this->format_position(res, msg->gPosition());
+      this->format_position(res, msg->Position());
    }
 
    if (has_details)
@@ -56,24 +56,26 @@ ConsoleFormatter::format (Message* msg)
 void
 ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
 {
-   if (msg->_description.length() != 0)
+   std::string sec_text = msg->SecondaryText();
+
+   if (sec_text.length() != 0)
    {
       size_t i;
       size_t last_nl = 0;
-      for (i=0; i<msg->_description.length(); ++i)
+      for (i=0; i < sec_text.length(); ++i)
       {
-         if (msg->_description.data()[i] == '\n')
+         if (sec_text.data()[i] == '\n')
          {
             str << "      ";
-            str << msg->_description.substr(last_nl, i-last_nl);
+            str << sec_text.substr(last_nl, i-last_nl);
             str << "\n";
             last_nl = i+1;
          }
       }
-      if (last_nl != msg->_description.size())
+      if (last_nl != sec_text.size())
       {
          str << "      ";
-         str << msg->_description.substr(last_nl, msg->_description.size()-last_nl);
+         str << sec_text.substr(last_nl, sec_text.size()-last_nl);
          str << "\n";
       }
    }
@@ -97,9 +99,9 @@ ConsoleFormatter::format_level_name (std::ostringstream& str, MessageLevel lvl)
 void
 ConsoleFormatter::format_message (std::ostringstream& str, Message* msg)
 {
-   this->format_level_name(str, msg->_level);
+   this->format_level_name(str, msg->Level());
    str << " "; //\033[1m";
-   str << msg->_message;
+   str << msg->PrimaryText();
    str << "\033[0m\n";
 }
 

@@ -83,7 +83,7 @@ Logger::log (Message* msg)
 
    if (msg != NULL)
    {
-      switch (msg->gLevel())
+      switch (msg->Level())
       {
          case ERROR: _n_errors++; break;
          case WARNING: _n_warnings++; break;
@@ -91,7 +91,7 @@ Logger::log (Message* msg)
          default:break; // Keep that, or clang will complain
       }
 
-      if (msg->gLevel() >= _level)
+      if (msg->Level() >= _level)
       {
          std::string log_msg = _formatter->format(msg);
          this->write(log_msg);
@@ -104,7 +104,7 @@ void
 Logger::log (MessageLevel level, const char* message)
 {
    Message* msg = new Message(level);
-   msg->sMessage(message);
+   msg->setPrimaryText(message);
    this->log(msg);
 }
 
@@ -120,8 +120,8 @@ Logger::log (MessageLevel level, const char* format, va_list varg)
    }
 
    Message* msg = new Message();
-   msg->sMessage(fmsg);
-   msg->sLevel(level);
+   msg->setPrimaryText(fmsg);
+   msg->setLevel(level);
    this->log(msg);
 
    delete[] fmsg;

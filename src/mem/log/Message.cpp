@@ -38,37 +38,13 @@ Message::formatDescription (const char* format, ...)
    char desc [300] = "\0";
    if (vsprintf(desc, format, args) >= 0)
    {
-      this->_description.assign(desc);
+      _description.assign(desc);
    }
    else
    {
-      this->_description.assign("[[INTERNAL_ERROR]]");
+      _description.assign("[[INTERNAL_ERROR]]");
    }
    va_end(args);
-}
-
-void
-Message::sDescription (const char* desc)
-{
-   this->_description.assign(desc);
-}
-
-void
-Message::sLevel (MessageLevel level)
-{
-   this->_level = level;
-}
-
-void
-Message::sMessage (const char* message)
-{
-   this->_message.assign(message);
-}
-
-void
-Message::sPosition (fs::position::Position* position)
-{
-   this->_position = position;
 }
 
 
