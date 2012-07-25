@@ -92,7 +92,7 @@ Compiler::dumpAst ()
 {
    if (_opts->isSet("--dump-ast-xml"))
    {
-      std::string dump_path = _opts->getStr("ast.dump.xml");
+      std::string dump_path = _opts->getStr("--dump-ast-xml");
 
       std::ofstream dump_file(dump_path.c_str());
 
