@@ -928,6 +928,12 @@ Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
    llvm::Value* left_val = cgExpr(node->NameNode());
    llvm::Value* right_val = cgExpr(node->ValueNode());
+
+   if (node->ValueNode()->isFinalIdNode())
+   {
+      right_val = new llvm::LoadInst(right_val, "", _cur_bb);
+   }
+
    new llvm::StoreInst(right_val, left_val, _cur_bb);
 }
 
