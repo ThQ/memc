@@ -314,9 +314,12 @@ llvm::Value*
 Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
 {
    assert (n != NULL);
-   llvm::Value* val = cgExpr(n->ValueNode());
+
+   // Taking care of VALUE
+   llvm::Value* val = cgExpr(n->ValueNode());//, NULL, NULL);
    assert (val != NULL);
 
+   // Taking care of INDEX
    llvm::Value* index = cgExprAndLoad(n->IndexNode(),
       n->IndexNode()->ExprType(), _st->gCoreTypes().gIntTy());
    assert (index != NULL);
@@ -326,7 +329,9 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
       llvm::APInt(32, 0)));
    idx.push_back(index);
 
-   llvm::GetElementPtrInst* inst = llvm::GetElementPtrInst::Create(val, idx, "", _cur_bb);
+   // Compute address
+   llvm::GetElementPtrInst* inst = llvm::GetElementPtrInst::Create(
+      val, idx, "", _cur_bb);
    inst->setIsInBounds(true);
 
    return inst;
@@ -571,33 +576,36 @@ llvm::Value*
 Codegen::cgExprAndLoad (ast::node::Node* node, st::Symbol* src_ty, st::Symbol* dst_ty)
 {
    assert(node != NULL);
-   assert(src_ty != NULL);
-   assert (dst_ty != NULL);
 
    llvm::Value* val = cgExpr(node);
    assert(val != NULL);
 
    bool must_load = false;
 
-   if (!src_ty->isPtrSymbol() && dst_ty->isPtrSymbol())
+   if (src_ty != NULL && dst_ty != NULL)
    {
-      must_load = true;
-   }
-   else if (src_ty->isPtrSymbol() && !dst_ty->isPtrSymbol())
-   {
-      st::Ptr* src_ptr = static_cast<st::Ptr*>(src_ty);
-      st::Ptr* dst_ptr = static_cast<st::Ptr*>(dst_ty);
-
-      if (src_ptr->IndirectionLevel() > dst_ptr->IndirectionLevel())
+      if (!src_ty->isPtrSymbol() && dst_ty->isPtrSymbol())
       {
          must_load = true;
       }
+      else if (src_ty->isPtrSymbol() && !dst_ty->isPtrSymbol())
+      {
+         st::Ptr* src_ptr = static_cast<st::Ptr*>(src_ty);
+         st::Ptr* dst_ptr = static_cast<st::Ptr*>(dst_ty);
+
+         if (src_ptr->IndirectionLevel() > dst_ptr->IndirectionLevel())
+         {
+            must_load = true;
+         }
+      }
    }
-   else
+
+   if (!must_load)
    {
       switch (node->Kind())
       {
          case ast::node::Kind::FINAL_ID:
+         case ast::node::Kind::BRACKET_OP:
             must_load = true;
             break;
       }
@@ -732,7 +740,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
    llvm::GlobalValue::LinkageTypes func_link;
    if (func_sym->Metadata()->has("external"))
    {
-      func_link = llvm::GlobalValue::DLLImportLinkage;
+      func_link = llvm::GlobalValue::ExternalLinkage;
    }
    else
    {
@@ -829,7 +837,7 @@ Codegen::cgMemoryFunctions ()
       /*isVarArg=*/false);
 
    llvm::Function* malloc = llvm::Function::Create(malloc_ty,
-      llvm::GlobalValue::DLLImportLinkage,
+      llvm::GlobalValue::ExternalLinkage,
       "malloc",
       _module);
    _functions["malloc"] = malloc;

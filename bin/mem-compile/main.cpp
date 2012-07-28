@@ -19,6 +19,8 @@ int main (int argc, char** argv)
       ->bind("fatal-error", log::FATAL_ERROR);
    opts.addBoolOpt("--help", "",
       "Show help");
+   opts.addStrOpt("--output", "",
+      "Path to the output file");
    opts.addBoolOpt("--version", "",
       "Show version");
    opts.addStrOpt("--dump-st-xml", "",

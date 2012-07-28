@@ -100,7 +100,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
          log::CircularClassDependency* err = new log::CircularClassDependency();
          err->sBaseClassName(scope->gQualifiedName());
          err->sDepClassName(type_node->ExprType()->gQualifiedName());
-         err->sPosition(field->copyPosition());
+         err->setPosition(field->copyPosition());
          err->format();
          log(err);
       }
@@ -288,7 +288,7 @@ TopTypesChecker::visitQualifiedName (st::Symbol* scope, node::Node* node)
       err->sSymbolName(name_node->gValue());
       err->sScopeName(scope->gQualifiedName());
       err->format();
-      err->sPosition(name_node->copyPosition());
+      err->setPosition(name_node->copyPosition());
       log(err);
    }
 }

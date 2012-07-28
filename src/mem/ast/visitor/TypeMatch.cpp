@@ -55,7 +55,7 @@ TypeMatch::visitVarDecl (node::VarDecl* var_decl_node)
       err->sExpectedTypeName(var_ty->gQualifiedName());
       err->sTypeName(value_ty->gQualifiedName());
       err->format();
-      err->sPosition(pos);
+      err->setPosition(pos);
 
       log(err);
    }

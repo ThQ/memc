@@ -26,11 +26,11 @@ CheckValidity::visit (node::Node* node)
       }
 
       log::FatalError* err = new log::FatalError();
-      err->sDescription(description);
       err->formatMessage("[BUG] Invalid node : %s", node->KindName().c_str());
+      err->setSecondaryText(description);
       if (node->Position() != NULL)
       {
-         err->sPosition(node->copyPosition());
+         err->setPosition(node->copyPosition());
       }
       log(err);
    }

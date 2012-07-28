@@ -31,6 +31,8 @@
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/visitor/DepBuilder.hpp"
 #include "mem/st/visitor/XmlDumper.hpp"
+#include "mem/tool/CommandChain.hpp"
+#include "mem/tool/Toolbox.hpp"
 #include "mem/Util.hpp"
 
 
@@ -60,6 +62,7 @@ class Compiler
    opt::Options* _opts;
    std::queue<std::string> _parse_queue;
    st::SymbolTable symbols;
+   Toolbox _tools;
 
    //--------------------------------------------------------------------------
    // PROPERTIES

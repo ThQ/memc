@@ -92,7 +92,9 @@ src_mem_st_visitor = \
  src/mem/st/visitor/DepBuilder.cpp \
  src/mem/st/visitor/XmlDumper.cpp \
  src/mem/st/visitor/Visitor.cpp
-
+src_mem_tool = \
+ src/mem/tool/CommandChain.cpp \
+ src/mem/tool/Toolbox.cpp
 BUILT_SOURCES = \
  src/mem/lang/Bison.hpp \
  src/mem/lang/TokenKind.hpp \
@@ -149,6 +151,8 @@ mem_compile_SOURCES =  \
  $(src_mem_log) \
  $(src_mem_opt) \
  $(src_mem_st) \
- $(src_mem_st_visitor)
+ $(src_mem_st_visitor)\
+ $(src_mem_tool)
+
 mem_compile_LDADD = $(LLVM_LDADD)
 mem_compile_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG

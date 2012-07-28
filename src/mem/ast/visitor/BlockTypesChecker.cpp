@@ -20,7 +20,7 @@ BlockTypesChecker::checkCallParameters (st::Func* func_sym, node::Node* params)
       err->sExpectedParamCount(func_sym->ParamCount());
       err->sParamCount(params->ChildCount());
       err->format();
-      err->sPosition(params->copyPosition());
+      err->setPosition(params->copyPosition());
       log(err);
    }
    else if (params != NULL)
@@ -258,7 +258,7 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
       err->sOpName(op_name.c_str());
       err->sRightTypeName(right_node->ExprType()->NameCstr());
       err->format();
-      err->sPosition(pos);
+      err->setPosition(pos);
       log(err);
    }
 }
@@ -269,10 +269,8 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
    assert (scope != NULL);
    assert (n != NULL);
 
-   printf("visitArray\n");
    if (n->TypeNode() != NULL)
    {
-      printf("Arr.Ty is not null\n");
       visitExpr(scope, n->TypeNode());
       if (n->LengthNode() != NULL)
       {
@@ -281,7 +279,6 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
 
       if (n->TypeNode()->hasBoundSymbol())
       {
-         printf("Arr.Ty has bound symbol\n");
          st::Symbol* arr_sym = st::Util::lookupArrayType(scope,
             n->TypeNode()->BoundSymbol()->Name(),
             static_cast<ast::node::Number*>(n->LengthNode())->getInt());
@@ -414,7 +411,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
          err->sSymbolName(static_cast<node::Text*>(right_node)->gValue());
          err->sScopeName(left_node->ExprType()->gQualifiedName());
          err->format();
-         err->sPosition(right_node->copyPosition());
+         err->setPosition(right_node->copyPosition());
          log(err);
       }
    }
@@ -543,6 +540,7 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
    assert(new_node != NULL);
 
    node::Node* ty_node = new_node->TypeNode();
+   assert (ty_node != NULL);
 
    visitExpr(scope, ty_node);
    ensureSymbolIsType(ty_node, ty_node->BoundSymbol());
@@ -566,7 +564,7 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
       log::CannotInstantiatePointerType* err =
          new log::CannotInstantiatePointerType();
       err->sPointerTypeName(ty_node->BoundSymbol()->gQualifiedName());
-      err->sPosition(ty_node->copyPosition());
+      err->setPosition(ty_node != NULL ? ty_node->copyPosition() : NULL);
       err->format();
       log(err);
    }
@@ -642,7 +640,7 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
       log::SymbolNotFound* err = new log::SymbolNotFound();
       err->sSymbolName(id_node->gValue());
       err->sScopeName(scope->gQualifiedName());
-      err->sPosition(id_node->copyPosition());
+      err->setPosition(id_node->copyPosition());
       err->format();
       log(err);
    }
@@ -699,7 +697,7 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
       err->sFuncName(parent_func->gQualifiedName());
       err->sRetTy(value_node->ExprType());
       err->sExpectedRetTy(parent_func->ReturnType());
-      err->sPosition(value_node->copyPosition());
+      err->setPosition(value_node->copyPosition());
       err->format();
       log(err);
    }
@@ -727,7 +725,7 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
    else
    {
       log::NotAssignable* e = new log::NotAssignable();
-      e->sPosition(node->NameNode()->copyPosition());
+      e->setPosition(node->NameNode()->copyPosition());
       e->format();
       log(e);
    }
@@ -785,7 +783,7 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
       {
          log::VariableAlreadyDefined* err = new log::VariableAlreadyDefined();
          err->sVarName(var_decl_node->Name());
-         err->sPosition(var_decl_node->copyPosition());
+         err->setPosition(var_decl_node->copyPosition());
          err->format();
          log(err);
       }

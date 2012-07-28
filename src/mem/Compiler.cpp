@@ -136,21 +136,50 @@ Compiler::dumpSt ()
 void
 Compiler::emitCode ()
 {
-   std::string out_path;
-
-   if (_opts->isSet("--emit-llvm-bc"))
+   if (_opts->hasArguments())
    {
-      out_path = _opts->getStr("--emit-llvm-bc");
+      std::string llvm_ir_path = "./mem.bc";
+      std::string bin_path = "./mem.out";
+
+      if (_opts->isSet("--emit-llvm-bc"))
+      {
+         llvm_ir_path = _opts->getStr("--emit-llvm-bc");
+      }
+
+      if (_opts->isSet("--output"))
+      {
+         bin_path = _opts->getStr("--output");
+      }
+
       mem::codegen::llvm_::Codegen cg;
       cg.SymbolTable(&symbols);
       cg.gen(&ast);
 
+      // Dump LLVM bytecode
       std::ofstream bc_file;
-      bc_file.open(out_path.c_str());
+      bc_file.open(llvm_ir_path.c_str());
       bc_file << cg.getLlvmByteCode();
       bc_file.close();
 
-      _logger->debug("LLVM ByteCode dumped to %s", out_path.c_str());
+      _logger->debug("LLVM ByteCode dumped to %s", llvm_ir_path.c_str());
+
+      // Generate native code
+      std::string out_s = llvm_ir_path  + ".s";
+      std::string out_as = llvm_ir_path + ".as";
+
+      tool::CommandChain cc (_tools);
+      cc.run(Toolbox::LLVM_COMPILER, "-o=" + out_s + " " + llvm_ir_path)
+         ->then(Toolbox::GCC, out_s + " -o " + bin_path);
+
+      if (cc.Status() == 0)
+      {
+         _logger->debug("Binary generated as %s", bin_path.c_str());
+      }
+      else
+      {
+         _logger->fatalError("Couldn't generate binary as %s",
+            bin_path.c_str());
+      }
    }
 }
 
@@ -227,7 +256,7 @@ Compiler::parse (std::string file_path)
 
       log::Message* msg = new log::Error();
       msg->formatMessage("Couldn't open file {path:%s}.", file_path.c_str());
-      msg->sDescription(description);
+      msg->setSecondaryText(description);
       _logger->log(msg);
    }
 }
@@ -303,7 +332,7 @@ void
 Compiler::runAstVisitors ()
 {
    for (size_t i=0;
-      i < ast_visitors.size() && _logger->FatalErrorCount() == 0; ++i)
+      i < ast_visitors.size() && _logger->FatalErrorCount() == 0 && _logger->ErrorCount()==0; ++i)
    {
       _logger->debug("[%s] running...", ast_visitors[i]->_name.c_str());
       ast_visitors[i]->SymbolTable(&symbols);

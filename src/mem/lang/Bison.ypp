@@ -91,9 +91,9 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
    pos->sFile(file);
 
    log::Message* msg = new log::Error();
-   msg->sMessage("Syntax error");
-   msg->sDescription(s);
-   msg->sPosition(pos);
+   msg->setPrimaryText("Syntax error");
+   msg->setSecondaryText(s);
+   msg->setPosition(pos);
    logger->log(msg);
 }
 }
@@ -243,7 +243,7 @@ use_file :
    }
 
 metadata :
-   T_HASH T_ID T_NEWLINE
+   T_AROBASE T_ID T_NEWLINE
    {
       $$ = new ast::node::Text();
       $$->sValue($2->c_str());

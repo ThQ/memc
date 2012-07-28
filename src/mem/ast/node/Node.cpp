@@ -145,7 +145,7 @@ Node::packChildrenExprTypes ()
 void
 Node::pushChild (Node* n)
 {
-   if (n != NULL)
+   if (n != NULL && n != this)
    {
       if (_first_child == 0)
       {
@@ -161,6 +161,8 @@ Node::pushChild (Node* n)
       n->Depth(_depth + 1);
       ++_child_count;
    }
+
+   assert(n != this);
 }
 
 void
@@ -170,7 +172,9 @@ Node::Depth (unsigned long depth)
    Node* node = _first_child;
    while (node != NULL)
    {
-      node->Depth(depth + 1);
+      assert (node != this);
+
+      //node->Depth(depth + 1);
       node = node->_next;
    }
 }

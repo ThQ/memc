@@ -165,6 +165,14 @@ Tokenizer::_processTokenStart (char c)
          emit_token = true;
          break;
       }
+      case '@':
+      {
+         _cur_tok = T_AROBASE;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
+      }
       case '&':
       {
          _cur_tok = T_AMPERSAND;
@@ -327,7 +335,9 @@ Tokenizer::getNextToken ()
       t = _getNextToken();
    }
 
-   DEBUG_PRINTF("=> TOKEN[%d] = <%s>\n", t.Kind(), t.Value().c_str());
+   //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
+   //   t.Kind(), t.Value().c_str());
+
    return t;
 }
 
@@ -348,11 +358,14 @@ Tokenizer::_getIndentTokenKind (std::string indent)
    // * _indent_unit = <   > (3 spaces)
    // * indent = <      > (6 spaces)
    // Then this is OK (true)
-   int is_mul_of_unit = (indent.size() % _indent_unit.size()) == 0;
+   int is_mul_of_unit = (indent.size() %
+      (_indent_unit.size() == 0 ? 1 : _indent_unit.size())) == 0;
 
    if (is_mul_of_unit)
    {
-      int indent_level = indent.size() / _indent_unit.size();
+      int indent_level = indent.size() /
+         (_indent_unit.size() == 0 ? 1 : _indent_unit.size());
+
       // Ident
       if (indent_level > _indent_level)
       {
@@ -375,7 +388,7 @@ Tokenizer::_getIndentTokenKind (std::string indent)
    else
    {
       log::Message* err = new log::FatalError();
-      err->sMessage("Bad indentation");
+      err->setPrimaryText("Bad indentation");
       err->formatDescription("Default indentation is %s, but got %s",
          _makeIndentationVisible(_indent_unit).c_str(),
          _makeIndentationVisible(indent).c_str());
