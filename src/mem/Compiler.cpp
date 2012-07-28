@@ -264,24 +264,27 @@ Compiler::parse (std::string file_path)
 void
 Compiler::printBuildSummary ()
 {
-   std::ostringstream sum;
+   std::ostringstream sec_text;
 
    if (_logger->FatalErrorCount() > 0)
    {
-      sum << _logger->FatalErrorCount();
-      sum << " fatal errors, ";
+      sec_text << "Fatal errors: ";
+      sec_text << _logger->FatalErrorCount();
+      sec_text << "\n";
    }
 
    if (_logger->ErrorCount() > 0)
    {
-      sum << _logger->ErrorCount();
-      sum << " errors, ";
+      sec_text << "Errors: ";
+      sec_text << _logger->ErrorCount();
+      sec_text << "\n";
    }
 
    if (_logger->WarningCount() > 0)
    {
-      sum << _logger->WarningCount();
-      sum << " warnings, ";
+      sec_text << "Warnings: ";
+      sec_text << _logger->WarningCount();
+      sec_text << "\n";
    }
 
    if (isBuildSuccessful())
@@ -290,8 +293,10 @@ Compiler::printBuildSummary ()
    }
    else
    {
-      _logger->info(sum.str().c_str(), "");
-      _logger->fatalError("Build FAILED", "");
+      log::Message* err = new log::FatalError();
+      err->setPrimaryText("Build FAILED");
+      err->setSecondaryText(sec_text.str());
+      _logger->log(err);
    }
 }
 
