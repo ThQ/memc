@@ -5,6 +5,8 @@ namespace mem { namespace log {
 
 ConsoleFormatter::ConsoleFormatter ()
 {
+   setId("console");
+
    this->add_tag("type", format_type_start, format_type_end);
    this->add_tag("symbol", format_type_start, format_type_end);
 }

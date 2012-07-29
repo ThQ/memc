@@ -3,12 +3,13 @@
 
 int main (int argc, char** argv)
 {
-
    opt::Options opts;
    opts.addStrOpt("--dump-ast-xml", "",
       "Dump the Abstract Syntax Tree as XML");
    opts.addStrOpt("--emit-llvm-bc", "",
       "Emit LLVM bytecode");
+   opts.addStrOpt("--log-formatter", "",
+      "Set the log formatter");
    opts.addIntEnumOpt("--log-level", "",
       "Set the minimum log level")
       ->bind("unknown", log::UNKNOWN)

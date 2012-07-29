@@ -27,6 +27,7 @@
 #include "mem/lang/Bison.hpp"
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
+#include "mem/log/XmlFormatter.hpp"
 #include "mem/opt/Options.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/visitor/DepBuilder.hpp"

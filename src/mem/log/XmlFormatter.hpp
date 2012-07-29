@@ -1,34 +1,33 @@
-#ifndef _MEM__LOG__FORMATTER__HPP_
-#define _MEM__LOG__FORMATTER__HPP_
+#ifndef _MEM__LOG__XML_FORMATTER__HPP_
+#define _MEM__LOG__XML_FORMATTER__HPP_
 
 
 #include <string>
 #include <string.h>
+#include "mem/log/Formatter.hpp"
 #include "mem/log/Message.hpp"
 
 
 namespace mem { namespace log {
 
 
-class Formatter
+class XmlFormatter : public Formatter
 {
-   public:
-   std::string _id;
-
-   GETTER(Id, std::string) {return _id;}
-   SETTER(Id, std::string) {_id = val;}
-
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   Formatter();
+   XmlFormatter();
 
-   /**
-    * Destructor.
-    */
-   virtual ~Formatter();
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   std::string
+   _formatLevel (MessageLevel lvl);
 
 
    //--------------------------------------------------------------------------
@@ -39,11 +38,11 @@ class Formatter
    virtual std::string
    format (Message* msg);
 
-   virtual std::string
-   formatStart () {return "";}
+   std::string
+   formatStart ();
 
-   virtual std::string
-   formatEnd () {return "";}
+   std::string
+   formatEnd ();
 };
 
 

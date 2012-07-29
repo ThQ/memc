@@ -286,8 +286,8 @@ Tokenizer::getNextToken ()
    t = _token_queue.front();
    _token_queue.pop();
 
-   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-     t.Kind(), t.Value().c_str());
+   //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
+   //  t.Kind(), t.Value().c_str());
 
    return t;
 }
@@ -554,7 +554,6 @@ Tokenizer::_makeIndentationVisible (std::string indent)
 void
 Tokenizer::_pushEndTokens ()
 {
-   DEBUG_PRINTF("EOF : ilevel=%d\n", _indent_level);
    _state = T_YACC_END;
    for (int i = 0; i < _indent_level; ++i)
    {

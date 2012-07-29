@@ -2,8 +2,11 @@
 
 namespace mem { namespace log {
 
+Formatter::Formatter ()
+{
+}
 
-Formatter::~Formatter()
+Formatter::~Formatter ()
 {
 }
 
@@ -12,12 +15,6 @@ Formatter::format (Message* msg)
 {
    std::string res = "";
    return res;
-}
-
-const char*
-Formatter::format_string (const char* message)
-{
-   return 0;
 }
 
 

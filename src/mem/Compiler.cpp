@@ -45,6 +45,14 @@ Compiler::~Compiler ()
 void
 Compiler::compile (int argc, char** argv)
 {
+   std::string formatter_id = _opts->getStr("--log-formatter");
+
+   if (formatter_id == "xml")
+   {
+      _logger->setFormatter(new log::XmlFormatter());
+   }
+   _logger->begin();
+
    fm.appendPath(".");
 
    // Need to set this before parsing command line arguments because it can
@@ -86,6 +94,8 @@ Compiler::compile (int argc, char** argv)
 
       printBuildSummary();
    }
+
+   _logger->finish();
 
    llvm::llvm_shutdown();
 }

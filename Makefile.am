@@ -72,7 +72,8 @@ src_mem_log = \
  src/mem/log/errors.errors-in \
  src/mem/log/Formatter.cpp \
  src/mem/log/Logger.cpp \
- src/mem/log/Message.cpp
+ src/mem/log/Message.cpp \
+ src/mem/log/XmlFormatter.cpp
 src_mem_opt = \
  src/mem/opt/Option.cpp \
  src/mem/opt/Options.cpp

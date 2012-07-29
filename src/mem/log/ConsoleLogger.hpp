@@ -12,6 +12,14 @@ namespace mem { namespace log {
 class ConsoleLogger : public Logger
 {
    protected: virtual void write(std::string str);
+
+   public:
+
+   virtual void
+   begin();
+
+   virtual void
+   finish();
 };
 
 

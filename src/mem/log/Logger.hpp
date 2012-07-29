@@ -35,7 +35,7 @@ class Logger
    GETTER(FatalErrorCount, int) {return _n_fatal_errors;}
 
    // Formatter
-   SETTER(Formatter, Formatter*) {_formatter = val;}
+   SETTER(Formatter, Formatter*) {delete _formatter; _formatter = val;}
 
    // Level
    SETTER(Level, int) {_level = val;}
@@ -67,6 +67,9 @@ class Logger
    public:
 
    void
+   begin ();
+
+   void
    error (const char* message);
 
    void
@@ -77,6 +80,9 @@ class Logger
 
    void
    fatalError (const char* format, ...);
+
+   void
+   finish ();
 
    void
    log (Message* msg);

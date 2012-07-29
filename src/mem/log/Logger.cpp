@@ -5,6 +5,7 @@ namespace mem { namespace log {
 
 Logger::Logger()
 {
+   _formatter = NULL;
    _level = log::UNKNOWN;
    _n_errors = 0;
    _n_warnings = 0;
@@ -13,7 +14,12 @@ Logger::Logger()
 
 Logger::~Logger()
 {
-   delete this->_formatter;
+   delete _formatter;
+}
+
+void
+Logger::begin ()
+{
 }
 
 void
@@ -59,6 +65,11 @@ void
 Logger::fatalError (const char* message)
 {
    this->log(FATAL_ERROR, message);
+}
+
+void
+Logger::finish ()
+{
 }
 
 void
