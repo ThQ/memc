@@ -191,7 +191,7 @@ Tokenizer::_processTokenStart (char c)
       }
       case '*':
       {
-         _cur_tok = T_MUL;
+         _cur_tok = T_STAR;
          _state = T_YACC_UNDEFINED;
          _tokenBuffer = c;
          emit_token = true;
@@ -343,8 +343,8 @@ Tokenizer::getNextToken ()
       t = _getNextToken();
    }
 
-   //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-   //  t.Kind(), t.Value().c_str());
+   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
+     t.Kind(), t.Value().c_str());
 
    return t;
 }

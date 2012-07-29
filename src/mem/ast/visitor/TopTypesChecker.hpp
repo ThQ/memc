@@ -3,10 +3,13 @@
 
 
 #include <vector>
+#include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/Class.hpp"
+#include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
+#include "mem/ast/node/Ptr.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/visitor/TypeChecker.hpp"
@@ -85,6 +88,9 @@ class TopTypesChecker : public TypeChecker
 
    virtual void
    visitQualifiedName (st::Symbol* scope, node::Node* name_node);
+
+   void
+   visitTypeName (st::Symbol* scope, node::Node* node);
 };
 
 

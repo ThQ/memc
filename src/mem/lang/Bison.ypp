@@ -21,6 +21,7 @@
 #include "mem/ast/node/For.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Primitive.hpp"
+#include "mem/ast/node/Ptr.hpp"
 #include "mem/ast/node/Root.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Use.hpp"
@@ -118,20 +119,24 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %token T_AMPERSAND
 %token T_AROBASE
 %token T_AND
+%token T_BANG
 %token T_CLASS
 %token T_COLON
 %token T_COMMA
 %token T_CP
 %token T_DEDENT
 %token T_DOT
+%token T_DOTDOTDOT
 %token T_ELSE
 %token T_EQ
 %token T_FOR
+%token T_HASH
 %token T_IF
 %token <text> T_ID
 %token T_INDENT
 %token T_INTERFACE
 %token T_LBRACKET
+%token T_LEFT_BINARY_OP
 %token T_LITERAL_FLOAT
 %token T_LITERAL_HEX
 %token <text> T_LITERAL_INT
@@ -141,29 +146,23 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %token T_OP
 %token T_OR
 %token T_PASS
-%token T_PATCH
-%token T_PRIMITIVE
 %token T_OBJECT
 %token T_RBRACKET
 %token T_RARR
+%token T_SPACE
+%token T_STAR
 %token <text> T_STRING
 %token T_USE
-%token T_WHITESPACE
-%token T_LEFT_BINARY_OP
 %token T_RETURN
 %token T_SEMICOLON
 %token T_WHILE
-%token T_SELF
-%token T_BANG
-%token T_HASH
-%token T_DOTDOTDOT
-%token T_SPACE
+%token T_WHITESPACE
 
 // Lower precedence first
 %left <node> T_AND T_OR
 %left <node> T_EQ_EQ T_GT T_GT_EQ T_LT T_RARR T_LT_EQ
 %left <node> T_MINUS T_PLUS
-%left <node> T_MUL T_DIV
+%left <node> T_STAR T_DIV
 %left <node> T_MUL_MUL T_MODULO
 %left <node> T_MINUS_MINUS T_PLUS_PLUS
 %left <node> T_DOT
@@ -532,6 +531,12 @@ type_name:
    {
       $$ = static_cast<ast::node::Node*>($1);
    }
+   | qualified_id T_STAR
+   {
+      ast::node::Ptr* ptr = new ast::node::Ptr();
+      ptr->pushChild($1);
+      $$ = static_cast<ast::node::Ptr*>(ptr);
+   }
    | T_LBRACKET qualified_id T_RBRACKET
    {
       ast::node::Array* arr = new ast::node::Array();
@@ -721,7 +726,7 @@ math_operator:
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::OP_MINUS);
    }
-   | T_MUL
+   | T_STAR
    {
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::OP_MUL);

@@ -28,6 +28,7 @@ src_mem_ast_node = \
  src/mem/ast/node/NodeValidator.cpp \
  src/mem/ast/node/Number.cpp \
  src/mem/ast/node/Primitive.cpp \
+ src/mem/ast/node/Ptr.cpp \
  src/mem/ast/node/Return.cpp \
  src/mem/ast/node/Root.cpp \
  src/mem/ast/node/Text.cpp \

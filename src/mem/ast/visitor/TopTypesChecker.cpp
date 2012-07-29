@@ -55,7 +55,7 @@ TopTypesChecker::visitDot (st::Symbol* scope, node::Node* node)
    else
    {
       // FIXME
-      printf("Not expr type in left expr of dot\n");
+      DEBUG_PRINTF("Not expr type in left expr of dot\n", "");
       assert(false);
    }
 
@@ -111,61 +111,6 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
    }
 }
 
-/**
-void
-TopTypesChecker::checkFuncOverloading (st::Symbol* scope, node::Func* func_decl,
-   st::Func* func_sym)
-{
-   st::Class* parent_cls = static_cast<st::Class*>(static_cast<st::Class*>(scope)->_parent_type);
-   st::Func* older_func = NULL;
-
-   while (parent_cls != NULL && func_sym->gOverloadedFunc() == NULL)
-   {
-      older_func = static_cast<st::Func*>(parent_cls->getChild(func_sym->gName()));
-      if (older_func != NULL)
-      {
-         if (func_sym->gReturnType() == older_func->gReturnType())
-         {
-            func_sym->sOverloadedFunc(older_func);
-         }
-         // Return type different from overloaded function
-         else
-         {
-            log::Message* err = new log::Error();
-            err->formatMessage("Return type was previously defined as %s.",
-               older_func->gReturnType()->gNameCstr());
-            err->sPosition(func_decl->gReturnTypeNode()->copyPosition());
-            this->log(err);
-            break;
-         }
-      }
-      parent_cls = parent_cls->gParentClass();
-   }
-}
-*/
-
-/**
-void
-TopTypesChecker::checkFuncOverriding (st::Symbol* scope, node::Func* func_decl,
-   st::Func* func_sym, st::FunctionSignature* func_sign_sym)
-{
-   std::vector<st::Symbol*> children_expr_types;
-   if (func_decl->gParamsNode() != NULL)
-   {
-      children_expr_types = func_decl->gParamsNode()->packChildrenExprTypes();
-   }
-   st::FunctionSignature* overridden_func = st::Util::lookupFunctionSignature(
-      func_sym->_parent, func_sym, children_expr_types);
-
-   if (overridden_func != NULL)
-   {
-      printf("FOUND overridden func\n");
-      func_sign_sym->sOverriddenFunc(overridden_func);
-   }
-
-}
-*/
-
 void
 TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
 {
@@ -199,9 +144,6 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    {
       visitFuncParams(scope, func_params, func_sym);
    }
-
-   //this->checkFuncOverloading(scope, func_decl, func_sym);
-   //this->checkFuncOverriding(scope, func_decl, func_sym, func_sign_sym);
 }
 
 void
@@ -219,7 +161,7 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
       name_node = static_cast<node::Text*>(param_node->getChild(0));
       type_node = static_cast<node::Text*>(param_node->getChild(1));
 
-      visitQualifiedName(scope, type_node);
+      visitTypeName(scope, type_node);
 
       if (type_node->hasExprType())
       {
@@ -293,5 +235,47 @@ TopTypesChecker::visitQualifiedName (st::Symbol* scope, node::Node* node)
    }
 }
 
+void
+TopTypesChecker::visitTypeName (st::Symbol* scope, node::Node* n)
+{
+   switch (n->Kind())
+   {
+      case node::Kind::FINAL_ID:
+         visitQualifiedName(scope, n);
+         break;
+
+      /*
+      case node::Kind::ARRAY:
+         visitTypeName(scope, static_cast<node::Array*>(n)->TypeNode());
+
+         st::Type* ty = static_cast<st::Type*>(static_cast<node::Array*>(n)->TypeNode()->BoundSymbol());
+         assert(ty != NULL);
+         n->setBoundSymbol(st::Util::lookup(......));
+         break;
+      */
+
+      case node::Kind::DOT:
+         visitDot(scope, static_cast<node::Dot*>(n));
+         break;
+
+      case node::Kind::POINTER:
+      {
+         visitTypeName(scope, static_cast<node::Ptr*>(n)->TypeNode());
+
+         st::Type* ty = static_cast<st::Type*>(static_cast<node::Ptr*>(n)->TypeNode()->BoundSymbol());
+         assert(ty != NULL);
+
+         n->setBoundSymbol(st::Util::lookupPointer(scope, ty));
+         n->setExprType(n->BoundSymbol());
+         break;
+      }
+
+      default:
+         DEBUG_PRINTF("Unsupported node type : %d\n", n->Kind());
+         assert(false);
+   }
+
+
+}
 
 } } }

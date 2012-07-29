@@ -47,6 +47,9 @@ class Util
    static Ptr*
    lookupPointer(Symbol* scope, std::string base_ty_name, size_t ptr_level);
 
+   static Ptr*
+   lookupPointer (Symbol* scope, Type* base_ty);
+
    static Symbol*
    lookupMember (Symbol* scope, std::string symbol_name);
 

@@ -46,58 +46,6 @@ Util::getPointerBaseType (Ptr* ptr)
    return base_ty;
 }
 
-/*
-st::FunctionSignature*
-Util::lookupFunctionSignature(Symbol* scope, Func* base_func, std::vector<st::Symbol*> params)
-{
-   printf("lookup func [%s] in [%s]\n", base_func->gQualifiedNameCstr(), scope->gQualifiedNameCstr());
-   Func* func = Util::lookupFunction(static_cast<st::Class*>(scope)->gParentType(), base_func->gName());
-
-   while (func != NULL)
-   {
-      std::map<std::string, st::Symbol*>::iterator i;
-      for (i = func->_children.begin(); i != func->_children.end() ; ++i)
-      {
-         printf ("- Testing %s\n", static_cast<st::FunctionSignature*>((*i).second)->gSignature().c_str());
-
-         if(static_cast<st::FunctionSignature*>((*i).second)->canOverride(params))
-         {
-            printf ("-> OKAY !!\n");
-            return static_cast<st::FunctionSignature*>((*i).second);
-         }
-      }
-      func = func->gOverloadedFunc();
-   }
-   return NULL;
-}
-*/
-
-/*
-std::vector<st::FunctionSignature*>
-Util::listFuncSigns (st::Class* cls_sym, std::string func_name)
-{
-   std::vector<st::FunctionSignature*> signs;
-
-   st::Class* cur_class = cls_sym;
-   st::Func* cur_func = NULL;
-
-   while (cur_class != NULL)
-   {
-      cur_func = Util::lookupFunction(cur_class, func_name);
-      if (cur_func != NULL)
-      {
-         for (std::map<std::string, st::Symbol*>::iterator i=cur_func->_children.begin();
-            i != cur_func->_children.end(); ++i)
-         {
-            signs.push_back(static_cast<st::FunctionSignature*>(i->second));
-         }
-      }
-      cur_class = static_cast<st::Class*>(cur_class->_parent_type);
-   }
-   return signs;
-}
-*/
-
 size_t
 Util::getIndirectionCount (std::string ty_name)
 {
@@ -235,6 +183,12 @@ Util::lookupSymbol (Symbol* scope, std::string symbol_name)
       }
    }
    return res;
+}
+
+st::Ptr*
+Util::lookupPointer (Symbol* scope, Type* base_ty)
+{
+   return lookupPointer (scope, base_ty->Name(), 1);
 }
 
 st::Ptr*

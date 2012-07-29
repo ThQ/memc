@@ -103,6 +103,9 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
          assert(ty != NULL);
       }
    }
+
+   assert(ty != NULL);
+
    return ty;
 }
 
@@ -770,6 +773,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
       {
          func_param = func_sym->_params[i];
          params.push_back(_getLlvmTy(func_param->Type()));
+         assert (params[i] != NULL);
       }
    }
 
