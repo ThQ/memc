@@ -3,11 +3,14 @@
 
 
 #include <fstream>
+#include <queue>
 #include <stdio.h>
 #include <string>
+#include <sstream>
 #include <vector>
 #include "mem/lang/Token.hpp"
 #include "mem/lang/TokenKind.hpp"
+#include "mem/log/errors.hpp"
 #include "mem/log/Logger.hpp"
 #include "mem/ss.hpp"
 
@@ -34,6 +37,7 @@ class Tokenizer
    log::Logger* _logger;
    int _state;
    int _cur_tok;
+   std::queue<Token> _token_queue;
 
 
    //--------------------------------------------------------------------------
@@ -70,14 +74,14 @@ class Tokenizer
    char
    _escapeChar(char c) const ;
 
-   inline int
+   inline void
    _getIndentTokenKind (std::string indent);
 
    inline int
    _getTokenKindFromId (std::string id);
 
-   inline Token
-   _getNextToken ();
+   inline void
+   _readNextToken ();
 
    static inline bool
    _isAlpha (char c) {return (c >= 97 && c <= 122) || (c >= 65 && c <= 90);}
@@ -111,6 +115,15 @@ class Tokenizer
 
    char*
    _getNChars (int n);
+
+   void
+   _pushEndTokens ();
+
+   inline void
+   _pushToken (int kind) { Token t(kind, _tokenBuffer); _token_queue.push(t); _state = T_YACC_UNDEFINED; }
+
+   inline void
+   _pushToken (int kind, std::string val) { Token t(kind, val); _token_queue.push(t); _state = T_YACC_UNDEFINED; }
 
 
    //--------------------------------------------------------------------------

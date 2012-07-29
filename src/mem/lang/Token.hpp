@@ -2,6 +2,7 @@
 #define _MEM__LANG__TOKEN__HPP_
 
 
+#include "mem/lang/TokenKind.hpp"
 #include "mem/ss.hpp"
 
 
@@ -18,6 +19,8 @@ class Token
 
    GETTER(Value, std::string) {return _value;}
    SETTER(Value, std::string) {_value = val;}
+   Token () {_kind = T_YACC_ERROR; _value="";}
+   Token (int kind, std::string val) {_kind = kind; _value = val;}
 };
 
 
