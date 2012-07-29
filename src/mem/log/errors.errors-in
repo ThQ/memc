@@ -125,5 +125,16 @@
    {
       "type": "Error",
       "message": "Expression is not assignable"
+   },
+   "BadIndentation":
+   {
+      "type": "FatalError",
+      "message": "Bad indentation",
+      "description": "Indentation must be a multiple of the indentation unit.%NEWLINE Default indentation is $DefaultIndentation, but got %Indentation.",
+      "params":
+      {
+         "DefaultIndentation": "std::string",
+         "Indentation": "std::string"
+       }
    }
 }

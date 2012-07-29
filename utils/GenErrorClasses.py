@@ -99,7 +99,9 @@ hpp += "//    by <" + __file__ + ">\n"
 hpp += "//    from <" + kIN + ">\n"
 hpp += "// " + ("-" * 76) + "\n"
 hpp += "\n\n"
-hpp += "#include \"mem/log/Message.hpp\"\n\n"
+hpp += "#include \"mem/st/Symbol.hpp\"\n"
+hpp += "#include \"mem/log/Message.hpp\"\n"
+hpp += "\n"
 hpp += "namespace mem { namespace log {\n\n\n"
 
 for err_id in src_json:
