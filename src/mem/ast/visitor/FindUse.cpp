@@ -12,6 +12,8 @@ FindUse::FindUse ()
 bool
 FindUse::visit (node::Node* node)
 {
+   assert (node != NULL);
+
    if (node->isUseNode())
    {
       node::Text* text_node = static_cast<node::Text*>(node);

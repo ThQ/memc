@@ -168,7 +168,8 @@ Node::pushChild (Node* n)
 void
 Node::Depth (unsigned long depth)
 {
-   _depth = depth;
+   /*
+   //_depth = depth;
    Node* node = _first_child;
    while (node != NULL)
    {
@@ -177,6 +178,7 @@ Node::Depth (unsigned long depth)
       //node->Depth(depth + 1);
       node = node->_next;
    }
+   */
 }
 
 bool

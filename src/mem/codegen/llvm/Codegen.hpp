@@ -14,6 +14,7 @@
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/FinalId.hpp"
+#include "mem/ast/node/For.hpp"
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
@@ -169,6 +170,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgFunctionDef (ast::node::Func* func_node);
+
+   void
+   cgForStatement (ast::node::For* n);
 
    void
    cgIfStatement (ast::node::If* node);

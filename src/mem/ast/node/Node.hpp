@@ -237,8 +237,8 @@ class Node
    inline void
    pushChildren (Node* n1, Node* n2)
    {
-      this->pushChild(n1);
-      this->pushChild(n2);
+      pushChild(n1);
+      pushChild(n2);
    }
 
    /**
@@ -247,9 +247,21 @@ class Node
    inline void
    pushChildren (Node* n1, Node* n2, Node* n3)
    {
-      this->pushChild(n1);
-      this->pushChild(n2);
-      this->pushChild(n3);
+      pushChild(n1);
+      pushChild(n2);
+      pushChild(n3);
+   }
+
+   /**
+    * Appends 4 children nodes.
+    */
+   inline void
+   pushChildren (Node* n1, Node* n2, Node* n3, Node* n4)
+   {
+      pushChild(n1);
+      pushChild(n2);
+      pushChild(n3);
+      pushChild(n4);
    }
 
    /**

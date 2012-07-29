@@ -13,6 +13,7 @@
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/FinalId.hpp"
+#include "mem/ast/node/For.hpp"
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
@@ -121,6 +122,9 @@ class BlockTypesChecker : public TypeChecker
 
    void
    visitFinalId (st::Symbol* scope, node::FinalId* node);
+
+   void
+   visitFor (st::Symbol* scope, node::For* n);
 
    void
    visitIf (st::Symbol* scope, node::If* node);

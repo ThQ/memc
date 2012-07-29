@@ -533,6 +533,10 @@ Codegen::cgExpr (ast::node::Node* node)
          res = cgFinalIdExpr(static_cast<ast::node::FinalId*>(node));
          break;
 
+      case ast::node::Kind::FOR:
+         cgForStatement(static_cast<ast::node::For*>(node));
+         break;
+
       case ast::node::Kind::NEW:
          res = cgNewExpr(static_cast<ast::node::New*>(node));
          break;
@@ -657,6 +661,41 @@ Codegen::cgFinalIdExpr (ast::node::Text* node)
 {
    llvm::Value* ty = _stack.get(node->gValue());
    return ty;
+}
+
+void
+Codegen::cgForStatement (ast::node::For* n)
+{
+   assert (n != NULL);
+
+   cgExpr(n->InitializationNode());
+
+
+   llvm::BasicBlock* body_block = llvm::BasicBlock::Create(
+      llvm::getGlobalContext(), "for_block", _cur_func);
+
+   llvm::BasicBlock* after_block = llvm::BasicBlock::Create(
+      llvm::getGlobalContext(), "for_after", _cur_func);
+
+   llvm::BasicBlock* cond_block = llvm::BasicBlock::Create(
+      llvm::getGlobalContext(), "for_cond", _cur_func);
+
+   _cur_bb->getInstList().push_back(llvm::BranchInst::Create(cond_block));
+
+   _cur_bb = body_block;
+
+   cgBlock(static_cast<ast::node::Block*>(n->BlockNode()));
+   cgExpr(n->IterationNode());
+   body_block->getInstList().push_back(llvm::BranchInst::Create(cond_block));
+
+   _cur_bb = cond_block;
+   llvm::Value* cond = cgExprAndLoad(n->ConditionNode(),
+      n->ConditionNode()->ExprType(),
+      _st->gCoreTypes().gBoolTy());
+
+   llvm::BranchInst::Create(body_block, after_block, cond, _cur_bb);
+
+   _cur_bb = after_block;
 }
 
 void

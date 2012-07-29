@@ -66,12 +66,10 @@ Compiler::compile (int argc, char** argv)
       }
       std::cout << "\n";
    }
-
    else if (_opts->isSet("--help"))
    {
       printUsage(std::cout);
    }
-
    else if (_opts->hasArguments())
    {
       _parse_queue.push(_opts->getArgument(0));

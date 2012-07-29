@@ -480,6 +480,10 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          visitFinalId(scope, util::castTo<node::FinalId*, node::Kind::FINAL_ID>(node));
          break;
 
+      case node::Kind::FOR:
+         visitFor(scope, util::castTo<node::For*, node::Kind::FOR>(node));
+         break;
+
       case node::Kind::GROUP:
          visitExpr(scope, node->getChild(0));
          node->setExprType(node->getChild(0)->ExprType());
@@ -504,7 +508,37 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       case node::Kind::DOT:
          visitDot(scope, util::castTo<node::Dot*, node::Kind::DOT>(node));
          break;
+
+      case node::Kind::NUMBER:
+         break;
+
+      case node::Kind::VARIABLE_DECLARATION:
+         visitVarDecl(scope, static_cast<node::VarDecl*>(node));
+         break;
+
+      case node::Kind::VARIABLE_ASSIGNMENT:
+         visitVarAssign(scope, static_cast<node::VarAssign*>(node));
+         break;
+
+      default:
+         DEBUG_PRINTF("Unsupported node kind {kind: %d, name: %s}\n",
+            node->Kind(),
+            node::kKIND_NAMES[node->Kind()]);
+         assert(false);
    }
+}
+
+void
+BlockTypesChecker::visitFor (st::Symbol* scope, node::For* n)
+{
+   visitExpr(scope, n->InitializationNode());
+
+   visitExpr(scope, n->ConditionNode());
+   ensureBoolExpr(n->ConditionNode());
+
+   visitExpr(scope, n->IterationNode());
+
+   visitBlock(scope, n->BlockNode());
 }
 
 void
@@ -654,20 +688,7 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
    for (size_t i = 0; i < block->ChildCount(); ++i)
    {
       st = block->getChild(i);
-
-      switch (st->Kind())
-      {
-         case node::Kind::VARIABLE_DECLARATION:
-            visitVarDecl(scope, static_cast<node::VarDecl*>(st));
-            break;
-
-         case node::Kind::VARIABLE_ASSIGNMENT:
-            visitVarAssign(scope, static_cast<node::VarAssign*>(st));
-            break;
-
-         default:
-            visitExpr(scope, st);
-      }
+      visitExpr(scope, st);
    }
 }
 

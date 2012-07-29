@@ -165,6 +165,14 @@ Tokenizer::_processTokenStart (char c)
          emit_token = true;
          break;
       }
+      case ';':
+      {
+         _cur_tok = T_COLON;
+         _state = T_YACC_UNDEFINED;
+         _tokenBuffer = c;
+         emit_token = true;
+         break;
+      }
       case '@':
       {
          _cur_tok = T_AROBASE;
@@ -336,7 +344,7 @@ Tokenizer::getNextToken ()
    }
 
    //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-   //   t.Kind(), t.Value().c_str());
+   //  t.Kind(), t.Value().c_str());
 
    return t;
 }
@@ -410,6 +418,10 @@ Tokenizer::_getTokenKindFromId (std::string id)
 
       case 'i':
          if (id == "if") kind = T_IF;
+         break;
+
+      case 'f':
+         if (id == "for") kind = T_FOR;
          break;
 
       case 'n':

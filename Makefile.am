@@ -19,6 +19,7 @@ src_mem_ast_node = \
  src/mem/ast/node/Field.cpp \
  src/mem/ast/node/File.cpp \
  src/mem/ast/node/FinalId.cpp \
+ src/mem/ast/node/For.cpp \
  src/mem/ast/node/Func.cpp \
  src/mem/ast/node/If.cpp \
  src/mem/ast/node/Kind.cpp \

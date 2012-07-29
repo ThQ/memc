@@ -16,6 +16,8 @@ Visitor::visit (node::Node* node)
 void
 Visitor::visit_preorder (node::Node* node)
 {
+   assert (node != NULL);
+
    if (visit(node))
    {
       node::Node* child_node = node->_first_child;
