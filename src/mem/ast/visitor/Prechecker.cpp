@@ -22,7 +22,9 @@ Prechecker::visit (node::Node* node)
 
    if (node->Kind() == node::Kind::UNKNOWN)
    {
-      _logger->warning("Node has an unknown type", "");
+      _logger->warning("Node has an unknown type {kind: %d, name: %s}",
+         node->Kind(),
+         node->KindName().c_str());
    }
 
    if (!node->isRootNode() && node->Parent() == NULL)

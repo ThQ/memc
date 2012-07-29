@@ -559,6 +559,10 @@ Codegen::cgExpr (ast::node::Node* node)
          cgReturnStatement (node);
          break;
 
+      case ast::node::Kind::STRING:
+         res = cgString(static_cast<ast::node::String*>(node));
+         break;
+
       case ast::node::Kind::VARIABLE_ASSIGNMENT:
          cgVarAssignStatement (static_cast<ast::node::VarAssign*>(node));
          break;
@@ -964,6 +968,28 @@ Codegen::cgReturnStatement (ast::node::Node* node)
    assert(val != NULL);
 
    llvm::ReturnInst::Create(_module->getContext(), val, _cur_bb);
+}
+
+llvm::Value*
+Codegen::cgString (ast::node::String* n)
+{
+   st::Type* mem_ty = st::Util::lookupArrayType(_st->_root, "char", n->gValue().size() + 1);
+   assert(mem_ty != NULL);
+
+   llvm::Type* llvm_ty = _getLlvmTy(mem_ty);
+   assert(llvm_ty != NULL);
+
+   llvm::Constant* str_val = llvm::ConstantArray::get(_module->getContext(), n->gValue().c_str(), true);
+
+   llvm::GlobalVariable* cons = new llvm::GlobalVariable(*_module, llvm_ty, true,
+      llvm::GlobalValue::PrivateLinkage, str_val, "");
+
+   std::vector<llvm::Constant*> idx;
+   idx.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0, 10)));
+   idx.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0, 10)));
+
+   llvm::Value* ret = llvm::ConstantExpr::getGetElementPtr(cons, idx);
+   return ret;
 }
 
 void

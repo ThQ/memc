@@ -18,6 +18,7 @@
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
+#include "mem/ast/node/String.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/While.hpp"
 #include "mem/codegen/ICodegen.hpp"
@@ -191,6 +192,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgReturnStatement (ast::node::Node* node);
+
+   llvm::Value*
+   cgString (ast::node::String* n);
 
    void
    cgVarAssignStatement (ast::node::VarAssign* node);

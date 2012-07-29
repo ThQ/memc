@@ -53,35 +53,6 @@ BlockTypesChecker::visit (node::Node* node)
    }
    return true;
 }
-/*
-bool
-BlockTypesChecker::isCompatibleFuncSign (st::FunctionSignature* sign_sym,
-   node::Node* params_node)
-{
-   unsigned int params_count = params_node == NULL ? 0 : params_node->gChildCount();
-
-   if (sign_sym->_params.size() == params_count)
-   {
-      bool params_ok = true;
-      node::Node* param = NULL;
-      st::Type* expected_param_ty = NULL;
-
-      for (size_t i = 0 ; i < sign_sym->_params.size() && params_ok ; ++i)
-      {
-         param = params_node->getChild(i);
-         expected_param_ty = static_cast<st::Type*>(sign_sym->_params[i]);
-
-         if(!param->gExprType()->isSubclass(expected_param_ty))
-         {
-            params_ok = false;
-         }
-      }
-      return params_ok;
-   }
-   return false;
-}
-*/
-
 
 void
 BlockTypesChecker::pickFuncSign (st::Func* func_sym, node::Node* call_node,
@@ -512,6 +483,10 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       case node::Kind::NUMBER:
          break;
 
+      case node::Kind::STRING:
+         visitString(scope, util::castTo<node::String*, node::Kind::STRING>(node));
+         break;
+
       case node::Kind::VARIABLE_DECLARATION:
          visitVarDecl(scope, static_cast<node::VarDecl*>(node));
          break;
@@ -722,6 +697,15 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
       err->format();
       log(err);
    }
+}
+
+void
+BlockTypesChecker::visitString (st::Symbol* scope, node::String* n)
+{
+   assert(n != NULL);
+
+   n->setExprType(st::Util::lookupPointer(scope, "char", 1));
+
 }
 
 void

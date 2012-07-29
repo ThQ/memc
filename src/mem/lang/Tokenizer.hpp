@@ -67,6 +67,9 @@ class Tokenizer
    void
    _dumpBuffer ();
 
+   char
+   _escapeChar(char c) const ;
+
    inline int
    _getIndentTokenKind (std::string indent);
 

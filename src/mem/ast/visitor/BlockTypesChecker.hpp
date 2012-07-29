@@ -19,6 +19,7 @@
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
 #include "mem/ast/node/Return.hpp"
+#include "mem/ast/node/String.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
@@ -134,6 +135,9 @@ class BlockTypesChecker : public TypeChecker
 
    void
    visitReturn (st::Symbol* scope, node::Return* ret);
+
+   void
+   visitString (st::Symbol* scope, node::String* n);
 
    void
    visitVarLiteralNumber (st::Type*, node::Text* literal_nb);

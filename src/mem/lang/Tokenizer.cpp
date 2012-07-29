@@ -47,6 +47,39 @@ Tokenizer::_dumpBuffer ()
 #endif
 }
 
+char
+Tokenizer::_escapeChar (char c_in) const
+{
+   char c = '\0';
+
+   switch (c_in)
+   {
+      case 'a':
+         return '\a';
+      case 'b':
+         return '\b';
+      case 'f':
+         return '\f';
+      case 'n':
+         return '\n';
+      case 'r':
+         return '\r';
+      case 't':
+         return '\t';
+      case 'v':
+         return '\v';
+      case '\'':
+         return 39;
+      case '\\':
+         return 47;
+
+      default:
+         c = c_in;
+   }
+
+   return c;
+}
+
 void
 Tokenizer::_readSome (int n)
 {
@@ -300,6 +333,12 @@ Tokenizer::_processTokenStart (char c)
          //printf("NEWLINE <%c>\n", c);
          break;
       }
+      case '"':
+      {
+         _state = T_STRING;
+         _cur_tok = T_STRING;
+         break;
+      }
       default:
       {
          if (Tokenizer::_isAlpha(c))
@@ -343,8 +382,8 @@ Tokenizer::getNextToken ()
       t = _getNextToken();
    }
 
-   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-     t.Kind(), t.Value().c_str());
+   //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
+   //  t.Kind(), t.Value().c_str());
 
    return t;
 }
@@ -551,6 +590,23 @@ Tokenizer::_getNextToken ()
             else
             {
                _backtrack();
+               _state = T_YACC_UNDEFINED;
+               goto ret;
+            }
+            break;
+         }
+         case T_STRING:
+         {
+            if (c == '\\')
+            {
+               _tokenBuffer += _escapeChar(_get1Char());
+            }
+            else if (c != '"')
+            {
+               _tokenBuffer += c;
+            }
+            else
+            {
                _state = T_YACC_UNDEFINED;
                goto ret;
             }

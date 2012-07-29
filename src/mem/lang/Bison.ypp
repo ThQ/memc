@@ -23,6 +23,7 @@
 #include "mem/ast/node/Primitive.hpp"
 #include "mem/ast/node/Ptr.hpp"
 #include "mem/ast/node/Root.hpp"
+#include "mem/ast/node/String.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Use.hpp"
 #include "mem/ast/node/VarAssign.hpp"
@@ -147,14 +148,15 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %token T_OR
 %token T_PASS
 %token T_OBJECT
+%token T_QUOTE
 %token T_RBRACKET
 %token T_RARR
+%token T_RETURN
+%token T_SEMICOLON
 %token T_SPACE
 %token T_STAR
 %token <text> T_STRING
 %token T_USE
-%token T_RETURN
-%token T_SEMICOLON
 %token T_WHILE
 %token T_WHITESPACE
 
@@ -845,6 +847,16 @@ literal :
          //FIXME Couldnt fit this value into a numeric type, so should fail
       }
       free(nb);
+      delete $1;
+   }
+   | T_STRING
+   {
+      ast::node::String* str = new ast::node::String();
+      str->sValue($1->c_str());
+      str->setPosition(@1.copy_range());
+
+      $$ = str;
+
       delete $1;
    }
 %%

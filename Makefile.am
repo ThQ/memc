@@ -31,6 +31,7 @@ src_mem_ast_node = \
  src/mem/ast/node/Ptr.cpp \
  src/mem/ast/node/Return.cpp \
  src/mem/ast/node/Root.cpp \
+ src/mem/ast/node/String.cpp \
  src/mem/ast/node/Text.cpp \
  src/mem/ast/node/Type.cpp \
  src/mem/ast/node/Use.cpp \
