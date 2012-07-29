@@ -26,5 +26,12 @@
    #define DEBUG_PRINTF(format, ...) printf("%s:%d [DEBUG] ", __FILE__, __LINE__);printf(format, __VA_ARGS__)
 #endif
 
+#ifdef NDEBUG
+   #define DEBUG_PRINT(str)
+#endif
+#ifndef NDEBUG
+   #define DEBUG_PRINT(str) printf("%s:%d [DEBUG] %s", __FILE__, __LINE__, str)
+#endif
+
 
 #endif
