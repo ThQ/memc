@@ -71,7 +71,7 @@ Tokenizer::_escapeChar (char c_in) const
       case '\'':
          return 39;
       case '\\':
-         return 47;
+         return 92;
 
       default:
          c = c_in;
