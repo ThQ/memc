@@ -39,9 +39,9 @@ TypeChecker::ensureSizedExprType (node::Node* expr)
    {
       std::string fix_str;
 
-      if (ty->isArraySymbol() && !static_cast<st::Array*>(ty)->hasLength())
+      if (ty->isArraySymbol() && !static_cast<st::ArrayType*>(ty)->hasLength())
       {
-         fix_str += "> [" + static_cast<st::Array*>(ty)->BaseType()->Name() + ",1i]\n";
+         fix_str += "> [" + static_cast<st::ArrayType*>(ty)->BaseType()->Name() + ",1i]\n";
       }
       std::string desc;
       if (fix_str.size() != 0)

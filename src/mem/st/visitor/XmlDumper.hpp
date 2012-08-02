@@ -26,7 +26,7 @@ class XmlDumper : public IDumper
    visit (st::Symbol* sym);
 
    virtual bool
-   visitArray (st::Array* sym);
+   visitArrayType (st::ArrayType* sym);
 
    virtual void
    visitChildren (st::Symbol* sym);

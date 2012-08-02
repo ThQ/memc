@@ -8,7 +8,7 @@
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/st/Alias.hpp"
-#include "mem/st/Array.hpp"
+#include "mem/st/ArrayType.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/Primitive.hpp"
@@ -42,13 +42,13 @@ class Util
    static size_t
    getIndirectionCount (std::string type_name);
 
-   static Array*
-   getUnsizedArrayType (st::Array* sized_arr);
+   static ArrayType*
+   getUnsizedArrayType (st::ArrayType* sized_arr);
 
-   static Array*
+   static ArrayType*
    getUnsizedArrayType (st::Type* base_ty);
 
-   static Array*
+   static ArrayType*
    lookupArrayType (Symbol* scope, std::string base_ty_name, int size);
 
    static Class*

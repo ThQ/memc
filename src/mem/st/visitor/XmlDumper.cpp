@@ -16,7 +16,9 @@ XmlDumper::visit (st::Symbol* sym)
    switch (sym->_kind)
    {
       case ARRAY:
-         visitArray(static_cast<st::Array*>(sym));
+         visitArrayType(static_cast<st::ArrayType*>(sym));
+         break;
+
       case CLASS:
          visitClass(static_cast<st::Class*>(sym));
          break;
@@ -63,7 +65,7 @@ XmlDumper::visitChildren (st::Symbol* sym)
 }
 
 bool
-XmlDumper::visitArray (st::Array* s)
+XmlDumper::visitArrayType (st::ArrayType* s)
 {
    *_out << "<Array name=\"" + s->Name() + "\"";
    if (s->BaseType() != NULL)

@@ -252,7 +252,7 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
    {
       if (value_ty->isArraySymbol())
       {
-         st::Array* arr = static_cast<st::Array*>(value_ty);
+         st::ArrayType* arr = static_cast<st::ArrayType*>(value_ty);
          n->setExprType(arr->BaseType());
       }
       else if (value_ty->isPtrSymbol())
@@ -664,7 +664,7 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
 
    if (ty_node->BoundSymbol()->isArraySymbol())
    {
-      st::Array* unsized_arr_ty = st::Util::getUnsizedArrayType(static_cast<st::Array*>(ty_node->BoundSymbol()));
+      st::ArrayType* unsized_arr_ty = st::Util::getUnsizedArrayType(static_cast<st::ArrayType*>(ty_node->BoundSymbol()));
       st::Type* ptr_ty = st::Util::getPointerType(unsized_arr_ty);
       new_node->setExprType(ptr_ty);
    }

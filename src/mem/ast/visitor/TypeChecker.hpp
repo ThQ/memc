@@ -5,7 +5,7 @@
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 #include "mem/log/Message.hpp"
-#include "mem/st/Array.hpp"
+#include "mem/st/ArrayType.hpp"
 #include "mem/st/Symbol.hpp"
 
 

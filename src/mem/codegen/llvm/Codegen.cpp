@@ -171,7 +171,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
       }
       else if (mem_ty->isArraySymbol())
       {
-         st::Array* arr = static_cast<mem::st::Array*>(mem_ty);
+         st::ArrayType* arr = static_cast<mem::st::ArrayType*>(mem_ty);
          llvm::Type* base_ty = _getLlvmTy(arr->BaseType());
          if (base_ty != NULL)
          {
@@ -1009,7 +1009,7 @@ Codegen::cgNewExpr (ast::node::New* node)
 
    if (type_node->BoundSymbol()->isArraySymbol())
    {
-      st::Array* arr_ty = static_cast<st::Array*>(type_node->BoundSymbol());
+      st::ArrayType* arr_ty = static_cast<st::ArrayType*>(type_node->BoundSymbol());
       int type_byte_size = static_cast<st::Type*>(type_node->getChild(0)->BoundSymbol())->ByteSize();
       llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1));
       llvm::Value* obj_size = llvm::ConstantInt::get(_classes["int"], type_byte_size);

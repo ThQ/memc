@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 
-#include "mem/st/Array.hpp"
+#include "mem/st/ArrayType.hpp"
 #include "mem/st/Class.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"

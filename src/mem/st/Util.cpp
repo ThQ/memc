@@ -149,13 +149,13 @@ Util::getSymbol (Symbol* scope, std::string sym_name)
    return res;
 }
 
-Array*
-Util::getUnsizedArrayType (Array* sized_array)
+ArrayType*
+Util::getUnsizedArrayType (ArrayType* sized_array)
 {
    return getUnsizedArrayType(sized_array->BaseType());
 }
 
-Array*
+ArrayType*
 Util::getUnsizedArrayType (Type* base_ty)
 {
    if (base_ty != NULL)
@@ -166,7 +166,7 @@ Util::getUnsizedArrayType (Type* base_ty)
 
       if (sym == NULL)
       {
-         st::Array* ty = new Array();
+         st::ArrayType* ty = new ArrayType();
          ty->setBaseType(base_ty);
          ty->setName(arr_ty_name.str());
          ty->setArrayLength(-1);
@@ -176,17 +176,17 @@ Util::getUnsizedArrayType (Type* base_ty)
       }
       else
       {
-         return static_cast<st::Array*>(sym);
+         return static_cast<st::ArrayType*>(sym);
       }
       DEBUG_UNREACHABLE;
    }
    return NULL;
 }
 
-Array*
+ArrayType*
 Util::lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
 {
-   Array* arr_ty = NULL;
+   ArrayType* arr_ty = NULL;
    Symbol* base_ty = Util::lookupSymbol(scope, base_ty_name);
 
    if (base_ty != NULL && base_ty->isAnyTypeSymbol())
@@ -198,7 +198,7 @@ Util::lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
       str << size;
       str << "]";
 
-      arr_ty = new Array();
+      arr_ty = new ArrayType();
       arr_ty->setBaseType(static_cast<Type*>(base_ty));
       arr_ty->setName(str.str());
       arr_ty->setArrayLength(size);

@@ -1,4 +1,4 @@
-#include "mem/st/Array.hpp"
+#include "mem/st/ArrayType.hpp"
 
 
 namespace mem { namespace st {
@@ -8,7 +8,7 @@ namespace mem { namespace st {
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
-Array::Array ()
+ArrayType::ArrayType ()
 {
    _kind = ARRAY;
    _array_length = -1;
@@ -20,7 +20,7 @@ Array::Array ()
 //-----------------------------------------------------------------------------
 
 void
-Array::_computeByteSize ()
+ArrayType::_computeByteSize ()
 {
    if (_array_length != -1 && _base_type != NULL
       && _base_type->ByteSize() != -1)
