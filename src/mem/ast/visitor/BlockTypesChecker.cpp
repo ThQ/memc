@@ -257,7 +257,7 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
       }
       else if (value_ty->isPtrSymbol())
       {
-         st::Type* ptr_parent = static_cast<st::Ptr*>(value_ty)->BaseType();
+         st::Type* ptr_parent = static_cast<st::PointerType*>(value_ty)->BaseType();
          n->setExprType(ptr_parent);
       }
       else
@@ -316,7 +316,7 @@ BlockTypesChecker::visitDeref (st::Symbol* scope, node::Node* n)
    {
       if (value_ty->isPtrSymbol())
       {
-         n->setExprType(static_cast<st::Ptr*>(value_ty)->BaseType());
+         n->setExprType(static_cast<st::PointerType*>(value_ty)->BaseType());
       }
       else
       {

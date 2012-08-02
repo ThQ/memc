@@ -36,7 +36,7 @@ XmlDumper::visit (st::Symbol* sym)
          break;
 
       case POINTER:
-         visitPointer(static_cast<st::Ptr*>(sym));
+         visitPointerType(static_cast<st::PointerType*>(sym));
          break;
 
       case PRIMITIVE:
@@ -135,7 +135,7 @@ XmlDumper::visitNamespace (st::Namespace* ns_sym)
 }
 
 bool
-XmlDumper::visitPointer (st::Ptr* s)
+XmlDumper::visitPointerType (st::PointerType* s)
 {
    *_out << "<PointerType name=\"" + s->Name() + "\"";
    if (s->BaseType() != NULL)

@@ -44,7 +44,7 @@ class XmlDumper : public IDumper
    visitNamespace (st::Namespace* var_sym);
 
    virtual bool
-   visitPointer (st::Ptr* s);
+   visitPointerType (st::PointerType* s);
 
    virtual bool
    visitPrimitive (st::Primitive* s);

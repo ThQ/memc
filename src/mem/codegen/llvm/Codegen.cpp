@@ -130,7 +130,7 @@ Codegen::_getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty)
    // Both operands are pointers
    else
    {
-      common_ty = st::Util::getPointerBaseType(static_cast<st::Ptr*>(left_ty));
+      common_ty = st::Util::getPointerBaseType(static_cast<st::PointerType*>(left_ty));
    }
 
    return common_ty;
@@ -161,7 +161,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
       {
          // Create the pointer type
          llvm::Type* base_ty = _getLlvmTy(
-            static_cast<mem::st::Ptr*>(mem_ty)->BaseType());
+            static_cast<st::PointerType*>(mem_ty)->BaseType());
          if (base_ty != NULL)
          {
             // TODO What is the second parameter (AddressSpace) ?
@@ -581,7 +581,7 @@ Codegen::cgDotExpr (ast::node::Dot* node)
 
    if (node->LeftNode()->ExprType()->isPtrSymbol())
    {
-      st::Ptr* ptr_ty = static_cast<st::Ptr*>(node->LeftNode()->ExprType());
+      st::PointerType* ptr_ty = static_cast<st::PointerType*>(node->LeftNode()->ExprType());
       for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
       {
          left_node = new llvm::LoadInst(left_node, "", _cur_bb);

@@ -1,10 +1,10 @@
-#include "mem/st/Ptr.hpp"
+#include "mem/st/PointerType.hpp"
 
 
 namespace mem { namespace st {
 
 
-Ptr::Ptr ()
+PointerType::PointerType ()
 {
    _base_type = NULL;
    _kind = POINTER;
@@ -12,17 +12,17 @@ Ptr::Ptr ()
    _byte_size = sizeof(void*);
 }
 
-Ptr::~Ptr ()
+PointerType::~PointerType ()
 {
 }
 
 Type*
-Ptr::getNonPointerParent ()
+PointerType::getNonPointerParent ()
 {
    st::Type* parent = _base_type;
    while (parent != NULL && parent->isPtrSymbol())
    {
-      parent = static_cast<st::Ptr*>(parent)->_base_type;
+      parent = static_cast<st::PointerType*>(parent)->BaseType();
    }
 
    if (!parent->isPtrSymbol())

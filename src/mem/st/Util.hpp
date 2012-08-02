@@ -12,7 +12,7 @@
 #include "mem/st/Func.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/Primitive.hpp"
-#include "mem/st/Ptr.hpp"
+#include "mem/st/PointerType.hpp"
 #include "mem/st/Type.hpp"
 #include "mem/st/Var.hpp"
 
@@ -31,9 +31,9 @@ class Util
    getExprType (Symbol* s);
 
    static Type*
-   getPointerBaseType(Ptr* ptr);
+   getPointerBaseType(PointerType* ptr);
 
-   static Ptr*
+   static PointerType*
    getPointerType (Type* base_ty);
 
    static Symbol*
@@ -57,10 +57,10 @@ class Util
    static Func*
    lookupFunction (Symbol* scope, std::string func_name);
 
-   static Ptr*
+   static PointerType*
    lookupPointer(Symbol* scope, std::string base_ty_name, size_t ptr_level);
 
-   static Ptr*
+   static PointerType*
    lookupPointer(Symbol* scope, Type* base_ty);
 
    static Symbol*

@@ -26,7 +26,7 @@
 #include "mem/st/Class.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
-#include "mem/st/Ptr.hpp"
+#include "mem/st/PointerType.hpp"
 #include "mem/st/Util.hpp"
 #include "mem/st/Var.hpp"
 

@@ -62,12 +62,12 @@ Util::getExprType (Symbol* s)
 }
 
 Type*
-Util::getPointerBaseType (Ptr* ptr)
+Util::getPointerBaseType (PointerType* ptr)
 {
    Type* base_ty = NULL;
    while (ptr->isPtrSymbol())
    {
-      ptr = static_cast<st::Ptr*>(ptr->BaseType());
+      ptr = static_cast<st::PointerType*>(ptr->BaseType());
    }
    if (!ptr->isPtrSymbol())
    {
@@ -76,7 +76,7 @@ Util::getPointerBaseType (Ptr* ptr)
    return base_ty;
 }
 
-Ptr*
+PointerType*
 Util::getPointerType (Type* base_ty)
 {
    if (base_ty != NULL && base_ty->Parent() != NULL)
@@ -84,7 +84,7 @@ Util::getPointerType (Type* base_ty)
       st::Symbol* ty = base_ty->Parent()->getChild(base_ty->Name() + "*");
       if (ty == NULL)
       {
-         st::Ptr* ptr_ty = new Ptr();
+         st::PointerType* ptr_ty = new PointerType();
          ptr_ty->setName(base_ty->Name() + "*");
          ptr_ty->setBaseType(base_ty);
          base_ty->Parent()->addChild(ptr_ty);
@@ -92,7 +92,7 @@ Util::getPointerType (Type* base_ty)
       }
       else if (ty->isPtrSymbol())
       {
-         return static_cast<st::Ptr*>(ty);
+         return static_cast<st::PointerType*>(ty);
       }
    }
 
@@ -304,7 +304,7 @@ Util::lookupSymbol (Symbol* scope, std::vector<std::string> parts)
    return NULL;
 }
 
-st::Ptr*
+st::PointerType*
 Util::lookupPointer(Symbol* scope, Type* base_ty)
 {
    st::Symbol* parent = base_ty->_parent;
@@ -316,7 +316,7 @@ Util::lookupPointer(Symbol* scope, Type* base_ty)
 
    if (ptr == NULL)
    {
-      st::Ptr* ptr_ty = new Ptr();
+      st::PointerType* ptr_ty = new PointerType();
       ptr_ty->setName(base_ty->Name() + "*");
       ptr_ty->setBaseType(base_ty);
       parent->addChild(ptr_ty);
@@ -325,13 +325,13 @@ Util::lookupPointer(Symbol* scope, Type* base_ty)
    }
    else if (ptr->isPtrSymbol())
    {
-      return static_cast<st::Ptr*>(ptr);
+      return static_cast<st::PointerType*>(ptr);
    }
 
    return NULL;
 }
 
-st::Ptr*
+st::PointerType*
 Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
 {
    DEBUG_REQUIRE(scope != NULL);
@@ -350,7 +350,7 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
       }
       else
       {
-         tmp_ptr = static_cast<st::Ptr*>(getSymbol(scope, cur_ptr_name));
+         tmp_ptr = static_cast<st::PointerType*>(getSymbol(scope, cur_ptr_name));
 
          if (tmp_ptr != NULL)
          {
@@ -359,7 +359,7 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
          else
          {
             // Create the pointer type
-            Ptr* ptr_symb = new Ptr();
+            PointerType* ptr_symb = new PointerType();
             ptr_symb->setName(cur_ptr_name);
             ptr_symb->setBaseType(cur_sym);
 
@@ -383,7 +383,7 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
 
    DEBUG_ENSURE(cur_sym == NULL || cur_sym->isPtrSymbol());
 
-   return static_cast<Ptr*>(cur_sym);
+   return static_cast<PointerType*>(cur_sym);
 }
 
 bool

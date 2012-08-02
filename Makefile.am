@@ -81,14 +81,14 @@ src_mem_opt = \
 src_mem_st = \
  src/mem/st/Alias.cpp \
  src/mem/st/Arg.cpp \
- src/mem/st/Array.cpp \
+ src/mem/st/ArrayType.cpp \
  src/mem/st/Class.cpp \
  src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \
  src/mem/st/Namespace.cpp \
  src/mem/st/Path.cpp \
  src/mem/st/Primitive.cpp \
- src/mem/st/Ptr.cpp \
+ src/mem/st/PointerType.cpp \
  src/mem/st/Symbol.cpp \
  src/mem/st/SymbolTable.cpp \
  src/mem/st/Type.cpp \
