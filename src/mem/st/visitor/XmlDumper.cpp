@@ -76,6 +76,7 @@ XmlDumper::visitArrayType (st::ArrayType* s)
    {
       *_out << " size=\"" << s->ArrayLength() << "\"";
    }
+   *_out << " byte-size=\"" << s->ByteSize() << "\"";
    *_out << " />\n";
 
    return true;
@@ -89,6 +90,7 @@ XmlDumper::visitClass (st::Class* cls_sym)
    {
       *_out << " parent_type=\"" + cls_sym->_parent_type->gQualifiedName() + "\"";
    }
+   *_out << " byte-size=\"" << cls_sym->ByteSize() << "\"";
    *_out << ">\n";
    this->visitChildren(cls_sym);
    *_out << "</Class>";
@@ -142,6 +144,7 @@ XmlDumper::visitPointerType (st::PointerType* s)
    {
       *_out << " base-type=\"" + s->BaseType()->gQualifiedName() + "\"";
    }
+   *_out << " byte-size=\"" << s->ByteSize() << "\"";
    *_out << " />\n";
 
    return true;
@@ -150,11 +153,8 @@ XmlDumper::visitPointerType (st::PointerType* s)
 bool
 XmlDumper::visitPrimitiveType (st::PrimitiveType* s)
 {
-   *_out << "<Primitive name=\"" + s->Name() + "\"";
-   if (s->_parent_type != NULL)
-   {
-      *_out << " parent_type=\"" + s->_parent_type->gQualifiedName() + "\"";
-   }
+   *_out << "<PrimitiveType name=\"" + s->Name() + "\"";
+   *_out << " byte-size=\"" << s->ByteSize() << "\"";
    *_out << " />\n";
 
    return true;
