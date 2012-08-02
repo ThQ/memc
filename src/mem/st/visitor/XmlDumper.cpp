@@ -140,9 +140,9 @@ bool
 XmlDumper::visitPointerType (st::PointerType* s)
 {
    *_out << "<PointerType name=\"" + s->Name() + "\"";
-   if (s->BaseType() != NULL)
+   if (s->PointedType() != NULL)
    {
-      *_out << " base-type=\"" + s->BaseType()->gQualifiedName() + "\"";
+      *_out << " base-type=\"" + s->PointedType()->gQualifiedName() + "\"";
    }
    *_out << " byte-size=\"" << s->ByteSize() << "\"";
    *_out << " />\n";

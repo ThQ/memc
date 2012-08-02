@@ -67,7 +67,7 @@ getPointerBaseType (PointerType* ptr)
    Type* base_ty = NULL;
    while (ptr->isPtrSymbol())
    {
-      ptr = static_cast<st::PointerType*>(ptr->BaseType());
+      ptr = static_cast<st::PointerType*>(ptr->PointedType());
    }
    if (!ptr->isPtrSymbol())
    {
@@ -86,7 +86,7 @@ getPointerType (Type* base_ty)
       {
          st::PointerType* ptr_ty = new PointerType();
          ptr_ty->setName(base_ty->Name() + "*");
-         ptr_ty->setBaseType(base_ty);
+         ptr_ty->setPointedType(base_ty);
          base_ty->Parent()->addChild(ptr_ty);
          return ptr_ty;
       }
@@ -318,7 +318,7 @@ lookupPointer(Symbol* scope, Type* base_ty)
    {
       st::PointerType* ptr_ty = new PointerType();
       ptr_ty->setName(base_ty->Name() + "*");
-      ptr_ty->setBaseType(base_ty);
+      ptr_ty->setPointedType(base_ty);
       parent->addChild(ptr_ty);
 
       return ptr_ty;
@@ -361,7 +361,7 @@ lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
             // Create the pointer type
             PointerType* ptr_symb = new PointerType();
             ptr_symb->setName(cur_ptr_name);
-            ptr_symb->setBaseType(cur_sym);
+            ptr_symb->setPointedType(cur_sym);
 
             // Add the pointer at the same level as the base type
             IF_DEBUG

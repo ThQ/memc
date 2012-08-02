@@ -18,7 +18,7 @@ class PointerType : public Type
    //--------------------------------------------------------------------------
    public:
 
-   Type* _base_type;
+   Type* _pointed_type;
    int _ptr_level;
 
 
@@ -28,10 +28,10 @@ class PointerType : public Type
    public:
 
    // BaseType
-   GETTER(BaseType, Type*) {return _base_type;}
-   SETTER(BaseType, Type*)
+   GETTER(PointedType, Type*) {return _pointed_type;}
+   SETTER(PointedType, Type*)
    {
-      _base_type = val;
+      _pointed_type = val;
       if(val->isPtrSymbol())
       {
          _ptr_level = static_cast<PointerType*>(val)->IndirectionLevel() + 1;
@@ -76,7 +76,7 @@ class PointerType : public Type
     * as a proxy.
     */
    inline Symbol*
-   getChild (std::string name) {return this->_base_type->getChild(name);}
+   getChild (std::string name) {return _pointed_type->getChild(name);}
 
    Type*
    getNonPointerParent ();

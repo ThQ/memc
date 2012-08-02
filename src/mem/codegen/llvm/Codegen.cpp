@@ -161,7 +161,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
       {
          // Create the pointer type
          llvm::Type* base_ty = _getLlvmTy(
-            static_cast<st::PointerType*>(mem_ty)->BaseType());
+            static_cast<st::PointerType*>(mem_ty)->PointedType());
          if (base_ty != NULL)
          {
             // TODO What is the second parameter (AddressSpace) ?
