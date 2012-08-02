@@ -86,9 +86,9 @@ bool
 XmlDumper::visitClass (st::Class* cls_sym)
 {
    *_out << "<Class name=\"" + cls_sym->Name() + "\"";
-   if (cls_sym->_parent_type != NULL)
+   if (cls_sym->ParentType() != NULL)
    {
-      *_out << " parent_type=\"" + cls_sym->_parent_type->gQualifiedName() + "\"";
+      *_out << " parent_type=\"" + cls_sym->ParentType()->gQualifiedName() + "\"";
    }
    *_out << " byte-size=\"" << cls_sym->ByteSize() << "\"";
    *_out << ">\n";

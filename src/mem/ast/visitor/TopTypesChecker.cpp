@@ -126,7 +126,7 @@ void
 TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
 {
    assert(scope!=NULL);
-   assert(scope->isClassSymbol());
+   assert(scope->isClassType());
    assert(field!=NULL);
 
    node::Text* name_node = static_cast<node::Text*>(field->NameNode());
@@ -140,7 +140,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
       && ensureSymbolIsType(type_node, type_node->ExprType()))
    {
       // TODO Ugly one here...
-      if (!type_node->ExprType()->isClassSymbol() || !static_cast<st::Class*>(type_node->BoundSymbol())->isDependingOn(static_cast<st::Class*>(scope)))
+      if (!type_node->ExprType()->isClassType() || !static_cast<st::Class*>(type_node->BoundSymbol())->isDependingOn(static_cast<st::Class*>(scope)))
       {
          st::Field* sym_field = new st::Field();
          sym_field->setName(name_node->gValue());

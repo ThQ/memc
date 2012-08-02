@@ -32,7 +32,7 @@ class PointerType : public Type
    SETTER(PointedType, Type*)
    {
       _pointed_type = val;
-      if(val->isPtrSymbol())
+      if(val->isPointerType())
       {
          _ptr_level = static_cast<PointerType*>(val)->IndirectionLevel() + 1;
       }

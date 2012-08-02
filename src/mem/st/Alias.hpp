@@ -8,16 +8,20 @@
 namespace mem { namespace st {
 
 
+/**
+ * A symbol that aliases a namespace.
+ *
+ * This is currently used to use only the last name part of the module imported.
+ * > use m.io.File
+ * can then be used as `File.xxx'.
+ *
+ * FIXME: Should be extended to alias any symbol.
+ */
 class Alias : public Symbol
 {
-   protected:
-
-   Namespace* _aliased;
-
-
-   // -------------------------------------------------------------------------
+   //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
-   // -------------------------------------------------------------------------
+   //--------------------------------------------------------------------------
    public:
 
    /**
@@ -25,18 +29,19 @@ class Alias : public Symbol
     */
    Alias();
 
-   // -------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTORS
-   // -------------------------------------------------------------------------
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
    public:
 
    GETTER(Aliased, Namespace*) {return _aliased;}
    SETTER(Aliased, Namespace*) {_aliased = val;}
 
 
-   // -------------------------------------------------------------------------
-   // PUBLIC METHODS
-   // -------------------------------------------------------------------------
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
    public:
 
    virtual inline bool
@@ -44,6 +49,14 @@ class Alias : public Symbol
 
    virtual Symbol*
    getChild (std::string name);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   Namespace* _aliased;
 };
 
 } }

@@ -250,12 +250,12 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 
    if (value_ty != NULL)
    {
-      if (value_ty->isArraySymbol())
+      if (value_ty->isArrayType())
       {
          st::ArrayType* arr = static_cast<st::ArrayType*>(value_ty);
          n->setExprType(arr->ItemType());
       }
-      else if (value_ty->isPtrSymbol())
+      else if (value_ty->isPointerType())
       {
          st::Type* ptr_parent = static_cast<st::PointerType*>(value_ty)->PointedType();
          n->setExprType(ptr_parent);
@@ -314,7 +314,7 @@ BlockTypesChecker::visitDeref (st::Symbol* scope, node::Node* n)
 
    if (value_ty != NULL)
    {
-      if (value_ty->isPtrSymbol())
+      if (value_ty->isPointerType())
       {
          n->setExprType(static_cast<st::PointerType*>(value_ty)->PointedType());
       }
@@ -662,7 +662,7 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
    visitExpr(scope, ty_node);
    ensureSymbolIsType(ty_node, ty_node->BoundSymbol());
 
-   if (ty_node->BoundSymbol()->isArraySymbol())
+   if (ty_node->BoundSymbol()->isArrayType())
    {
       st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(static_cast<st::ArrayType*>(ty_node->BoundSymbol()));
       st::Type* ptr_ty = st::util::getPointerType(unsized_arr_ty);
@@ -739,7 +739,8 @@ BlockTypesChecker::visitPointer (st::Symbol* scope, node::Ptr* n)
          n->TypeNode()->setBoundSymbol(BugType());
       }
 
-      if (n->TypeNode()->hasBoundSymbol() && n->TypeNode()->BoundSymbol()->isAnyTypeSymbol())
+      if (n->TypeNode()->hasBoundSymbol()
+         && n->TypeNode()->BoundSymbol()->isAnyType())
       {
          st::Symbol* ptr_ty = st::util::lookupPointer(scope,
             static_cast<st::Type*>(n->TypeNode()->BoundSymbol()));

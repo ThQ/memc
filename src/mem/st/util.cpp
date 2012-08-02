@@ -37,7 +37,7 @@ getExprType (Symbol* s)
 
    st::Type* ret = NULL;
 
-   if (s->isAnyTypeSymbol())
+   if (s->isAnyType())
    {
       ret = static_cast<st::Type*>(s);
    }
@@ -65,11 +65,11 @@ Type*
 getPointerBaseType (PointerType* ptr)
 {
    Type* base_ty = NULL;
-   while (ptr->isPtrSymbol())
+   while (ptr->isPointerType())
    {
       ptr = static_cast<st::PointerType*>(ptr->PointedType());
    }
-   if (!ptr->isPtrSymbol())
+   if (!ptr->isPointerType())
    {
       base_ty = ptr;
    }
@@ -90,7 +90,7 @@ getPointerType (Type* base_ty)
          base_ty->Parent()->addChild(ptr_ty);
          return ptr_ty;
       }
-      else if (ty->isPtrSymbol())
+      else if (ty->isPointerType())
       {
          return static_cast<st::PointerType*>(ty);
       }
@@ -189,7 +189,7 @@ lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
    ArrayType* arr_ty = NULL;
    Symbol* base_ty = util::lookupSymbol(scope, base_ty_name);
 
-   if (base_ty != NULL && base_ty->isAnyTypeSymbol())
+   if (base_ty != NULL && base_ty->isAnyType())
    {
       std::stringstream str;
       str << "[";
@@ -240,7 +240,7 @@ lookupMember (Symbol* scope, std::string symbol_name)
    {
       res = scope->getChild(symbol_name);
       if (res != NULL) return res;
-      scope = static_cast<Class*>(scope)->_parent_type;
+      scope = static_cast<Class*>(scope)->ParentType();
    }
 
    return NULL;
@@ -323,7 +323,7 @@ lookupPointer(Symbol* scope, Type* base_ty)
 
       return ptr_ty;
    }
-   else if (ptr->isPtrSymbol())
+   else if (ptr->isPointerType())
    {
       return static_cast<st::PointerType*>(ptr);
    }
@@ -381,7 +381,7 @@ lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
       cur_ptr_name += "*";
    }
 
-   DEBUG_ENSURE(cur_sym == NULL || cur_sym->isPtrSymbol());
+   DEBUG_ENSURE(cur_sym == NULL || cur_sym->isPointerType());
 
    return static_cast<PointerType*>(cur_sym);
 }

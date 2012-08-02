@@ -119,11 +119,11 @@ st::Type*
 Codegen::_getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty)
 {
    st::Type* common_ty = NULL;
-   if (!left_ty->isPtrSymbol())
+   if (!left_ty->isPointerType())
    {
       common_ty = static_cast<st::Type*>(left_ty);
    }
-   else if (!right_ty->isPtrSymbol())
+   else if (!right_ty->isPointerType())
    {
       common_ty = static_cast<st::Type*>(right_ty);
    }
@@ -157,7 +157,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
    // Type is NOT found, so ?
    else
    {
-      if (mem_ty->isPtrSymbol())
+      if (mem_ty->isPointerType())
       {
          // Create the pointer type
          llvm::Type* base_ty = _getLlvmTy(
@@ -169,7 +169,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
              _classes[mem_ty->gQualifiedName()] = ty;
          }
       }
-      else if (mem_ty->isArraySymbol())
+      else if (mem_ty->isArrayType())
       {
          st::ArrayType* arr = static_cast<mem::st::ArrayType*>(mem_ty);
          llvm::Type* base_ty = _getLlvmTy(arr->ItemType());
@@ -314,7 +314,7 @@ Codegen::gen (ast::node::Node* root)
    for (i = types.begin() ; i != types.end(); ++i)
    {
       ty = (*i).second;
-      if (ty->isClassSymbol())
+      if (ty->isClassType())
       {
          cgClass(static_cast<st::Class*>(ty));
       }
@@ -438,7 +438,7 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    assert (index != NULL);
 
    std::vector<llvm::Value*> idx;
-   if (n->ValueNode()->ExprType()->isArraySymbol())
+   if (n->ValueNode()->ExprType()->isArrayType())
    {
       idx.push_back(_createInt32Constant(0));
    }
@@ -507,7 +507,7 @@ Codegen::cgCallExpr (ast::node::Call* node)
 void
 Codegen::cgClass (st::Class* cls_sym)
 {
-   assert (cls_sym->isClassSymbol());
+   assert (cls_sym->isClassType());
 
    std::vector<llvm::Type*> fields;
    if (cls_sym->_cur_field_index > 0)
@@ -579,7 +579,7 @@ Codegen::cgDotExpr (ast::node::Dot* node)
    llvm::Value* left_node = cgExpr(node->LeftNode());
    std::vector<llvm::Value*> idx;
 
-   if (node->LeftNode()->ExprType()->isPtrSymbol())
+   if (node->LeftNode()->ExprType()->isPointerType())
    {
       st::PointerType* ptr_ty = static_cast<st::PointerType*>(node->LeftNode()->ExprType());
       for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
@@ -1007,7 +1007,7 @@ Codegen::cgNewExpr (ast::node::New* node)
 
    ast::node::Node* type_node = node->getChild(0);
 
-   if (type_node->BoundSymbol()->isArraySymbol())
+   if (type_node->BoundSymbol()->isArrayType())
    {
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(type_node->BoundSymbol());
       int type_byte_size = static_cast<st::Type*>(type_node->getChild(0)->BoundSymbol())->ByteSize();

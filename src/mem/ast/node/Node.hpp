@@ -55,7 +55,7 @@ class Node
    // ExprType
    GETTER(ExprType, st::Type*) {return _exp_type;}
    SETTER(ExprType, st::Type*) {_exp_type = val;}
-   SETTER(ExprType, st::Symbol*) {assert(val->isAnyTypeSymbol());_exp_type = static_cast<st::Type*>(val);}
+   SETTER(ExprType, st::Symbol*) {assert(val->isAnyType());_exp_type = static_cast<st::Type*>(val);}
 
    // Kind
    GETTER(Kind, unsigned int) {return _type;}

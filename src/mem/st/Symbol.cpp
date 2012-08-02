@@ -123,7 +123,7 @@ Symbol::hintName (Symbol* parent, std::string hint)
 }
 
 bool
-Symbol::isAnyTypeSymbol() const
+Symbol::isAnyType () const
 {
    switch (_kind)
    {
@@ -152,18 +152,5 @@ Symbol::isReferenceSymbol() const
    }
 }
 
-bool
-Symbol::isTypeSymbol () const
-{
-   switch (_kind)
-   {
-      case CLASS:
-      case POINTER:
-      case PRIMITIVE:
-         return true;
-      default:
-         return false;
-   }
-}
 
 } }

@@ -11,21 +11,6 @@ namespace mem { namespace st {
 
 class Var : public Symbol
 {
-   st::Type* _type;
-
-   // -------------------------------------------------------------------------
-   // PROPERTIES
-   // -------------------------------------------------------------------------
-   public:
-
-   // PROPERTY : Type
-   GETTER(Type, class st::Type*) {return _type;}
-   SETTER(Type, class Type*) {_type = val;}
-   SETTER(Type, class Symbol*) {_type = static_cast<class Type*>(val);}
-
-   virtual Symbol*
-   gExprType ();
-
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    // -------------------------------------------------------------------------
@@ -42,6 +27,20 @@ class Var : public Symbol
    Var (std::string name, class Type* type);
 
 
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   // PROPERTY : Type
+   GETTER(Type, class st::Type*) {return _type;}
+   SETTER(Type, class Type*) {_type = val;}
+   SETTER(Type, class Symbol*) {_type = static_cast<class Type*>(val);}
+
+   virtual Symbol*
+   gExprType ();
+
+
    // -------------------------------------------------------------------------
    // PUBLIC METHODS
    // -------------------------------------------------------------------------
@@ -52,6 +51,13 @@ class Var : public Symbol
 
    virtual Symbol*
    gEvalType ();
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   st::Type* _type;
 };
 
 

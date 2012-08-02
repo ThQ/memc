@@ -11,7 +11,7 @@ DepBuilder::DepBuilder ()
 bool
 DepBuilder::visit (st::Symbol* sym)
 {
-   if (sym->isClassSymbol())
+   if (sym->isClassType())
    {
       visitClass(static_cast<st::Class*>(sym));
    }

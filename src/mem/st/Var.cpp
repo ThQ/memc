@@ -1,8 +1,12 @@
 #include "mem/st/Var.hpp"
 
+
 namespace mem { namespace st {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTORS
+//-----------------------------------------------------------------------------
 Var::Var ()
 {
    _kind = VAR;
@@ -16,6 +20,9 @@ Var::Var (std::string name, class Type* type)
    _type = type;
 }
 
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 Var*
 Var::create (std::string name, class Type* ty)
 {
@@ -36,5 +43,6 @@ Var::gExprType ()
 {
    return _type;
 }
+
 
 } }

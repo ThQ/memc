@@ -39,7 +39,7 @@ TypeChecker::ensureSizedExprType (node::Node* expr)
    {
       std::string fix_str;
 
-      if (ty->isArraySymbol() && !static_cast<st::ArrayType*>(ty)->hasLength())
+      if (ty->isArrayType() && !static_cast<st::ArrayType*>(ty)->hasLength())
       {
          fix_str += "> [" + static_cast<st::ArrayType*>(ty)->ItemType()->Name() + ",1i]\n";
       }
@@ -68,7 +68,7 @@ TypeChecker::ensureSymbolIsType (node::Node* node, st::Symbol* sym)
    assert (node != NULL);
    assert (sym != NULL);
 
-   if (!sym->isAnyTypeSymbol())
+   if (!sym->isAnyType())
    {
       log::TypeExpected* err = new log::TypeExpected();
       err->sSymbolName(sym->gQualifiedName());

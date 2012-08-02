@@ -131,10 +131,10 @@ class Symbol
    isAliasSymbol() const {return is(st::ALIAS);}
 
    inline bool
-   isArraySymbol() const {return is(st::ARRAY);}
+   isArrayType() const {return is(st::ARRAY);}
 
    inline bool
-   isClassSymbol() const {return is(st::CLASS);}
+   isClassType() const {return is(st::CLASS);}
 
    inline bool
    isFieldSymbol() const {return is(st::FIELD);}
@@ -146,7 +146,7 @@ class Symbol
    isPrimitiveSymbol() const {return is(st::PRIMITIVE);}
 
    inline bool
-   isPtrSymbol() const {return is(st::POINTER);}
+   isPointerType() const {return is(st::POINTER);}
 
    bool
    isReferenceSymbol() const;
@@ -155,13 +155,7 @@ class Symbol
    isVarSymbol() const {return is(st::VAR);}
 
    bool
-   isAnyTypeSymbol() const;
-
-   /**
-    * Returns true if the symbol is a type symbol (Type, Class, Primitive, ...).
-    */
-   bool
-   isTypeSymbol () const;
+   isAnyType () const;
 
    /**
     * Returns the qualified name of the symbol.

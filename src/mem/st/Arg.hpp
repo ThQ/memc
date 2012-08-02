@@ -8,6 +8,12 @@
 namespace mem { namespace st {
 
 
+/**
+ * A symbol to represent function arguments.
+ *
+ * We do not use an st::Var because we need to make the distinction sometimes
+ * (in codegen::Llvm for example).
+ */
 class Arg : public Var
 {
    // -------------------------------------------------------------------------

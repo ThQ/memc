@@ -61,7 +61,7 @@ bool
 Class::isDependingOn (Class* other_cls)
 {
    assert (other_cls != NULL);
-   assert (other_cls->isClassSymbol());
+   assert (other_cls->isClassType());
 
    st::Var* cls_field = NULL;
 
@@ -78,7 +78,7 @@ Class::isDependingOn (Class* other_cls)
          if ((*i).second->isVarSymbol())
          {
             cls_field = static_cast<st::Var*>(i->second);
-            if (cls_field->Type()->isClassSymbol())
+            if (cls_field->Type()->isClassType())
             {
                if (cls_field->Type() == other_cls)
                {
