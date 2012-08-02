@@ -152,7 +152,7 @@ getSymbol (Symbol* scope, std::string sym_name)
 ArrayType*
 getUnsizedArrayType (ArrayType* sized_array)
 {
-   return getUnsizedArrayType(sized_array->BaseType());
+   return getUnsizedArrayType(sized_array->ItemType());
 }
 
 ArrayType*
@@ -167,7 +167,7 @@ getUnsizedArrayType (Type* base_ty)
       if (sym == NULL)
       {
          st::ArrayType* ty = new ArrayType();
-         ty->setBaseType(base_ty);
+         ty->setItemType(base_ty);
          ty->setName(arr_ty_name.str());
          ty->setArrayLength(-1);
          base_ty->Parent()->addChild(ty);
@@ -199,7 +199,7 @@ lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
       str << "]";
 
       arr_ty = new ArrayType();
-      arr_ty->setBaseType(static_cast<Type*>(base_ty));
+      arr_ty->setItemType(static_cast<Type*>(base_ty));
       arr_ty->setName(str.str());
       arr_ty->setArrayLength(size);
 

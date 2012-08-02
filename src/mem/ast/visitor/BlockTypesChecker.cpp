@@ -253,7 +253,7 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
       if (value_ty->isArraySymbol())
       {
          st::ArrayType* arr = static_cast<st::ArrayType*>(value_ty);
-         n->setExprType(arr->BaseType());
+         n->setExprType(arr->ItemType());
       }
       else if (value_ty->isPtrSymbol())
       {

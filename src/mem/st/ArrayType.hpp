@@ -21,7 +21,7 @@ class ArrayType : public Type
    //--------------------------------------------------------------------------
    protected:
 
-   st::Type* _base_type;
+   st::Type* _item_type;
    int _array_length;
 
    //--------------------------------------------------------------------------
@@ -39,8 +39,8 @@ class ArrayType : public Type
    //--------------------------------------------------------------------------
    public:
 
-   GETTER(BaseType, st::Type*) {return _base_type;}
-   SETTER(BaseType, st::Type*) {_base_type = val; _computeByteSize();}
+   GETTER(ItemType, st::Type*) {return _item_type;}
+   SETTER(ItemType, st::Type*) {_item_type = val; _computeByteSize();}
 
    GETTER (ArrayLength, int) {return _array_length;}
    SETTER (ArrayLength, int) {_array_length = val; _computeByteSize();}

@@ -172,7 +172,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
       else if (mem_ty->isArraySymbol())
       {
          st::ArrayType* arr = static_cast<mem::st::ArrayType*>(mem_ty);
-         llvm::Type* base_ty = _getLlvmTy(arr->BaseType());
+         llvm::Type* base_ty = _getLlvmTy(arr->ItemType());
          if (base_ty != NULL)
          {
             if (arr->hasLength())

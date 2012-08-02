@@ -12,6 +12,7 @@ ArrayType::ArrayType ()
 {
    _kind = ARRAY;
    _array_length = -1;
+   _item_type = NULL;
 }
 
 
@@ -22,10 +23,10 @@ ArrayType::ArrayType ()
 void
 ArrayType::_computeByteSize ()
 {
-   if (_array_length != -1 && _base_type != NULL
-      && _base_type->ByteSize() != -1)
+   if (_array_length != -1 && _item_type != NULL
+      && _item_type->ByteSize() != -1)
    {
-      _byte_size = _array_length * _base_type->ByteSize();
+      _byte_size = _array_length * _item_type->ByteSize();
    }
    else
    {

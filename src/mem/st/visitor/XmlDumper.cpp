@@ -68,9 +68,9 @@ bool
 XmlDumper::visitArrayType (st::ArrayType* s)
 {
    *_out << "<Array name=\"" + s->Name() + "\"";
-   if (s->BaseType() != NULL)
+   if (s->ItemType() != NULL)
    {
-      *_out << " base-type=\"" + s->BaseType()->gQualifiedName() + "\"";
+      *_out << " base-type=\"" + s->ItemType()->gQualifiedName() + "\"";
    }
    if (s->hasLength())
    {
