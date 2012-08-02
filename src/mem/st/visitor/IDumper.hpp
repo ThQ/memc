@@ -11,7 +11,7 @@
 #include "mem/st/Func.hpp"
 #include "mem/st/Namespace.hpp"
 #include "mem/st/PointerType.hpp"
-#include "mem/st/Primitive.hpp"
+#include "mem/st/PrimitiveType.hpp"
 #include "mem/st/Symbol.hpp"
 #include "mem/st/Var.hpp"
 #include "mem/st/visitor/Visitor.hpp"

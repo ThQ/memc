@@ -11,7 +11,7 @@
 #include "mem/st/ArrayType.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/SymbolTable.hpp"
-#include "mem/st/Primitive.hpp"
+#include "mem/st/PrimitiveType.hpp"
 #include "mem/st/PointerType.hpp"
 #include "mem/st/Type.hpp"
 #include "mem/st/Var.hpp"

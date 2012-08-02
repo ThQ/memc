@@ -421,7 +421,7 @@ Util::registerType (SymbolTable* st, Symbol* scope, Type* ty)
 void
 Util::setupBool (SymbolTable& st, CoreTypes& core_types)
 {
-   core_types._bool = new st::Primitive();
+   core_types._bool = new st::PrimitiveType();
    core_types._bool->setName("bool");
    core_types._bool->setByteSize(sizeof(bool));
    Util::registerType(&st, st.gRoot(), core_types._bool);
@@ -433,7 +433,7 @@ Util::setupBool (SymbolTable& st, CoreTypes& core_types)
 void
 Util::setupBugType (SymbolTable& st, CoreTypes& core_types)
 {
-   core_types._bug_type = new st::Primitive();
+   core_types._bug_type = new st::PrimitiveType();
    core_types._bug_type->setName("#BadType");
    Util::registerType(&st, st.gRoot(), core_types._bug_type);
 }
@@ -442,19 +442,19 @@ void
 Util::setupInts (SymbolTable& st, CoreTypes& core_types)
 {
    // Type : char
-   core_types._char = new st::Primitive();
+   core_types._char = new st::PrimitiveType();
    core_types._char->setName("char");
    core_types._char->setByteSize(sizeof(char));
    Util::registerType(&st, st.gRoot(), core_types._char);
 
    // Type : short
-   core_types._short = new st::Primitive();
+   core_types._short = new st::PrimitiveType();
    core_types._short->setName("short");
    core_types._short->setByteSize(sizeof(short));
    Util::registerType(&st, st.gRoot(), core_types._short);
 
    // Type : int
-   core_types._int = new st::Primitive();
+   core_types._int = new st::PrimitiveType();
    core_types._int->setName("int");
    core_types._int->setByteSize(sizeof(int));
    Util::registerType(&st, st.gRoot(), core_types._int);
@@ -463,7 +463,7 @@ Util::setupInts (SymbolTable& st, CoreTypes& core_types)
 void
 Util::setupVoid (SymbolTable& st, CoreTypes& core_types)
 {
-   core_types._void = new st::Primitive();
+   core_types._void = new st::PrimitiveType();
    core_types._void->setName("void");
    Util::registerType(&st, st.gRoot(), core_types._void);
 

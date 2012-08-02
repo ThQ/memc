@@ -249,7 +249,7 @@ class Codegen : public mem::codegen::ICodegen
    cgNumberExpr (ast::node::Number* node);
 
    void
-   cgPrimitive (st::Primitive* prim);
+   cgPrimitiveType (st::PrimitiveType* prim);
 
    llvm::Value*
    cgDerefExpr (ast::node::Node* node);

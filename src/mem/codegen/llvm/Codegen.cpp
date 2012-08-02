@@ -320,7 +320,7 @@ Codegen::gen (ast::node::Node* root)
       }
       else if (ty->isPrimitiveSymbol())
       {
-         cgPrimitive(static_cast<st::Primitive*>(ty));
+         cgPrimitiveType(static_cast<st::PrimitiveType*>(ty));
       }
    }
 
@@ -1072,9 +1072,9 @@ Codegen::cgNumberExpr (ast::node::Number* node)
 }
 
 void
-Codegen::cgPrimitive (st::Primitive* prim)
+Codegen::cgPrimitiveType (st::PrimitiveType* prim)
 {
-   assert(prim != NULL);
+   DEBUG_REQUIRE (prim != NULL);
 
    llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
       prim->gQualifiedName());

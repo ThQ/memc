@@ -87,7 +87,7 @@ src_mem_st = \
  src/mem/st/Func.cpp \
  src/mem/st/Namespace.cpp \
  src/mem/st/Path.cpp \
- src/mem/st/Primitive.cpp \
+ src/mem/st/PrimitiveType.cpp \
  src/mem/st/PointerType.cpp \
  src/mem/st/Symbol.cpp \
  src/mem/st/SymbolTable.cpp \

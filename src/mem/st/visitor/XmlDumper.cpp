@@ -40,7 +40,7 @@ XmlDumper::visit (st::Symbol* sym)
          break;
 
       case PRIMITIVE:
-         visitPrimitive(static_cast<st::Primitive*>(sym));
+         visitPrimitiveType(static_cast<st::PrimitiveType*>(sym));
          break;
 
       case VAR:
@@ -148,7 +148,7 @@ XmlDumper::visitPointerType (st::PointerType* s)
 }
 
 bool
-XmlDumper::visitPrimitive (st::Primitive* s)
+XmlDumper::visitPrimitiveType (st::PrimitiveType* s)
 {
    *_out << "<Primitive name=\"" + s->Name() + "\"";
    if (s->_parent_type != NULL)
