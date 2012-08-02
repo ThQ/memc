@@ -30,7 +30,7 @@ int main (int argc, char** argv)
 
    Compiler memc;
    memc.setOptions(&opts);
-   memc.compile(argc, argv);
+   memc.run();
 
    return 0;
 }

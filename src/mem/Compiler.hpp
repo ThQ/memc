@@ -109,12 +109,6 @@ class Compiler
    inline void
    addStVisitor (st::visitor::Visitor* visitor){st_visitors.push_back(visitor);}
 
-   /**
-    * Start a compiling job starting with an entry file.
-    */
-   void
-   compile (int argc, char** argv);
-
    void
    dumpAst ();
 
@@ -157,6 +151,12 @@ class Compiler
     */
    void
    processParseQueue ();
+
+   /**
+    * Start a compiling job starting with an entry file.
+    */
+   void
+   run ();
 
    void
    runAstVisitors ();

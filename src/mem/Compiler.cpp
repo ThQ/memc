@@ -45,64 +45,6 @@ Compiler::~Compiler ()
 }
 
 void
-Compiler::compile (int argc, char** argv)
-{
-   std::string formatter_id = _opts->getStr("--log-formatter");
-
-   if (formatter_id == "xml")
-   {
-      _logger->setFormatter(new log::XmlFormatter());
-   }
-   _logger->begin();
-
-   fm.appendPath(".");
-
-   // Need to set this before parsing command line arguments because it can
-   // raise warnings
-   _logger->setLevel(log::INFO);
-
-   if (_opts->isSet("--log-level"))
-   {
-      _logger->setLevel(_opts->getInt("--log-level"));
-   }
-
-   if (_opts->isSet("--version"))
-   {
-      std::cout << PACKAGE_NAME " version " PACKAGE_VERSION;
-      std::cout << " (" __DATE__ " " __TIME__ ")";
-      IF_DEBUG
-      {
-         std::cout << " [DEBUG]";
-      }
-      std::cout << "\n";
-   }
-   else if (_opts->isSet("--help"))
-   {
-      printUsage(std::cout);
-   }
-   else if (_opts->hasArguments())
-   {
-      _parse_queue.push(_opts->getArgument(0));
-
-      processParseQueue();
-
-      runAstVisitors();
-      //runStVisitors();
-
-      dumpAst();
-      dumpSt();
-
-      if (isBuildSuccessful()) emitCode();
-
-      printBuildSummary();
-   }
-
-   _logger->finish();
-
-   llvm::llvm_shutdown();
-}
-
-void
 Compiler::dumpAst ()
 {
    if (_opts->isSet("--dump-ast-xml"))
@@ -332,6 +274,64 @@ Compiler::processParseQueue ()
       parse(_parse_queue.front());
       _parse_queue.pop();
    }
+}
+
+void
+Compiler::run ()
+{
+   std::string formatter_id = _opts->getStr("--log-formatter");
+
+   if (formatter_id == "xml")
+   {
+      _logger->setFormatter(new log::XmlFormatter());
+   }
+   _logger->begin();
+
+   fm.appendPath(".");
+
+   // Need to set this before parsing command line arguments because it can
+   // raise warnings
+   _logger->setLevel(log::INFO);
+
+   if (_opts->isSet("--log-level"))
+   {
+      _logger->setLevel(_opts->getInt("--log-level"));
+   }
+
+   if (_opts->isSet("--version"))
+   {
+      std::cout << PACKAGE_NAME " version " PACKAGE_VERSION;
+      std::cout << " (" __DATE__ " " __TIME__ ")";
+      IF_DEBUG
+      {
+         std::cout << " [DEBUG]";
+      }
+      std::cout << "\n";
+   }
+   else if (_opts->isSet("--help"))
+   {
+      printUsage(std::cout);
+   }
+   else if (_opts->hasArguments())
+   {
+      _parse_queue.push(_opts->getArgument(0));
+
+      processParseQueue();
+
+      runAstVisitors();
+      //runStVisitors();
+
+      dumpAst();
+      dumpSt();
+
+      if (isBuildSuccessful()) emitCode();
+
+      printBuildSummary();
+   }
+
+   _logger->finish();
+
+   llvm::llvm_shutdown();
 }
 
 void
