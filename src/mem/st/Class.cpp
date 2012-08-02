@@ -19,8 +19,13 @@ Class::addChild (Symbol* s)
 {
    if (s->_kind == FIELD)
    {
-      static_cast<Field*>(s)->_field_index = _cur_field_index;
+      st::Field* field = static_cast<Field*>(s);
+      field->_field_index = _cur_field_index;
       _cur_field_index++;
+
+      // Compute new byte size
+      if (_byte_size == -1) _byte_size = 0;
+      _byte_size += field->Type()->ByteSize();
    }
    return Type::addChild(s);
 }

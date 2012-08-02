@@ -15,6 +15,7 @@ Tokenizer::Tokenizer ()
 void
 Tokenizer::_backtrack ()
 {
+   //DEBUG_PRINT("backtrack\n");
    _bufferCursor --;
 }
 
@@ -157,11 +158,26 @@ Tokenizer::_processTokenStart (char c)
       case ':': _pushToken(T_SEMICOLON, ":"); break;
       case ',': _pushToken(T_COMMA, ","); break;
       case ';': _pushToken(T_COLON, ";"); break;
+      case '.': _pushToken(T_DOT, "."); break;
       case '@': _pushToken(T_AROBASE, "@"); break;
       case '&': _pushToken(T_AMPERSAND, "&"); break;
       case '*': _pushToken(T_STAR, "*"); break;
       case '+': _pushToken(T_PLUS, "*"); break;
 
+      case '!':
+      {
+         c2 = _get1Char();
+         if (c2 == '=')
+         {
+            _pushToken(T_BANG_EQ, "!=");
+         }
+         else
+         {
+            _pushToken(T_BANG, "!");
+            _backtrack();
+         }
+         break;
+      }
       case '-':
       {
          c2 = _get1Char();
@@ -287,7 +303,7 @@ Tokenizer::getNextToken ()
    _token_queue.pop();
 
    //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-   //  t.Kind(), t.Value().c_str());
+     //t.Kind(), t.Value().c_str());
 
    return t;
 }
@@ -368,6 +384,10 @@ Tokenizer::_getTokenKindFromId (std::string id)
    int kind = T_ID;
    switch (id[0])
    {
+      case 'c':
+         if (id == "class") kind = T_CLASS;
+         break;
+
       case 'e':
          if (id == "else") kind = T_ELSE;
          break;
@@ -402,6 +422,8 @@ Tokenizer::_getTokenKindFromId (std::string id)
 void
 Tokenizer::reset ()
 {
+   _bufferCursor = 0;
+   _bufferSize = 0;
    _state = T_YACC_UNDEFINED;
 }
 
@@ -435,7 +457,7 @@ Tokenizer::_readNextToken ()
          }
          case T_ID:
          {
-            if (Tokenizer::_isAlphaNumeric(c))
+            if (Tokenizer::_isValidIdChar(c))
             {
                _tokenBuffer += c;
             }
@@ -549,6 +571,12 @@ Tokenizer::_makeIndentationVisible (std::string indent)
       assert(false);
    }
    return r.str();
+}
+
+bool
+Tokenizer::isFinished ()
+{
+   return _isFileConsumed();
 }
 
 void

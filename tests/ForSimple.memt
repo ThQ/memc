@@ -1,0 +1,4 @@
+main () -> int
+ for i := 0i; i < 10i; i=i+1i
+  a := 1i
+ return 0i

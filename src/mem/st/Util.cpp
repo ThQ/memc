@@ -3,7 +3,6 @@
 
 namespace mem { namespace st {
 
-
 st::Namespace*
 Util::createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
 {
@@ -32,6 +31,37 @@ Util::createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
 }
 
 Type*
+Util::getExprType (Symbol* s)
+{
+   assert (s != NULL);
+
+   st::Type* ret = NULL;
+
+   if (s->isAnyTypeSymbol())
+   {
+      ret = static_cast<st::Type*>(s);
+   }
+   else if (s->isArgSymbol())
+   {
+      ret = static_cast<st::Arg*>(s)->Type();
+   }
+   else if (s->isFieldSymbol())
+   {
+      ret = static_cast<st::Field*>(s)->Type();
+   }
+   else if (s->isVarSymbol())
+   {
+      ret = static_cast<st::Var*>(s)->Type();
+   }
+   else if (s->isFuncSymbol())
+   {
+      ret = static_cast<st::Type*>(static_cast<st::Func*>(s)->ReturnType());
+   }
+
+   return ret;
+}
+
+Type*
 Util::getPointerBaseType (Ptr* ptr)
 {
    Type* base_ty = NULL;
@@ -44,6 +74,29 @@ Util::getPointerBaseType (Ptr* ptr)
       base_ty = ptr;
    }
    return base_ty;
+}
+
+Ptr*
+Util::getPointerType (Type* base_ty)
+{
+   if (base_ty != NULL && base_ty->Parent() != NULL)
+   {
+      st::Symbol* ty = base_ty->Parent()->getChild(base_ty->Name() + "*");
+      if (ty == NULL)
+      {
+         st::Ptr* ptr_ty = new Ptr();
+         ptr_ty->setName(base_ty->Name() + "*");
+         ptr_ty->setBaseType(base_ty);
+         base_ty->Parent()->addChild(ptr_ty);
+         return ptr_ty;
+      }
+      else if (ty->isPtrSymbol())
+      {
+         return static_cast<st::Ptr*>(ty);
+      }
+   }
+
+   return NULL;
 }
 
 size_t
@@ -70,6 +123,7 @@ Util::getIndirectionCount (std::string ty_name)
 Symbol*
 Util::getSymbol (Symbol* scope, std::string sym_name)
 {
+   //DEBUG_PRINT("getSymbol()\n");
    Symbol* res = NULL;
 
    if (scope != NULL && sym_name.size() != 0)
@@ -78,6 +132,7 @@ Util::getSymbol (Symbol* scope, std::string sym_name)
 
       while (scope != NULL)
       {
+         //DEBUG_PRINTF("looking sym <%s> in <%s>\n", sym_name.c_str(), scope->Name().c_str());
          res = scope->getChild(sym_name);
          if (res != NULL)
          {
@@ -85,9 +140,47 @@ Util::getSymbol (Symbol* scope, std::string sym_name)
          }
          scope = scope->_parent;
       }
+      if (res != NULL && res->isAliasSymbol())
+      {
+         res = static_cast<st::Alias*>(res)->Aliased();
+      }
    }
 
    return res;
+}
+
+Array*
+Util::getUnsizedArrayType (Array* sized_array)
+{
+   return getUnsizedArrayType(sized_array->BaseType());
+}
+
+Array*
+Util::getUnsizedArrayType (Type* base_ty)
+{
+   if (base_ty != NULL)
+   {
+      std::stringstream arr_ty_name;
+      arr_ty_name << "[" << base_ty->Name() << "]";
+      Symbol* sym = base_ty->Parent()->getChild(arr_ty_name.str());
+
+      if (sym == NULL)
+      {
+         st::Array* ty = new Array();
+         ty->setBaseType(base_ty);
+         ty->setName(arr_ty_name.str());
+         ty->setArrayLength(-1);
+         base_ty->Parent()->addChild(ty);
+
+         return ty;
+      }
+      else
+      {
+         return static_cast<st::Array*>(sym);
+      }
+      DEBUG_UNREACHABLE;
+   }
+   return NULL;
 }
 
 Array*
@@ -156,45 +249,93 @@ Util::lookupMember (Symbol* scope, std::string symbol_name)
 Symbol*
 Util::lookupSymbol (Symbol* scope, std::string symbol_name)
 {
-   assert(scope != NULL);
-   assert(symbol_name.size() != 0);
+   Symbol* res = NULL;
 
-   Symbol* res = getSymbol(scope, symbol_name);
-
-   // Symbol is not found, maybe it is a pointer
-   if (res == NULL)
+   if (scope != NULL && symbol_name.size() != 0)
    {
-      size_t ptr_level = getIndirectionCount(symbol_name);
+      res= getSymbol(scope, symbol_name);
 
-      // It is a pointer, look the base type up
-      if (ptr_level > 0)
-      {
-         std::string base_ty_name = symbol_name.substr(0, symbol_name.size() - ptr_level);
-         res = lookupPointer(scope, base_ty_name, ptr_level);
-      }
-   }
-
-   IF_DEBUG
-   {
+      // Symbol is not found, maybe it is a pointer
       if (res == NULL)
       {
-         DEBUG_PRINTF("Symbol <%s> not found in <%s>.\n",
-            scope->gQualifiedNameCstr(), symbol_name.c_str());
+         size_t ptr_level = getIndirectionCount(symbol_name);
+
+         // It is a pointer, look the base type up
+         if (ptr_level > 0)
+         {
+            std::string base_ty_name = symbol_name.substr(0, symbol_name.size() - ptr_level);
+            res = lookupPointer(scope, base_ty_name, ptr_level);
+         }
+      }
+
+      if (res != NULL && res->isAliasSymbol())
+      {
+         res = static_cast<st::Alias*>(res)->Aliased();
       }
    }
+
    return res;
 }
 
-st::Ptr*
-Util::lookupPointer (Symbol* scope, Type* base_ty)
+Symbol*
+Util::lookupSymbol (Symbol* scope, std::vector<std::string> parts)
 {
-   return lookupPointer (scope, base_ty->Name(), 1);
+   DEBUG_REQUIRE (scope != NULL);
+
+   Symbol* cur_scope = scope;
+   Symbol* inner_symbol = NULL;
+   size_t i = 0;
+   while (cur_scope != NULL)
+   {
+      inner_symbol = cur_scope;
+      for (i = 0; i < parts.size(); ++i)
+      {
+         inner_symbol = inner_symbol->getChild(parts[i]);
+         if (inner_symbol == NULL) break;
+      }
+
+      if (i == parts.size() && inner_symbol->Name() == parts[i-1])
+      {
+         return inner_symbol;
+      }
+      cur_scope = cur_scope->_parent;
+   }
+
+   return NULL;
+}
+
+st::Ptr*
+Util::lookupPointer(Symbol* scope, Type* base_ty)
+{
+   st::Symbol* parent = base_ty->_parent;
+   if (parent != NULL && parent->isAliasSymbol())
+   {
+      parent = static_cast<st::Alias*>(parent)->Aliased();
+   }
+   st::Symbol* ptr = parent->getChild(base_ty->Name() + "*");
+
+   if (ptr == NULL)
+   {
+      st::Ptr* ptr_ty = new Ptr();
+      ptr_ty->setName(base_ty->Name() + "*");
+      ptr_ty->setBaseType(base_ty);
+      parent->addChild(ptr_ty);
+
+      return ptr_ty;
+   }
+   else if (ptr->isPtrSymbol())
+   {
+      return static_cast<st::Ptr*>(ptr);
+   }
+
+   return NULL;
 }
 
 st::Ptr*
 Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
 {
-   assert(ptr_level > 0);
+   DEBUG_REQUIRE(scope != NULL);
+   DEBUG_REQUIRE(ptr_level > 0);
 
    st::Type* tmp_ptr = NULL;
    st::Type* cur_sym = NULL;
@@ -205,6 +346,7 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
       if (i == 0)
       {
          cur_sym = static_cast<st::Type*>(lookupSymbol(scope, base_ty_name));
+         if (cur_sym == NULL) break;
       }
       else
       {
@@ -222,15 +364,25 @@ Util::lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
             ptr_symb->setBaseType(cur_sym);
 
             // Add the pointer at the same level as the base type
-            cur_sym->_parent->addChild(ptr_symb);
+            IF_DEBUG
+            {
+               if (cur_sym->_parent == NULL)
+               {
+                  DEBUG_PRINTF("Symbol <%s>(%d) must have a parent",
+                     cur_sym->Name().c_str(), cur_sym->Kind());
+               }
+               assert(cur_sym->_parent != NULL);
+            }
 
+            cur_sym->_parent->addChild(ptr_symb);
             cur_sym = ptr_symb;
          }
       }
       cur_ptr_name += "*";
    }
 
-   assert(cur_sym->isPtrSymbol());
+   DEBUG_ENSURE(cur_sym == NULL || cur_sym->isPtrSymbol());
+
    return static_cast<Ptr*>(cur_sym);
 }
 
@@ -271,10 +423,19 @@ Util::setupBool (SymbolTable& st, CoreTypes& core_types)
 {
    core_types._bool = new st::Primitive();
    core_types._bool->setName("bool");
+   core_types._bool->setByteSize(sizeof(bool));
    Util::registerType(&st, st.gRoot(), core_types._bool);
 
    st.gRoot()->addChild(new st::Var("true", core_types._bool));
    st.gRoot()->addChild(new st::Var("false", core_types._bool));
+}
+
+void
+Util::setupBugType (SymbolTable& st, CoreTypes& core_types)
+{
+   core_types._bug_type = new st::Primitive();
+   core_types._bug_type->setName("#BadType");
+   Util::registerType(&st, st.gRoot(), core_types._bug_type);
 }
 
 void
@@ -283,41 +444,20 @@ Util::setupInts (SymbolTable& st, CoreTypes& core_types)
    // Type : char
    core_types._char = new st::Primitive();
    core_types._char->setName("char");
+   core_types._char->setByteSize(sizeof(char));
    Util::registerType(&st, st.gRoot(), core_types._char);
 
    // Type : short
    core_types._short = new st::Primitive();
    core_types._short->setName("short");
+   core_types._short->setByteSize(sizeof(short));
    Util::registerType(&st, st.gRoot(), core_types._short);
-
-   // Function : short_add_short
-   st::Func* func_s_add_s = new st::Func();
-   func_s_add_s->setName("short_plus_short");
-   func_s_add_s->addParam("base_short", core_types._short);
-   func_s_add_s->addParam("short_to_add", core_types._short);
-   func_s_add_s->setReturnType(core_types._short);
-   st.gRoot()->addChild(func_s_add_s);
 
    // Type : int
    core_types._int = new st::Primitive();
    core_types._int->setName("int");
+   core_types._int->setByteSize(sizeof(int));
    Util::registerType(&st, st.gRoot(), core_types._int);
-
-   // Function : int_add_int
-   st::Func* func_i_add_i = new st::Func();
-   func_i_add_i->setName("int_plus_int");
-   func_i_add_i->addParam("base_int", core_types._int);
-   func_i_add_i->addParam("int_to_add", core_types._int);
-   func_i_add_i->setReturnType(core_types._int);
-   st.gRoot()->addChild(func_i_add_i);
-
-   // Function : int_add_short
-   st::Func* func_i_add_s = new st::Func();
-   func_i_add_s->setName("int_plus_short");
-   func_i_add_s->addParam("base_int", core_types._int);
-   func_i_add_s->addParam("short_to_add", core_types._short);
-   func_i_add_s->setReturnType(core_types._int);
-   st.gRoot()->addChild(func_i_add_s);
 }
 
 void
@@ -328,6 +468,31 @@ Util::setupVoid (SymbolTable& st, CoreTypes& core_types)
    Util::registerType(&st, st.gRoot(), core_types._void);
 
    st.gRoot()->addChild(new st::Var("null", core_types._void));
+}
+
+std::vector<std::string>
+Util::splitQualifiedName (std::string name)
+{
+   std::vector<std::string> parts;
+   std::string buffer = "";
+   for (size_t i = 0; i < name.size(); ++i)
+   {
+      if (name[i] == '.')
+      {
+         if (buffer.size() != 0)
+         {
+            parts.push_back(buffer);
+            buffer = "";
+         }
+      }
+      else
+      {
+         buffer += name[i];
+      }
+   }
+   if (buffer.size() != 0) parts.push_back(buffer);
+
+   return parts;
 }
 
 } }

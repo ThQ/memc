@@ -13,8 +13,13 @@ Func::Func ()
 
 Func::~Func ()
 {
-   // We don't delete the parameters here because they are added as st::Func
-   // children and will be deleted from st::Symbol.
+   // For some reason, parameters are not deleted from st::Symbol::~Symbol
+   // before ending up here
+   // But if we delete them, it will crash (SEGFAULT), should investigate
+   for (size_t i = 0; i < _params.size(); ++i)
+   {
+      //delete _params[i];
+   }
 }
 
 st::Arg*

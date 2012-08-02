@@ -4,6 +4,90 @@
 namespace mem { namespace codegen { namespace llvm_ {
 
 
+Codegen::Codegen ()
+{
+   _cur_bb = NULL;
+   _cur_func = NULL;
+   _exit_block = NULL;
+   _module = NULL;
+   _st = NULL;
+}
+
+std::string
+Codegen::_getLlvmTypeName (llvm::Type* ty)
+{
+   std::string name;
+   if (ty != NULL)
+   {
+      if (ty->isStructTy())
+      {
+         name = llvm::cast<llvm::StructType>(ty)->getName().str();
+      }
+      else if (ty->isPointerTy())
+      {
+         name = _getLlvmTypeName(llvm::cast<llvm::PointerType>(ty)->getElementType()) + "*";
+      }
+      else if (ty->isPrimitiveType())
+      {
+         name = "Primitive";
+      }
+      else if (ty->isArrayTy())
+      {
+         name = "[" + _getLlvmTypeName(llvm::cast<llvm::ArrayType>(ty)->getElementType()) + "]";
+      }
+      else if (ty->isVectorTy())
+      {
+         name = "<>";
+      }
+      else if (ty->isFunctionTy())
+      {
+         name = "Func";
+      }
+      else if (ty->isIntegerTy())
+      {
+         name = "i";
+      }
+      else
+      {
+         name = "UnknownType";
+      }
+   }
+   else
+   {
+      name = "NULL";
+   }
+   return name;
+}
+
+llvm::GetElementPtrInst*
+Codegen::_createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx)
+{
+   DEBUG_REQUIRE (base != NULL);
+
+#if 0
+   llvm::Type* base_ty = base->getType();
+   std::string base_ty_name;
+   if (base_ty != NULL)
+   {
+      base_ty_name = _getLlvmTypeName(base_ty);
+   }
+   std::string idx_name = "";
+   for (size_t i = 0; i < idx.size(); ++i)
+   {
+      idx_name += "[";
+      idx_name += _getLlvmTypeName(idx[i]->getType());
+      idx_name += "]";
+   }
+   DEBUG_PRINTF("GEP %s%s\n", base_ty_name.c_str(), idx_name.c_str());
+#endif
+
+   llvm::GetElementPtrInst* gep_inst = llvm::GetElementPtrInst::Create(base, idx, "", _cur_bb);
+
+   DEBUG_ENSURE (gep_inst != NULL && "Failed to create GEP instruction");
+
+   return gep_inst;
+}
+
 void
 Codegen::_dumpTypes ()
 {
@@ -82,6 +166,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
          {
             // TODO What is the second parameter (AddressSpace) ?
              ty = llvm::PointerType::get(base_ty, 0);
+             _classes[mem_ty->gQualifiedName()] = ty;
          }
       }
       else if (mem_ty->isArraySymbol())
@@ -90,7 +175,16 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
          llvm::Type* base_ty = _getLlvmTy(arr->BaseType());
          if (base_ty != NULL)
          {
-            ty = llvm::ArrayType::get(base_ty, arr->ArrayLength());
+            if (arr->hasLength())
+            {
+               ty = llvm::ArrayType::get(base_ty, arr->ArrayLength());
+               _classes[mem_ty->gQualifiedName()] = ty;
+            }
+            else
+            {
+               ty = llvm::PointerType::get(base_ty, 0);
+               _classes[mem_ty->gQualifiedName()] = ty;
+            }
          }
       }
    }
@@ -132,13 +226,22 @@ Codegen::_getFuncReturnTy (ast::node::Func* func)
 
    if (func->ReturnTypeNode() != NULL)
    {
-      ty = _classes[func->ExprType()->gQualifiedName()];
+      ty = _getLlvmTy(func->ExprType());
    }
    else
    {
       ty = _getVoidTy();
    }
 
+   IF_DEBUG
+   {
+      if (ty == NULL)
+      {
+         DEBUG_PRINTF("Function <%s> : cannot find return type <%s>\n",
+            func->gValueCstr(),
+            func->ExprType()->gQualifiedNameCstr());
+      }
+   }
    assert(ty != NULL);
    return ty;
 }
@@ -177,6 +280,10 @@ Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
       {
          _classes[mem_ty->gQualifiedName()] = _getVoidTy();
       }
+      else if (mem_ty == _st->_core_types._bug_type)
+      {
+         // We don't want to codegen the bug type
+      }
       else
       {
          printf("Primitive : %s\n", mem_ty->gQualifiedNameCstr());
@@ -207,7 +314,6 @@ Codegen::gen (ast::node::Node* root)
    for (i = types.begin() ; i != types.end(); ++i)
    {
       ty = (*i).second;
-
       if (ty->isClassSymbol())
       {
          cgClass(static_cast<st::Class*>(ty));
@@ -248,18 +354,20 @@ Codegen::cgAmpersandExpr (ast::node::Node* node)
    llvm::Value* tmp = new llvm::AllocaInst(dest_ty, NULL, amp_label + ".Alloca", _cur_bb);
    builder.CreateStore(base_val, tmp);
    llvm::Value* load = new llvm::LoadInst(tmp, amp_label + ".Load", _cur_bb);
-   */
    //llvm::LoadInst* load = new llvm::LoadInst(base_val, "", _cur_bb);
    llvm::GetElementPtrInst* gep = llvm::GetElementPtrInst::Create(base_val,
-      llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0)),
+      _createInt32Constant(0),
       "dot", _cur_bb);
+   */
 
-   return gep;
+   return base_val;
 }
 
 llvm::Value*
 Codegen::cgBinaryExpr (ast::node::Node* node)
 {
+   DEBUG_REQUIRE (node != NULL);
+
    llvm::Value* val = NULL;
    ast::node::Node* left_node = node->getChild(0);
    ast::node::Node* right_node = node->getChild(1);
@@ -267,8 +375,8 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
    st::Type* ty = _getLowestCommonType(left_node->ExprType(),
       right_node->ExprType());
 
-   llvm::Value* left_val = cgExprAndLoad(left_node, left_node->ExprType(), ty);
-   llvm::Value* right_val = cgExprAndLoad(right_node, right_node->ExprType(), ty);
+   llvm::Value* left_val = cgExprAndLoad(left_node);
+   llvm::Value* right_val = cgExprAndLoad(right_node);
 
    switch (node->Kind())
    {
@@ -293,7 +401,7 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
          assert (false);
    }
 
-   assert (val != NULL);
+   DEBUG_ENSURE (val != NULL);
    return val;
 }
 
@@ -316,26 +424,31 @@ Codegen::cgBlock (ast::node::Block* block)
 llvm::Value*
 Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
 {
-   assert (n != NULL);
+   DEBUG_REQUIRE (n != NULL);
 
    // Taking care of VALUE
-   llvm::Value* val = cgExpr(n->ValueNode());//, NULL, NULL);
+   llvm::Value* val = cgExpr(n->ValueNode());
    assert (val != NULL);
+   //val = new llvm::LoadInst(val, "", _cur_bb);
+   //assert (val != NULL);
+
 
    // Taking care of INDEX
-   llvm::Value* index = cgExprAndLoad(n->IndexNode(),
-      n->IndexNode()->ExprType(), _st->gCoreTypes().gIntTy());
+   llvm::Value* index = cgExprAndLoad(n->IndexNode());
    assert (index != NULL);
 
    std::vector<llvm::Value*> idx;
-   idx.push_back(llvm::ConstantInt::get(_module->getContext(),
-      llvm::APInt(32, 0)));
+   if (n->ValueNode()->ExprType()->isArraySymbol())
+   {
+      idx.push_back(_createInt32Constant(0));
+   }
    idx.push_back(index);
 
    // Compute address
-   llvm::GetElementPtrInst* inst = llvm::GetElementPtrInst::Create(
-      val, idx, "", _cur_bb);
-   inst->setIsInBounds(true);
+   llvm::GetElementPtrInst* inst = _createGepInst(val, idx);
+   //inst->setIsInBounds(true);
+
+   DEBUG_ENSURE (inst != NULL);
 
    return inst;
 }
@@ -343,6 +456,8 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
 llvm::Value*
 Codegen::cgCallExpr (ast::node::Call* node)
 {
+   DEBUG_REQUIRE (node != NULL);
+
    st::Func* func_sym = static_cast<st::Func*>(
       node->CallerNode()->BoundSymbol());
    std::vector<llvm::Value*> params;
@@ -357,9 +472,9 @@ Codegen::cgCallExpr (ast::node::Call* node)
          cur_param_node = node->ParamsNode()->getChild(i);
          cur_param = func_sym->getParam(i);
 
-         param_value = cgExprAndLoad(cur_param_node,
-            static_cast<st::Type*>(cur_param_node->ExprType()),
-            cur_param->Type());
+         param_value = cgExpr(cur_param_node);
+            //static_cast<st::Type*>(cur_param_node->ExprType()),
+            //cur_param->Type());
 
          params.push_back(param_value);
       }
@@ -367,16 +482,26 @@ Codegen::cgCallExpr (ast::node::Call* node)
 
    assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
 
+   llvm::CallInst* call = NULL;
    if (params.size() > 0)
    {
-      return llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
-         params, "call." + func_sym->gQualifiedName(), _cur_bb);
+      call = llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
+         params, "", _cur_bb);
    }
    else
    {
-      return llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
-         "call." + func_sym->gQualifiedName(), _cur_bb);
+      call = llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
+         "", _cur_bb);
    }
+
+   if (call != NULL && func_sym->ReturnType()->Name() == "void")
+   {
+      call->setDoesNotReturn(true);
+   }
+
+   DEBUG_ENSURE (call != NULL);
+
+   return call;
 }
 
 void
@@ -419,15 +544,14 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
    st::Type* expected_operand_ty = _getLowestCommonType(
       left_val_node->ExprType(), right_val_node->ExprType());
 
-   llvm::Value* left_val = cgExprAndLoad(left_val_node,
-      left_val_node->ExprType(), expected_operand_ty);
-   llvm::Value* right_val = cgExprAndLoad(right_val_node,
-      right_val_node->ExprType(), expected_operand_ty);
+   llvm::Value* left_val = cgExpr(left_val_node);
+   llvm::Value* right_val = cgExpr(right_val_node);
 
    llvm::ICmpInst::Predicate pred;
 
    switch (n->Kind())
    {
+      case ast::node::Kind::OP_NE:    pred = llvm::ICmpInst::ICMP_NE; break;
       case ast::node::Kind::OP_EQ_EQ: pred = llvm::ICmpInst::ICMP_EQ; break;
       case ast::node::Kind::OP_LT:    pred = llvm::ICmpInst::ICMP_SLT; break;
       case ast::node::Kind::OP_LTE:   pred = llvm::ICmpInst::ICMP_SLE; break;
@@ -449,49 +573,32 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
 llvm::Value*
 Codegen::cgDotExpr (ast::node::Dot* node)
 {
-   assert(node->isDotNode());
-
-   int field_index = static_cast<st::Field*>(node->BoundSymbol())->_field_index;
-
-   std::vector<llvm::Value*> gep;
-   gep.push_back(llvm::ConstantInt::get(_module->getContext(),
-      llvm::APInt(32, 0)));
-   gep.push_back(llvm::ConstantInt::get(_module->getContext(),
-      llvm::APInt(32, field_index)));
+   DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node->isDotNode());
 
    llvm::Value* left_node = cgExpr(node->LeftNode());
-   assert (left_node != NULL);
+   std::vector<llvm::Value*> idx;
 
-   if (!node->LeftNode()->ExprType()->isPtrSymbol())
+   if (node->LeftNode()->ExprType()->isPtrSymbol())
    {
-      st::Type* base_mem_ty = static_cast<st::Type*>(st::Util::lookupSymbol(
-         node->LeftNode()->ExprType()->_parent,
-         node->LeftNode()->ExprType()->Name() + "*"));
-
-      llvm::Type* base_ty = _getLlvmTy(base_mem_ty);
-      assert(base_ty != NULL);
-
-      llvm::AllocaInst* tmp = new llvm::AllocaInst(base_ty, NULL, "dot",
-         _cur_bb);
-      assert(tmp != NULL);
-
-      llvm::StoreInst* store = new llvm::StoreInst(left_node, tmp, _cur_bb);
-      assert(store != NULL);
-
-      left_node = new llvm::LoadInst(tmp, "dot", _cur_bb);
+      st::Ptr* ptr_ty = static_cast<st::Ptr*>(node->LeftNode()->ExprType());
+      for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
+      {
+         left_node = new llvm::LoadInst(left_node, "", _cur_bb);
+         assert(left_node != NULL);
+      }
+      for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
+      {
+         idx.push_back(_createInt32Constant(0));
+      }
    }
-   else
-   {
-      left_node = new llvm::LoadInst(left_node, "dot", _cur_bb);
-   }
-   assert (left_node != NULL);
 
-   llvm::Value* gep_inst = llvm::GetElementPtrInst::Create(left_node, gep,
-      "dot", _cur_bb);
-   assert(gep_inst != NULL);
+   int field_index = static_cast<st::Field*>(node->BoundSymbol())->_field_index;
+   idx.push_back(_createInt32Constant(field_index));
 
-   //llvm::LoadInst* load_inst = new llvm::LoadInst(gep_inst, "dot", _cur_bb);
-   //assert(load_inst != NULL);
+   llvm::Value* gep_inst =  _createGepInst(left_node, idx);
+
+   DEBUG_ENSURE (gep_inst != NULL);
 
    return gep_inst;
 }
@@ -520,6 +627,7 @@ Codegen::cgExpr (ast::node::Node* node)
          res = cgDotExpr(static_cast<ast::node::Dot*>(node));
          break;
 
+      case ast::node::Kind::OP_NE:
       case ast::node::Kind::OP_EQ_EQ:
       case ast::node::Kind::OP_LT:
       case ast::node::Kind::OP_LTE:
@@ -555,6 +663,10 @@ Codegen::cgExpr (ast::node::Node* node)
          res = cgBinaryExpr(node);
          break;
 
+      case ast::node::Kind::DEREF:
+         res = cgDerefExpr(node);
+         break;
+
       case ast::node::Kind::RETURN:
          cgReturnStatement (node);
          break;
@@ -584,39 +696,24 @@ Codegen::cgExpr (ast::node::Node* node)
 }
 
 llvm::Value*
-Codegen::cgExprAndLoad (ast::node::Node* node, st::Symbol* src_ty, st::Symbol* dst_ty)
+Codegen::cgExprAndLoad (ast::node::Node* node)
 {
-   assert(node != NULL);
-
    llvm::Value* val = cgExpr(node);
-   assert(val != NULL);
-
    bool must_load = false;
 
-   if (src_ty != NULL && dst_ty != NULL)
-   {
-      if (!src_ty->isPtrSymbol() && dst_ty->isPtrSymbol())
-      {
-         must_load = true;
-      }
-      else if (src_ty->isPtrSymbol() && !dst_ty->isPtrSymbol())
-      {
-         st::Ptr* src_ptr = static_cast<st::Ptr*>(src_ty);
-         st::Ptr* dst_ptr = static_cast<st::Ptr*>(dst_ty);
-
-         if (src_ptr->IndirectionLevel() > dst_ptr->IndirectionLevel())
-         {
-            must_load = true;
-         }
-      }
-   }
-
-   if (!must_load)
+   if (val != NULL)
    {
       switch (node->Kind())
       {
          case ast::node::Kind::FINAL_ID:
+            if (!node->BoundSymbol()->isArgSymbol())
+            {
+               must_load = true;
+            }
+            break;
+         case ast::node::Kind::DEREF:
          case ast::node::Kind::BRACKET_OP:
+         case ast::node::Kind::DOT:
             must_load = true;
             break;
       }
@@ -624,9 +721,7 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Symbol* src_ty, st::Symbol* d
 
    if (must_load)
    {
-      llvm::LoadInst* load_inst = new llvm::LoadInst(val, "", _cur_bb);
-      assert (load_inst != NULL);
-      return load_inst;
+      val = new llvm::LoadInst(val, "", _cur_bb);
    }
 
    return val;
@@ -696,9 +791,7 @@ Codegen::cgForStatement (ast::node::For* n)
    body_block->getInstList().push_back(llvm::BranchInst::Create(cond_block));
 
    _cur_bb = cond_block;
-   llvm::Value* cond = cgExprAndLoad(n->ConditionNode(),
-      n->ConditionNode()->ExprType(),
-      _st->gCoreTypes().gBoolTy());
+   llvm::Value* cond = cgExpr(n->ConditionNode());
 
    llvm::BranchInst::Create(body_block, after_block, cond, _cur_bb);
 
@@ -721,6 +814,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
 
       llvm::BasicBlock& block = func->getEntryBlock();
       _cur_bb = &block;
+      _exit_block = NULL;
       _cur_func = func;
 
       _stack.push();
@@ -738,7 +832,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
          _stack.set(func_param->Name(), arg);
       }
 
-      cgBlock(static_cast<ast::node::Block*>(func_node->BodyNode()));
+      cgBlock(func_node->BodyNode());
       _stack.pop();
 
       if (func_sym->ReturnType() == _st->_core_types.gVoidTy())
@@ -814,61 +908,77 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
 void
 Codegen::cgIfStatement (ast::node::If* node)
 {
+   assert (node != NULL);
+   assert (_cur_bb != NULL);
+
    llvm::BasicBlock* cur_bb = _cur_bb;
+   llvm::BasicBlock* origin_exit_block = _exit_block;
+   if (origin_exit_block == NULL) origin_exit_block = _cur_bb;
+
    bool if_is_last_child = node->Parent()->isLastChild(node);
 
    // After if
-   llvm::BasicBlock* after_block = NULL;
-   if (!if_is_last_child)
-   {
-      after_block = llvm::BasicBlock::Create(
-         llvm::getGlobalContext(), "after_cont", _cur_func);
-   }
-
-   // TRUE block
-   llvm::BasicBlock* true_block = llvm::BasicBlock::Create(
-      llvm::getGlobalContext(), "if_true", _cur_func);
-   _cur_bb = true_block;
-   assert(node->IfBlockNode() != NULL);
-   cgBlock(static_cast<ast::node::Block*>(node->IfBlockNode()));
-   if (!if_is_last_child)
-   {
-      true_block->getInstList().push_back(llvm::BranchInst::Create(after_block));
-   }
-
-   // FALSE block
+   llvm::BasicBlock* true_block = _createBasicBlock("if_true");
    llvm::BasicBlock* false_block = NULL;
    if (node->ElseBlockNode() != NULL)
    {
-      false_block = llvm::BasicBlock::Create(llvm::getGlobalContext(),
-         "if_false", _cur_func);
-      _cur_bb = false_block;
-      cgBlock(static_cast<ast::node::Block*>(node->ElseBlockNode()));
-      if (!if_is_last_child)
-      {
-         false_block->getInstList().push_back(
-            llvm::BranchInst::Create(after_block));
-      }
+      false_block = _createBasicBlock("if_false");
+   }
+   llvm::BasicBlock* after_block = _createBasicBlock("if_after");
+
+   // TRUE block
+   _cur_bb = true_block;
+   _exit_block = true_block;
+   cgBlock(node->IfBlockNode());
+
+   // FALSE block
+   if (false_block != NULL)
+   {
+      _exit_block = after_block;
+      cgBlock(node->ElseBlockNode());
+   }
+   //_exit_block = origin_exit_block;
+
+   _cur_bb = cur_bb;
+   llvm::Value* cond = cgExpr(node->ConditionNode());
+
+   // ---------
+   // BRANCHING
+   // ---------
+
+   // Branching at the end of the TRUE block
+   if (false_block == NULL)
+   {
+      _pushNewBranchInst(_exit_block, after_block);
+   }
+   else
+   {
+      // Branching at the end of the FALSE block
+      _pushNewBranchInst(false_block, after_block);
    }
 
-   // BRANCH
-   assert (node->ConditionNode() != NULL);
-   _cur_bb = cur_bb;
-   llvm::Value* cond = cgExprAndLoad(node->ConditionNode(), node->ExprType(),
-      node->ConditionNode()->ExprType());
-
    // IF/ELSE
+   llvm::BasicBlock* after_if_block = NULL;
+
    if (node->hasElseBlockNode())
    {
-      llvm::BranchInst::Create(true_block, false_block, cond, cur_bb);
+      after_if_block = false_block;
    }
    // Only If
    else
    {
-      llvm::BranchInst::Create(true_block, after_block, cond, cur_bb);
+      after_if_block = after_block;
    }
 
-   _cur_bb = after_block;
+   assert (true_block != NULL);
+   assert (after_if_block != NULL);
+   assert (cond != NULL);
+   assert (cur_bb != NULL);
+
+   _pushNewCondBranchInst(cur_bb, cond, true_block, after_if_block);
+
+   _cur_bb = after_if_block;
+   _exit_block = after_if_block;
 }
 
 void
@@ -893,9 +1003,27 @@ Codegen::cgMemoryFunctions ()
 llvm::Value*
 Codegen::cgNewExpr (ast::node::New* node)
 {
+   llvm::Value* byte_size = NULL;
+
+   ast::node::Node* type_node = node->getChild(0);
+
+   if (type_node->BoundSymbol()->isArraySymbol())
+   {
+      st::Array* arr_ty = static_cast<st::Array*>(type_node->BoundSymbol());
+      int type_byte_size = static_cast<st::Type*>(type_node->getChild(0)->BoundSymbol())->ByteSize();
+      llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1));
+      llvm::Value* obj_size = llvm::ConstantInt::get(_classes["int"], type_byte_size);
+      byte_size = llvm::BinaryOperator::Create(llvm::Instruction::Mul, num_obj, obj_size, "", _cur_bb);
+   }
+   else
+   {
+      int type_byte_size = static_cast<st::Type*>(type_node->BoundSymbol())->ByteSize();
+      byte_size = llvm::ConstantInt::get(_classes["int"], type_byte_size);
+   }
+
    // Create the call
    llvm::Value* malloc_call = llvm::CallInst::Create(_functions["malloc"],
-      llvm::ConstantInt::get(_classes["int"], 2), "", _cur_bb);
+      byte_size, "", _cur_bb);
    assert(malloc_call != NULL);
 
    // Cast the return pointer to the appropriate pointer type
@@ -935,7 +1063,7 @@ Codegen::cgNumberExpr (ast::node::Number* node)
          break;
 
       default:
-         assert (false && "Invalid constant type.");
+         assert (false && "Invalid number constant type.");
    }
 
    assert (val != NULL);
@@ -954,17 +1082,20 @@ Codegen::cgPrimitive (st::Primitive* prim)
    addType(prim, ty);
 }
 
+llvm::Value*
+Codegen::cgDerefExpr (ast::node::Node* node)
+{
+   llvm::Value* val = cgExpr(node->getChild(0));
+   return new llvm::LoadInst(val, "", _cur_bb);
+}
+
 void
 Codegen::cgReturnStatement (ast::node::Node* node)
 {
-   assert(_cur_bb != NULL);
-   assert(node != NULL);
-   assert(node->isReturnNode());
-   assert(node->getChild(0) != NULL);
+   DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node->getChild(0) != NULL);
 
-   // FIXME Not null
-   llvm::Value* val = cgExprAndLoad(node->getChild(0),
-      node->getChild(0)->ExprType(), node->ExprType());
+   llvm::Value* val = cgExprAndLoad(node->getChild(0));
    assert(val != NULL);
 
    llvm::ReturnInst::Create(_module->getContext(), val, _cur_bb);
@@ -985,8 +1116,8 @@ Codegen::cgString (ast::node::String* n)
       llvm::GlobalValue::PrivateLinkage, str_val, "");
 
    std::vector<llvm::Constant*> idx;
-   idx.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0, 10)));
-   idx.push_back(llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, 0, 10)));
+   idx.push_back(_createInt32Constant(0));
+   idx.push_back(_createInt32Constant(0));
 
    llvm::Value* ret = llvm::ConstantExpr::getGetElementPtr(cons, idx);
    return ret;
@@ -995,13 +1126,9 @@ Codegen::cgString (ast::node::String* n)
 void
 Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
+   st::Type* right_ty = static_cast<st::Type*>(node->ValueNode()->ExprType());
    llvm::Value* left_val = cgExpr(node->NameNode());
-   llvm::Value* right_val = cgExpr(node->ValueNode());
-
-   if (node->ValueNode()->isFinalIdNode())
-   {
-      right_val = new llvm::LoadInst(right_val, "", _cur_bb);
-   }
+   llvm::Value* right_val = cgExprAndLoad(node->ValueNode());
 
    new llvm::StoreInst(right_val, left_val, _cur_bb);
 }
@@ -1009,9 +1136,9 @@ Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 void
 Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 {
-   assert(node != NULL);
-   assert(node->isVarDeclNode());
-   assert(node->hasExprType());
+   DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node->isVarDeclNode());
+   DEBUG_REQUIRE (node->hasExprType());
 
    llvm::Type* var_ty = NULL;
    llvm::Value* var_len = NULL;
@@ -1021,9 +1148,8 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
       ast::node::Array* arr = static_cast<ast::node::Array*>(node->TypeNode());
       assert (arr->LengthNode() != NULL);
 
-      var_len = cgExpr(arr->LengthNode());
-      var_ty = llvm::ArrayType::get(_getLlvmTy(arr->TypeNode()->ExprType()),
-         static_cast<ast::node::Number*>(arr->LengthNode())->getInt());
+      //var_len = cgExpr(arr->LengthNode());
+      var_ty = _getLlvmTy(node->TypeNode()->BoundSymbol());
    }
    else
    {
@@ -1037,13 +1163,10 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 
    if (node->ValueNode() != NULL)
    {
-      llvm::Value* var_val = cgExprAndLoad(node->ValueNode(),
-         node->ValueNode()->ExprType(), node->TypeNode()->ExprType());
+      llvm::Value* var_val = cgExprAndLoad(node->ValueNode());
       assert (var_val != NULL);
       new llvm::StoreInst(var_val, var, _cur_bb);
    }
-
-   //var = new llvm::LoadInst(var, "", _cur_bb);
 
    _stack.set(node->Name(), var);
 }
@@ -1051,30 +1174,46 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 void
 Codegen::cgWhileStatement (ast::node::While* n)
 {
-   assert (n != NULL);
+   DEBUG_REQUIRE (n != NULL);
+
+   llvm::BasicBlock* while_head = _createBasicBlock("while_head");
+   llvm::BasicBlock* while_body = _createBasicBlock("while_body");
+   llvm::BasicBlock* while_after = _createBasicBlock("while_after");
+   assert(while_head != NULL && while_body != NULL && while_after != NULL);
 
    llvm::BasicBlock* origin_block = _cur_bb;
+   if (_exit_block == NULL) _exit_block = while_body;
+   llvm::BasicBlock* origin_exit_block = _exit_block;
 
-   llvm::BasicBlock* while_head = llvm::BasicBlock::Create(
-      llvm::getGlobalContext(), "while_head", _cur_func);
+
+   // ==================
+   // == CODEGEN BODY ==
+
+   // While condition
    _cur_bb = while_head;
    llvm::Value* cond = cgExpr(n->ConditionNode());
    assert(cond != NULL);
 
-   llvm::BasicBlock* while_body = llvm::BasicBlock::Create(
-      llvm::getGlobalContext(), "while_body", _cur_func);
-   assert (while_body != NULL);
+   // While body
    _cur_bb = while_body;
+   _exit_block = while_after;
    cgBlock(static_cast<ast::node::Block*>(n->BodyNode()));
-   while_body->getInstList().push_back(llvm::BranchInst::Create(while_head));
 
-   llvm::BasicBlock* while_after = llvm::BasicBlock::Create(
-      llvm::getGlobalContext(), "while_after", _cur_func);
-   assert (while_after != NULL);
+
+   // ===============
+   // == BRANCHING ==
+
+   // Going to the condition block from current block
+   _pushNewBranchInst(origin_block, while_head);
+
+   // Returning to the while condition at the end of the body block
+   _pushNewBranchInst(_cur_bb, while_head);
+
+   // Conditional branching
+   _pushNewCondBranchInst(while_head, cond, while_body, while_after);
+
    _cur_bb = while_after;
-
-   origin_block->getInstList().push_back(llvm::BranchInst::Create(while_head));
-   llvm::BranchInst::Create(while_body, while_after, cond, while_head);
+   _exit_block = origin_exit_block;
 }
 
 std::string

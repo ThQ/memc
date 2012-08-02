@@ -33,6 +33,64 @@ TopTypesChecker::visit (node::Node* node)
    return true;
 }
 
+#if 0
+
+void
+TopTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+
+   st::Symbol* arr_sym = BugType();
+
+   if (n->TypeNode() != NULL)
+   {
+      visitTypeName(scope, n->TypeNode());
+      ensureSymbolIsType(n->TypeNode(), n->TypeNode()->BoundSymbol());
+
+      if (n->LengthNode() != NULL)
+      {
+         visitExpr(scope, n->LengthNode());
+      }
+
+      if (n->TypeNode()->hasBoundSymbol())
+      {
+         if (n->LengthNode() == NULL)
+         {
+            arr_sym = st::Util::getUnsizedArrayType(n->TypeNode()->ExprType());
+         }
+         else
+         {
+            // Array with size
+            if (n->LengthNode()->isNumberNode())
+            {
+               arr_sym = st::Util::lookupArrayType(scope,
+               n->TypeNode()->BoundSymbol()->Name(),
+               static_cast<ast::node::Number*>(n->LengthNode())->getInt());
+            }
+            // Array without size
+            else
+            {
+               arr_sym = st::Util::getUnsizedArrayType(static_cast<st::Type*>(n->TypeNode()->BoundSymbol()));
+            }
+         }
+      }
+   }
+   else
+   {
+      assert(false);
+   }
+
+   n->setBoundSymbol(arr_sym);
+   n->setExprType(static_cast<st::Type*>(arr_sym));
+
+   DEBUG_ENSURE (n->hasBoundSymbol());
+   DEBUG_ENSURE (n->hasExprType());
+   DEBUG_ENSURE (n->TypeNode() != NULL);
+   DEBUG_ENSURE (n->TypeNode()->hasBoundSymbol());
+   DEBUG_ENSURE (n->TypeNode()->hasExprType());
+}
+
 void
 TopTypesChecker::visitDot (st::Symbol* scope, node::Node* node)
 {
@@ -55,13 +113,14 @@ TopTypesChecker::visitDot (st::Symbol* scope, node::Node* node)
    else
    {
       // FIXME
-      DEBUG_PRINTF("Not expr type in left expr of dot\n", "");
+      DEBUG_PRINT("Not expr type in left expr of dot\n");
       assert(false);
    }
 
    node->setBoundSymbol(right_node->BoundSymbol());
    node->setExprType(right_node->BoundSymbol());
 }
+#endif
 
 void
 TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
@@ -75,7 +134,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
    assert (name_node != NULL);
    assert (type_node != NULL);
 
-   visitQualifiedName(scope, type_node);
+   visitExpr(scope, type_node);
 
    if (type_node->hasExprType()
       && ensureSymbolIsType(type_node, type_node->ExprType()))
@@ -114,8 +173,8 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
 void
 TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
 {
-   assert(scope != NULL);
-   assert(func_decl != NULL);
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (func_decl != NULL);
 
    st::Func* func_sym = new st::Func();
    if (func_decl->hasMetadata())
@@ -128,6 +187,8 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    }
    func_sym->setName(func_decl->gValue());
    scope->addChild(func_sym);
+
+   func_decl->setBoundSymbol(func_sym);
 
    if (func_decl->ReturnTypeNode() != NULL)
    {
@@ -161,7 +222,7 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
       name_node = static_cast<node::Text*>(param_node->getChild(0));
       type_node = static_cast<node::Text*>(param_node->getChild(1));
 
-      visitTypeName(scope, type_node);
+      visitExpr(scope, type_node);
 
       if (type_node->hasExprType())
       {
@@ -171,7 +232,7 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
 
          // Add parameter to the symbol table of the block
          if (type_node->hasExprType()
-            && ensureSymbolIsType(type_node, type_node->ExprType()))
+            && ensureSizedExprType(type_node))
          {
             param_sym->setType(static_cast<st::Class*>(type_node->ExprType()));
          }
@@ -188,21 +249,23 @@ void
 TopTypesChecker::visitFuncReturnType (node::Func* func_node,
    st::Func* func_sym)
 {
+   DEBUG_REQUIRE (func_node != NULL);
+   DEBUG_REQUIRE (func_sym != NULL);
+
    node::Text* ret_ty_node = static_cast<node::Text*>(
       func_node->ReturnTypeNode());
 
-   if (ret_ty_node->isDotNode())
+   visitExpr(func_sym, ret_ty_node);
+   func_node->setBoundSymbol(func_sym);
+
+   if (ret_ty_node->BoundSymbol()->Name() != "void")
    {
-      visitDot(func_node->Parent()->BoundSymbol(), ret_ty_node);
+      ensureSizedExprType(ret_ty_node);
    }
    else
    {
-      visitQualifiedName(func_sym->_parent, ret_ty_node);
+      ensureSymbolIsType(ret_ty_node, ret_ty_node->BoundSymbol());
    }
-
-   ensureSymbolIsType(ret_ty_node, ret_ty_node->BoundSymbol());
-
-   func_node->setBoundSymbol(func_sym);
 
    if (func_node->ReturnTypeNode()->hasExprType())
    {
@@ -212,47 +275,56 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
       assert(func_sym->ReturnType() != NULL);
       assert(func_node->hasExprType());
    }
+
+   DEBUG_ENSURE (ret_ty_node->hasExprType());
+   DEBUG_ENSURE (ret_ty_node->hasBoundSymbol());
 }
 
+#if 0
 void
 TopTypesChecker::visitQualifiedName (st::Symbol* scope, node::Node* node)
 {
-   assert (scope != NULL);
-   assert (node != NULL);
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (node != NULL);
 
    node::Text* name_node = static_cast<node::Text*>(node);
-   name_node->setExprType(st::Util::lookupSymbol(scope, name_node->gValue()));
-   name_node->setBoundSymbol(name_node->ExprType());
+   st::Symbol* node_ty = st::Util::lookupSymbol(scope, name_node->gValue());
+
+   name_node->setExprType(node_ty);
+   name_node->setBoundSymbol(node_ty);
 
    if (!name_node->hasExprType())
    {
+      name_node->setExprType(BugType());
+      name_node->setBoundSymbol(BugType());
+
       log::SymbolNotFound* err = new log::SymbolNotFound();
       err->sSymbolName(name_node->gValue());
       err->sScopeName(scope->gQualifiedName());
       err->format();
-      err->setPosition(name_node->copyPosition());
+      //err->setPosition(name_node->copyPosition());
       log(err);
    }
+
+   DEBUG_ENSURE(name_node->hasExprType());
+   DEBUG_ENSURE(name_node->hasBoundSymbol());
 }
 
 void
 TopTypesChecker::visitTypeName (st::Symbol* scope, node::Node* n)
 {
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+
    switch (n->Kind())
    {
       case node::Kind::FINAL_ID:
          visitQualifiedName(scope, n);
          break;
 
-      /*
       case node::Kind::ARRAY:
-         visitTypeName(scope, static_cast<node::Array*>(n)->TypeNode());
-
-         st::Type* ty = static_cast<st::Type*>(static_cast<node::Array*>(n)->TypeNode()->BoundSymbol());
-         assert(ty != NULL);
-         n->setBoundSymbol(st::Util::lookup(......));
+         visitArray(scope, static_cast<node::Array*>(n));
          break;
-      */
 
       case node::Kind::DOT:
          visitDot(scope, static_cast<node::Dot*>(n));
@@ -271,11 +343,13 @@ TopTypesChecker::visitTypeName (st::Symbol* scope, node::Node* n)
       }
 
       default:
-         DEBUG_PRINTF("Unsupported node type : %d\n", n->Kind());
+         DEBUG_PRINTF("Unsupported node {Kind:%d, Name:%s}\n", n->Kind(),
+            n->KindNameCstr());
          assert(false);
    }
 
-
+   DEBUG_ENSURE (n->hasExprType());
 }
+#endif
 
 } } }

@@ -29,7 +29,7 @@ class Func: public Type
    bool _is_entry_point;
    std::vector<Arg*> _params;
    //Func* _overloaded_func;
-   Symbol* _return_type;
+   Type* _return_type;
 
 
    // -------------------------------------------------------------------------
@@ -45,8 +45,8 @@ class Func: public Type
    GETTER(ParamCount, size_t) {return _params.size();}
 
    // ReturnType
-   GETTER(ReturnType, Symbol*) {return _return_type;}
-   SETTER(ReturnType, Symbol*) {_return_type = val;}
+   GETTER(ReturnType, Type*) {return _return_type;}
+   SETTER(ReturnType, Type*) {_return_type = val;}
 
    /*
    public: inline Func* gOverloadedFunc() { return this->_overloaded_func;}

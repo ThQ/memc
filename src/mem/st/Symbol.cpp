@@ -26,7 +26,6 @@ Symbol::~Symbol ()
 Symbol*
 Symbol::gExprType ()
 {
-   printf("gExprType(FROM:%d)\n", _kind);
    return NULL;
 }
 
@@ -71,6 +70,21 @@ Symbol::gEvalType ()
 }
 */
 
+std::vector<Symbol*>
+Symbol::getParents ()
+{
+   std::vector<Symbol*> parents;
+
+   Symbol* parent = _parent;
+
+   while (parent != NULL)
+   {
+      parents.insert(parents.begin(), parent);
+      parent = parent->_parent;
+   }
+   return parents;
+}
+
 std::string
 Symbol::gQualifiedName ()
 {
@@ -108,6 +122,22 @@ Symbol::isAnyTypeSymbol() const
       case st::CLASS:
       case st::PRIMITIVE:
       case st::POINTER:
+      case st::ARRAY:
+         return true;
+      default:
+         return false;
+   }
+}
+
+bool
+Symbol::isReferenceSymbol() const
+{
+   switch (_kind)
+   {
+      case VAR:
+      case ARG:
+      case ARRAY:
+      case POINTER:
          return true;
       default:
          return false;
@@ -117,7 +147,7 @@ Symbol::isAnyTypeSymbol() const
 bool
 Symbol::isTypeSymbol () const
 {
-   switch (this->_kind)
+   switch (_kind)
    {
       case CLASS:
       case POINTER:

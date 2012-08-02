@@ -104,9 +104,25 @@ Node::isAssignable ()
       case Kind::DOT:
       case Kind::AMPERSAND:
       case Kind::BRACKET_OP:
+      case Kind::DEREF:
          return true;
    }
    return false;
+}
+
+bool
+Node::isReferenceNode () const
+{
+   switch (Kind())
+   {
+      case Kind::ARRAY:
+      case Kind::BRACKET_OP:
+      case Kind::DOT:
+      case Kind::FINAL_ID:
+         return true;
+      default:
+         return false;
+   }
 }
 
 bool

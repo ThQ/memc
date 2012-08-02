@@ -4,7 +4,8 @@ namespace mem { namespace st {
 
 Type::Type ()
 {
-   this->_parent_type = NULL;
+   _parent_type = NULL;
+   _byte_size = -1;
 }
 
 bool

@@ -98,6 +98,9 @@ class Tokenizer
    static inline bool
    _isSpace (char c) {return (c == 9 || c== 32);}
 
+   static inline bool
+   _isValidIdChar (char c) {return _isAlphaNumeric(c) || c == '_';}
+
    std::string
    _makeIndentationVisible (std::string indent);
 
@@ -133,6 +136,9 @@ class Tokenizer
 
    Token
    getNextToken ();
+
+   bool
+   isFinished ();
 
    void
    reset ();

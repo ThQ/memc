@@ -130,11 +130,39 @@
    {
       "type": "FatalError",
       "message": "Bad indentation",
-      "description": "Indentation must be a multiple of the indentation unit.%NEWLINE Default indentation is $DefaultIndentation, but got %Indentation.",
+      "description": "Indentation must be a multiple of the indentation unit.%NEWLINE Default indentation is $DefaultIndentation, but got $Indentation.",
       "params":
       {
          "DefaultIndentation": "std::string",
          "Indentation": "std::string"
        }
+   },
+   "CannotAssign":
+   {
+      "type": "Error",
+      "message": "Cannot assign value of type $TypeName, when $ExpectedTypeName was expected",
+      "params":
+      {
+         "TypeName": "std::string",
+         "ExpectedTypeName": "std::string"
+      }
+   },
+   "UnsizedType":
+   {
+      "type": "FatalError",
+      "message": "Type `$TypeName' has no size",
+      "params":
+      {
+         "TypeName": "std::string"
+      }
+   },
+   "DerefNonPointer":
+   {
+      "type": "FatalError",
+      "message": "Cannot dereference non pointer type `$TypeName'",
+      "params":
+      {
+         "TypeName": "std::string"
+      }
    }
 }

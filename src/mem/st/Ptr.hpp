@@ -29,7 +29,14 @@ class Ptr : public Type
 
    // BaseType
    GETTER(BaseType, Type*) {return _base_type;}
-   SETTER(BaseType, Type*) {_base_type = val;}
+   SETTER(BaseType, Type*)
+   {
+      _base_type = val;
+      if(val->isPtrSymbol())
+      {
+         _ptr_level = static_cast<Ptr*>(val)->IndirectionLevel() + 1;
+      }
+   }
 
    // IndirectionLevel
    GETTER(IndirectionLevel, int) {return _ptr_level;}
@@ -70,6 +77,9 @@ class Ptr : public Type
     */
    inline Symbol*
    getChild (std::string name) {return this->_base_type->getChild(name);}
+
+   Type*
+   getNonPointerParent ();
 };
 
 

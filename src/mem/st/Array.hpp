@@ -25,12 +25,25 @@ class Array : public Type
     */
    Array();
 
+   // -------------------------------------------------------------------------
+   // PROPERTIES
+   // -------------------------------------------------------------------------
+   public:
 
    GETTER(BaseType, st::Type*) {return _base_type;}
-   SETTER(BaseType, st::Type*) {_base_type = val;}
+   SETTER(BaseType, st::Type*) {_base_type = val; _computeByteSize();}
 
    GETTER (ArrayLength, int) {return _array_length;}
-   SETTER (ArrayLength, int) {_array_length = val;}
+   SETTER (ArrayLength, int) {_array_length = val; _computeByteSize();}
+
+
+   // -------------------------------------------------------------------------
+   // PROTECTED METHODS
+   // -------------------------------------------------------------------------
+   public:
+
+   void
+   _computeByteSize();
 
 
    // -------------------------------------------------------------------------
@@ -40,6 +53,9 @@ class Array : public Type
 
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Array");return false;}
+
+   bool
+   hasLength() const {return _array_length != -1;}
 };
 
 } }

@@ -5,6 +5,7 @@
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 #include "mem/log/Message.hpp"
+#include "mem/st/Array.hpp"
 #include "mem/st/Symbol.hpp"
 
 
@@ -25,7 +26,13 @@ class TypeChecker : public Visitor
    ensureExprType (node::Node* expr, st::Symbol* expr_type);
 
    bool
+   ensureSizedExprType (node::Node* expr);
+
+   bool
    ensureSymbolIsType (node::Node* node, st::Symbol* sym);
+
+   void
+   logSymbolNotFound (st::Symbol* scope, std::string symbol_name);
 };
 
 

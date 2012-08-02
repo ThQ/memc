@@ -10,6 +10,7 @@
 #include "mem/ast/node/NodeValidator.hpp"
 #include "mem/fs/position/Range.hpp"
 #include "mem/st/Class.hpp"
+#include "mem/st/Type.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -25,7 +26,7 @@ class Node
    st::Symbol* _bound_type;
    unsigned int _child_count;
    unsigned long _depth;
-   st::Symbol* _exp_type;
+   st::Type* _exp_type;
    Node* _first_child;
    Node* _last_child;
    Node* _next;
@@ -52,8 +53,9 @@ class Node
    void Depth (unsigned long depth);
 
    // ExprType
-   GETTER(ExprType, st::Symbol*) {return _exp_type;}
-   SETTER(ExprType, st::Symbol*) {_exp_type = val;}
+   GETTER(ExprType, st::Type*) {return _exp_type;}
+   SETTER(ExprType, st::Type*) {_exp_type = val;}
+   SETTER(ExprType, st::Symbol*) {assert(val->isAnyTypeSymbol());_exp_type = static_cast<st::Type*>(val);}
 
    // Kind
    GETTER(Kind, unsigned int) {return _type;}
@@ -61,6 +63,7 @@ class Node
 
    // KindName
    GETTER(KindName, std::string) {return get_type_name(_type);}
+   GETTER(KindNameCstr, const char*) {return get_type_name(_type);}
 
    // Metadata
    GETTER(Metadata, class mem::Metadata*) {return _md;}
@@ -162,16 +165,28 @@ class Node
    isIdNode() const {return isKind(Kind::ID);}
 
    inline bool
+   isNewNode() const {return isKind(Kind::NEW);}
+
+   inline bool
+   isNumberNode() const {return isKind(Kind::NUMBER);}
+
+   inline bool
    isOrNode() const {return isKind(Kind::OP_OR);}
 
    inline bool
    isPlaceHolderNode() const {return isKind(Kind::PLACE_HOLDER);}
+
+   bool
+   isReferenceNode() const;
 
    inline bool
    isReturnNode() const {return isKind(Kind::RETURN);}
 
    inline bool
    isRootNode() const {return isKind(Kind::ROOT);}
+
+   inline bool
+   isStringNode() const {return isKind(Kind::STRING);}
 
    inline bool
    isUseNode() const {return isKind(Kind::USE);}

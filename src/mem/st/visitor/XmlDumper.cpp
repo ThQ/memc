@@ -15,6 +15,8 @@ XmlDumper::visit (st::Symbol* sym)
 {
    switch (sym->_kind)
    {
+      case ARRAY:
+         visitArray(static_cast<st::Array*>(sym));
       case CLASS:
          visitClass(static_cast<st::Class*>(sym));
          break;
@@ -58,6 +60,23 @@ XmlDumper::visitChildren (st::Symbol* sym)
    {
       this->visit(i->second);
    }
+}
+
+bool
+XmlDumper::visitArray (st::Array* s)
+{
+   *_out << "<Array name=\"" + s->Name() + "\"";
+   if (s->BaseType() != NULL)
+   {
+      *_out << " base-type=\"" + s->BaseType()->gQualifiedName() + "\"";
+   }
+   if (s->hasLength())
+   {
+      *_out << " size=\"" << s->ArrayLength() << "\"";
+   }
+   *_out << " />\n";
+
+   return true;
 }
 
 bool

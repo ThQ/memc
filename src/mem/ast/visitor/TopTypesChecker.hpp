@@ -12,7 +12,7 @@
 #include "mem/ast/node/Ptr.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Type.hpp"
-#include "mem/ast/visitor/TypeChecker.hpp"
+#include "mem/ast/visitor/BlockTypesChecker.hpp"
 #include "mem/fs/position/Range.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
@@ -27,7 +27,7 @@ namespace mem { namespace ast { namespace visitor {
  * Checks correctness of types in high level declarations : functions
  * and fields.
  */
-class TopTypesChecker : public TypeChecker
+class TopTypesChecker : public BlockTypesChecker
 {
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -51,12 +51,17 @@ class TopTypesChecker : public TypeChecker
    virtual bool
    visit (node::Node* node);
 
+#if 0
+   void
+   visitArray (st::Symbol* scope, node::Array* n);
+
    /**
     * Visit a DOT expression (MEM_NODE_DOT).
     */
    void
    visitDot (st::Symbol* scope, node::Node* dot);
 
+#endif
    /**
     * Visits a class field declaration (MEM_NODE_FIELD).
     *
@@ -86,11 +91,13 @@ class TopTypesChecker : public TypeChecker
    virtual void
    visitFuncReturnType (node::Func* func_node, st::Func* func_sym);
 
+#if 0
    virtual void
    visitQualifiedName (st::Symbol* scope, node::Node* name_node);
 
    void
    visitTypeName (st::Symbol* scope, node::Node* node);
+#endif
 };
 
 

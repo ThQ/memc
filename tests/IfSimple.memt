@@ -1,0 +1,4 @@
+main () -> int
+ if 1i == 2i
+  a := 1i
+ return 0i

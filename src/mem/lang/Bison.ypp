@@ -79,8 +79,12 @@ mem::lang::Tokenizer gTOKENIZER;
 int yylex()
 {
    mem::lang::Token t = gTOKENIZER.getNextToken();
-   yylval.text = new std::string();
-   yylval.text->assign(t.Value());
+
+   std::string* str = new std::string();
+   str->assign(t.Value());
+
+   yylval.text = str;
+
    return t.Kind();
 }
 
@@ -104,10 +108,9 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %code requires {
 }
 
-%union {
-   int integer;
-   std::string* text; // We can't have a non-trivial type here (std::string)
-   ast::node::Node* binary_node;
+%union
+{
+   std::string* text;
    ast::node::Node* node;
    ast::node::Text* text_node;
 }
@@ -121,6 +124,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %token T_AROBASE
 %token T_AND
 %token T_BANG
+%token T_BANG_EQ
 %token T_CLASS
 %token T_COLON
 %token T_COMMA
@@ -162,13 +166,15 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 
 // Lower precedence first
 %left <node> T_AND T_OR
-%left <node> T_EQ_EQ T_GT T_GT_EQ T_LT T_RARR T_LT_EQ
+%left <node> T_EQ_EQ T_GT T_GT_EQ T_LT T_RARR T_LT_EQ T_BANQ_EQ
 %left <node> T_MINUS T_PLUS
 %left <node> T_STAR T_DIV
 %left <node> T_MUL_MUL T_MODULO
 %left <node> T_MINUS_MINUS T_PLUS_PLUS
 %left <node> T_DOT
 
+%type <node> argument
+%type <node> argument_list
 %type <node> binary_expr
 %type <text_node> binary_operator
 %type <text_node> bool_operator
@@ -186,8 +192,6 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %type <node> for_initialization_statement
 %type <node> for_iteration_statement
 %type <node> function_declaration
-%type <node> function_declaration_parameter
-%type <node> function_declaration_parameter_list
 %type <node> function_name
 %type <text_node> id
 %type <node> if
@@ -195,7 +199,9 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %type <node> members_declarations
 %type <node> member_declaration
 %type <text_node> metadata
+%type <node> newline_or_block
 %type <node> return_statement
+%type <node> return_type_or_null
 %type <node> simple_statement
 %type <node> statement
 %type <node> statements
@@ -234,6 +240,7 @@ use:
       $$ = new ast::node::Use();
       $$->sValue($2->gValue());
       $$->setPosition(new fs::position::Range(@1, @2));
+
       delete $2;
    }
 
@@ -322,76 +329,78 @@ function_name:
       delete $2;
    }
 
+newline_or_block:
+   T_NEWLINE { $$ = NULL; }
+   | block
+
+return_type_or_null:
+   /* EMPTY */
+   {
+      $$ = NULL;
+   }
+   | T_RARR type_name { $$ = $2; }
+
 function_declaration:
-   //------------------------------------------------------------------------//
-   // VIRTUAL FUNCTIONS                                                      //
-   //------------------------------------------------------------------------//
-
-   // Virtual function : no parameters, return type
    // Ex: my_function_name() -> my_return_type
-   function_name T_OP T_CP T_RARR type_name T_NEWLINE
+   function_name T_OP T_CP return_type_or_null newline_or_block
    {
       ast::node::Func* n = static_cast<ast::node::Func*>($1);
-      n->pushChild($5);
-      n->setPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-   }
-   // Virtual function : parameters, return type
-   // Ex: my_function_name(my_variable :my_type) -> my_return_type
-   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name T_NEWLINE
-   {
-      $3->setPosition(new fs::position::Range(
-         *($3->getChild(0)->_position),
-         *($3->getChild($3->_child_count-1)->_position)));
 
-      ast::node::Func* n = static_cast<ast::node::Func*>($1);
-      n->pushChildren($3, $6);
-      n->setPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-   }
+      // Return type
+      if ($4 != NULL) n->pushChild($4);
+      else
+      {
+         ast::node::Text* void_ty = new ast::node::Text();
+         void_ty->setKind(ast::node::Kind::FINAL_ID);
+         void_ty->sValue("void");
+         n->pushChild(void_ty);
+      }
 
-   //------------------------------------------------------------------------//
-   // NORMAL FUNCTIONS                                                       //
-   //------------------------------------------------------------------------//
-   // Ex: my_function_name() -> my_return_type
-   | function_name T_OP T_CP T_RARR type_name block
-   {
-      ast::node::Func* n = static_cast<ast::node::Func*>($1);
-      n->pushChildren($5, $6);
+      // Body block
+      if ($5 != NULL) n->pushChild($5);
+
       n->setPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
    }
    // Ex: my_function_name(my_variable :my_type) :my_return_type
-   | function_name T_OP function_declaration_parameter_list T_CP T_RARR type_name block
+   | function_name T_OP argument_list T_CP return_type_or_null newline_or_block
    {
-      $3->setPosition(new fs::position::Range(
-         *($3->getChild(0)->_position),
-         *($3->getChild($3->_child_count-1)->_position)));
-
       ast::node::Func* n = static_cast<ast::node::Func*>($1);
-      n->pushChildren($3, $6, $7);
+
+      // Argument list
+      n->pushChild($3);
+
+      // Return type
+      if ($5 != NULL) n->pushChild($5);
+      else
+      {
+         ast::node::Text* void_ty = new ast::node::Text();
+         void_ty->setKind(ast::node::Kind::FINAL_ID);
+         void_ty->sValue("void");
+         n->pushChild(void_ty);
+      }
+
+      // Body block
+      if ($6 != NULL) n->pushChild($6);
+
       n->setPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
    }
 
 
-function_declaration_parameter_list:
-   function_declaration_parameter
+argument_list:
+   argument
    {
       $$ = new ast::node::Node();
       $$->setKind(ast::node::Kind::FUNCTION_PARAMETERS);
       $$->pushChild($1);
    }
-   | function_declaration_parameter_list T_COMMA function_declaration_parameter
+   | argument_list T_COMMA argument
    {
       $$->pushChild($3);
    }
-   | function_declaration_parameter_list T_COMMA T_DOTDOTDOT function_declaration_parameter
-   {
-      $$->pushChild($4);
-   }
 
-function_declaration_parameter:
+argument:
    id T_SEMICOLON type_name
    {
       $$ = new ast::node::Node();
@@ -533,21 +542,20 @@ type_name:
    {
       $$ = static_cast<ast::node::Node*>($1);
    }
-   | qualified_id T_STAR
+   | type_name T_STAR
    {
       ast::node::Ptr* ptr = new ast::node::Ptr();
       ptr->pushChild($1);
       $$ = static_cast<ast::node::Ptr*>(ptr);
    }
-   | T_LBRACKET qualified_id T_RBRACKET
+   | T_LBRACKET type_name T_RBRACKET
    {
       ast::node::Array* arr = new ast::node::Array();
       arr->pushChild($2);
       $$ = static_cast<ast::node::Node*>(arr);
    }
-   | T_LBRACKET qualified_id T_COMMA literal T_RBRACKET
+   | T_LBRACKET type_name T_COMMA expr T_RBRACKET
    {
-      // FIXME $4 should be only a literal number, or, even better, any expr
       ast::node::Array* arr = new ast::node::Array();
       arr->pushChildren($2, $4);
       $$ = static_cast<ast::node::Node*>(arr);
@@ -660,6 +668,12 @@ expr :
       $$->setKind(ast::node::Kind::AMPERSAND);
       $$->pushChild($2);
    }
+   | T_AROBASE expr
+   {
+      $$ = new ast::node::Node();
+      $$->setKind(ast::node::Kind::DEREF);
+      $$->pushChild($2);
+   }
    | T_NEW type_name
    {
       $$ = new ast::node::New();
@@ -714,6 +728,12 @@ comp_operator:
    {
       $$ = new ast::node::BinaryOp();
       $$->setKind(ast::node::Kind::OP_GTE);
+   }
+   // ex: 1 != 2
+   | T_BANG_EQ
+   {
+      $$ = new ast::node::BinaryOp();
+      $$->setKind(ast::node::Kind::OP_NE);
    }
 
 math_operator:

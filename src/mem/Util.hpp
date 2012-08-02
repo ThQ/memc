@@ -18,7 +18,10 @@ class Util
 {
    public: static void namespace_to_path (std::string& path);
    public: static void partition_full_type_name (std::string full_type_name, std::string& ns, std::string& type_name);
-   public: static void path_to_namespace (std::string& path);
+
+   static std::string
+   getNamespaceNameFromPath (std::string path);
+
    public: static std::string stripFileExtension (std::string file_path);
    public: static std::vector<std::string>split (std::string qualified_name, char separator);
 

@@ -7,6 +7,7 @@
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/node/Text.hpp"
+#include "mem/st/Alias.hpp"
 #include "mem/st/Array.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/SymbolTable.hpp"
@@ -27,13 +28,25 @@ class Util
    createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts);
 
    static Type*
+   getExprType (Symbol* s);
+
+   static Type*
    getPointerBaseType(Ptr* ptr);
+
+   static Ptr*
+   getPointerType (Type* base_ty);
 
    static Symbol*
    getSymbol (Symbol* scope, std::string symbol_name);
 
    static size_t
    getIndirectionCount (std::string type_name);
+
+   static Array*
+   getUnsizedArrayType (st::Array* sized_arr);
+
+   static Array*
+   getUnsizedArrayType (st::Type* base_ty);
 
    static Array*
    lookupArrayType (Symbol* scope, std::string base_ty_name, int size);
@@ -48,13 +61,16 @@ class Util
    lookupPointer(Symbol* scope, std::string base_ty_name, size_t ptr_level);
 
    static Ptr*
-   lookupPointer (Symbol* scope, Type* base_ty);
+   lookupPointer(Symbol* scope, Type* base_ty);
 
    static Symbol*
    lookupMember (Symbol* scope, std::string symbol_name);
 
    static Symbol*
    lookupSymbol (Symbol* scope, std::string symbol_name);
+
+   static Symbol*
+   lookupSymbol (Symbol* scope, std::vector<std::string> name_parts);
 
    static bool
    parseArrayTypeName (std::string name, std::string& base_ty_name, int& array_len);
@@ -66,10 +82,16 @@ class Util
    setupBool (SymbolTable& st, CoreTypes& core_types);
 
    static void
+   setupBugType (SymbolTable& st, CoreTypes& core_types);
+
+   static void
    setupInts (SymbolTable& st, CoreTypes& core_types);
 
    static void
    setupVoid (SymbolTable& st, CoreTypes& core_types);
+
+   static std::vector<std::string>
+   splitQualifiedName (std::string name);
 };
 
 

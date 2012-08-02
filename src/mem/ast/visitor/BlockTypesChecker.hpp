@@ -18,6 +18,7 @@
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
+#include "mem/ast/node/Ptr.hpp"
 #include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/String.hpp"
 #include "mem/ast/node/Type.hpp"
@@ -58,26 +59,14 @@ class BlockTypesChecker : public TypeChecker
    void
    checkCallParameters (st::Func* func_sym, node::Node* params);
 
-   /**
-    * Checks whether a function node is compatible with a declared
-    * function signature.
-    */
-   //public: bool isCompatibleFuncSign(st::FunctionSignature* sign_sym,
-   //   node::Node* params_node);
-
-   /**
-    * Finds a matching function signature and binds it to a call node.
-    */
    void
-   pickFuncSign(st::Func* func_sym, node::Node* call_node,
-      node::Node* params_node);
+   checkAssignment (node::Node* src, st::Type* dest_ty);
 
    /**
     * Visitor entry point.
     */
    virtual bool
    visit (node::Node* node);
-
 
    void
    visitAmpersand (st::Symbol* scope, node::Node* node);
@@ -96,6 +85,9 @@ class BlockTypesChecker : public TypeChecker
 
    void
    visitCompOp (st::Symbol* scope, node::BinaryOp* n);
+
+   void
+   visitDeref (st::Symbol* scope, node::Node* n);
 
    void
    visitLogicalExpr (st::Symbol* scope, node::Node* expr_node);
@@ -134,13 +126,18 @@ class BlockTypesChecker : public TypeChecker
    visitNew (st::Symbol* scope, node::New* node);
 
    void
+   visitPointer (st::Symbol* scope, node::Ptr* n);
+
+   void
    visitReturn (st::Symbol* scope, node::Return* ret);
 
    void
    visitString (st::Symbol* scope, node::String* n);
 
+#if 0
    void
    visitVarLiteralNumber (st::Type*, node::Text* literal_nb);
+#endif
 
    void
    visitVarAssign (st::Symbol* scope, node::VarAssign* var_assign_node);

@@ -20,18 +20,48 @@
 #endif
 
 #ifdef NDEBUG
-   #define DEBUG_PRINTF(format, ...)
+   #define DEBUG_PRINTF(format, ...) (0)
 #endif
 #ifndef NDEBUG
-   #define DEBUG_PRINTF(format, ...) printf("%s:%d [DEBUG] ", __FILE__, __LINE__);printf(format, __VA_ARGS__)
+   #define DEBUG_PRINTF(format, ...) printf("%s:%d (%s) [DEBUG] ", __FILE__, __LINE__, __FUNCTION__);printf(format, __VA_ARGS__)
 #endif
 
 #ifdef NDEBUG
-   #define DEBUG_PRINT(str)
+   #define DEBUG_PRINT(str) (0);
 #endif
 #ifndef NDEBUG
-   #define DEBUG_PRINT(str) printf("%s:%d [DEBUG] %s", __FILE__, __LINE__, str)
+   #define DEBUG_PRINT(str) printf("%s:%d (%s) [DEBUG] %s", __FILE__, __LINE__, __FUNCTION__,  str)
 #endif
 
+
+#ifdef NDEBUG
+   #define DEBUG_REQUIRE(cond) (0)
+#endif
+#ifndef NDEBUG
+   #define DEBUG_REQUIRE(cond) assert((cond))
+#endif
+
+#ifdef NDEBUG
+   #define DEBUG_ENSURE(cond) (0)
+#endif
+#ifndef NDEBUG
+   #define DEBUG_ENSURE(cond) assert((cond))
+#endif
+
+#ifdef NDEBUG
+   #define DEBUG_DEPRECATED() (0)
+#endif
+#ifndef NDEBUG
+   #define DEBUG_DEPRECATED() printf("%s(...) is deprecated\n", __FUNCTION__);assert(false)
+#endif
+
+
+
+#ifdef NDEBUG
+   #define DEBUG_UNREACHABLE (0)
+#endif
+#ifndef NDEBUG
+   #define DEBUG_UNREACHABLE assert(false && "Code point supposed to be unreachable")
+#endif
 
 #endif

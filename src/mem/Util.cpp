@@ -32,20 +32,26 @@ Util::partition_full_type_name (std::string full_type_name, std::string& ns,
    }
 }
 
-void
-Util::path_to_namespace (std::string& path)
+
+std::string
+Util::getNamespaceNameFromPath (std::string path)
 {
-   for (size_t i = 0 ; i < path.size() ; ++i)
+   std::string ns_name = stripFileExtension(path);
+
+   while (ns_name[0] == '/' || ns_name[0] == '.')
    {
-      if (path[i] == '/')
+      ns_name = ns_name.substr(1, ns_name.size());
+   }
+
+   for (size_t i = 0 ; i < ns_name.size() ; ++i)
+   {
+      if (ns_name[i] == '/')
       {
-         path[i] = '.';
+         ns_name[i] = '.';
       }
    }
-   if (path.compare(path.size() - 4, 4, ".mem", 4) == 0)
-   {
-      path.erase(path.size() - 4, 4);
-   }
+
+   return ns_name;
 }
 
 std::string

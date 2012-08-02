@@ -9,6 +9,7 @@ namespace mem { namespace st {
 class CoreTypes
 {
    public: Type* _long;
+   Type* _bug_type;
 
    // -------------------------------------------------------------------------
    // PUBLIC PROPERTIES

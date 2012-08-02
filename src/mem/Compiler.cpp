@@ -13,6 +13,7 @@ Compiler::Compiler ()
 
    gTOKENIZER.setLogger(_logger);
 
+   addAstVisitor(new ast::visitor::UseAlias());
    addAstVisitor(new ast::visitor::Prechecker());
    addAstVisitor(new ast::visitor::FindClasses());
    addAstVisitor(new ast::visitor::TopTypesChecker());
@@ -22,6 +23,7 @@ Compiler::Compiler ()
    addAstVisitor(new ast::visitor::FindEntryPoint());
 
    st::Util::setupBool(this->symbols, this->symbols.gCoreTypes());
+   st::Util::setupBugType(this->symbols, this->symbols.gCoreTypes());
    st::Util::setupInts(this->symbols, this->symbols.gCoreTypes());
    st::Util::setupVoid(this->symbols, this->symbols.gCoreTypes());
 }
@@ -85,7 +87,7 @@ Compiler::compile (int argc, char** argv)
       processParseQueue();
 
       runAstVisitors();
-      runStVisitors();
+      //runStVisitors();
 
       dumpAst();
       dumpSt();
@@ -196,44 +198,36 @@ Compiler::parse (std::string file_path)
 {
    _logger->debug("[%s] parsing...", file_path.c_str());
 
-   // @TODO Split it
-   st::Namespace* file_sym = st::Util::createNamespace(this->symbols._root, Util::split(Util::stripFileExtension(file_path),'/'));
+   std::string ns_name = Util::getNamespaceNameFromPath(file_path);
+   std::vector<std::string> ns_parts = Util::split(ns_name, '.');
+   st::Namespace* file_sym = st::Util::createNamespace(symbols._root, ns_parts);
    assert(file_sym != NULL);
 
-   //reset_lexer();
    std::vector<std::string> paths_tried;
 
    fs::File* file = fm.tryOpenFile(file_path, paths_tried);
 
    if (file != NULL)
    {
-      std::string ns = file->gPathWithoutInclude();
-      mem::Util::path_to_namespace(ns);
-
       ast::node::File* file_node = new ast::node::File();
       file_node->setBoundSymbol(file_sym);
-      file_node->setId(ns);
+      file_node->setId(ns_name);
       file_node->setIncludePath(file->_include_path);
       file_node->setPath(file_path);
       ast.pushChild(file_node);
 
-      // Used by yyparse
-      //yyin = fopen(file_path.c_str(), "rb");
-      // TODO The file was opened ms before
-      // We could open the file only once if we used Bison++
-      //assert(yyin != NULL);
-      //yyfile = file;
-      // TODO We are actually reading each file twice, lang::Tokenizer should 
+      // TODO We are actually reading each file twice, lang::Tokenizer should
       // populate fs::File
       gTOKENIZER.setInputFile(file->gPath());
       gTOKENIZER.reset();
       yyparse(this->fm, file_node, this->symbols, _logger, file);
 
       ast::visitor::FindUse find_use;
+      _logger->debug("Searching for use statements", "");
       find_use.visit_preorder(file_node);
       for (size_t i = 0; i < find_use._uses.size(); ++i)
       {
-         if (ns == find_use._uses[i])
+         if (ns_name == find_use._uses[i])
          {
             // FIXME This thing is probably failing, should use a pointer.
             log::Message warn(log::WARNING);
@@ -251,7 +245,6 @@ Compiler::parse (std::string file_path)
             this->_parse_queue.push(rel_file_path);
          }
       }
-      //fclose(yyin);
    }
    else
    {

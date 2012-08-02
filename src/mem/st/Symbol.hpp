@@ -67,6 +67,8 @@ class Symbol
    GETTER(NameCstr, const char*) {return Name().c_str();}
    //void sName (char* name, size_t len);
 
+   // Parent
+   GETTER(Parent, st::Symbol*) {return _parent;}
 
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
@@ -102,6 +104,9 @@ class Symbol
    virtual Symbol*
    getChild (std::string name);
 
+   std::vector<st::Symbol*>
+   getParents ();
+
    void
    hintName (Symbol* parent, std::string hint);
 
@@ -115,10 +120,16 @@ class Symbol
    isArgSymbol() const {return is(st::ARG);}
 
    inline bool
+   isAliasSymbol() const {return is(st::ALIAS);}
+
+   inline bool
    isArraySymbol() const {return is(st::ARRAY);}
 
    inline bool
    isClassSymbol() const {return is(st::CLASS);}
+
+   inline bool
+   isFieldSymbol() const {return is(st::FIELD);}
 
    inline bool
    isFuncSymbol() const {return is(st::FUNCTION);}
@@ -128,6 +139,9 @@ class Symbol
 
    inline bool
    isPtrSymbol() const {return is(st::POINTER);}
+
+   bool
+   isReferenceSymbol() const;
 
    inline bool
    isVarSymbol() const {return is(st::VAR);}

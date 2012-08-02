@@ -56,11 +56,12 @@ FileManager::tryOpenFile (std::string file_path,
       for (i=0; res==NULL && i < _path.size(); ++i)
       {
          try_file_path = _path[i] + "/" + file_path;
+         DEBUG_PRINTF("Trying to open %s\n", try_file_path.c_str());
          paths_tried.push_back(try_file_path);
 
          res = openFile(try_file_path);
 
-         if (res == NULL)
+         if (res != NULL)
          {
             res->_include_path = _path[i];
             break;

@@ -56,6 +56,7 @@ class Codegen : public mem::codegen::ICodegen
    std::map<std::string, llvm::Type*> _classes;
    llvm::BasicBlock* _cur_bb;
    llvm::Function* _cur_func;
+   llvm::BasicBlock* _exit_block;
    std::map<std::string, llvm::Function*> _functions;
    llvm::Module* _module;
    st::SymbolTable* _st;
@@ -70,11 +71,53 @@ class Codegen : public mem::codegen::ICodegen
    inline void
    SymbolTable (st::SymbolTable* st) {_st=st;}
 
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   Codegen ();
 
    //--------------------------------------------------------------------------
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
+
+   inline llvm::BasicBlock*
+   _createBasicBlock(std::string name="")
+   {
+      llvm::BasicBlock* bb = llvm::BasicBlock::Create(llvm::getGlobalContext(),
+         name, _cur_func);
+      assert (bb != NULL);
+      return bb;
+   }
+
+   inline llvm::Constant*
+   _createInt32Constant (int val)
+   {
+      return llvm::ConstantInt::get(_module->getContext(), llvm::APInt(32, val));
+   }
+
+   inline llvm::Constant*
+   _createInt64Constant (int val)
+   {
+      return llvm::ConstantInt::get(_module->getContext(), llvm::APInt(64, val));
+   }
+
+   inline llvm::GetElementPtrInst*
+   _createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx);
+
+   inline void
+   _pushNewBranchInst (llvm::BasicBlock* parent, llvm::BasicBlock* dest)
+   {
+      parent->getInstList().push_back(llvm::BranchInst::Create(dest));
+   }
+
+   inline void
+   _pushNewCondBranchInst (llvm::BasicBlock* parent, llvm::Value* cond, llvm::BasicBlock* dest_true, llvm::BasicBlock* dest_false)
+   {
+      llvm::BranchInst::Create(dest_true, dest_false, cond, parent);
+   }
 
    void
    _dumpTypes ();
@@ -112,6 +155,9 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Type*
    _getLlvmTy (st::Type* mem_ty);
 
+   std::string
+   _getLlvmTypeName (llvm::Type* ty);
+
    /**
     * Returns the void LLVM type.
     */
@@ -129,6 +175,13 @@ class Codegen : public mem::codegen::ICodegen
 
    llvm::Value*
    cgBinaryExpr (ast::node::Node* node);
+
+   inline void
+   cgBlock (ast::node::Node* block)
+   {
+      assert(block->isBlockNode());
+      cgBlock(static_cast<ast::node::Block*>(block));
+   }
 
    void
    cgBlock (ast::node::Block* block);
@@ -160,11 +213,19 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Value*
    cgExpr (ast::node::Node* node);
 
+   llvm::Value*
+   cgExprAndLoad (ast::node::Node* node);
+
    /**
     * Codegen a node and generate a LLVM Load instruction if necessary.
     */
+    /*
    llvm::Value*
    cgExprAndLoad (ast::node::Node* node, st::Symbol* source_ty, st::Symbol* dest_ty);
+
+   llvm::Value*
+   cgExprAndLoad (ast::node::Node* src, st::Symbol* dest_ty);
+   */
 
    void
    cgFunctionBody (ast::node::Func* func_node);
@@ -189,6 +250,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgPrimitive (st::Primitive* prim);
+
+   llvm::Value*
+   cgDerefExpr (ast::node::Node* node);
 
    void
    cgReturnStatement (ast::node::Node* node);

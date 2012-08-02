@@ -48,6 +48,7 @@ src_mem_ast_visitor = \
  src/mem/ast/visitor/TopTypesChecker.cpp \
  src/mem/ast/visitor/TypeChecker.cpp \
  src/mem/ast/visitor/TypeMatch.cpp \
+ src/mem/ast/visitor/UseAlias.cpp \
  src/mem/ast/visitor/Visitor.cpp \
  src/mem/ast/visitor/XmlDumper.cpp
 src_mem_codegen_llvm = \
@@ -78,6 +79,7 @@ src_mem_opt = \
  src/mem/opt/Option.cpp \
  src/mem/opt/Options.cpp
 src_mem_st = \
+ src/mem/st/Alias.cpp \
  src/mem/st/Arg.cpp \
  src/mem/st/Array.cpp \
  src/mem/st/Class.cpp \
