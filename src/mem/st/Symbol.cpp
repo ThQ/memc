@@ -3,6 +3,9 @@
 namespace mem { namespace st {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTORS
+//-----------------------------------------------------------------------------
 Symbol::Symbol ()
 {
    _child_count = 0;
@@ -22,6 +25,11 @@ Symbol::~Symbol ()
    }
    delete _md;
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 Symbol*
 Symbol::gExprType ()
@@ -157,14 +165,5 @@ Symbol::isTypeSymbol () const
          return false;
    }
 }
-
-/*
-void
-Symbol::sName (char* name, size_t name_len)
-{
-   _name.assign(name, name_len);
-}
-*/
-
 
 } }

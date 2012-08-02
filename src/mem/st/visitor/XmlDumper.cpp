@@ -13,7 +13,7 @@ XmlDumper::setup ()
 bool
 XmlDumper::visit (st::Symbol* sym)
 {
-   switch (sym->_kind)
+   switch (sym->Kind())
    {
       case ARRAY:
          visitArrayType(static_cast<st::ArrayType*>(sym));
@@ -58,7 +58,7 @@ void
 XmlDumper::visitChildren (st::Symbol* sym)
 {
    st::Symbol::SymbolCollectionIterator i;
-   for (i=sym->_children.begin(); i != sym->_children.end(); ++i)
+   for (i=sym->Children().begin(); i != sym->Children().end(); ++i)
    {
       this->visit(i->second);
    }
@@ -129,7 +129,7 @@ XmlDumper::visitFunction (st::Func* func_sym)
 bool
 XmlDumper::visitNamespace (st::Namespace* ns_sym)
 {
-   *_out << "<Namespace name=\"" + ns_sym->_name + "\">\n";
+   *_out << "<Namespace name=\"" << ns_sym->Name() << "\">\n";
    visitChildren(ns_sym);
    *_out << "</Namespace>";
 

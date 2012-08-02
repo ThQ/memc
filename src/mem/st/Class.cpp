@@ -17,7 +17,7 @@ Class::~Class ()
 bool
 Class::addChild (Symbol* s)
 {
-   if (s->_kind == FIELD)
+   if (s->Kind() == FIELD)
    {
       st::Field* field = static_cast<Field*>(s);
       field->_field_index = _cur_field_index;
@@ -42,7 +42,7 @@ Class::getOrderedFields ()
       SymbolCollectionIterator i;
       for (i = _children.begin(); i != _children.end(); i++)
       {
-         if (i->second->_kind == FIELD)
+         if (i->second->Kind() == FIELD)
          {
             field = static_cast<Field*>(i->second);
             v[field->_field_index] = field;

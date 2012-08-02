@@ -9,7 +9,7 @@ Visitor::visitPreorder (st::Symbol* sym)
    {
       st::Symbol* cur_sym = NULL;
       st::Symbol::SymbolCollectionIterator i;
-      for (i=sym->_children.begin(); i != sym->_children.end(); ++i)
+      for (i=sym->Children().begin(); i != sym->Children().end(); ++i)
       {
          this->visitPreorder(i->second);
       }

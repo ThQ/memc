@@ -25,7 +25,7 @@ createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
       }
       cur_scope = cur_ns;
    }
-   assert(cur_scope->_parent != NULL);
+   assert(cur_scope->Parent() != NULL);
    assert(cur_ns->is(NAMESPACE));
    return static_cast<st::Namespace*>(cur_ns);
 }
@@ -138,7 +138,7 @@ getSymbol (Symbol* scope, std::string sym_name)
          {
             break;
          }
-         scope = scope->_parent;
+         scope = scope->Parent();
       }
       if (res != NULL && res->isAliasSymbol())
       {
@@ -203,7 +203,7 @@ lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
       arr_ty->setName(str.str());
       arr_ty->setArrayLength(size);
 
-      base_ty->_parent->addChild(arr_ty);
+      base_ty->Parent()->addChild(arr_ty);
    }
 
    return arr_ty;
@@ -298,7 +298,7 @@ lookupSymbol (Symbol* scope, std::vector<std::string> parts)
       {
          return inner_symbol;
       }
-      cur_scope = cur_scope->_parent;
+      cur_scope = cur_scope->Parent();
    }
 
    return NULL;
@@ -307,7 +307,7 @@ lookupSymbol (Symbol* scope, std::vector<std::string> parts)
 st::PointerType*
 lookupPointer(Symbol* scope, Type* base_ty)
 {
-   st::Symbol* parent = base_ty->_parent;
+   st::Symbol* parent = base_ty->Parent();
    if (parent != NULL && parent->isAliasSymbol())
    {
       parent = static_cast<st::Alias*>(parent)->Aliased();
@@ -366,15 +366,15 @@ lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
             // Add the pointer at the same level as the base type
             IF_DEBUG
             {
-               if (cur_sym->_parent == NULL)
+               if (cur_sym->Parent() == NULL)
                {
                   DEBUG_PRINTF("Symbol <%s>(%d) must have a parent",
                      cur_sym->Name().c_str(), cur_sym->Kind());
                }
-               assert(cur_sym->_parent != NULL);
+               assert(cur_sym->Parent() != NULL);
             }
 
-            cur_sym->_parent->addChild(ptr_symb);
+            cur_sym->Parent()->addChild(ptr_symb);
             cur_sym = ptr_symb;
          }
       }

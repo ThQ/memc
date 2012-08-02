@@ -74,13 +74,13 @@ Namespace::push (Namespace* ns)
 Type*
 Namespace::push (Type* type)
 {
-   if (this->_children.find(type->_name.c_str()) == this->_children.end())
+   if (this->_children.find(type->NameCstr()) == this->_children.end())
    {
-      type->_depth = this->_depth + 1;
-      this->_children[type->_name] = type;
+      type->setDepth(this->Depth() + 1);
+      this->_children[type->Name()] = type;
       return type;
    }
-   return static_cast<Type*>(this->_children[type->_name]);
+   return static_cast<Type*>(this->_children[type->Name()]);
 }
 
 
