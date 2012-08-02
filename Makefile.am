@@ -92,7 +92,7 @@ src_mem_st = \
  src/mem/st/Symbol.cpp \
  src/mem/st/SymbolTable.cpp \
  src/mem/st/Type.cpp \
- src/mem/st/Util.cpp \
+ src/mem/st/util.cpp \
  src/mem/st/Var.cpp
 src_mem_st_visitor = \
  src/mem/st/visitor/DepBuilder.cpp \

@@ -130,7 +130,7 @@ Codegen::_getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty)
    // Both operands are pointers
    else
    {
-      common_ty = st::Util::getPointerBaseType(static_cast<st::PointerType*>(left_ty));
+      common_ty = st::util::getPointerBaseType(static_cast<st::PointerType*>(left_ty));
    }
 
    return common_ty;
@@ -1104,7 +1104,7 @@ Codegen::cgReturnStatement (ast::node::Node* node)
 llvm::Value*
 Codegen::cgString (ast::node::String* n)
 {
-   st::Type* mem_ty = st::Util::lookupArrayType(_st->_root, "char", n->gValue().size() + 1);
+   st::Type* mem_ty = st::util::lookupArrayType(_st->_root, "char", n->gValue().size() + 1);
    assert(mem_ty != NULL);
 
    llvm::Type* llvm_ty = _getLlvmTy(mem_ty);

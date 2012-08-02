@@ -37,7 +37,7 @@ FindClasses::visitClassDecl (node::Class* cls_node)
    cls->setName(cls_node->gValue());
    cls_node->setBoundSymbol(cls);
 
-   st::Util::registerType(_symbols, file_sym, cls);
+   st::util::registerType(_symbols, file_sym, cls);
 }
 
 } } }

@@ -8,7 +8,7 @@
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/util.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
-#include "mem/st/Util.hpp"
+#include "mem/st/util.hpp"
 
 
 namespace mem { namespace ast { namespace visitor {

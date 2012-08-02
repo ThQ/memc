@@ -91,7 +91,7 @@ BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::Node* node)
    {
       st::Type* ptr_base_ty = static_cast<st::Type*>(node->getChild(0)->ExprType());
       std::string base_ty_name = ptr_base_ty->Name();
-      st::Type* amp_ty = st::Util::lookupPointer(scope, ptr_base_ty);
+      st::Type* amp_ty = st::util::lookupPointer(scope, ptr_base_ty);
 
       if (amp_ty != NULL)
       {
@@ -202,21 +202,21 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
       {
          if (n->LengthNode() == NULL)
          {
-            arr_sym = st::Util::getUnsizedArrayType(n->TypeNode()->ExprType());
+            arr_sym = st::util::getUnsizedArrayType(n->TypeNode()->ExprType());
          }
          else
          {
             // Array with size
             if (n->LengthNode()->isNumberNode())
             {
-               arr_sym = st::Util::lookupArrayType(scope,
+               arr_sym = st::util::lookupArrayType(scope,
                n->TypeNode()->BoundSymbol()->Name(),
                static_cast<ast::node::Number*>(n->LengthNode())->getInt());
             }
             // Array without size
             else
             {
-               arr_sym = st::Util::getUnsizedArrayType(static_cast<st::Type*>(n->TypeNode()->BoundSymbol()));
+               arr_sym = st::util::getUnsizedArrayType(static_cast<st::Type*>(n->TypeNode()->BoundSymbol()));
             }
          }
       }
@@ -414,14 +414,14 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 
       if (dot_node->hasBoundSymbol())
       {
-         st::Symbol* expr_ty = st::Util::getExprType(dot_node->BoundSymbol());
+         st::Symbol* expr_ty = st::util::getExprType(dot_node->BoundSymbol());
          if (expr_ty == NULL)
          {
             expr_ty = dot_node->BoundSymbol();
          }
 
          right_node->setBoundSymbol(dot_node->BoundSymbol());
-         right_node->setExprType(st::Util::getExprType(dot_node->BoundSymbol()));
+         right_node->setExprType(st::util::getExprType(dot_node->BoundSymbol()));
          dot_node->setExprType(static_cast<st::Type*>(expr_ty));
 
       }
@@ -572,11 +572,11 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (id_node != NULL);
 
-   st::Symbol* sym = st::Util::lookupSymbol(scope, id_node->gValue());
+   st::Symbol* sym = st::util::lookupSymbol(scope, id_node->gValue());
 
    if (sym != NULL)
    {
-      st::Type* expr_ty = st::Util::getExprType(sym);
+      st::Type* expr_ty = st::util::getExprType(sym);
 
       id_node->setBoundSymbol(sym);
       if (expr_ty != NULL)
@@ -664,13 +664,13 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
 
    if (ty_node->BoundSymbol()->isArraySymbol())
    {
-      st::ArrayType* unsized_arr_ty = st::Util::getUnsizedArrayType(static_cast<st::ArrayType*>(ty_node->BoundSymbol()));
-      st::Type* ptr_ty = st::Util::getPointerType(unsized_arr_ty);
+      st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(static_cast<st::ArrayType*>(ty_node->BoundSymbol()));
+      st::Type* ptr_ty = st::util::getPointerType(unsized_arr_ty);
       new_node->setExprType(ptr_ty);
    }
    else
    {
-      st::Type* ptr_ty = st::Util::lookupPointer(scope, static_cast<st::Type*>(ty_node->ExprType()));
+      st::Type* ptr_ty = st::util::lookupPointer(scope, static_cast<st::Type*>(ty_node->ExprType()));
       new_node->setExprType(ptr_ty);
    }
 
@@ -741,7 +741,7 @@ BlockTypesChecker::visitPointer (st::Symbol* scope, node::Ptr* n)
 
       if (n->TypeNode()->hasBoundSymbol() && n->TypeNode()->BoundSymbol()->isAnyTypeSymbol())
       {
-         st::Symbol* ptr_ty = st::Util::lookupPointer(scope,
+         st::Symbol* ptr_ty = st::util::lookupPointer(scope,
             static_cast<st::Type*>(n->TypeNode()->BoundSymbol()));
          assert (ptr_ty != NULL);
          n->setBoundSymbol(ptr_ty);
@@ -800,7 +800,7 @@ BlockTypesChecker::visitString (st::Symbol* scope, node::String* n)
 {
    DEBUG_REQUIRE(n != NULL);
 
-   n->setExprType(st::Util::lookupPointer(scope, "char", 1));
+   n->setExprType(st::util::lookupPointer(scope, "char", 1));
 
    DEBUG_ENSURE (n->hasExprType());
 }

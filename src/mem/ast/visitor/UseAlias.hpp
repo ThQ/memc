@@ -6,7 +6,7 @@
 #include "mem/ast/visitor/Visitor.hpp"
 #include "mem/fs/position/Composite.hpp"
 #include "mem/st/Alias.hpp"
-#include "mem/st/Util.hpp"
+#include "mem/st/util.hpp"
 
 
 namespace mem { namespace ast { namespace visitor {
