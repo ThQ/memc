@@ -32,5 +32,5 @@ int main (int argc, char** argv)
    memc.setOptions(&opts);
    memc.run();
 
-   return 0;
+   return memc.isBuildSuccessful() ? 0 : 1;
 }
