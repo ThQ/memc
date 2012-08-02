@@ -1,4 +1,4 @@
-AC_INIT([mem-compile], [0.1], [https://github.com/thomas-quemard/memc/issues/new])
+AC_INIT([memc], [0.1.0], [https://github.com/thomas-quemard/memc/issues/new])
 AM_INIT_AUTOMAKE([1.10 foreign no-define])
 AC_CONFIG_HEADERS([src/config.h])
 AC_CHECK_PROGS(llvm, [llvm-config llvm-config-3.0])
@@ -11,6 +11,5 @@ AM_PROG_CC_C_O
 AC_SEARCH_LIBS([dlopen], [dl dld])
 AC_PROG_CXX
 AC_PROG_YACC
-AC_PROG_LEX
 AC_CONFIG_FILES([ Makefile ])
 AC_OUTPUT

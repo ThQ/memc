@@ -136,12 +136,12 @@ src/mem/lang/TokenKind.hpp: src/mem/lang/Bison.hpp
 # Programs
 ###############################################################################
 
-bin_PROGRAMS = mem_compile
+bin_PROGRAMS = memc
 
 #------------------------------------------------------------------------------
 # mem-compile
 #------------------------------------------------------------------------------
-mem_compile_SOURCES =  \
+memc_SOURCES =  \
  bin/mem-compile/main.cpp \
  $(src_mem) \
  $(src_mem_ast) \
@@ -160,5 +160,5 @@ mem_compile_SOURCES =  \
  $(src_mem_st_visitor)\
  $(src_mem_tool)
 
-mem_compile_LDADD = $(LLVM_LDADD)
-mem_compile_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
+memc_LDADD = $(LLVM_LDADD)
+memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
