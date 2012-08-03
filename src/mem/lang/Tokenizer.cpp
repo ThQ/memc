@@ -199,6 +199,10 @@ Tokenizer::_processTokenStart (char c)
          {
             _pushToken(T_GT_EQ, ">=");
          }
+         else if (c2 == '>')
+         {
+            _pushToken(T_GT_GT, ">>");
+         }
          else
          {
             _pushToken(T_GT, ">");
@@ -212,6 +216,10 @@ Tokenizer::_processTokenStart (char c)
          if (c2 == '=')
          {
             _pushToken(T_LT_EQ, "<=");
+         }
+         else if (c2 == '<')
+         {
+            _pushToken(T_LT_LT, "<<");
          }
          else
          {
@@ -384,6 +392,21 @@ Tokenizer::_getTokenKindFromId (std::string id)
    int kind = T_ID;
    switch (id[0])
    {
+      case 'b':
+         if (id.size() >= 2)
+         {
+            switch (id[1])
+            {
+               case 'o':
+                  if (id == "bor") kind = T_BIT_OR;
+                  break;
+               case 'a':
+                  if (id == "band") kind = T_BIT_AND;
+                  break;
+            }
+         }
+         break;
+
       case 'c':
          if (id == "class") kind = T_CLASS;
          break;
@@ -415,6 +438,9 @@ Tokenizer::_getTokenKindFromId (std::string id)
       case 'w':
          if (id == "while") kind = T_WHILE;
          break;
+
+      case 'x':
+         if (id == "xor") kind = T_XOR;
    }
    return kind;
 }

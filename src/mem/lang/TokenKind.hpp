@@ -67,10 +67,15 @@ typedef enum _TokenKind {
    T_PLUS=307,
    T_MINUS=308,
    T_DIV=309,
-   T_MODULO=310,
-   T_MUL_MUL=311,
-   T_PLUS_PLUS=312,
-   T_MINUS_MINUS=313,
+   T_XOR=310,
+   T_BIT_AND=311,
+   T_BIT_OR=312,
+   T_GT_GT=313,
+   T_LT_LT=314,
+   T_MODULO=315,
+   T_MUL_MUL=316,
+   T_PLUS_PLUS=317,
+   T_MINUS_MINUS=318,
 } TokenKind;
 
 } }

@@ -442,51 +442,35 @@ void
 setupInts (SymbolTable& st, CoreTypes& core_types)
 {
    // Type : char
-   core_types._char = new st::IntType();
-   core_types._char->setName("char");
-   core_types._char->setByteSize(sizeof(char));
+   core_types._char = new st::IntType("char", sizeof(char));
    util::registerType(&st, st.gRoot(), core_types._char);
 
    // Type : short
-   core_types._short = new st::IntType();
-   core_types._short->setName("short");
-   core_types._short->setByteSize(sizeof(short));
+   core_types._short = new st::IntType("short", sizeof(short));
    util::registerType(&st, st.gRoot(), core_types._short);
 
    // Type : int
-   core_types._int = new st::IntType();
-   core_types._int->setName("int");
-   core_types._int->setByteSize(sizeof(int));
+   core_types._int = new st::IntType("int", sizeof(int));
    util::registerType(&st, st.gRoot(), core_types._int);
 
    // Type : long
-   core_types._long = new st::IntType();
-   core_types._long->setName("long");
-   core_types._long->setByteSize(sizeof(long));
+   core_types._long = new st::IntType("long", sizeof(long));
    util::registerType(&st, st.gRoot(), core_types._long);
 
    // Type : i8
-   core_types._i8 = new st::IntType();
-   core_types._i8->setName("i8");
-   core_types._i8->setByteSize(1);
+   core_types._i8 = new st::IntType("i8", 1);
    util::registerType(&st, st.gRoot(), core_types._i8);
 
    // Type : i16
-   core_types._i16 = new st::IntType();
-   core_types._i16->setName("i16");
-   core_types._i16->setByteSize(2);
+   core_types._i16 = new st::IntType("i16", 2);
    util::registerType(&st, st.gRoot(), core_types._i16);
 
    // Type : i32
-   core_types._i32 = new st::IntType();
-   core_types._i32->setName("i32");
-   core_types._i32->setByteSize(4);
+   core_types._i32 = new st::IntType("i32", 4);
    util::registerType(&st, st.gRoot(), core_types._i32);
 
    // Type : i64
-   core_types._i64 = new st::IntType();
-   core_types._i64->setName("i64");
-   core_types._i64->setByteSize(8);
+   core_types._i64 = new st::IntType("i64", 8);
    util::registerType(&st, st.gRoot(), core_types._i64);
 }
 

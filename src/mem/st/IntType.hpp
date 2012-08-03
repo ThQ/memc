@@ -23,6 +23,7 @@ class IntType : public PrimitiveType
     */
    IntType ();
 
+   IntType (std::string name, int size);
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTION

@@ -12,6 +12,12 @@ IntType::IntType ()
    _kind = INT_TYPE;
 }
 
+IntType::IntType (std::string name, int byte_size)
+{
+   _kind = INT_TYPE;
+   setName(name);
+   setByteSize(byte_size);
+}
 
 //-----------------------------------------------------------------------------
 // PUBLIC FUNCTIONS

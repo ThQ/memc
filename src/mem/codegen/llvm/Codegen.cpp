@@ -386,6 +386,31 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
 
    switch (node->Kind())
    {
+      case ast::node::Kind::OP_BIT_OR:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::Or, left_val,
+            right_val, "", _cur_bb);
+         break;
+
+      case ast::node::Kind::OP_BIT_AND:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::And, left_val,
+            right_val, "", _cur_bb);
+         break;
+
+      case ast::node::Kind::OP_XOR:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::Xor, left_val,
+            right_val, "", _cur_bb);
+         break;
+
+      case ast::node::Kind::OP_LSHIFT:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::Shl, left_val,
+            right_val, "", _cur_bb);
+         break;
+
+      case ast::node::Kind::OP_RSHIFT:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::LShr, left_val,
+            right_val, "", _cur_bb);
+         break;
+
       case ast::node::Kind::OP_PLUS:
          val = llvm::BinaryOperator::Create(llvm::Instruction::Add, left_val,
             right_val, "", _cur_bb);
@@ -725,6 +750,11 @@ Codegen::cgExpr (ast::node::Node* node)
          assert (res != NULL);
          break;
 
+      case ast::node::Kind::OP_BIT_AND:
+      case ast::node::Kind::OP_BIT_OR:
+      case ast::node::Kind::OP_XOR:
+      case ast::node::Kind::OP_LSHIFT:
+      case ast::node::Kind::OP_RSHIFT:
       case ast::node::Kind::OP_PLUS:
       case ast::node::Kind::OP_MINUS:
       case ast::node::Kind::OP_MUL:

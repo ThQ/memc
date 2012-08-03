@@ -135,23 +135,19 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
    std::string op_name;
    switch (node->Kind())
    {
-      case node::Kind::OP_PLUS:
-         op_name = "plus";
-         break;
-
-      case node::Kind::OP_MINUS:
-         op_name = "minus";
-         break;
-
-      case node::Kind::OP_MUL:
-         op_name = "mul";
-         break;
+      case node::Kind::OP_BIT_AND: op_name = "band"; break;
+      case node::Kind::OP_BIT_OR:  op_name = "bor"; break;
+      case node::Kind::OP_XOR:     op_name = "xor"; break;
+      case node::Kind::OP_LSHIFT:  op_name = "<<"; break;
+      case node::Kind::OP_RSHIFT:  op_name = ">>"; break;
+      case node::Kind::OP_PLUS:    op_name = "+"; break;
+      case node::Kind::OP_MINUS:   op_name = "-"; break;
+      case node::Kind::OP_MUL:     op_name = "*"; break;
 
       default:
          DEBUG_PRINTF("Unsupported arithmetic operator (%s)",
             node->KindName().c_str());
          assert (false);
-
    }
 
    if (op_name.size() != 0)
@@ -504,6 +500,11 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       case node::Kind::OP_MUL:
       case node::Kind::OP_PLUS:
       case node::Kind::OP_MINUS:
+      case node::Kind::OP_LSHIFT:
+      case node::Kind::OP_RSHIFT:
+      case node::Kind::OP_BIT_OR:
+      case node::Kind::OP_BIT_AND:
+      case node::Kind::OP_XOR:
          visitArithmeticOp(scope, node);
          break;
 

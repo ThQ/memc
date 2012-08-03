@@ -170,6 +170,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %left <node> T_EQ_EQ T_GT T_GT_EQ T_LT T_RARR T_LT_EQ T_BANQ_EQ
 %left <node> T_MINUS T_PLUS
 %left <node> T_STAR T_DIV
+%left <node> T_LT_LT T_GT_GT T_BIT_OR T_BIT_AND T_XOR
 %left <node> T_MUL_MUL T_MODULO
 %left <node> T_MINUS_MINUS T_PLUS_PLUS
 %left <node> T_DOT
@@ -759,6 +760,31 @@ math_operator:
    {
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::OP_MUL);
+   }
+   | T_GT_GT
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_RSHIFT);
+   }
+   | T_LT_LT
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_LSHIFT);
+   }
+   | T_BIT_OR
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_BIT_OR);
+   }
+   | T_BIT_AND
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_BIT_AND);
+   }
+   | T_XOR
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_XOR);
    }
 
 binary_operator:
