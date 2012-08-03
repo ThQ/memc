@@ -113,7 +113,7 @@
    {
       "type": "Error",
       "message": "Return type differs from function prototype",
-      "description": "Function $FuncName is expected to return $ExpectedRetTy, but got $RetTy",
+      "description": "Function `$FuncName' is expected to return `$ExpectedRetTy', but got `$RetTy'",
       "params":
       {
          "FuncName": "std::string",
@@ -163,6 +163,16 @@
       "params":
       {
          "TypeName": "std::string"
+      }
+   },
+   "InvalidCast":
+   {
+      "type": "Error",
+      "message": "Cannot cast from `$DestType' to `$SourceType'",
+      "params":
+      {
+         "SourceType": "st::Symbol*",
+         "DestType": "st::Symbol*"
       }
    }
 }

@@ -9,6 +9,7 @@
 #include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
+#include "mem/ast/node/CastOp.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/File.hpp"
@@ -84,6 +85,9 @@ class BlockTypesChecker : public TypeChecker
    visitBracketOp (st::Symbol* scope, node::BracketOp* n);
 
    void
+   visitCastOperator (st::Symbol* scope, node::CastOp* n);
+
+   void
    visitCompOp (st::Symbol* scope, node::BinaryOp* n);
 
    void
@@ -133,11 +137,6 @@ class BlockTypesChecker : public TypeChecker
 
    void
    visitString (st::Symbol* scope, node::String* n);
-
-#if 0
-   void
-   visitVarLiteralNumber (st::Type*, node::Text* literal_nb);
-#endif
 
    void
    visitVarAssign (st::Symbol* scope, node::VarAssign* var_assign_node);

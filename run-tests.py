@@ -1,13 +1,70 @@
 import os
+import os.path
 import subprocess
 
 kCWD=os.getcwd()
 kTEST_DIR = kCWD + "/tests"
-kMEMC = kCWD + "/mem_compile"
+kMEMC = "memc"
 kBIN = kCWD + "/build/memt"
 kMEM_SRC=os.getcwd() + "/build/test.mem"
 kREPORT_DIR = kCWD + "/build/test-reports"
 
+
+class TextOutsideOfSectionError (Exception):
+   pass
+
+class TestFile:
+   def __init__ (self):
+      self.sections = {}
+      self.content = ""
+      self.name = ""
+      self.path = ""
+      self.out_path = ""
+
+   def parse (self):
+      self.sections = {}
+      section_name = ""
+
+      for line in self.content.split("\n"):
+         if len(line) >= 4 and line[0:3] == "###":
+            section_name = line[4:].strip()
+            self.sections[section_name] = ""
+         else:
+            if section_name == "":
+               raise TextOutsideOfSectionError()
+            self.sections[section_name] += line + "\n"
+
+   def open (self, path):
+      self.content = ""
+      self.name = os.path.splitext(os.path.basename(path))[0]
+      self.out_path = kMEM_SRC
+      self.path = path
+      fin = open(path, "r")
+      if fin:
+         self.content = fin.read()
+         fin.close()
+         self.parse ()
+         self.write_test_source()
+
+   def run (self):
+      args = [kMEMC, "--log-level=debug", "--log-formatter=xml", "--output=" + kBIN, str(self.out_path)]
+      memc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+      data = memc.communicate()[0]
+      retcode = int(memc.returncode)
+
+      if retcode:
+         report = open(kREPORT_DIR + "/" + self.name, "w+")
+         if report:
+            report.write(data)
+            report.close()
+      return retcode
+
+   def write_test_source (self):
+      if "file" in self.sections:
+         f = open(self.out_path, "w+")
+         if f:
+            f.write(self.sections["file"])
+            f.close()
 
 class TestRunner:
    def __init__ (self):
@@ -47,19 +104,6 @@ class TestRunner:
          ret_code = self.run(path, name)
       return ret_code
 
-   def run (self, path, name):
-      args = [kMEMC, "--log-level=debug", "--log-formatter=xml", "--output=" + kBIN, str(path)]
-      memc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE)
-      data = memc.communicate()[0]
-      retcode = int(memc.returncode)
-
-      if retcode:
-         report = open(kREPORT_DIR + "/" + name, "w+")
-         if report:
-            report.write(data)
-            report.close()
-      return retcode
-
    def run_all (self):
       self.print_section("Running tests...")
       self._num_tests = len(os.listdir(kTEST_DIR))
@@ -69,16 +113,14 @@ class TestRunner:
       items.sort()
       line = ""
       for item in items:
+         test = TestFile()
+         test.open(os.path.join(kTEST_DIR + "/" + item))
+
          line = ""
-         test_file = kTEST_DIR + "/" + item
+         line += "[" + str(int(1.0*i/self._num_tests*100)).rjust(3) + "%]"
+         line += " Running " + test.name + " "
 
-         line += "("
-         line += str(i)
-         line += "/"
-         line += str(self._num_tests)
-         line += ") Running " + item
-
-         ret_code = self.run_test_file(test_file, item)
+         ret_code = test.run()
          if ret_code != 0:
             self._failed_tests.append(item)
             line += "." * (79 - len(line) - 7) + " FAILED"

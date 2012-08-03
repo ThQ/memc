@@ -1,3 +1,4 @@
+
 AUTOMAKE_OPTIONS = subdir-objects
 
 src_mem = \
@@ -14,6 +15,7 @@ src_mem_ast_node = \
  src/mem/ast/node/Block.cpp \
  src/mem/ast/node/BracketOp.cpp \
  src/mem/ast/node/Call.cpp \
+ src/mem/ast/node/CastOp.cpp \
  src/mem/ast/node/Class.cpp \
  src/mem/ast/node/Dot.cpp \
  src/mem/ast/node/Field.cpp \
@@ -85,6 +87,7 @@ src_mem_st = \
  src/mem/st/Class.cpp \
  src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \
+ src/mem/st/IntType.cpp \
  src/mem/st/Namespace.cpp \
  src/mem/st/Path.cpp \
  src/mem/st/PrimitiveType.cpp \

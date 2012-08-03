@@ -1,6 +1,7 @@
 #ifndef _MEM__MEM__ST__CORE_TYPES__HPP_
 #define _MEM__MEM__ST__CORE_TYPES__HPP_
 
+#include "mem/st/IntType.hpp"
 #include "mem/st/Type.hpp"
 
 
@@ -8,9 +9,13 @@ namespace mem { namespace st {
 
 class CoreTypes
 {
-   public: Type* _long;
+   public:
+   IntType* _long;
    Type* _bug_type;
-
+   IntType* _i64;
+   IntType* _i32;
+   IntType* _i16;
+   IntType* _i8;
    // -------------------------------------------------------------------------
    // PUBLIC PROPERTIES
    // -------------------------------------------------------------------------

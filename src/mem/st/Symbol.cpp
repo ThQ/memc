@@ -108,7 +108,7 @@ Symbol::gQualifiedName ()
          }
          name.insert(0, sym->Name());
       }
-      sym = sym->_parent;
+      sym = sym->Parent();
    }
 
    return name;
@@ -128,13 +128,29 @@ Symbol::isAnyType () const
    switch (_kind)
    {
       case st::CLASS:
-      case st::PRIMITIVE:
+      case st::INT_TYPE:
+      case st::PRIMITIVE_TYPE:
       case st::POINTER:
       case st::ARRAY:
          return true;
       default:
          return false;
    }
+   DEBUG_UNREACHABLE();
+}
+
+bool
+Symbol::isAnyPrimitiveType () const
+{
+   switch (_kind)
+   {
+      case st::INT_TYPE:
+      case st::PRIMITIVE_TYPE:
+         return true;
+      default:
+         return false;
+   }
+   DEBUG_UNREACHABLE();
 }
 
 bool

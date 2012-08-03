@@ -276,6 +276,46 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 }
 
 void
+BlockTypesChecker::visitCastOperator (st::Symbol* scope, node::CastOp* n)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+
+   visitExpr(scope, n->ValueNode());
+   visitExpr(scope, n->TypeNode());
+
+   if (n->TypeNode()->BoundSymbol() != NULL)
+   {
+      n->setExprType(n->TypeNode()->BoundSymbol());
+   }
+   else
+   {
+      n->setExprType(BugType());
+   }
+
+   if (ensureSizedExprType(n))
+   {
+      st::Type* src_ty = n->ValueNode()->ExprType();
+      st::Type* dest_ty = static_cast<st::Type*>(n->TypeNode()->BoundSymbol());
+
+      bool can_cast = false;
+
+      // TODO We should be able to cast from a class type to another
+      if (!src_ty->canCastTo(dest_ty))
+      {
+         log::InvalidCast* err = new log::InvalidCast();
+         err->sSourceType(src_ty);
+         err->sDestType(dest_ty);
+         err->format();
+         log(err);
+      }
+   }
+
+
+   DEBUG_ENSURE (n->hasExprType());
+}
+
+void
 BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
 {
    DEBUG_REQUIRE (scope != NULL);
@@ -488,6 +528,11 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       case node::Kind::OP_AND:
       case node::Kind::OP_OR:
          visitLogicalExpr(scope, node);
+         break;
+
+      case node::Kind::OP_CAST:
+         visitCastOperator (scope, util::castTo<node::CastOp*,
+            node::Kind::OP_CAST>(node));
          break;
 
       case node::Kind::AMPERSAND:
@@ -780,16 +825,16 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
    }
    else
    {
-      n->setExprType(BugType());
-
       log::ReturnTypeDiffersFromPrototype* err = new
          log::ReturnTypeDiffersFromPrototype();
       err->sFuncName(parent_func->gQualifiedName());
-      err->sRetTy(value_node->ExprType());
+      err->sRetTy(n->ValueNode()->ExprType());
       err->sExpectedRetTy(parent_func->ReturnType());
       //err->setPosition(value_node->copyPosition());
       err->format();
       log(err);
+
+      n->setExprType(BugType());
    }
 
    DEBUG_ENSURE (n->hasExprType());

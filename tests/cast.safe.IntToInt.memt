@@ -1,0 +1,5 @@
+### file
+main () -> int
+ i_src := 12 :int
+ i_dest := i_src :int
+ return 0 :int

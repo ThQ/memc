@@ -10,6 +10,7 @@
 #include "mem/st/Alias.hpp"
 #include "mem/st/ArrayType.hpp"
 #include "mem/st/Func.hpp"
+#include "mem/st/IntType.hpp"
 #include "mem/st/SymbolTable.hpp"
 #include "mem/st/PrimitiveType.hpp"
 #include "mem/st/PointerType.hpp"

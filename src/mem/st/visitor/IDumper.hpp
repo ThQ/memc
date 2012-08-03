@@ -9,6 +9,7 @@
 #include "mem/st/Class.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
+#include "mem/st/IntType.hpp"
 #include "mem/st/Namespace.hpp"
 #include "mem/st/PointerType.hpp"
 #include "mem/st/PrimitiveType.hpp"

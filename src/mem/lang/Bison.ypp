@@ -14,6 +14,7 @@
 #include "mem/ast/node/Block.hpp"
 #include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
+#include "mem/ast/node/CastOp.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/Field.hpp"
@@ -680,6 +681,12 @@ expr :
       $$->setPosition(@$.copy_range());
       $$->pushChild($2);
    }
+   | expr T_SEMICOLON type_name
+   {
+      $$ = new ast::node::CastOp();
+      $$->setPosition(@$.copy_range());
+      $$->pushChildren($1, $3);
+   }
    | expr T_LBRACKET expr T_RBRACKET
    {
       $$ = new ast::node::BracketOp();
@@ -803,52 +810,37 @@ call :
 literal :
    T_LITERAL_NUMBER
    {
-      char c_val = 0;
-      short s_val = 0;
-      int i_val = 0;
+      int i = 0;
+      char nb_format = number::parseIntNumber(*$1, i);
 
-      size_t nb_len = $1->size();
-      char int_ty = $1->data()[nb_len-1];
-      char sign_ty = $1->data()[nb_len-2];
-      if (sign_ty != 'u') nb_len--;
-
-      // FIXME No need to malloc explicitly here, change the get*FromString to
-      // accept std::string instead of char*
-      char* nb = static_cast<char*>(malloc(sizeof(char) * nb_len + 1));
-      $1->copy(nb, $1->size(), 0);
-      nb[nb_len] = '\0';
-
-      switch (int_ty)
+      switch (nb_format)
       {
          case 'c':
-            if (mem::number::getCharFromString(nb, c_val))
-            {
-               ast::node::Number* s_node = new ast::node::Number();
-               s_node->setChar(c_val);
-               s_node->setExprType(symbols._core_types.gCharTy());
-               $$ = s_node;
-            }
+         {
+            ast::node::Number* c_node = new ast::node::Number();
+            c_node->setChar(i);
+            c_node->setExprType(symbols._core_types.gCharTy());
+            $$ = c_node;
             break;
+         }
 
          case 's':
-            if (mem::number::getShortFromString(nb, s_val))
-            {
-               ast::node::Number* s_node = new ast::node::Number();
-               s_node->setShort(s_val);
-               s_node->setExprType(symbols._core_types.gShortTy());
-               $$ = s_node;
-            }
+         {
+            ast::node::Number* s_node = new ast::node::Number();
+            s_node->setShort(i);
+            s_node->setExprType(symbols._core_types.gShortTy());
+            $$ = s_node;
             break;
+         }
 
          case 'i':
-            if (mem::number::getIntFromString(nb, i_val))
-            {
-               ast::node::Number* i_node = new ast::node::Number();
-               i_node->setInt(i_val);
-               i_node->setExprType(symbols._core_types.gIntTy());
-               $$ = i_node;
-            }
+         {
+            ast::node::Number* i_node = new ast::node::Number();
+            i_node->setInt(i);
+            i_node->setExprType(symbols._core_types.gIntTy());
+            $$ = i_node;
             break;
+         }
 
          defaut:
             printf("Strange number in source");
@@ -866,8 +858,6 @@ literal :
          assert(false);
          //FIXME Couldnt fit this value into a numeric type, so should fail
       }
-      free(nb);
-      delete $1;
    }
    | T_STRING
    {

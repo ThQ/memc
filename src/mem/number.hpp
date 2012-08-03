@@ -10,18 +10,16 @@
 #include <string.h>
 
 
-namespace mem {
+namespace mem { namespace number {
 
 
-class number
-{
-   public: static int getIntStringLength (double nb);
-   public: static bool getCharFromString (const char* nb, char& c_out);
-   public: static bool getIntFromString (const char* nb, int& i_out);
-   public: static bool getShortFromString (const char* nb, short& s_out);
-};
+char parseIntNumber (std::string str, int& nb);
+int getIntStringLength (double nb);
+bool getCharFromString (const char* nb, int& c_out);
+bool getIntFromString (const char* nb, int& i_out);
+bool getShortFromString (const char* nb, int& s_out);
 
 
-}
+} }
 
 #endif

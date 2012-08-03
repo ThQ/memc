@@ -252,12 +252,52 @@ Codegen::_getVoidTy ()
    return llvm::Type::getVoidTy(_module->getContext());
 }
 
+bool
+Codegen::_mustBeLoaded (ast::node::Node* node)
+{
+   switch (node->Kind())
+   {
+      case ast::node::Kind::FINAL_ID:
+         if (!node->BoundSymbol()->isArgSymbol())
+         {
+            return true;
+         }
+         break;
+      case ast::node::Kind::DEREF:
+      case ast::node::Kind::BRACKET_OP:
+      case ast::node::Kind::DOT:
+         return true;
+   }
+   return false;
+
+}
 void
 Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
 {
-   if (mem_ty->isPrimitiveSymbol())
+   if (mem_ty->isAnyPrimitiveType())
    {
-      // TODO This is very ugly...
+      if (mem_ty->isIntType())
+      {
+         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(mem_ty->ByteSize());
+         assert(_classes[mem_ty->gQualifiedName()] != NULL);
+      }
+      // Internal type
+      else if (mem_ty->Name()[0] == '#' || mem_ty->Name()=="void")
+      {
+      }
+      else
+      {
+         DEBUG_PRINTF("Unsupported primitive type for type `%s'\n",
+            mem_ty->NameCstr());
+         assert(false);
+      }
+   }
+   else
+   {
+      _classes[mem_ty->gQualifiedName()] = llvm_ty;
+   }
+/*
+// TODO This is very ugly...
       if (mem_ty == _st->_core_types.gIntTy())
       {
          _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(int));
@@ -270,7 +310,7 @@ Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
       }
       else if (mem_ty == _st->_core_types.gCharTy())
       {
-         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(char));
+         _classes[mem_ty->Name()] = _getLlvmIntTy(sizeof(char));
       }
       else if (mem_ty == _st->_core_types.gShortTy())
       {
@@ -290,10 +330,7 @@ Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
          assert(false && "Primitive not defined as LLVM type.");
       }
    }
-   else
-   {
-      _classes[mem_ty->gQualifiedName()] = llvm_ty;
-   }
+   */
 }
 
 void
@@ -318,7 +355,7 @@ Codegen::gen (ast::node::Node* root)
       {
          cgClass(static_cast<st::Class*>(ty));
       }
-      else if (ty->isPrimitiveSymbol())
+      else if (ty->isAnyPrimitiveType())
       {
          cgPrimitiveType(static_cast<st::PrimitiveType*>(ty));
       }
@@ -504,6 +541,37 @@ Codegen::cgCallExpr (ast::node::Call* node)
    return call;
 }
 
+llvm::Value*
+Codegen::cgCastExpr (ast::node::CastOp* n)
+{
+   DEBUG_REQUIRE (n != NULL);
+
+   llvm::Value* src_val = cgExpr(n->ValueNode());
+   llvm::Type* dest_ty = NULL;
+   llvm::Value* val = NULL;
+
+   // Value is not a LLVM pointer so we cannot cast it directly
+   if (!_mustBeLoaded(n->ValueNode()))
+   {
+      // FIXME We could do better by using LLVM assembly constructs: zext, ...
+      dest_ty = _getLlvmTy(st::util::getPointerType(n->ExprType()));
+      src_val = new llvm::AllocaInst(_getLlvmTy(n->ValueNode()->ExprType()),
+         "", _cur_bb);
+      src_val = new llvm::BitCastInst(src_val, dest_ty, "", _cur_bb);
+      val = new llvm::LoadInst(src_val, "", _cur_bb);
+   }
+   else
+   {
+      dest_ty = _getLlvmTy(n->ExprType());
+      val = new llvm::BitCastInst(src_val, dest_ty, "", _cur_bb);
+   }
+
+
+   DEBUG_ENSURE (val != NULL);
+   return val;
+}
+
+
 void
 Codegen::cgClass (st::Class* cls_sym)
 {
@@ -636,6 +704,10 @@ Codegen::cgExpr (ast::node::Node* node)
          res = cgCompOp(static_cast<ast::node::BinaryOp*>(node));
          break;
 
+      case ast::node::Kind::OP_CAST:
+         res = cgCastExpr (static_cast<ast::node::CastOp*>(node));
+         break;
+
       case ast::node::Kind::IF:
          cgIfStatement(static_cast<ast::node::If*>(node));
          break;
@@ -703,20 +775,9 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
 
    if (val != NULL)
    {
-      switch (node->Kind())
-      {
-         case ast::node::Kind::FINAL_ID:
-            if (!node->BoundSymbol()->isArgSymbol())
-            {
-               must_load = true;
-            }
-            break;
-         case ast::node::Kind::DEREF:
-         case ast::node::Kind::BRACKET_OP:
-         case ast::node::Kind::DOT:
-            must_load = true;
-            break;
-      }
+      must_load = _mustBeLoaded(node);
+
+      
    }
 
    if (must_load)

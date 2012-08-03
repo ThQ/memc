@@ -1,5 +1,5 @@
-#ifndef _MEM__ST__PTR__HPP
-#define _MEM__ST__PTR__HPP
+#ifndef _MEM__ST__POINTER_TYPE__HPP
+#define _MEM__ST__POINTER_TYPE__HPP
 
 
 #include "mem/st/Type.hpp"

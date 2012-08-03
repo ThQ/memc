@@ -31,6 +31,10 @@ XmlDumper::visit (st::Symbol* sym)
          visitFunction(static_cast<st::Func*>(sym));
          break;
 
+      case INT_TYPE:
+         visitIntType(static_cast<st::IntType*>(sym));
+         break;
+
       case NAMESPACE:
          visitNamespace(static_cast<st::Namespace*>(sym));
          break;
@@ -39,7 +43,7 @@ XmlDumper::visit (st::Symbol* sym)
          visitPointerType(static_cast<st::PointerType*>(sym));
          break;
 
-      case PRIMITIVE:
+      case PRIMITIVE_TYPE:
          visitPrimitiveType(static_cast<st::PrimitiveType*>(sym));
          break;
 
@@ -122,6 +126,16 @@ XmlDumper::visitFunction (st::Func* func_sym)
    *_out << ">\n";
    visitChildren(func_sym);
    *_out << "</Function>";
+
+   return true;
+}
+
+bool
+XmlDumper::visitIntType (st::IntType* s)
+{
+   *_out << "<IntType name=\"" + s->Name() + "\"";
+   *_out << " byte-size=\"" << s->ByteSize() << "\"";
+   *_out << " />\n";
 
    return true;
 }

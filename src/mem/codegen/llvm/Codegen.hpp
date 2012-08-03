@@ -12,6 +12,7 @@
 #include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
+#include "mem/ast/node/CastOp.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/FinalId.hpp"
 #include "mem/ast/node/For.hpp"
@@ -77,6 +78,7 @@ class Codegen : public mem::codegen::ICodegen
    public:
 
    Codegen ();
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS
@@ -164,6 +166,9 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Type*
    _getVoidTy ();
 
+   bool
+   _mustBeLoaded (ast::node::Node* n);
+
    /**
     * Associates an ST type with an LLVM type.
     */
@@ -188,6 +193,9 @@ class Codegen : public mem::codegen::ICodegen
 
    llvm::Value*
    cgBracketOpExpr (ast::node::BracketOp* n);
+
+   llvm::Value*
+   cgCastExpr (ast::node::CastOp* n);
 
    llvm::Value*
    cgCallExpr (ast::node::Call* node);

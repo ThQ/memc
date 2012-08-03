@@ -43,6 +43,9 @@ class Type: public Symbol
    //--------------------------------------------------------------------------
    public:
 
+   virtual bool
+   canCastTo (Type* dest_ty) const {return false;}
+
    inline bool
    hasByteSize() {return _byte_size != -1;}
 

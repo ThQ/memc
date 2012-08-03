@@ -155,7 +155,6 @@ Tokenizer::_processTokenStart (char c)
       case ')': _pushToken(T_CP, ")"); break;
       case '[': _pushToken(T_LBRACKET, "["); break;
       case ']': _pushToken(T_RBRACKET, "]"); break;
-      case ':': _pushToken(T_SEMICOLON, ":"); break;
       case ',': _pushToken(T_COMMA, ","); break;
       case ';': _pushToken(T_COLON, ";"); break;
       case '.': _pushToken(T_DOT, "."); break;
@@ -163,6 +162,7 @@ Tokenizer::_processTokenStart (char c)
       case '&': _pushToken(T_AMPERSAND, "&"); break;
       case '*': _pushToken(T_STAR, "*"); break;
       case '+': _pushToken(T_PLUS, "*"); break;
+      case ':': _pushToken(T_SEMICOLON, ":"); break;
 
       case '!':
       {

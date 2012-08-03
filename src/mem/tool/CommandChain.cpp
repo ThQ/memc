@@ -29,7 +29,6 @@ CommandChain::run (Toolbox::ToolName alias, std::string args)
    }
    else
    {
-      printf("cmd not found\n");
       _last_status = -1;
    }
    return this;

@@ -41,6 +41,9 @@ class XmlDumper : public IDumper
    visitField (st::Field* s);
 
    virtual bool
+   visitIntType (st::IntType* s);
+
+   virtual bool
    visitNamespace (st::Namespace* var_sym);
 
    virtual bool

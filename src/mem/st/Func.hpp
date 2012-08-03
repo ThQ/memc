@@ -14,7 +14,7 @@ namespace mem { namespace st {
  * A symbol to represent functions.
  *
  * Several properties :
- * - Functions have parameters, each having the type Var
+ * - Functions have parameters, each having the type Arg
  * - Functions have a return type
  * - Functions can have children, first each parameter is added as a child,
  *   then each variable at the top of the function body is also listed.
@@ -48,13 +48,6 @@ class Func: public Type
    GETTER(ReturnType, Type*) {return _return_type;}
    SETTER(ReturnType, Type*) {_return_type = val;}
 
-   /*
-   public: inline Func* gOverloadedFunc() { return this->_overloaded_func;}
-   public: inline void sOverloadedFunc(Func* overloaded_func) {
-      assert(overloaded_func->is(st::FUNCTION));
-      this->_overloaded_func = overloaded_func;
-      }
-      */
 
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
@@ -78,13 +71,13 @@ class Func: public Type
    public:
 
    /**
-    * Adds a function parameter given its name and type.
+    * Add a function parameter given its name and type.
     */
    st::Arg*
    addParam (std::string name, st::Type* ty);
 
    /**
-    * Returns the Nth parameter.
+    * Return the Nth parameter.
     */
    st::Var*
    getParam (int i);

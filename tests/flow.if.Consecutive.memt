@@ -1,0 +1,7 @@
+### file
+main () -> int
+ if 1 == 2
+  a := 1
+ if 2 == 1
+  a := 2
+ return 0 :int

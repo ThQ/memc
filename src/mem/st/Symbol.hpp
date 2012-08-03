@@ -143,7 +143,10 @@ class Symbol
    isFuncSymbol() const {return is(st::FUNCTION);}
 
    inline bool
-   isPrimitiveSymbol() const {return is(st::PRIMITIVE);}
+   isIntType () const {return is(st::INT_TYPE);}
+
+   inline bool
+   isPrimitiveType() const {return is(st::PRIMITIVE_TYPE);}
 
    inline bool
    isPointerType() const {return is(st::POINTER);}
@@ -153,6 +156,9 @@ class Symbol
 
    inline bool
    isVarSymbol() const {return is(st::VAR);}
+
+   bool
+   isAnyPrimitiveType () const;
 
    bool
    isAnyType () const;

@@ -1,0 +1,4 @@
+### file
+main () -> int
+ c := 99 :char
+ return c :int

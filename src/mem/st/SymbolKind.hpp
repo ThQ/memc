@@ -11,7 +11,7 @@ typedef enum {
    FIELD=2,
    NAMESPACE=3,
    OBJECT=4,
-   PRIMITIVE=5,
+   PRIMITIVE_TYPE=5,
    FUNCTION=6,
    VAR=7,
    INSTANCE=8,
@@ -19,7 +19,8 @@ typedef enum {
    POINTER=10,
    ARG=11,
    ARRAY=12,
-   ALIAS=13
+   ALIAS=13,
+   INT_TYPE=14
 } SymbolKind;
 
 

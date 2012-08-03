@@ -1,5 +1,0 @@
-main () -> int
- while 1i < 2i
-  while 2i > 1i
-   a := 1i
- return 0i
