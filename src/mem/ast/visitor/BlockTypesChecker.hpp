@@ -124,6 +124,9 @@ class BlockTypesChecker : public TypeChecker
    visitFor (st::Symbol* scope, node::For* n);
 
    void
+   visitGroup (st::Symbol* scope, node::Node* n);
+
+   void
    visitIf (st::Symbol* scope, node::If* node);
 
    void

@@ -263,6 +263,10 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
             return true;
          }
          break;
+      case ast::node::Kind::GROUP:
+         printf("Must load group ?\n");
+         return _mustBeLoaded(node->getChild(0));
+
       case ast::node::Kind::DEREF:
       case ast::node::Kind::BRACKET_OP:
       case ast::node::Kind::DOT:
@@ -296,41 +300,6 @@ Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
    {
       _classes[mem_ty->gQualifiedName()] = llvm_ty;
    }
-/*
-// TODO This is very ugly...
-      if (mem_ty == _st->_core_types.gIntTy())
-      {
-         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(int));
-         assert(_classes[mem_ty->gQualifiedName()] != NULL);
-      }
-      else if (mem_ty == _st->_core_types.gBoolTy())
-      {
-         _classes[mem_ty->gQualifiedName()] = llvm::Type::getIntNTy(
-            _module->getContext(), 1);
-      }
-      else if (mem_ty == _st->_core_types.gCharTy())
-      {
-         _classes[mem_ty->Name()] = _getLlvmIntTy(sizeof(char));
-      }
-      else if (mem_ty == _st->_core_types.gShortTy())
-      {
-         _classes[mem_ty->gQualifiedName()] = _getLlvmIntTy(sizeof(short));
-      }
-      else if (mem_ty == _st->_core_types.gVoidTy())
-      {
-         _classes[mem_ty->gQualifiedName()] = _getVoidTy();
-      }
-      else if (mem_ty == _st->_core_types._bug_type)
-      {
-         // We don't want to codegen the bug type
-      }
-      else
-      {
-         printf("Primitive : %s\n", mem_ty->gQualifiedNameCstr());
-         assert(false && "Primitive not defined as LLVM type.");
-      }
-   }
-   */
 }
 
 void
@@ -546,10 +515,33 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
 {
    DEBUG_REQUIRE (n != NULL);
 
-   llvm::Value* src_val = cgExpr(n->ValueNode());
-   llvm::Type* dest_ty = NULL;
+   llvm::Value* src_val = cgExprAndLoad(n->ValueNode());
+   st::Type* src_ty = n->ValueNode()->ExprType();
+   st::Type* dest_ty = n->ExprType();
    llvm::Value* val = NULL;
 
+   if (src_ty != dest_ty)
+   {
+      if (src_ty->isIntType() && dest_ty->isIntType())
+      {
+         if (src_ty->ByteSize() != dest_ty->ByteSize())
+         {
+            val = new llvm::SExtInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+         }
+         else
+         {
+            // No casting required
+            val = src_val;
+         }
+      }
+      else
+      {
+         DEBUG_PRINTF("Unsupported safe type casting from `%s' to `%s'\n",
+            src_ty->NameCstr(), dest_ty->NameCstr());
+         assert(false);
+      }
+   }
+   /*
    // Value is not a LLVM pointer so we cannot cast it directly
    if (!_mustBeLoaded(n->ValueNode()))
    {
@@ -562,10 +554,10 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
    }
    else
    {
-      dest_ty = _getLlvmTy(n->ExprType());
-      val = new llvm::BitCastInst(src_val, dest_ty, "", _cur_bb);
    }
-
+   */
+   //dest_ty = _getLlvmTy(n->ExprType());
+   //val = new llvm::BitCastInst(src_val, dest_ty, "", _cur_bb);
 
    DEBUG_ENSURE (val != NULL);
    return val;
@@ -706,6 +698,10 @@ Codegen::cgExpr (ast::node::Node* node)
 
       case ast::node::Kind::OP_CAST:
          res = cgCastExpr (static_cast<ast::node::CastOp*>(node));
+         break;
+
+      case ast::node::Kind::GROUP:
+         res = cgExpr(node->getChild(0));
          break;
 
       case ast::node::Kind::IF:

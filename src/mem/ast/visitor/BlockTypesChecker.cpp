@@ -547,6 +547,10 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          visitDeref(scope, node);
          break;
 
+      case node::Kind::GROUP:
+         visitGroup(scope, node);
+         break;
+
       case node::Kind::IF:
          visitIf(scope, util::castTo<node::If*, node::Kind::IF>(node));
          break;
@@ -557,11 +561,6 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 
       case node::Kind::FOR:
          visitFor(scope, util::castTo<node::For*, node::Kind::FOR>(node));
-         break;
-
-      case node::Kind::GROUP:
-         visitExpr(scope, node->getChild(0));
-         node->setExprType(node->getChild(0)->ExprType());
          break;
 
       case node::Kind::EXPRESSION_LIST:
@@ -660,6 +659,19 @@ BlockTypesChecker::visitFor (st::Symbol* scope, node::For* n)
    visitExpr(scope, n->IterationNode());
 
    visitBlock(scope, n->BlockNode());
+}
+
+void
+BlockTypesChecker::visitGroup (st::Symbol* scope, node::Node* n)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (n->getChild(0) != NULL);
+
+   visitExpr(scope, n->getChild(0));
+   n->setExprType(n->getChild(0)->ExprType());
+
+   DEBUG_ENSURE(n->hasExprType());
 }
 
 void
