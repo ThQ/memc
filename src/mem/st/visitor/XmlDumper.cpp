@@ -15,6 +15,10 @@ XmlDumper::visit (st::Symbol* sym)
 {
    switch (sym->Kind())
    {
+      case ARG:
+         visitArgument(static_cast<st::Arg*>(sym));
+         break;
+
       case ARRAY:
          visitArrayType(static_cast<st::ArrayType*>(sym));
          break;
@@ -69,9 +73,22 @@ XmlDumper::visitChildren (st::Symbol* sym)
 }
 
 bool
+XmlDumper::visitArgument (st::Arg* s)
+{
+   *_out << "<Argument name=\"" + s->Name() + "\"";
+   if (s->Type() != NULL)
+   {
+      *_out << " type=\"" + s->Type()->gQualifiedName() + "\"";
+   }
+   *_out << " />\n";
+
+   return true;
+}
+
+bool
 XmlDumper::visitArrayType (st::ArrayType* s)
 {
-   *_out << "<Array name=\"" + s->Name() + "\"";
+   *_out << "<ArrayType name=\"" + s->Name() + "\"";
    if (s->ItemType() != NULL)
    {
       *_out << " base-type=\"" + s->ItemType()->gQualifiedName() + "\"";
@@ -89,7 +106,7 @@ XmlDumper::visitArrayType (st::ArrayType* s)
 bool
 XmlDumper::visitClass (st::Class* cls_sym)
 {
-   *_out << "<Class name=\"" + cls_sym->Name() + "\"";
+   *_out << "<ClassType name=\"" + cls_sym->Name() + "\"";
    if (cls_sym->ParentType() != NULL)
    {
       *_out << " parent_type=\"" + cls_sym->ParentType()->gQualifiedName() + "\"";
@@ -97,7 +114,7 @@ XmlDumper::visitClass (st::Class* cls_sym)
    *_out << " byte-size=\"" << cls_sym->ByteSize() << "\"";
    *_out << ">\n";
    this->visitChildren(cls_sym);
-   *_out << "</Class>";
+   *_out << "</ClassType>";
 
    return true;
 }
