@@ -244,10 +244,9 @@ Tokenizer::_processTokenStart (char c)
       }
       case 10: // NL
       {
-         // We emit the token now but next time we know we're looking for
-         // indent/dedent
-         _pushToken(T_NEWLINE, "\n");
-         _state = T_INDENT;
+         _pushToken(T_NEWLINE);
+         _state = T_NEWLINE;
+         _cur_tok = T_NEWLINE;
          break;
       }
       case '"':
@@ -310,8 +309,8 @@ Tokenizer::getNextToken ()
    t = _token_queue.front();
    _token_queue.pop();
 
-   //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-     //t.Kind(), t.Value().c_str());
+   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
+     t.Kind(), t.Value().c_str());
 
    return t;
 }
@@ -554,6 +553,15 @@ Tokenizer::_readNextToken ()
             {
                _pushToken(T_STRING);
                return;
+            }
+            break;
+         }
+         case T_NEWLINE:
+         {
+            if (c != '\n')
+            {
+               _state = T_INDENT;
+               _backtrack();
             }
             break;
          }
