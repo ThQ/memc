@@ -90,6 +90,9 @@ class Tokenizer
    _isAlphaNumeric (char c) {return _isAlpha(c) || _isNumeric(c);}
 
    inline bool
+   _isIdFirstChar (char c) {return _isAlpha(c) || c == '_';}
+
+   inline bool
    _isFileConsumed () {return _in->eof() && (_bufferCursor == _bufferSize);}
 
    static inline bool

@@ -407,6 +407,16 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
    {
       if (base_object->BoundSymbol()->isFuncSymbol())
       {
+         if (base_object->isDotNode())
+         {
+            // We are calling an instance object
+            if (static_cast<node::Dot*>(base_object)->LeftNode()->BoundSymbol()->isVarSymbol())
+            {
+
+               call_node->setCaller(static_cast<node::Dot*>(base_object)->LeftNode()->BoundSymbol());
+            }
+         }
+
          st::Func* base_func = static_cast<st::Func*>(
             base_object->BoundSymbol());
          call_node->setExprType(base_func->ReturnType());

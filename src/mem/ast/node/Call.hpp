@@ -27,6 +27,10 @@ class Call : public Node
    //--------------------------------------------------------------------------
    public:
 
+   // Caller
+   GETTER(Caller, st::Symbol*) {return _caller;}
+   SETTER(Caller, st::Symbol*) {_caller = val;}
+
    // CallerNode
    GETTER(CallerNode, Node*) {return getChild(0);}
 
@@ -44,6 +48,14 @@ class Call : public Node
 
    virtual void
    isValid(NodeValidator* vld);
+
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   st::Symbol* _caller;
 };
 
 

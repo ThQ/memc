@@ -258,7 +258,7 @@ Tokenizer::_processTokenStart (char c)
       }
       default:
       {
-         if (Tokenizer::_isAlpha(c))
+         if (Tokenizer::_isIdFirstChar(c))
          {
             _state = T_ID;
             _cur_tok = T_ID;

@@ -194,11 +194,8 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
       if (ty == NULL)
       {
          DEBUG_PRINTF("Type <%s> not found.\n", mem_ty->NameCstr());
-         assert(ty != NULL);
       }
    }
-
-   assert(ty != NULL);
 
    return ty;
 }
@@ -482,6 +479,13 @@ Codegen::cgCallExpr (ast::node::Call* node)
       node->CallerNode()->BoundSymbol());
    std::vector<llvm::Value*> params;
 
+   // Instance call
+   if (node->Caller() != NULL)
+   {
+      llvm::Value* caller = cgExprAndLoad(node->getChild(0)->getChild(0));
+      params.push_back(caller);
+   }
+
    if (node->ParamsNode() != NULL)
    {
       ast::node::Node* cur_param_node = NULL;
@@ -492,7 +496,7 @@ Codegen::cgCallExpr (ast::node::Call* node)
          cur_param_node = node->ParamsNode()->getChild(i);
          cur_param = func_sym->getParam(i);
 
-         param_value = cgExpr(cur_param_node);
+         param_value = cgExprAndLoad(cur_param_node);
             //static_cast<st::Type*>(cur_param_node->ExprType()),
             //cur_param->Type());
 
@@ -507,20 +511,12 @@ Codegen::cgCallExpr (ast::node::Call* node)
          DEBUG_PRINTF("Cannot find function with name `%s'\n",
             _getCodegenFuncName(func_sym).c_str());
       }
-      assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
    }
+   assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
 
    llvm::CallInst* call = NULL;
-   if (params.size() > 0)
-   {
-      call = llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
-         params, "", _cur_bb);
-   }
-   else
-   {
-      call = llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
-         "", _cur_bb);
-   }
+   call = llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
+      params, "", _cur_bb);
 
    if (call != NULL && func_sym->ReturnType()->Name() == "void")
    {
@@ -658,17 +654,29 @@ Codegen::cgDotExpr (ast::node::Dot* node)
    DEBUG_REQUIRE (node != NULL);
    DEBUG_REQUIRE (node->isDotNode());
 
-   llvm::Value* left_node = cgExpr(node->LeftNode());
+   llvm::Value* left_node = NULL;
+   // We can't rely on cgExpr here because it would load the left node and we
+   // wouldn't be able to have a pointer to use GetElementPtr on.
+   if (node->LeftNode()->isDotNode())
+   {
+      left_node = cgDotExpr(static_cast<ast::node::Dot*>(node->LeftNode()));
+   }
+   else
+   {
+      left_node = cgFinalIdExpr(static_cast<ast::node::Text*>(node->LeftNode()));
+   }
    std::vector<llvm::Value*> idx;
 
    if (node->LeftNode()->ExprType()->isPointerType())
    {
       st::PointerType* ptr_ty = static_cast<st::PointerType*>(node->LeftNode()->ExprType());
+      /*
       for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
       {
          left_node = new llvm::LoadInst(left_node, "", _cur_bb);
          assert(left_node != NULL);
       }
+      */
       for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
       {
          idx.push_back(_createInt32Constant(0));
@@ -1339,8 +1347,16 @@ Codegen::codegenFunctionType (st::Func* func_ty)
       }
    }
 
-   llvm::FunctionType* func_lty = llvm::FunctionType::get(
-      _getLlvmTy(func_ty->ReturnType()), params, false);
+   llvm::FunctionType* func_lty = NULL;
+   st::Type* return_ty = func_ty->ReturnType();
+   if (return_ty->gQualifiedName() != "void")
+   {
+      func_lty = llvm::FunctionType::get(_getLlvmTy(return_ty), params, false);
+   }
+   else
+   {
+      func_lty = llvm::FunctionType::get(_getVoidTy(), params, false);
+   }
 
    llvm::GlobalValue::LinkageTypes func_link;
    if (func_ty->Metadata()->has("external"))
