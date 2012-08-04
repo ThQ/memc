@@ -18,6 +18,9 @@ namespace mem { namespace st {
  * - Functions have a return type
  * - Functions can have children, first each parameter is added as a child,
  *   then each variable at the top of the function body is also listed.
+ *
+ * Functions are nodes of a linked list which lists all functions. This is
+ * useful when code generating.
  */
 class Func: public Type
 {
@@ -26,10 +29,12 @@ class Func: public Type
    // -------------------------------------------------------------------------
    public:
 
+   bool _has_body;
    bool _is_entry_point;
    std::vector<Arg*> _params;
    //Func* _overloaded_func;
    Type* _return_type;
+   Func* _next_function;
 
 
    // -------------------------------------------------------------------------
@@ -37,9 +42,17 @@ class Func: public Type
    // -------------------------------------------------------------------------
    public:
 
+   // HasBody
+   GETTER(HasBody, bool) {return _has_body;}
+   SETTER(HasBody, bool) {_has_body = val;}
+
    // IsEntryPoint
    GETTER(IsEntryPoint, bool) {return _is_entry_point;}
    SETTER(IsEntryPoint, bool) {_is_entry_point = val;}
+
+   // NextFunction
+   GETTER(NextFunction, Func*) {return _next_function;}
+   SETTER(NextFunction, Func*) {_next_function = val;}
 
    // ParamCount
    GETTER(ParamCount, size_t) {return _params.size();}

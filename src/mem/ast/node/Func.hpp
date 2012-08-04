@@ -33,6 +33,8 @@ class Func: public Text
    Node*
    ReturnTypeNode ();
 
+   GETTER(NextFunction, Func*) {return _next_function;}
+   SETTER(NextFunction, Func*) {_next_function = val;}
 
    //--------------------------------------------------------------------------
    // FUNCTIONS
@@ -41,6 +43,12 @@ class Func: public Text
 
    bool
    isVirtual ();
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+   Func* _next_function;
 };
 
 

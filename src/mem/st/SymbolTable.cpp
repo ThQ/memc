@@ -6,7 +6,8 @@ namespace mem { namespace st {
 
 SymbolTable::SymbolTable ()
 {
-   this->_root = new Namespace();
+   _root = new Namespace();
+   _func_ll_head = NULL;
 }
 
 SymbolTable::~SymbolTable ()
@@ -201,6 +202,7 @@ SymbolTable::get_symbol (std::string name)
    return cur_symbol;
 }
 
+/*
 Func*
 SymbolTable::register_function (std::string func_full_name)
 {
@@ -221,6 +223,7 @@ SymbolTable::register_function (std::string func_full_name)
 
    return func;
 }
+*/
 
 bool
 SymbolTable::register_symbol (std::string path, Symbol* sym)
@@ -234,5 +237,19 @@ SymbolTable::register_symbol (std::string path, Symbol* sym)
    return false;
 }
 
+void
+SymbolTable::registerFunction (Func* func)
+{
+   if (_func_ll_head == NULL)
+   {
+      _func_ll_head = func;
+      _func_ll_tail = func;
+   }
+   else
+   {
+      _func_ll_tail->setNextFunction(func);
+      _func_ll_tail = func;
+   }
+}
 
 } }

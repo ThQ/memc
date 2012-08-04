@@ -538,6 +538,7 @@ member_declaration:
 
       $$ = (ast::node::Node*)field;
    }
+   | function_declaration
 
 type_name:
    qualified_id

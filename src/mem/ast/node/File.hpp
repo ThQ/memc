@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/Node.hpp"
 
 
@@ -19,7 +20,8 @@ class File : public Node
    std::string _id;
    std::string _include_path;
    std::string _path;
-
+   Func* _function_ll_head;
+   Func* _function_ll_tail;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -36,6 +38,14 @@ class File : public Node
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
+
+   // FunctionLinkedListHead
+   GETTER(FunctionLinkedListHead, node::Func*) {return _function_ll_head;}
+   SETTER(FunctionLinkedListHead, node::Func*) {_function_ll_head = val;}
+
+   // FunctionLinkedListTail
+   GETTER(FunctionLinkedListTail, node::Func*) {return _function_ll_tail;}
+   SETTER(FunctionLinkedListTail, node::Func*) {_function_ll_tail = val;}
 
    // Id
    GETTER(Id, std::string) {return _id;}
@@ -55,6 +65,9 @@ class File : public Node
 
    virtual void
    isValid(NodeValidator* v);
+
+   void
+   registerFunction(node::Func* func_n);
 };
 
 

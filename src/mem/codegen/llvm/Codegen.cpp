@@ -264,7 +264,6 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
          }
          break;
       case ast::node::Kind::GROUP:
-         printf("Must load group ?\n");
          return _mustBeLoaded(node->getChild(0));
 
       case ast::node::Kind::DEREF:
@@ -330,19 +329,9 @@ Codegen::gen (ast::node::Node* root)
       }
    }
 
-   cgMemoryFunctions();
-
-   // ... then codegen functions by traversing files
-   for (size_t i = 0; i < root->ChildCount(); ++i)
-   {
-      cgFile(static_cast<ast::node::File*>(root->getChild(i)), true);
-   }
-
-   // ... then codegen functions by traversing files
-   for (size_t i = 0; i < root->ChildCount(); ++i)
-   {
-      cgFile(static_cast<ast::node::File*>(root->getChild(i)), false);
-   }
+   codegenMemoryFunctions();
+   codegenFunctionDeclarations();
+   codegenFunctionBodies(static_cast<ast::node::Root*>(root));
 }
 
 llvm::Value*
@@ -511,7 +500,15 @@ Codegen::cgCallExpr (ast::node::Call* node)
       }
    }
 
-   assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
+   IF_DEBUG
+   {
+      if (_functions[_getCodegenFuncName(func_sym)] == NULL)
+      {
+         DEBUG_PRINTF("Cannot find function with name `%s'\n",
+            _getCodegenFuncName(func_sym).c_str());
+      }
+      assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
+   }
 
    llvm::CallInst* call = NULL;
    if (params.size() > 0)
@@ -802,8 +799,6 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
    if (val != NULL)
    {
       must_load = _mustBeLoaded(node);
-
-      
    }
 
    if (must_load)
@@ -815,32 +810,17 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
 }
 
 void
-Codegen::cgFile (ast::node::File* file_node, bool cg_func_def)
+Codegen::cgFile (ast::node::File* file_node)
 {
    ast::node::Node* node = NULL;
 
-   if (cg_func_def)
+   // Codegen function bodies
+   for (size_t i = 0 ; i < file_node->ChildCount(); ++i)
    {
-      // Codegen function definitions
-      for (size_t i = 0 ; i < file_node->ChildCount(); ++i)
+      node = file_node->getChild(i);
+      if (node->isFuncNode())
       {
-         node = file_node->getChild(i);
-         if (node->isFuncNode())
-         {
-            cgFunctionDef(static_cast<ast::node::Func*>(node));
-         }
-      }
-   }
-   else
-   {
-      // Codegen function bodies
-      for (size_t i = 0 ; i < file_node->ChildCount(); ++i)
-      {
-         node = file_node->getChild(i);
-         if (node->isFuncNode())
-         {
-            cgFunctionBody(static_cast<ast::node::Func*>(node));
-         }
+         cgFunctionBody(static_cast<ast::node::Func*>(node));
       }
    }
 }
@@ -1069,7 +1049,7 @@ Codegen::cgIfStatement (ast::node::If* node)
 }
 
 void
-Codegen::cgMemoryFunctions ()
+Codegen::codegenMemoryFunctions ()
 {
    // MALLOC
    std::vector<llvm::Type*> malloc_tys;
@@ -1301,6 +1281,93 @@ Codegen::cgWhileStatement (ast::node::While* n)
 
    _cur_bb = while_after;
    _exit_block = origin_exit_block;
+}
+
+void
+Codegen::codegenFunctionDeclarations ()
+{
+   st::Func* func = _st->FunctionLinkedListHead();
+   while (func != NULL)
+   {
+      codegenFunctionType (func);
+      func = func->NextFunction();
+   }
+}
+
+void
+Codegen::codegenFunctionBodies (ast::node::Root* root_n)
+{
+   ast::node::File* file_node = NULL;
+   ast::node::Func* func_node = NULL;
+   for (size_t i = 0; i < root_n->ChildCount(); ++i)
+   {
+      file_node = static_cast<ast::node::File*>(root_n->getChild(i));
+      func_node = file_node->FunctionLinkedListHead();
+      while (func_node != NULL)
+      {
+         cgFunctionBody(func_node);
+         func_node = func_node->NextFunction();
+      }
+   }
+}
+
+void
+Codegen::codegenFunctionType (st::Func* func_ty)
+{
+   std::vector<llvm::Type*> func_ty_args;
+   std::string func_name;
+
+   if (func_ty->IsEntryPoint())
+   {
+      func_name = "main";
+   }
+   else
+   {
+      func_name = _getCodegenFuncName(func_ty);
+   }
+
+   // External function
+   std::vector<llvm::Type*> params;
+   if (func_ty->Metadata()->has("external"))
+   {
+      st::Var* func_param = NULL;
+      for (size_t i = 0; i < func_ty->ParamCount(); ++i)
+      {
+         func_param = func_ty->_params[i];
+         params.push_back(_getLlvmTy(func_param->Type()));
+         assert (params[i] != NULL);
+      }
+   }
+
+   llvm::FunctionType* func_lty = llvm::FunctionType::get(
+      _getLlvmTy(func_ty->ReturnType()), params, false);
+
+   llvm::GlobalValue::LinkageTypes func_link;
+   if (func_ty->Metadata()->has("external"))
+   {
+      func_link = llvm::GlobalValue::ExternalLinkage;
+   }
+   else
+   {
+      func_link = llvm::GlobalValue::ExternalLinkage;
+   }
+
+   llvm::Function* func = llvm::Function::Create(func_lty,
+      func_link,
+      func_name,
+      _module);
+   func->setCallingConv(llvm::CallingConv::C);
+   _cur_func = func;
+
+   // Don't codegen a body for a virtual/external function
+   if (func_ty->HasBody())
+   {
+      llvm::BasicBlock* block = llvm::BasicBlock::Create(
+         llvm::getGlobalContext(), "entry", func);
+   }
+
+   _functions[_getCodegenFuncName(func_ty)] = func;
+
 }
 
 std::string

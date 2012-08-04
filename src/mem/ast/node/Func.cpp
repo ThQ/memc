@@ -7,6 +7,7 @@ namespace mem { namespace ast { namespace node {
 Func::Func()
 {
    _type = Kind::FUNCTION;
+   _next_function = NULL;
 }
 
 Block*

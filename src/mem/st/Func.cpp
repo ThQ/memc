@@ -6,9 +6,10 @@ namespace mem { namespace st {
 Func::Func ()
 {
    _kind = FUNCTION;
+   _has_body = false;
    _is_entry_point = false;
-   //_overloaded_func = NULL;
    _return_type = NULL;
+   _next_function = NULL;
 }
 
 Func::~Func ()

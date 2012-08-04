@@ -50,19 +50,8 @@ class TopTypesChecker : public BlockTypesChecker
    virtual bool
    visit (node::Node* node);
 
-#if 0
-   void
-   visitArray (st::Symbol* scope, node::Array* n);
-
    /**
-    * Visit a DOT expression (MEM_NODE_DOT).
-    */
-   void
-   visitDot (st::Symbol* scope, node::Node* dot);
-
-#endif
-   /**
-    * Visits a class field declaration (MEM_NODE_FIELD).
+    * Visit a class field declaration (MEM_NODE_FIELD).
     *
     * Checks whether the type symbol is really one and binds it to the AST.
     *
@@ -73,30 +62,22 @@ class TopTypesChecker : public BlockTypesChecker
    visitField (st::Symbol* scope, node::Field* field);
 
    /**
-    * Visits a function declaration (MEM_NODE_FUNCTION_DECLARATION)
+    * Visit a function declaration (MEM_NODE_FUNCTION_DECLARATION)
     */
    virtual void
    visitFuncDecl (st::Symbol* scope, node::Func* func_decl);
 
    /**
-    * Visits parameters in function declaration.
+    * Visit parameters in function declaration.
     */
    virtual void
    visitFuncParams (st::Symbol* scope, node::Node* params_node, st::Func* func);
 
    /**
-    * Visits return type in function declaration.
+    * Visit return type in function declaration.
     */
    virtual void
    visitFuncReturnType (node::Func* func_node, st::Func* func_sym);
-
-#if 0
-   virtual void
-   visitQualifiedName (st::Symbol* scope, node::Node* name_node);
-
-   void
-   visitTypeName (st::Symbol* scope, node::Node* node);
-#endif
 };
 
 

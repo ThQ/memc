@@ -210,7 +210,7 @@ class Codegen : public mem::codegen::ICodegen
    cgDotExpr (ast::node::Dot* node);
 
    void
-   cgFile (ast::node::File* file_node, bool cg_func_def);
+   cgFile (ast::node::File* file_node);
 
    llvm::Value*
    cgFinalIdExpr (ast::node::Text* node);
@@ -248,7 +248,7 @@ class Codegen : public mem::codegen::ICodegen
    cgIfStatement (ast::node::If* node);
 
    void
-   cgMemoryFunctions ();
+   codegenMemoryFunctions ();
 
    llvm::Value*
    cgNewExpr (ast::node::New* node);
@@ -276,6 +276,15 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    cgWhileStatement (ast::node::While* n);
+
+   void
+   codegenFunctionDeclarations ();
+
+   void
+   codegenFunctionType (st::Func* func_ty);
+
+   void
+   codegenFunctionBodies (ast::node::Root* root_n);
 
    virtual void
    gen (ast::node::Node* root);

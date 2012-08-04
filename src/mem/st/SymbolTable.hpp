@@ -27,6 +27,10 @@ class SymbolTable
 
    public: st::CoreTypes _core_types;
    public: inline st::CoreTypes& gCoreTypes(){return _core_types;}
+   public:
+
+   Func* _func_ll_head;
+   Func* _func_ll_tail;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -43,20 +47,41 @@ class SymbolTable
     */
    ~SymbolTable ();
 
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   // FunctionLinkedListHead
+   GETTER(FunctionLinkedListHead, Func*) {return _func_ll_head;}
+   SETTER(FunctionLinkedListHead, Func*) {_func_ll_head = val;}
+
+   // FunctionLinkedListTail
+   GETTER(FunctionLinkedListTail, Func*) {return _func_ll_tail;}
+   SETTER(FunctionLinkedListTail, Func*) {_func_ll_tail = val;}
+
+
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
+   public:
 
-   public: Class* create_class (std::string full_class_name);
-   public: bool create_type (Type* anonymous_type, std::string full_type_name);
-   public: Namespace* create_namespace (std::string name);
-   //public: void dump ();
-   public: Namespace* get_namespace (std::string ns_name);
-   public: Symbol* get_symbol (std::string name);
-   public: bool has_class (std::string class_name);
-   public: bool has_namespace (std::string ns_name);
-   public: Func* register_function (std::string func_full_name);
-   public: bool register_symbol (std::string path, Symbol* sym);
+   Class* create_class (std::string full_class_name);
+   bool create_type (Type* anonymous_type, std::string full_type_name);
+   Namespace* create_namespace (std::string name);
+   Namespace* get_namespace (std::string ns_name);
+   Symbol* get_symbol (std::string name);
+   bool has_class (std::string class_name);
+   bool has_namespace (std::string ns_name);
+   //Func* register_function (std::string func_full_name);
+   bool register_symbol (std::string path, Symbol* sym);
+
+   /**
+    * Add a function to the function linked list.
+    */
+   void
+   registerFunction (Func* func);
 };
 
 

@@ -7,6 +7,8 @@ namespace mem { namespace ast { namespace node {
 File::File ()
 {
    _type = Kind::FILE;
+   _function_ll_head = NULL;
+   _function_ll_tail = NULL;
 }
 
 void
@@ -24,5 +26,19 @@ File::isValid (NodeValidator* v)
    }
 }
 
+void
+File::registerFunction (node::Func* func)
+{
+   if (_function_ll_head == NULL)
+   {
+      _function_ll_head = func;
+      _function_ll_tail = func;
+   }
+   else
+   {
+      _function_ll_tail->setNextFunction(func);
+      _function_ll_tail = func;
+   }
+}
 
 } } }
