@@ -437,12 +437,18 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
       }
       else
       {
+         call_node->setExprType(BugType());
+
          log::CallNonFunction* err = new log::CallNonFunction();
          err->sObjectName(base_object->BoundSymbol()->Name());
          err->sObjectTypeName(base_object->BoundSymbol()->gQualifiedName());
          err->format();
          log(err);
       }
+   }
+   else
+   {
+      call_node->setBoundSymbol(BugType());
    }
 
    DEBUG_ENSURE(call_node->hasExprType());
@@ -656,6 +662,7 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
    else
    {
       id_node->setBoundSymbol(BugType());
+      id_node->setExprType(BugType());
 
       log::SymbolNotFound* err = new log::SymbolNotFound();
       err->sSymbolName(id_node->gValue());

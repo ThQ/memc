@@ -309,8 +309,8 @@ Tokenizer::getNextToken ()
    t = _token_queue.front();
    _token_queue.pop();
 
-   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-     t.Kind(), t.Value().c_str());
+   //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
+     //t.Kind(), t.Value().c_str());
 
    return t;
 }
