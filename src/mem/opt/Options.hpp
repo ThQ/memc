@@ -4,6 +4,7 @@
 
 #include <map>
 #include <stack>
+#include <ostream>
 #include <string>
 #include <string.h>
 #include <vector>
@@ -12,15 +13,18 @@
 
 namespace mem { namespace opt {
 
+typedef std::map<std::string, _Option*> OptionMap;
 
 class Options
 {
+   public:
+
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
    public:
 
-   std::map<std::string, _Option*> _options;
+   OptionMap _options;
    std::vector<std::string> _params;
 
 
@@ -62,6 +66,9 @@ class Options
 
    void
    addStrOpt (std::string long_name, std::string short_name, std::string desc);
+
+   void
+   dump (std::ostream& out);
 
    inline std::string
    getArgument (size_t i) {return _params[i];}

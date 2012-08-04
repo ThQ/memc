@@ -250,6 +250,9 @@ Compiler::printUsage (std::ostream& out)
    out << PACKAGE_NAME;
    out << " [OPTIONS] <input>\n\n";
    out << "OPTIONS:\n";
+
+   _opts->dump(out);
+
    /*
    std::map<std::string, opt::CliOption*>::iterator i;
    for (i = _opts->_cli_options.begin(); i != _opts->_cli_options.end(); ++i)

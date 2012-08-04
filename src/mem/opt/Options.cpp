@@ -5,8 +5,7 @@ namespace mem { namespace opt {
 
 Options::~Options ()
 {
-   for (std::map<std::string, _Option*>::iterator i= _options.begin();
-      i!= _options.end(); ++i)
+   for (OptionMap::iterator i= _options.begin(); i != _options.end(); ++i)
    {
       delete i->second;
       // This is usefull because options are added twice if they have a long
@@ -23,6 +22,31 @@ Options::_getOptObject (std::string opt_name)
       return _options[opt_name];
    }
    return NULL;
+}
+
+void
+Options::dump (std::ostream& out)
+{
+   for (OptionMap::iterator i = _options.begin(); i != _options.end(); ++i)
+   {
+      if (i->second->ShortName().size() != 0)
+      {
+         out << i->second->ShortName() << "\n";
+      }
+      out << " " << i->second->LongName();
+      switch (i->second->Type())
+      {
+         case _Option::STRING:
+            out << "=<string>\n";
+            break;
+         default:
+            out << "\n";
+      }
+      if (i->second->Description().size() != 0)
+      {
+         out << "   " << i->second->Description() << "\n";
+      }
+   }
 }
 
 bool
