@@ -173,7 +173,8 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %left <node> T_LT_LT T_GT_GT T_BIT_OR T_BIT_AND T_XOR
 %left <node> T_MUL_MUL T_MODULO
 %left <node> T_MINUS_MINUS T_PLUS_PLUS
-%left <node> T_DOT
+%left <node> T_OP T_CP T_LBRACKET T_RBRACKET
+%left <node> T_DOT T_AROBASE
 
 %type <node> argument
 %type <node> argument_list
@@ -295,7 +296,7 @@ class_declaration:
    }
 
 class_members:
-   T_NEWLINE T_INDENT members_declarations T_DEDENT
+   T_NEWLINE T_INDENT members_declarations
    {
       $$ = new ast::node::Block();
       $$->setPosition(new fs::position::Range(@3, @3));
@@ -525,7 +526,10 @@ members_declarations:
    }
    | members_declarations member_declaration
    {
-      $$->pushChild($2);
+      if ($2 != NULL)
+      {
+         $$->pushChild($2);
+      }
    }
 
 member_declaration:

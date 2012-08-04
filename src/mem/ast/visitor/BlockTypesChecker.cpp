@@ -254,7 +254,14 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
       else if (value_ty->isPointerType())
       {
          st::Type* ptr_parent = static_cast<st::PointerType*>(value_ty)->PointedType();
-         n->setExprType(ptr_parent);
+         if (ptr_parent->isArrayType())
+         {
+            n->setExprType(static_cast<st::ArrayType*>(ptr_parent)->ItemType());
+         }
+         else
+         {
+            n->setExprType(ptr_parent);
+         }
       }
       else
       {
@@ -420,10 +427,13 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
          st::Func* base_func = static_cast<st::Func*>(
             base_object->BoundSymbol());
          call_node->setExprType(base_func->ReturnType());
+         // FIXME Parameter types are NOT checked
+         /*
          if (call_node->hasParamsNode())
          {
             checkCallParameters(base_func, call_node->ParamsNode());
          }
+         */
       }
       else
       {
@@ -869,7 +879,8 @@ BlockTypesChecker::visitString (st::Symbol* scope, node::String* n)
 {
    DEBUG_REQUIRE(n != NULL);
 
-   n->setExprType(st::util::lookupPointer(scope, "char", 1));
+   st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(_symbols->_core_types.gCharTy());
+   n->setExprType(st::util::getPointerType(unsized_arr_ty));
 
    DEBUG_ENSURE (n->hasExprType());
 }

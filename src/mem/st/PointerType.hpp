@@ -80,6 +80,9 @@ class PointerType : public Type
 
    Type*
    getNonPointerParent ();
+
+   bool
+   isPointerToArray () { return _pointed_type->isArrayType();}
 };
 
 

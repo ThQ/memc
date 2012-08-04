@@ -46,38 +46,49 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
 
    visitExpr(scope, type_node);
 
-   if (type_node->hasExprType()
-      && ensureSymbolIsType(type_node, type_node->ExprType()))
+   if (type_node->hasExprType())
    {
-      // TODO Ugly one here...
-      if (!type_node->ExprType()->isClassType() || !static_cast<st::Class*>(type_node->BoundSymbol())->isDependingOn(static_cast<st::Class*>(scope)))
+      if (ensureSizedExprType(type_node))
       {
-         st::Field* sym_field = new st::Field();
-         sym_field->setName(name_node->gValue());
-         sym_field->setType(type_node->ExprType());
-         scope->addChild(sym_field);
+         // TODO Ugly one here...
+         if (!type_node->ExprType()->isClassType() || !static_cast<st::Class*>(type_node->BoundSymbol())->isDependingOn(static_cast<st::Class*>(scope)))
+         {
+            st::Field* sym_field = new st::Field();
+            sym_field->setName(name_node->gValue());
+            sym_field->setType(type_node->ExprType());
+            scope->addChild(sym_field);
 
-         name_node->setBoundSymbol(sym_field);
-         field->setBoundSymbol(sym_field);
-         field->setExprType(sym_field->Type());
-         assert(sym_field->Type() != NULL);
+            name_node->setBoundSymbol(sym_field);
+            field->setBoundSymbol(sym_field);
+            field->setExprType(sym_field->Type());
+            assert(sym_field->Type() != NULL);
 
+         }
+         // Circular dependency
+         else
+         {
+            log::CircularClassDependency* err = new log::CircularClassDependency();
+            err->sBaseClassName(scope->gQualifiedName());
+            err->sDepClassName(type_node->ExprType()->gQualifiedName());
+            err->setPosition(field->copyPosition());
+            err->format();
+            log(err);
+         }
       }
-      // Circular dependency
       else
       {
-         log::CircularClassDependency* err = new log::CircularClassDependency();
-         err->sBaseClassName(scope->gQualifiedName());
-         err->sDepClassName(type_node->ExprType()->gQualifiedName());
-         err->setPosition(field->copyPosition());
-         err->format();
-         log(err);
+         type_node->setExprType(BugType());
+         field->setExprType(BugType());
+         field->setBoundSymbol(BugType());
       }
    }
    else
    {
-      assert(false);
+      DEBUG_UNREACHABLE();
    }
+
+   DEBUG_ENSURE (field->hasExprType());
+   DEBUG_ENSURE (field->hasBoundSymbol());
 }
 
 void

@@ -42,6 +42,7 @@ TypeChecker::ensureSizedExprType (node::Node* expr)
       if (ty->isArrayType() && !static_cast<st::ArrayType*>(ty)->hasLength())
       {
          fix_str += "> [" + static_cast<st::ArrayType*>(ty)->ItemType()->Name() + ",1i]\n";
+         fix_str += "> [" + static_cast<st::ArrayType*>(ty)->ItemType()->Name() + "]*\n";
       }
       std::string desc;
       if (fix_str.size() != 0)

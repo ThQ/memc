@@ -159,14 +159,22 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
    {
       if (mem_ty->isPointerType())
       {
+         st::PointerType* ptr_ty = static_cast<st::PointerType*>(mem_ty);
+
          // Create the pointer type
-         llvm::Type* base_ty = _getLlvmTy(
-            static_cast<st::PointerType*>(mem_ty)->PointedType());
+         llvm::Type* base_ty = _getLlvmTy(ptr_ty->PointedType());
          if (base_ty != NULL)
          {
-            // TODO What is the second parameter (AddressSpace) ?
-             ty = llvm::PointerType::get(base_ty, 0);
-             _classes[mem_ty->gQualifiedName()] = ty;
+            if (ptr_ty->PointedType()->isArrayType() && !static_cast<st::ArrayType*>(ptr_ty->PointedType())->hasLength())
+            {
+               ty = llvm::PointerType::get(_getLlvmTy(static_cast<st::ArrayType*>(ptr_ty->PointedType())->ItemType()), 0);
+            }
+            else
+            {
+               // TODO What is the second parameter (AddressSpace) ?
+                ty = llvm::PointerType::get(base_ty, 0);
+                _classes[mem_ty->gQualifiedName()] = ty;
+            }
          }
       }
       else if (mem_ty->isArrayType())
@@ -455,9 +463,11 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    assert (index != NULL);
 
    std::vector<llvm::Value*> idx;
-   if (n->ValueNode()->ExprType()->isArrayType())
+   if (n->ValueNode()->ExprType()->isArrayType()
+      || (n->ValueNode()->ExprType()->isPointerType() && static_cast<st::PointerType*>(n->ValueNode()->ExprType())->isPointerToArray()))
    {
-      idx.push_back(_createInt32Constant(0));
+      val = new llvm::LoadInst(val, "", _cur_bb);
+      //idx.push_back(_createInt32Constant(0));
    }
    idx.push_back(index);
 
