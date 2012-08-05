@@ -24,6 +24,14 @@ namespace mem { namespace st { namespace util {
 st::Namespace*
 createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts);
 
+inline IntType*
+getBiggestIntType (st::IntType* t1, st::IntType* t2)
+{
+   DEBUG_REQUIRE (t1 != NULL);
+   DEBUG_REQUIRE (t2 != NULL);
+   return t1->ByteSize() >= t2->ByteSize() ? t1 : t2;
+}
+
 Type*
 getExprType (Symbol* s);
 

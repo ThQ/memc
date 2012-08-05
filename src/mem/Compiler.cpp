@@ -18,7 +18,7 @@ Compiler::Compiler ()
    addAstVisitor(new ast::visitor::FindClasses());
    addAstVisitor(new ast::visitor::TopTypesChecker());
    addAstVisitor(new ast::visitor::BlockTypesChecker());
-   addAstVisitor(new ast::visitor::TypeMatch());
+   //addAstVisitor(new ast::visitor::TypeMatch());
    addAstVisitor(new ast::visitor::CheckValidity());
    addAstVisitor(new ast::visitor::FindEntryPoint());
 

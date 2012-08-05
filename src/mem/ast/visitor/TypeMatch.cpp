@@ -43,12 +43,10 @@ TypeMatch::visitVarDecl (node::VarDecl* var_decl_node)
 
    if (value_ty != NULL && !value_ty->isSubclass(var_ty))
    {
-      assert (type_node->Position() != NULL);
-      assert (value_node->Position() != NULL);
 
       fs::position::Composite* pos = new fs::position::Composite();
-      pos->addChild(type_node->copyPosition());
-      pos->addChild(value_node->copyPosition());
+      //pos->addChild(type_node->copyPosition());
+      //pos->addChild(value_node->copyPosition());
 
       log::InvalidTypeInVarAssignment* err = new log::InvalidTypeInVarAssignment();
       err->sVariableName(var_decl_node->Name());

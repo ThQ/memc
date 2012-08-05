@@ -224,6 +224,9 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Value*
    cgExprAndLoad (ast::node::Node* node);
 
+   llvm::Value*
+   cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty);
+
    /**
     * Codegen a node and generate a LLVM Load instruction if necessary.
     */

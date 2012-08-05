@@ -20,6 +20,9 @@ class TypeChecker : public Visitor
    public:
 
    bool
+   checkAssignment (node::Node* src, st::Type* dest_ty);
+
+   bool
    ensureBoolExpr (node::Node* expr);
 
    bool

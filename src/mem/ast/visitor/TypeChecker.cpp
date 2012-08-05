@@ -3,6 +3,36 @@
 namespace mem { namespace ast { namespace visitor {
 
 bool
+TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
+{
+   bool is_valid = false;
+   st::Type* src_ty = source->ExprType();
+
+   if (src_ty == dest_ty)
+   {
+      is_valid = true;
+   }
+   else if (src_ty->isIntType() && dest_ty->isIntType())
+   {
+      // Safe integer cast
+      if (src_ty->ByteSize() < dest_ty->ByteSize())
+      {
+         is_valid = true;
+      }
+   }
+
+   if (!is_valid)
+   {
+      log::CannotAssign* err = new log::CannotAssign();
+      err->sTypeName(src_ty->Name());
+      err->sExpectedTypeName(dest_ty->Name());
+      err->format();
+      log(err);
+   }
+   return is_valid;
+}
+
+bool
 TypeChecker::ensureBoolExpr (node::Node* expr)
 {
    assert (expr != NULL);

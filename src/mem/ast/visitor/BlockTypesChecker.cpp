@@ -11,30 +11,6 @@ BlockTypesChecker::BlockTypesChecker ()
 }
 
 void
-BlockTypesChecker::checkAssignment (node::Node* src, st::Type* dest_ty)
-{
-   DEBUG_REQUIRE (src != NULL);
-   DEBUG_REQUIRE (dest_ty != NULL);
-
-   st::Type* src_ty = static_cast<st::Type*>(src->ExprType());
-   bool can_assign = false;
-
-   if (src_ty == dest_ty)
-   {
-      can_assign = true;
-   }
-
-   if (!can_assign)
-   {
-      log::CannotAssign* err = new log::CannotAssign();
-      err->sTypeName(src_ty->Name());
-      err->sExpectedTypeName(dest_ty->Name());
-      err->format();
-      log(err);
-   }
-}
-
-void
 BlockTypesChecker::checkCallParameters (st::Func* func_sym, node::Node* params)
 {
    DEBUG_REQUIRE (func_sym != NULL);
@@ -56,7 +32,7 @@ BlockTypesChecker::checkCallParameters (st::Func* func_sym, node::Node* params)
       {
          if (func_sym->getParam(i)->Type() != params->getChild(i)->ExprType())
          {
-            ensureExprType(params->getChild(i), func_sym->getParam(i)->Type());
+            checkAssignment(params->getChild(i), func_sym->getParam(i)->Type());
          }
       }
 
@@ -154,8 +130,13 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
 
    if (op_name.size() != 0)
    {
+      st::Type* left_ty = left_node->ExprType();
+      st::Type* right_ty = right_node->ExprType();
+      st::Type* common_ty = st::util::getBiggestIntType(
+         static_cast<st::IntType*>(left_ty),
+         static_cast<st::IntType*>(right_ty));
       // FIXME Must check operand types
-      node->setExprType(node->getChild(0)->ExprType());
+      node->setExprType(common_ty);
    }
    else
    {
@@ -431,13 +412,11 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
          st::Func* base_func = static_cast<st::Func*>(
             base_object->BoundSymbol());
          call_node->setExprType(base_func->ReturnType());
-         // FIXME Parameter types are NOT checked
-         /*
+
          if (call_node->hasParamsNode())
          {
             checkCallParameters(base_func, call_node->ParamsNode());
          }
-         */
       }
       else
       {
@@ -912,8 +891,6 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
    {
       if (node->NameNode()->hasExprType())
       {
-         checkAssignment(node->NameNode(), node->ValueNode()->ExprType());
-
          node->setExprType(node->NameNode()->ExprType());
       }
       else
@@ -1009,6 +986,10 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
    }
 
    ensureSizedExprType(type_node);
+   if (var_decl_node->ValueNode() != NULL)
+   {
+      checkAssignment(var_decl_node->ValueNode(), var_decl_node->ExprType());
+   }
 
    DEBUG_ENSURE (var_decl_node->hasExprType());
    DEBUG_ENSURE (var_decl_node->hasBoundSymbol());

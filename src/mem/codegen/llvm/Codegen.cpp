@@ -372,69 +372,31 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
    ast::node::Node* left_node = node->getChild(0);
    ast::node::Node* right_node = node->getChild(1);
 
-   st::Type* ty = _getLowestCommonType(left_node->ExprType(),
-      right_node->ExprType());
-
-   llvm::Value* left_val = cgExprAndLoad(left_node);
-   llvm::Value* right_val = cgExprAndLoad(right_node);
+   llvm::Value* left_val = cgExprAndLoad(left_node, node->ExprType());
+   llvm::Value* right_val = cgExprAndLoad(right_node, node->ExprType());
+   llvm::Instruction::BinaryOps op;
 
    switch (node->Kind())
    {
-      case ast::node::Kind::OP_BIT_OR:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::Or, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_BIT_AND:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::And, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_XOR:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::Xor, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_LSHIFT:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::Shl, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_RSHIFT:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::LShr, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_PLUS:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::Add, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_MINUS:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::Sub, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_MODULO:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::SRem, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_MUL:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::Mul, left_val,
-            right_val, "", _cur_bb);
-         break;
-
-      case ast::node::Kind::OP_DIV:
-         val = llvm::BinaryOperator::Create(llvm::Instruction::SDiv, left_val,
-            right_val, "", _cur_bb);
-         break;
+      case ast::node::Kind::OP_BIT_OR:  op = llvm::Instruction::Or; break;
+      case ast::node::Kind::OP_BIT_AND: op = llvm::Instruction::And; break;
+      case ast::node::Kind::OP_XOR:     op = llvm::Instruction::Xor; break;
+      case ast::node::Kind::OP_LSHIFT:  op = llvm::Instruction::Shl; break;
+      case ast::node::Kind::OP_RSHIFT:  op = llvm::Instruction::LShr; break;
+      case ast::node::Kind::OP_PLUS:    op = llvm::Instruction::Add; break;
+      case ast::node::Kind::OP_MINUS:   op = llvm::Instruction::Sub; break;
+      case ast::node::Kind::OP_MODULO:  op = llvm::Instruction::SRem; break;
+      case ast::node::Kind::OP_MUL:     op = llvm::Instruction::Mul; break;
+      case ast::node::Kind::OP_DIV:     op = llvm::Instruction::SDiv; break;
 
       default:
          DEBUG_PRINTF("Unsupported arithmetic operation : %s\n",
             node->KindName().c_str());
          assert (false);
    }
+
+   val = llvm::BinaryOperator::Create(op, left_val,
+      right_val, "", _cur_bb);
 
    DEBUG_ENSURE (val != NULL);
    return val;
@@ -494,6 +456,7 @@ llvm::Value*
 Codegen::cgCallExpr (ast::node::Call* node)
 {
    DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node->CallerNode() != NULL);
 
    st::Func* func_sym = static_cast<st::Func*>(
       node->CallerNode()->BoundSymbol());
@@ -516,7 +479,7 @@ Codegen::cgCallExpr (ast::node::Call* node)
          cur_param_node = node->ParamsNode()->getChild(i);
          cur_param = func_sym->getParam(i);
 
-         param_value = cgExprAndLoad(cur_param_node);
+         param_value = cgExprAndLoad(cur_param_node, cur_param->Type());
             //static_cast<st::Type*>(cur_param_node->ExprType()),
             //cur_param->Type());
 
@@ -815,6 +778,32 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
 
    return val;
 }
+
+llvm::Value*
+Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
+{
+   llvm::Value* val = cgExpr(node);
+   bool must_load = false;
+
+   st::Type* src_ty = node->ExprType();
+
+   if (src_ty != dest_ty)
+   {
+      if (src_ty->isIntType() && dest_ty->isIntType())
+      {
+         val = new llvm::SExtInst(val, _getLlvmTy(dest_ty), "", _cur_bb);
+      }
+   }
+
+   if (val != NULL) must_load = _mustBeLoaded(node);
+   if (must_load)
+   {
+      val = new llvm::LoadInst(val, "", _cur_bb);
+   }
+
+   return val;
+}
+
 
 void
 Codegen::cgFile (ast::node::File* file_node)
@@ -1207,7 +1196,7 @@ Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
    st::Type* right_ty = static_cast<st::Type*>(node->ValueNode()->ExprType());
    llvm::Value* left_val = cgExpr(node->NameNode());
-   llvm::Value* right_val = cgExprAndLoad(node->ValueNode());
+   llvm::Value* right_val = cgExprAndLoad(node->ValueNode(), node->ExprType());
 
    new llvm::StoreInst(right_val, left_val, _cur_bb);
 }
@@ -1242,7 +1231,7 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
 
    if (node->ValueNode() != NULL)
    {
-      llvm::Value* var_val = cgExprAndLoad(node->ValueNode());
+      llvm::Value* var_val = cgExprAndLoad(node->ValueNode(), node->ExprType());
       assert (var_val != NULL);
       new llvm::StoreInst(var_val, var, _cur_bb);
    }
