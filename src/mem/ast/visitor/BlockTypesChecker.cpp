@@ -11,31 +11,35 @@ BlockTypesChecker::BlockTypesChecker ()
 }
 
 void
-BlockTypesChecker::checkCallParameters (st::Func* func_sym, node::Node* params)
+BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::Func* func_sym, node::Node* params)
 {
    DEBUG_REQUIRE (func_sym != NULL);
 
-   if (params != NULL && func_sym->ParamCount() != params->ChildCount())
+   int param_count = params->ChildCount();
+   if (caller != NULL) param_count ++;
+
+   if (params != NULL)
    {
-      log::BadParameterCount* err = new log::BadParameterCount();
-      err->sExpectedParamCount(func_sym->ParamCount());
-      err->sParamCount(params->ChildCount());
-      err->format();
-      err->setPosition(params->copyPosition());
-      log(err);
-   }
-   else if (params != NULL)
-   {
-      // Each parameter node must have the same expr type as declared in its
-      // function definition.
-      for (size_t i = 0; i < func_sym->ParamCount(); ++i)
+      if (func_sym->ParamCount() != param_count)
       {
-         if (func_sym->getParam(i)->Type() != params->getChild(i)->ExprType())
+         log::BadParameterCount* err = new log::BadParameterCount();
+         err->sExpectedParamCount(func_sym->ParamCount());
+         err->sParamCount(params->ChildCount());
+         err->format();
+         err->setPosition(params->copyPosition());
+         log(err);
+      }
+      else
+      {
+         int skip_first_param = caller != NULL ? 1 : 0;
+
+         // Each parameter node must have the same expr type as declared in its
+         // function definition.
+         for (size_t i = 0; i < params->ChildCount(); ++i)
          {
-            checkAssignment(params->getChild(i), func_sym->getParam(i)->Type());
+            checkAssignment(params->getChild(i), func_sym->getParam(skip_first_param + i)->Type());
          }
       }
-
    }
 }
 
@@ -404,7 +408,6 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
             // We are calling an instance object
             if (static_cast<node::Dot*>(base_object)->LeftNode()->BoundSymbol()->isVarSymbol())
             {
-
                call_node->setCaller(static_cast<node::Dot*>(base_object)->LeftNode()->BoundSymbol());
             }
          }
@@ -415,7 +418,7 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
 
          if (call_node->hasParamsNode())
          {
-            checkCallParameters(base_func, call_node->ParamsNode());
+            checkCallParameters(call_node->Caller(), base_func, call_node->ParamsNode());
          }
       }
       else

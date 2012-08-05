@@ -480,8 +480,6 @@ Codegen::cgCallExpr (ast::node::Call* node)
          cur_param = func_sym->getParam(i);
 
          param_value = cgExprAndLoad(cur_param_node, cur_param->Type());
-            //static_cast<st::Type*>(cur_param_node->ExprType()),
-            //cur_param->Type());
 
          params.push_back(param_value);
       }
@@ -521,20 +519,30 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
    st::Type* dest_ty = n->ExprType();
    llvm::Value* val = NULL;
 
-   // Extending (SAFE)
-   if (src_ty->ByteSize() < dest_ty->ByteSize())
+   if (src_ty->isIntType() && dest_ty->isIntType())
    {
-      val = new llvm::SExtInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+      // Extending (SAFE)
+      if (src_ty->ByteSize() < dest_ty->ByteSize())
+      {
+         val = new llvm::SExtInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+      }
+      // Truncating (UNSAFE)
+      else if (src_ty->ByteSize() > dest_ty->ByteSize())
+      {
+         val = new llvm::TruncInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+      }
+      else
+      {
+         // No casting required
+         val = src_val;
+      }
    }
-   // Truncating (UNSAFE)
-   else if (src_ty->ByteSize() > dest_ty->ByteSize())
+   else if (src_ty->isPointerType() && dest_ty->isPointerType())
    {
-      val = new llvm::TruncInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
-   }
-   else
-   {
-      // No casting required
-      val = src_val;
+      if (static_cast<st::PointerType*>(dest_ty)->PointedType()->Name() == "void")
+      {
+         val = new llvm::BitCastInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+      }
    }
 
    DEBUG_ENSURE (val != NULL);
@@ -630,13 +638,11 @@ Codegen::cgDotExpr (ast::node::Dot* node)
    if (node->LeftNode()->ExprType()->isPointerType())
    {
       st::PointerType* ptr_ty = static_cast<st::PointerType*>(node->LeftNode()->ExprType());
-      /*
       for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
       {
          left_node = new llvm::LoadInst(left_node, "", _cur_bb);
          assert(left_node != NULL);
       }
-      */
       for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
       {
          idx.push_back(_createInt32Constant(0));
@@ -646,9 +652,9 @@ Codegen::cgDotExpr (ast::node::Dot* node)
    int field_index = static_cast<st::Field*>(node->BoundSymbol())->_field_index;
    idx.push_back(_createInt32Constant(field_index));
 
-   llvm::Value* gep_inst =  _createGepInst(left_node, idx);
+   llvm::Value* gep_inst = _createGepInst(left_node, idx);
 
-   DEBUG_ENSURE (gep_inst != NULL);
+   DEBUG_ENSURE (gep_inst!= NULL);
 
    return gep_inst;
 }

@@ -247,7 +247,11 @@ void
 Compiler::printUsage (std::ostream& out)
 {
    out << "USAGE: ";
+#ifdef PACKAGE_NAME
    out << PACKAGE_NAME;
+#else
+   out << "?";
+#endif
    out << " [OPTIONS] <input>\n\n";
    out << "OPTIONS:\n";
 
@@ -303,7 +307,11 @@ Compiler::run ()
 
    if (_opts->isSet("--version"))
    {
+#ifdef PACKAGE_NAME
       std::cout << PACKAGE_NAME " version " PACKAGE_VERSION;
+#else
+      std::cout << "? version ?";
+#endif
       std::cout << " (" __DATE__ " " __TIME__ ")";
       IF_DEBUG
       {

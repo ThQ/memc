@@ -58,7 +58,7 @@ class BlockTypesChecker : public TypeChecker
    public:
 
    void
-   checkCallParameters (st::Func* func_sym, node::Node* params);
+   checkCallParameters (st::Symbol* caller, st::Func* func_sym, node::Node* params);
 
    /**
     * Visitor entry point.
