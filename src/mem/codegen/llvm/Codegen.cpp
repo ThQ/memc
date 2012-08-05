@@ -64,7 +64,7 @@ Codegen::_createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx)
 {
    DEBUG_REQUIRE (base != NULL);
 
-#if 0
+#if 1
    llvm::Type* base_ty = base->getType();
    std::string base_ty_name;
    if (base_ty != NULL)
@@ -263,10 +263,10 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
    switch (node->Kind())
    {
       case ast::node::Kind::FINAL_ID:
-         if (!node->BoundSymbol()->isArgSymbol())
-         {
+         //if (!node->BoundSymbol()->isArgSymbol())
+         //{
             return true;
-         }
+         //}
          break;
       case ast::node::Kind::GROUP:
          return _mustBeLoaded(node->getChild(0));
@@ -415,8 +415,18 @@ Codegen::cgBinaryExpr (ast::node::Node* node)
             right_val, "", _cur_bb);
          break;
 
+      case ast::node::Kind::OP_MODULO:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::SRem, left_val,
+            right_val, "", _cur_bb);
+         break;
+
       case ast::node::Kind::OP_MUL:
          val = llvm::BinaryOperator::Create(llvm::Instruction::Mul, left_val,
+            right_val, "", _cur_bb);
+         break;
+
+      case ast::node::Kind::OP_DIV:
+         val = llvm::BinaryOperator::Create(llvm::Instruction::SDiv, left_val,
             right_val, "", _cur_bb);
          break;
 
@@ -548,44 +558,21 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
    st::Type* dest_ty = n->ExprType();
    llvm::Value* val = NULL;
 
-   if (src_ty != dest_ty)
+   // Extending (SAFE)
+   if (src_ty->ByteSize() < dest_ty->ByteSize())
    {
-      if (src_ty->isIntType() && dest_ty->isIntType())
-      {
-         if (src_ty->ByteSize() != dest_ty->ByteSize())
-         {
-            val = new llvm::SExtInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
-         }
-         else
-         {
-            // No casting required
-            val = src_val;
-         }
-      }
-      else
-      {
-         DEBUG_PRINTF("Unsupported safe type casting from `%s' to `%s'\n",
-            src_ty->NameCstr(), dest_ty->NameCstr());
-         assert(false);
-      }
+      val = new llvm::SExtInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
    }
-   /*
-   // Value is not a LLVM pointer so we cannot cast it directly
-   if (!_mustBeLoaded(n->ValueNode()))
+   // Truncating (UNSAFE)
+   else if (src_ty->ByteSize() > dest_ty->ByteSize())
    {
-      // FIXME We could do better by using LLVM assembly constructs: zext, ...
-      dest_ty = _getLlvmTy(st::util::getPointerType(n->ExprType()));
-      src_val = new llvm::AllocaInst(_getLlvmTy(n->ValueNode()->ExprType()),
-         "", _cur_bb);
-      src_val = new llvm::BitCastInst(src_val, dest_ty, "", _cur_bb);
-      val = new llvm::LoadInst(src_val, "", _cur_bb);
+      val = new llvm::TruncInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
    }
    else
    {
+      // No casting required
+      val = src_val;
    }
-   */
-   //dest_ty = _getLlvmTy(n->ExprType());
-   //val = new llvm::BitCastInst(src_val, dest_ty, "", _cur_bb);
 
    DEBUG_ENSURE (val != NULL);
    return val;
@@ -632,8 +619,8 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
    st::Type* expected_operand_ty = _getLowestCommonType(
       left_val_node->ExprType(), right_val_node->ExprType());
 
-   llvm::Value* left_val = cgExpr(left_val_node);
-   llvm::Value* right_val = cgExpr(right_val_node);
+   llvm::Value* left_val = cgExprAndLoad(left_val_node);
+   llvm::Value* right_val = cgExprAndLoad(right_val_node);
 
    llvm::ICmpInst::Predicate pred;
 
@@ -767,12 +754,14 @@ Codegen::cgExpr (ast::node::Node* node)
 
       case ast::node::Kind::OP_BIT_AND:
       case ast::node::Kind::OP_BIT_OR:
-      case ast::node::Kind::OP_XOR:
+      case ast::node::Kind::OP_DIV:
       case ast::node::Kind::OP_LSHIFT:
       case ast::node::Kind::OP_RSHIFT:
-      case ast::node::Kind::OP_PLUS:
       case ast::node::Kind::OP_MINUS:
+      case ast::node::Kind::OP_MODULO:
       case ast::node::Kind::OP_MUL:
+      case ast::node::Kind::OP_PLUS:
+      case ast::node::Kind::OP_XOR:
          res = cgBinaryExpr(node);
          break;
 
@@ -909,12 +898,17 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
       // parameters to the stack of the body of the function.
       st::Var* func_param = NULL;
       llvm::Argument* arg = NULL;
+      llvm::Value* alloc = NULL;
+      llvm::Type* param_lty = NULL;
       for (size_t i = 0; i < func_sym->ParamCount(); ++i)
       {
+         func_param = func_sym->getParam(i);
+         param_lty = _getLlvmTy(func_param->Type());
          func_param = func_sym->_params[i];
-         arg = new llvm::Argument(_getLlvmTy(func_param->Type()),
-            func_param->Name(), func);
-         _stack.set(func_param->Name(), arg);
+         arg = new llvm::Argument(param_lty, func_param->Name(), func);
+         alloc = new llvm::AllocaInst(param_lty, 0, "", _cur_bb);
+         new llvm::StoreInst(arg, alloc, false, _cur_bb);
+         _stack.set(func_param->Name(), alloc);
       }
 
       cgBlock(func_node->BodyNode());

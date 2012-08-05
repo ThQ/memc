@@ -766,6 +766,11 @@ math_operator:
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::OP_MUL);
    }
+   | T_DIV
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_DIV);
+   }
    | T_GT_GT
    {
       $$ = new ast::node::Text();
@@ -790,6 +795,11 @@ math_operator:
    {
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::OP_XOR);
+   }
+   | T_MODULO
+   {
+      $$ = new ast::node::Text();
+      $$->setKind(ast::node::Kind::OP_MODULO);
    }
 
 binary_operator:

@@ -161,6 +161,8 @@ Tokenizer::_processTokenStart (char c)
       case '@': _pushToken(T_AROBASE, "@"); break;
       case '&': _pushToken(T_AMPERSAND, "&"); break;
       case '*': _pushToken(T_STAR, "*"); break;
+      case '/': _pushToken(T_DIV, "/"); break;
+      case '%': _pushToken(T_MODULO, "*"); break;
       case '+': _pushToken(T_PLUS, "*"); break;
       case ':': _pushToken(T_SEMICOLON, ":"); break;
 

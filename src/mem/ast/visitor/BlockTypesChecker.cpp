@@ -142,7 +142,9 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
       case node::Kind::OP_RSHIFT:  op_name = ">>"; break;
       case node::Kind::OP_PLUS:    op_name = "+"; break;
       case node::Kind::OP_MINUS:   op_name = "-"; break;
+      case node::Kind::OP_MODULO:  op_name = "%"; break;
       case node::Kind::OP_MUL:     op_name = "*"; break;
+      case node::Kind::OP_DIV:     op_name = "/"; break;
 
       default:
          DEBUG_PRINTF("Unsupported arithmetic operator (%s)",
@@ -301,6 +303,7 @@ BlockTypesChecker::visitCastOperator (st::Symbol* scope, node::CastOp* n)
       st::Type* src_ty = n->ValueNode()->ExprType();
       st::Type* dest_ty = static_cast<st::Type*>(n->TypeNode()->BoundSymbol());
 
+      /*
       bool can_cast = false;
 
       // TODO We should be able to cast from a class type to another
@@ -312,6 +315,7 @@ BlockTypesChecker::visitCastOperator (st::Symbol* scope, node::CastOp* n)
          err->format();
          log(err);
       }
+      */
    }
 
 
@@ -523,6 +527,8 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 
    switch (node->Kind())
    {
+      case node::Kind::OP_DIV:
+      case node::Kind::OP_MODULO:
       case node::Kind::OP_MUL:
       case node::Kind::OP_PLUS:
       case node::Kind::OP_MINUS:
