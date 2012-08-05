@@ -1,0 +1,18 @@
+
+@external
+putchar (c :int) -> int
+
+@external
+puts (c :[char]*) -> int
+
+@external
+fclose (filep :void*) -> int
+
+@external
+feof(file :void*) -> int
+
+@external
+fopen(path :[char]*, mode :[char]*) -> void*
+
+@external
+fread(buff :[char]*, item_size :int, item_count :int, file :void*) -> int

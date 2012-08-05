@@ -1,0 +1,88 @@
+
+// Copy a substring of a C string @s from @start to @start+@length
+//
+// param(s) : The C string to copy from
+// return : A pointer to the new C string
+copySubstring (s :[char]*, start :int, length :int) -> [char]*
+   new_s := new [char, length + 1]
+   i :int = 0
+   c :char = s[start]
+   while i < length
+      new_s[i] = c
+      i = i + 1
+      c = s[start + i]
+   new_s[length] = 0
+   return new_s
+
+// Copy the whole C string @s
+//
+// param(s) : The C string to copy
+// return : A pointer to the new C string
+@inline
+copy (s :[char]*) -> [char]*
+   return copySubstring(s, 0, getLength(s))
+
+// Convert an integer @val to its C string representation in base @base
+//
+// param(val) : the integer to convert
+// param(base) : the base in which to convert the integer
+// return : a C string representation of @val
+fromInt (val :int, base :int) -> [char]*
+   base_chars := "0123456789abcdef"
+   ret := new [char, 34 :int]
+
+   i := 0 :int
+
+   while val >= base
+      ret[i] = base_chars[val % base]
+      val = val / base
+      i = i + 1
+
+   ret[i] = base_chars[val % base]
+   ret[i + 1] = 0
+
+   reverseSubstring(ret, 0, i)
+
+   return ret
+
+// Get the length of a C string
+//
+// param(s) : The C string to get the length from
+// return : The length of the C string
+getLength (s :[char]*) -> int
+   len :int = 0
+   c :char = 1
+   while c != 0
+      c = s[len]
+      len = len + 1
+   return len
+
+// Reverse in place a substring of @s from @start to @start+@length
+//
+// param(start) : The position at which to start the reversing
+// param(length) : How many chars to reverse
+// return : the original C string pointer
+reverseSubstring (s :[char]*, start :int, length :int) -> [char]*
+   str := s
+   i :int = 0
+   num :int = 0
+   if (length % 2) == (0 :int)
+      num = length / 2
+   if (length % 2) != (0 :int)
+      num = (length - 1) / 2
+
+   swap :char = 0
+   while i < num
+      swap = str[i]
+      str[i] = str[start + length - i]
+      str[start + length - i] = swap
+      i = i + 1
+   return s
+
+// Reverse in place the whole C string @s
+//
+// param(s) : The C string to reverse
+// return : A pointer to the original C string
+@inline
+reverse (s :[char]*) -> [char]*
+   return reverseSubstring(s, 0, getLength(s))
