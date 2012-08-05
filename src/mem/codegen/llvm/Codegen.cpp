@@ -64,7 +64,7 @@ Codegen::_createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx)
 {
    DEBUG_REQUIRE (base != NULL);
 
-#if 1
+#if 0
    llvm::Type* base_ty = base->getType();
    std::string base_ty_name;
    if (base_ty != NULL)
