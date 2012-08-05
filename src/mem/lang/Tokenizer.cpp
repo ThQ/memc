@@ -161,7 +161,6 @@ Tokenizer::_processTokenStart (char c)
       case '@': _pushToken(T_AROBASE, "@"); break;
       case '&': _pushToken(T_AMPERSAND, "&"); break;
       case '*': _pushToken(T_STAR, "*"); break;
-      case '/': _pushToken(T_DIV, "/"); break;
       case '%': _pushToken(T_MODULO, "*"); break;
       case '+': _pushToken(T_PLUS, "*"); break;
       case ':': _pushToken(T_SEMICOLON, ":"); break;
@@ -176,6 +175,20 @@ Tokenizer::_processTokenStart (char c)
          else
          {
             _pushToken(T_BANG, "!");
+            _backtrack();
+         }
+         break;
+      }
+      case '/':
+      {
+         c2 = _get1Char();
+         if (c2 == '/')
+         {
+            _state = T_SINGLE_LINE_COMMENT;
+         }
+         else
+         {
+            _pushToken(T_DIV, "/");
             _backtrack();
          }
          break;
@@ -564,6 +577,14 @@ Tokenizer::_readNextToken ()
             {
                _state = T_INDENT;
                _backtrack();
+            }
+            break;
+         }
+         case T_SINGLE_LINE_COMMENT:
+         {
+            if (c == '\n')
+            {
+               _state = T_YACC_UNDEFINED;
             }
             break;
          }

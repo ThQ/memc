@@ -158,6 +158,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %token T_RARR
 %token T_RETURN
 %token T_SEMICOLON
+%token T_SINGLE_LINE_COMMENT
 %token T_SPACE
 %token T_STAR
 %token <text> T_STRING
