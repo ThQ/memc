@@ -26,6 +26,9 @@ class TypeChecker : public Visitor
    ensureBoolExpr (node::Node* expr);
 
    bool
+   ensureClassType (node::Node* expr);
+
+   bool
    ensureExprType (node::Node* expr, st::Symbol* expr_type);
 
    bool

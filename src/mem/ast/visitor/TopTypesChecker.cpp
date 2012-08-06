@@ -48,7 +48,7 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
    {
       visitExpr(scope, parent_ty_node);
       st::Symbol* parent_cls = parent_ty_node->BoundSymbol();
-      if (parent_cls != NULL)
+      if (parent_cls != NULL && ensureClassType(parent_ty_node))
       {
          static_cast<st::Class*>(clss->BoundSymbol())->setParentClass(static_cast<st::Class*>(parent_cls));
       }

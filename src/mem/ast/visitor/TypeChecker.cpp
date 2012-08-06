@@ -40,6 +40,27 @@ TypeChecker::ensureBoolExpr (node::Node* expr)
 }
 
 bool
+TypeChecker::ensureClassType (node::Node* expr)
+{
+   bool is_class_ty = false;
+
+   if (expr->hasBoundSymbol() && expr->BoundSymbol()->isClassType())
+   {
+      is_class_ty = true;
+   }
+   else
+   {
+      log::ExpectedClassType* err = new log::ExpectedClassType();
+      err->sType(expr->BoundSymbol());
+      err->format();
+      log(err);
+   }
+
+
+   return is_class_ty;
+}
+
+bool
 TypeChecker::ensureExprType (node::Node* expr, st::Symbol* expr_type)
 {
    if (expr->hasExprType() && expr->ExprType() != expr_type)

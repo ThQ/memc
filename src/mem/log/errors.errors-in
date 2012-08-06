@@ -22,7 +22,7 @@
 	},
 	"SymbolNotFound":
 	{
-		"message": "Symbol $SymbolName not found in $ScopeName",
+		"message": "Symbol `$SymbolName' not found in `$ScopeName'",
 		"type": "Error",
 		"params":
 		{
@@ -173,6 +173,15 @@
       {
          "SourceType": "st::Symbol*",
          "DestType": "st::Symbol*"
+      }
+   },
+   "ExpectedClassType":
+   {
+      "type": "FatalError",
+      "message": "Expected class type, but `$Type' is not",
+      "params":
+      {
+         "Type": "st::Symbol*"
       }
    }
 }
