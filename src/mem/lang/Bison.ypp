@@ -283,7 +283,7 @@ class_declaration:
       delete $3;
       $$ = cls;
    }
-   | T_CLASS id T_LT id class_members
+   | T_CLASS id T_LT type_name class_members
    {
       ast::node::Class* cls = new ast::node::Class();
 

@@ -466,6 +466,16 @@ Codegen::cgCallExpr (ast::node::Call* node)
    if (node->Caller() != NULL)
    {
       llvm::Value* caller = cgExprAndLoad(node->getChild(0)->getChild(0));
+      st::Type* caller_expected_ty = func_sym->getParam(0)->Type();
+
+      // Function belongs to an ancestor of the caller type, we have to cast
+      // the caller
+      if (node->CallerNode()->ExprType() != caller_expected_ty)
+      {
+         caller = new llvm::BitCastInst(caller, _getLlvmTy(caller_expected_ty),
+            "", _cur_bb);
+      }
+
       params.push_back(caller);
    }
 
@@ -649,7 +659,11 @@ Codegen::cgDotExpr (ast::node::Dot* node)
       }
    }
 
-   int field_index = static_cast<st::Field*>(node->BoundSymbol())->_field_index;
+   // Compute the field index in the whole type hierarchy
+   st::Field* field = static_cast<st::Field*>(node->BoundSymbol());
+   st::Class* cls_ty = static_cast<st::Class*>(field->Parent());
+   int field_index = cls_ty->getFieldAbsoluteIndex(field->FieldIndex());
+
    idx.push_back(_createInt32Constant(field_index));
 
    llvm::Value* gep_inst = _createGepInst(left_node, idx);

@@ -5,6 +5,7 @@
 #include <map>
 #include <stdlib.h>
 #include <vector>
+#include "mem/ast/macro/Macro.hpp"
 #include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/BracketOp.hpp"

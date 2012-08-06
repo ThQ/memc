@@ -50,6 +50,9 @@ class TopTypesChecker : public BlockTypesChecker
    virtual bool
    visit (node::Node* node);
 
+   virtual void
+   visitClass (st::Symbol* scope, node::Class* clss);
+
    /**
     * Visit a class field declaration (MEM_NODE_FIELD).
     *

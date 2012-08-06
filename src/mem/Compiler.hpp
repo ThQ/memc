@@ -10,6 +10,7 @@
 #include <queue>
 #include <vector>
 #include "config.h"
+#include "mem/ast/macro/PtrMacros.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/BlockTypesChecker.hpp"
@@ -102,6 +103,9 @@ class Compiler
     */
    inline void
    addAstVisitor (ast::visitor::Visitor* visitor){ast_visitors.push_back(visitor);}
+
+   void
+   addMacro (ast::macro::Macro* macro);
 
    /**
     * Append an ST visitor to the visitor list (FIFO).

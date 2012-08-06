@@ -8,6 +8,9 @@ src_mem = \
  src/mem/Util.cpp
 src_mem_ast = \
  src/mem/ast/util.cpp
+src_mem_ast_macro = \
+ src/mem/ast/macro/Macro.cpp \
+ src/mem/ast/macro/PtrMacros.cpp
 src_mem_ast_node = \
  src/mem/ast/node/Array.cpp \
  src/mem/ast/node/BinaryExpression.cpp \
@@ -88,6 +91,7 @@ src_mem_st = \
  src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \
  src/mem/st/IntType.cpp \
+ src/mem/st/Macro.cpp \
  src/mem/st/Namespace.cpp \
  src/mem/st/Path.cpp \
  src/mem/st/PrimitiveType.cpp \
@@ -149,6 +153,7 @@ memc_SOURCES =  \
  $(src_mem) \
  $(src_mem_ast) \
  $(src_mem_ast_dumper) \
+ $(src_mem_ast_macro) \
  $(src_mem_ast_node) \
  $(src_mem_ast_visitor) \
  $(src_mem_codegen) \

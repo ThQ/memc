@@ -39,6 +39,7 @@ class Class : public Type
     * Returns the parent class in the type hierarchy.
     */
    GETTER(ParentClass, st::Class*) { return static_cast<st::Class*>(_parent);}
+   SETTER(ParentClass, st::Class*) { _parent = val; }
 
 
    // -------------------------------------------------------------------------
@@ -48,6 +49,12 @@ class Class : public Type
 
    bool
    addChild (st::Symbol* sym);
+
+   int
+   getAbsoluteFieldCount ();
+
+   int
+   getFieldAbsoluteIndex (int field_relative_index);
 
    std::vector<st::Field*>
    getOrderedFields();

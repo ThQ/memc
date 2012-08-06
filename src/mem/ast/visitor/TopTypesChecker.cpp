@@ -15,6 +15,11 @@ TopTypesChecker::visit (node::Node* node)
 
    switch (node->Kind())
    {
+      case node::Kind::CLASS:
+      {
+         visitClass(node->BoundSymbol(), static_cast<node::Class*>(node));
+         return true;
+      }
       case node::Kind::FIELD:
       {
          assert (node->Parent()->isClassNode());
@@ -33,11 +38,29 @@ TopTypesChecker::visit (node::Node* node)
 }
 
 void
+TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (clss != NULL);
+
+   node::Node* parent_ty_node = clss->gParentTypeNode();
+   if (parent_ty_node != NULL)
+   {
+      visitExpr(scope, parent_ty_node);
+      st::Symbol* parent_cls = parent_ty_node->BoundSymbol();
+      if (parent_cls != NULL)
+      {
+         static_cast<st::Class*>(clss->BoundSymbol())->setParentClass(static_cast<st::Class*>(parent_cls));
+      }
+   }
+}
+
+void
 TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
 {
-   assert(scope!=NULL);
-   assert(scope->isClassType());
-   assert(field!=NULL);
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (scope->isClassType());
+   DEBUG_REQUIRE (field != NULL);
 
    node::Text* name_node = static_cast<node::Text*>(field->NameNode());
    node::Node* type_node = field->ValueNode();

@@ -9,6 +9,7 @@
 #include "mem/st/Class.hpp"
 #include "mem/st/CoreTypes.hpp"
 #include "mem/st/Func.hpp"
+#include "mem/st/Macro.hpp"
 #include "mem/st/Namespace.hpp"
 #include "mem/st/Path.hpp"
 #include "mem/st/Var.hpp"

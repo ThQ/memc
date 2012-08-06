@@ -147,6 +147,9 @@ class Node
    isDotNode() const {return isKind(Kind::DOT);}
 
    inline bool
+   isFieldNode() const {return isKind(Kind::FIELD);}
+
+   inline bool
    isFileNode() const {return isKind(Kind::FILE);}
 
    inline bool

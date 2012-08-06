@@ -20,7 +20,7 @@ Class::addChild (Symbol* s)
    if (s->Kind() == FIELD)
    {
       st::Field* field = static_cast<Field*>(s);
-      field->_field_index = _cur_field_index;
+      field->setFieldIndex(_cur_field_index);
       _cur_field_index++;
 
       // Compute new byte size
@@ -30,13 +30,37 @@ Class::addChild (Symbol* s)
    return Type::addChild(s);
 }
 
+int
+Class::getAbsoluteFieldCount ()
+{
+   int count = 0;
+   if (_parent != NULL && _parent->isClassType())
+   {
+      count += static_cast<st::Class*>(_parent)->getAbsoluteFieldCount();
+   }
+   count += _cur_field_index;
+   return count;
+}
+
+int
+Class::getFieldAbsoluteIndex (int relative_idx)
+{
+   return getAbsoluteFieldCount() - _cur_field_index + relative_idx;
+}
+
 std::vector<st::Field*>
 Class::getOrderedFields ()
 {
    std::vector<st::Field*> v;
+   size_t parent_field_count = 0;
+   if (_parent!= NULL && _parent->isClassType())
+   {
+      v = static_cast<st::Class*>(_parent)->getOrderedFields();
+      parent_field_count = v.size();
+   }
    if (hasFields())
    {
-      v.resize(_cur_field_index, NULL);
+      v.resize(parent_field_count + _cur_field_index, NULL);
 
       Field* field = NULL;
       SymbolCollectionIterator i;
@@ -45,13 +69,15 @@ Class::getOrderedFields ()
          if (i->second->Kind() == FIELD)
          {
             field = static_cast<Field*>(i->second);
-            v[field->_field_index] = field;
+            v[parent_field_count + field->_field_index] = field;
          }
       }
-
-      for (size_t i = 0; i < v.size(); ++i)
+      IF_DEBUG
       {
-         assert(v[i] != NULL);
+         for (size_t i = 0; i < v.size(); ++i)
+         {
+            assert(v[i] != NULL);
+         }
       }
    }
    return v;

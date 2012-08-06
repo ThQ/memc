@@ -146,6 +146,9 @@ class Symbol
    isIntType () const {return is(st::INT_TYPE);}
 
    inline bool
+   isMacro () const {return is(st::MACRO);}
+
+   inline bool
    isPrimitiveType() const {return is(st::PRIMITIVE_TYPE);}
 
    inline bool

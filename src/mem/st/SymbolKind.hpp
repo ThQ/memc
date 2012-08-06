@@ -20,7 +20,8 @@ typedef enum {
    ARG=11,
    ARRAY=12,
    ALIAS=13,
-   INT_TYPE=14
+   INT_TYPE=14,
+   MACRO=15
 } SymbolKind;
 
 

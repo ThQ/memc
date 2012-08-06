@@ -27,7 +27,7 @@ class Class : public Type
    // -------------------------------------------------------------------------
    public:
 
-   Text*
+   Node*
    gParentTypeNode ();
 };
 

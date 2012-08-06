@@ -26,6 +26,8 @@ Compiler::Compiler ()
    st::util::setupBugType(this->symbols, this->symbols.gCoreTypes());
    st::util::setupInts(this->symbols, this->symbols.gCoreTypes());
    st::util::setupVoid(this->symbols, this->symbols.gCoreTypes());
+
+   addMacro(new ast::macro::PtrMacros());
 }
 
 Compiler::~Compiler ()
@@ -42,6 +44,15 @@ Compiler::~Compiler ()
    {
       delete st_visitors[i];
    }
+}
+
+void
+Compiler::addMacro (ast::macro::Macro* macro)
+{
+   DEBUG_REQUIRE (macro != NULL);
+
+   st::Macro* macro_sym = macro->getSymbol();
+   symbols._root->addChild(macro_sym);
 }
 
 void

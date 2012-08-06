@@ -10,5 +10,4 @@ Field::Field ()
    _kind = FIELD;
 }
 
-
 } }

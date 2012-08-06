@@ -401,7 +401,24 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
 
    if (base_object->hasBoundSymbol())
    {
-      if (base_object->BoundSymbol()->isFuncSymbol())
+      if (base_object->BoundSymbol()->isMacro())
+      {
+         st::Macro* macro_sym = static_cast<st::Macro*>(base_object->BoundSymbol());
+         macro::Macro* macro = static_cast<macro::Macro*>(macro_sym->MacroExpander());
+         node::Node* macro_result = macro->expand(call_node);
+         if (call_node->_prev != NULL)
+         {
+            call_node->_prev->_next = macro_result;
+         }
+         if (call_node->_next != NULL)
+         {
+            call_node->_next->_prev = macro_result;
+         }
+         call_node->unlink();
+         delete call_node;
+         visitExpr(scope, macro_result);
+      }
+      else if (base_object->BoundSymbol()->isFuncSymbol())
       {
          if (base_object->isDotNode())
          {
@@ -437,7 +454,9 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
       call_node->setBoundSymbol(BugType());
    }
 
-   DEBUG_ENSURE(call_node->hasExprType());
+   // FIXME We cannot assert this since it can be a macro that may not have
+   // an expression type
+   //DEBUG_ENSURE(call_node->hasExprType());
 }
 
 void
@@ -938,6 +957,7 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
    if (value_node != NULL)
    {
       visitExpr(scope, value_node);
+      value_node = var_decl_node->ValueNode();
       if (!value_node->hasExprType()) value_node->setExprType(BugType());
    }
 
@@ -958,6 +978,7 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
    {
       // Type is explicity declared
       visitExpr(scope, type_node);
+      type_node = var_decl_node->TypeNode();
    }
    if (!type_node->hasExprType()) type_node->setExprType(BugType());
    if (!type_node->hasBoundSymbol()) type_node->setBoundSymbol(BugType());
