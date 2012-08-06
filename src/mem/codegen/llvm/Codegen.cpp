@@ -1183,7 +1183,7 @@ Codegen::cgReturnStatement (ast::node::Node* node)
    DEBUG_REQUIRE (node != NULL);
    DEBUG_REQUIRE (node->getChild(0) != NULL);
 
-   llvm::Value* val = cgExprAndLoad(node->getChild(0));
+   llvm::Value* val = cgExprAndLoad(node->getChild(0), node->ExprType());
    assert(val != NULL);
 
    llvm::ReturnInst::Create(_module->getContext(), val, _cur_bb);
