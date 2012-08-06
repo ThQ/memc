@@ -16,47 +16,47 @@ Codegen::Codegen ()
 std::string
 Codegen::_getLlvmTypeName (llvm::Type* ty)
 {
-   std::string name;
+   std::stringstream name;
    if (ty != NULL)
    {
       if (ty->isStructTy())
       {
-         name = llvm::cast<llvm::StructType>(ty)->getName().str();
+         name << llvm::cast<llvm::StructType>(ty)->getName().str();
       }
       else if (ty->isPointerTy())
       {
-         name = _getLlvmTypeName(llvm::cast<llvm::PointerType>(ty)->getElementType()) + "*";
+         name << _getLlvmTypeName(llvm::cast<llvm::PointerType>(ty)->getElementType()) + "*";
       }
       else if (ty->isPrimitiveType())
       {
-         name = "Primitive";
+         name << "Primitive";
       }
       else if (ty->isArrayTy())
       {
-         name = "[" + _getLlvmTypeName(llvm::cast<llvm::ArrayType>(ty)->getElementType()) + "]";
+         name << "[" + _getLlvmTypeName(llvm::cast<llvm::ArrayType>(ty)->getElementType()) + "]";
       }
       else if (ty->isVectorTy())
       {
-         name = "<>";
+         name << "<>";
       }
       else if (ty->isFunctionTy())
       {
-         name = "Func";
+         name << "Func";
       }
       else if (ty->isIntegerTy())
       {
-         name = "i";
+         name << "i" << static_cast<llvm::IntegerType*>(ty)->getBitWidth();
       }
       else
       {
-         name = "UnknownType";
+         name << "UnknownType";
       }
    }
    else
    {
-      name = "NULL";
+      name << "NULL";
    }
-   return name;
+   return name.str();
 }
 
 llvm::GetElementPtrInst*
@@ -64,7 +64,7 @@ Codegen::_createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx)
 {
    DEBUG_REQUIRE (base != NULL);
 
-#if 0
+#if 1
    llvm::Type* base_ty = base->getType();
    std::string base_ty_name;
    if (base_ty != NULL)
@@ -201,7 +201,7 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
    {
       if (ty == NULL)
       {
-         DEBUG_PRINTF("Type <%s> not found.\n", mem_ty->NameCstr());
+         DEBUG_PRINTF("Type `%s' not found.\n", mem_ty->NameCstr());
       }
    }
 
@@ -271,9 +271,10 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
       case ast::node::Kind::GROUP:
          return _mustBeLoaded(node->getChild(0));
 
-      case ast::node::Kind::DEREF:
       case ast::node::Kind::BRACKET_OP:
+      case ast::node::Kind::DEREF:
       case ast::node::Kind::DOT:
+      case ast::node::Kind::TUPLE:
          return true;
    }
    return false;
@@ -333,6 +334,7 @@ Codegen::gen (ast::node::Node* root)
          cgPrimitiveType(static_cast<st::PrimitiveType*>(ty));
       }
    }
+   codegenTupleTypes();
 
    codegenMemoryFunctions();
    codegenFunctionDeclarations();
@@ -431,21 +433,38 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
 
 
    // Taking care of INDEX
-   llvm::Value* index = cgExprAndLoad(n->IndexNode());
+   llvm::Value* index = cgExprAndLoad(n->IndexNode(), _st->gCoreTypes()._int);
    assert (index != NULL);
 
+   ast::node::Node* value_node = n->ValueNode();
+   st::Type* value_ty = value_node->ExprType();
+
    std::vector<llvm::Value*> idx;
-   if (n->ValueNode()->ExprType()->isArrayType()
-      || (n->ValueNode()->ExprType()->isPointerType() && static_cast<st::PointerType*>(n->ValueNode()->ExprType())->isPointerToArray()))
+   /*
+   if (value_ty->isArrayType()
+      || (value_ty->isPointerType() && static_cast<st::PointerType*>(value_ty)->isPointerToArray()))
    {
       val = new llvm::LoadInst(val, "", _cur_bb);
       //idx.push_back(_createInt32Constant(0));
    }
+   else if (value_ty->isTupleType())
+   {
+      val = new llvm::LoadInst(val, "", _cur_bb);
+   }
+   */
+   if (value_ty->isPointerType())
+   {
+      for (int i = 0; i <= static_cast<st::PointerType*>(value_ty)->IndirectionLevel(); ++i)
+      {
+         val = new llvm::LoadInst(val, "", _cur_bb);
+      }
+   }
+   idx.push_back(_createInt32Constant(0));
    idx.push_back(index);
 
    // Compute address
    llvm::GetElementPtrInst* inst = _createGepInst(val, idx);
-   //inst->setIsInBounds(true);
+   inst->setIsInBounds(true);
 
    DEBUG_ENSURE (inst != NULL);
 
@@ -756,6 +775,10 @@ Codegen::cgExpr (ast::node::Node* node)
          cgReturnStatement (node);
          break;
 
+      case ast::node::Kind::TUPLE:
+         res = codegenTuple (static_cast<ast::node::Tuple*>(node));
+         break;
+
       case ast::node::Kind::STRING:
          res = cgString(static_cast<ast::node::String*>(node));
          break;
@@ -802,10 +825,21 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
 llvm::Value*
 Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
 {
-   llvm::Value* val = cgExpr(node);
+   llvm::Value* val = NULL;
+   st::Type* src_ty = node->ExprType();
+
+   if (dest_ty->isIntType() && node->isNumberNode())
+   {
+      src_ty = dest_ty;
+      int i_val = static_cast<ast::node::Number*>(node)->getInt();
+      val = llvm::ConstantInt::get(_module->getContext(), llvm::APInt(dest_ty->ByteSize() * 8, i_val));
+   }
+   else
+   {
+      val = cgExpr(node);
+   }
    bool must_load = false;
 
-   st::Type* src_ty = node->ExprType();
 
    if (src_ty != dest_ty)
    {
@@ -1170,6 +1204,32 @@ Codegen::cgPrimitiveType (st::PrimitiveType* prim)
    addType(prim, ty);
 }
 
+void
+Codegen::codegenTupleType (st::TupleType* t)
+{
+   std::vector<llvm::Type*> ltys;
+   for (size_t i=0; i < t->Subtypes().size(); ++i)
+   {
+      ltys.push_back(_getLlvmTy(t->Subtypes()[i]));
+   }
+
+   llvm::StructType* tuple_lty = llvm::StructType::create(ltys, "tuple");
+   _classes[t->gQualifiedName()] = tuple_lty;
+}
+
+void
+Codegen::codegenTupleTypes ()
+{
+   st::Symbol::SymbolCollection::iterator i;
+   for (i = _st->gRoot()->Children().begin(); i != _st->gRoot()->Children().end(); ++i)
+   {
+      if (i->second->isTupleType())
+      {
+         codegenTupleType (static_cast<st::TupleType*>(i->second));
+      }
+   }
+}
+
 llvm::Value*
 Codegen::cgDerefExpr (ast::node::Node* node)
 {
@@ -1397,6 +1457,33 @@ Codegen::codegenFunctionType (st::Func* func_ty)
 
    _functions[_getCodegenFuncName(func_ty)] = func;
 
+}
+
+llvm::Value*
+Codegen::codegenTuple (ast::node::Tuple* n)
+{
+   DEBUG_REQUIRE (n != NULL);
+
+   st::TupleType* tuple_ty = static_cast<st::TupleType*>(n->ExprType());
+   llvm::Type* tuple_lty = _getLlvmTy(tuple_ty);
+   llvm::AllocaInst* var = new llvm::AllocaInst(tuple_lty, 0, "", _cur_bb);
+
+   llvm::Value* field = NULL;
+   llvm::Value* field_val = NULL;
+   std::vector<llvm::Value*> field_idx;
+   field_idx.push_back(_createInt32Constant(0));
+   field_idx.push_back(NULL); // Reserved for the field index
+
+   for (size_t i = 0; i < n->ChildCount(); ++i)
+   {
+      field_idx[1] = _createInt32Constant(i);
+      field = _createGepInst(var, field_idx);
+
+      field_val = cgExprAndLoad(n->getChild(i), tuple_ty->Subtypes()[i]);
+      new llvm::StoreInst(field_val, field, "", _cur_bb);
+   }
+
+   return var;
 }
 
 std::string

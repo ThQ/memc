@@ -11,9 +11,10 @@
 #include "mem/st/ArrayType.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/IntType.hpp"
-#include "mem/st/SymbolTable.hpp"
 #include "mem/st/PrimitiveType.hpp"
 #include "mem/st/PointerType.hpp"
+#include "mem/st/SymbolTable.hpp"
+#include "mem/st/TupleType.hpp"
 #include "mem/st/Type.hpp"
 #include "mem/st/Var.hpp"
 
@@ -43,6 +44,9 @@ getPointerType (Type* base_ty);
 
 Symbol*
 getSymbol (Symbol* scope, std::string symbol_name);
+
+TupleType*
+getTupleType (Symbol* scope, TypeVector tys);
 
 size_t
 getIndirectionCount (std::string type_name);

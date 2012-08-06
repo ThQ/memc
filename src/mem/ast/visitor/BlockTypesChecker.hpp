@@ -23,6 +23,8 @@
 #include "mem/ast/node/Ptr.hpp"
 #include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/String.hpp"
+#include "mem/ast/node/Tuple.hpp"
+#include "mem/ast/node/TupleType.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
@@ -138,6 +140,12 @@ class BlockTypesChecker : public TypeChecker
 
    void
    visitString (st::Symbol* scope, node::String* n);
+
+   void
+   visitTuple (st::Symbol* scope, node::Tuple* n);
+
+   void
+   visitTupleType (st::Symbol* scope, node::TupleType* n);
 
    void
    visitVarAssign (st::Symbol* scope, node::VarAssign* var_assign_node);

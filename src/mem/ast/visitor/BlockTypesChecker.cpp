@@ -233,11 +233,24 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 
    if (value_ty != NULL)
    {
+      if (value_ty->isPointerType())
+      {
+         value_ty = static_cast<st::PointerType*>(value_ty)->getNonPointerParent();
+      }
+
       if (value_ty->isArrayType())
       {
          st::ArrayType* arr = static_cast<st::ArrayType*>(value_ty);
          n->setExprType(arr->ItemType());
       }
+      else if (value_ty->isTupleType())
+      {
+         // FIXME Nothing super safe here...
+         assert(n->getChild(1)->isNumberNode());
+         int item_index = static_cast<node::Number*>(n->getChild(1))->getInt();
+         n->setExprType(static_cast<st::TupleType*>(value_ty)->Subtypes()[item_index]);
+      }
+      /*
       else if (value_ty->isPointerType())
       {
          st::Type* ptr_parent = static_cast<st::PointerType*>(value_ty)->PointedType();
@@ -250,10 +263,11 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
             n->setExprType(ptr_parent);
          }
       }
+      */
       else
       {
          log::Error* err = new log::Error();
-         err->setPrimaryText("Subscripted value is not an array of pointer");
+         err->setPrimaryText("Subscripted value is not of array or tuple type (nor a pointer to those types)");
          _logger->log(err);
       }
    }
@@ -628,6 +642,14 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          visitString(scope, util::castTo<node::String*, node::Kind::STRING>(node));
          break;
 
+      case node::Kind::TUPLE:
+         visitTuple(scope, static_cast<node::Tuple*>(node));
+         break;
+
+      case node::Kind::TUPLE_TYPE:
+         visitTupleType(scope, static_cast<node::TupleType*>(node));
+         break;
+
       case node::Kind::VARIABLE_DECLARATION:
          visitVarDecl(scope, static_cast<node::VarDecl*>(node));
          break;
@@ -897,6 +919,71 @@ BlockTypesChecker::visitString (st::Symbol* scope, node::String* n)
    n->setExprType(st::util::getPointerType(unsized_arr_ty));
 
    DEBUG_ENSURE (n->hasExprType());
+}
+
+void
+BlockTypesChecker::visitTuple (st::Symbol* scope, node::Tuple* n)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+
+   st::TypeVector tys;
+   bool an_expr_failed = false;
+   for (size_t i = 0; i < n->ChildCount(); ++i)
+   {
+      visitExpr(scope, n->getChild(i));
+      if (n->getChild(i)->hasExprType())
+      {
+         tys.push_back(n->getChild(i)->ExprType());
+      }
+      else
+      {
+         an_expr_failed = true;
+         break;
+      }
+   }
+
+   if (!an_expr_failed)
+   {
+      st::TupleType* tuple_ty = st::util::getTupleType(_symbols->gRoot(), tys);
+      n->setExprType(tuple_ty);
+      ensureSizedExprType(n);
+   }
+   else
+   {
+      n->setExprType(BugType());
+   }
+
+   DEBUG_ENSURE (n->hasExprType());
+}
+
+void
+BlockTypesChecker::visitTupleType (st::Symbol* scope, node::TupleType* n)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+
+   st::TypeVector tys;
+   for (size_t i = 0; i < n->ChildCount(); ++i)
+   {
+      visitExpr(scope, n->getChild(i));
+      ensureSizedExprType (n->getChild(i));
+      assert(n->getChild(i)->hasExprType());
+      tys.push_back(n->getChild(i)->ExprType());
+   }
+
+   st::TupleType* tuple_ty = st::util::getTupleType(_symbols->gRoot(), tys);
+
+   if (tuple_ty != NULL)
+   {
+      n->setExprType(tuple_ty);
+      n->setBoundSymbol(tuple_ty);
+   }
+   else
+   {
+      n->setExprType(BugType());
+      n->setBoundSymbol(BugType());
+   }
 }
 
 void

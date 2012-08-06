@@ -13,10 +13,7 @@ namespace mem { namespace ast { namespace node {
 class Number : public Node
 {
    public: char _format;
-   public: long _lval;
-   public: int _ival;
-   public: short _sval;
-   public: char _cval;
+   public: long _val;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUTOR
@@ -35,7 +32,7 @@ class Number : public Node
    public:
 
    char
-   getChar(){return _cval;}
+   getChar(){return (char)_val;}
 
    int
    getInt ();
@@ -44,7 +41,7 @@ class Number : public Node
    getShort ();
 
    inline long
-   getLong () {assert(_format=='l');return _lval;}
+   getLong () {return _val;}
 
    std::string
    getStringFromVal();
@@ -62,7 +59,7 @@ class Number : public Node
    setShort (short s);
 
    inline void
-   setChar (char c){_format='c';_cval = c;}
+   setChar (char c){_format='c';_val = c;}
 };
 
 

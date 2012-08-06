@@ -8,23 +8,13 @@ Number::Number ()
 {
    _type = Kind::NUMBER;
    _format = ' ';
-   _sval = 0;
-   _ival = 0;
-   _lval = 0;
+   _val = 0;
 }
 
 int
 Number::getInt ()
 {
-   switch (_format)
-   {
-      case 's':
-         return (int)_sval;
-
-      case 'i':
-         return _ival;
-   }
-   return 0;
+   return (int)_val;
 }
 
 unsigned int
@@ -36,21 +26,21 @@ Number::getUInt ()
 short
 Number::getShort ()
 {
-   return _sval;
+   return (short)_val;
 }
 
 void
 Number::setInt (int i)
 {
    _format = 'i';
-   _ival = i;
+   _val = i;
 }
 
 void
 Number::setShort (short s)
 {
    _format = 's';
-   _sval = s;
+   _val = s;
 }
 
 std::string
@@ -61,14 +51,19 @@ Number::getStringFromVal ()
    switch (_format)
    {
       case 'i':
-         s << (int)_ival;
+         s << (int)_val;
          break;
+
       case 's':
-         s << (short)_sval;
+         s << (short)_val;
          break;
+
       case 'c':
-         s << (short)_cval;
+         s << (char)_val;
          break;
+
+      default:
+         DEBUG_PRINTF("Unknown number format `%c'\n", _format);
    }
 
    return s.str();

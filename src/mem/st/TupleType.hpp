@@ -1,18 +1,14 @@
-#ifndef _MEM__ST__TYPE__HPP_
-#define _MEM__ST__TYPE__HPP_
+#ifndef _MEM__ST__TUPLE_TYPE__HPP_
+#define _MEM__ST__TUPLE_TYPE__HPP_
 
 
-#include <vector>
-#include "mem/st/Symbol.hpp"
+#include "mem/st/Type.hpp"
 
 
 namespace mem { namespace st {
 
 
-/**
- * A base class for all mem types.
- */
-class Type: public Symbol
+class TupleType : public Type
 {
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -22,7 +18,7 @@ class Type: public Symbol
    /**
     * Default constructor.
     */
-   Type();
+   TupleType();
 
 
    //--------------------------------------------------------------------------
@@ -30,14 +26,7 @@ class Type: public Symbol
    //--------------------------------------------------------------------------
    public:
 
-   GETTER(ByteSize, int) {return _byte_size;}
-   SETTER(ByteSize, int) {_byte_size = val;}
-
-   GETTER(ParentType, Type*) {return _parent_type;}
-   SETTER(ParentType, Type*) {_parent_type = val;}
-
-   virtual Symbol*
-   gExprType() {return this;}
+   GETTER(Subtypes, TypeVector) {return _subtypes;}
 
 
    //--------------------------------------------------------------------------
@@ -46,25 +35,30 @@ class Type: public Symbol
    public:
 
    virtual bool
-   canCastTo (Type* dest_ty) const {return false;}
-
-   inline bool
-   hasByteSize() {return _byte_size != -1;}
+   addChild (Symbol* s);
 
    bool
-   isSubclass (Type* parent);
+   addTypes (TypeVector tys);
 
+   bool
+   hasTypes (TypeVector tys);
+
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   void
+   _recomputeName ();
 
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   Type* _parent_type;
-   int _byte_size;
+   TypeVector _subtypes;
 };
-
-typedef std::vector<st::Type*> TypeVector;
 
 } }
 

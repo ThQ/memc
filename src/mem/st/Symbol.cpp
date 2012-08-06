@@ -131,6 +131,7 @@ Symbol::isAnyType () const
       case st::INT_TYPE:
       case st::PRIMITIVE_TYPE:
       case st::POINTER:
+      case st::TUPLE_TYPE:
       case st::ARRAY:
          return true;
       default:

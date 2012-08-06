@@ -51,6 +51,10 @@ XmlDumper::visit (st::Symbol* sym)
          visitPrimitiveType(static_cast<st::PrimitiveType*>(sym));
          break;
 
+      case TUPLE_TYPE:
+         visitTupleType(static_cast<st::TupleType*>(sym));
+         break;
+
       case VAR:
          visitVar(static_cast<st::Var*>(sym));
          break;
@@ -187,6 +191,25 @@ XmlDumper::visitPrimitiveType (st::PrimitiveType* s)
    *_out << "<PrimitiveType name=\"" + s->Name() + "\"";
    *_out << " byte-size=\"" << s->ByteSize() << "\"";
    *_out << " />\n";
+
+   return true;
+}
+
+bool
+XmlDumper::visitTupleType (st::TupleType* s)
+{
+   *_out << "<TupleType name=\"" + s->Name() + "\"";
+   *_out << " byte-size=\"" << s->ByteSize() << "\"";
+   if (s->hasChildren())
+   {
+      *_out << ">\n";
+      visitChildren(s);
+      *_out << "</TupleType>\n";
+   }
+   else
+   {
+      *_out << " />\n";
+   }
 
    return true;
 }

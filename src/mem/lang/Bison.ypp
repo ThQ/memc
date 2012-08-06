@@ -26,6 +26,8 @@
 #include "mem/ast/node/Root.hpp"
 #include "mem/ast/node/String.hpp"
 #include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/Tuple.hpp"
+#include "mem/ast/node/TupleType.hpp"
 #include "mem/ast/node/Use.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
@@ -209,7 +211,9 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %type <node> simple_statement
 %type <node> statement
 %type <node> statements
+%type <node> tuple_type
 %type <node> type_name
+%type <node> type_list
 %type <text_node> use
 %type <text_node> use_file
 %type <node> variable_assignment
@@ -568,6 +572,25 @@ type_name:
       arr->pushChildren($2, $4);
       $$ = static_cast<ast::node::Node*>(arr);
    }
+   | tuple_type
+
+type_list:
+   type_name
+   {
+      $$ = new ast::node::TupleType();
+      $$->pushChild($1);
+   }
+   | type_list T_COMMA type_name
+   {
+      assert ($1 != NULL);
+      $$->pushChild($3);
+   }
+
+tuple_type:
+   T_OP type_list T_CP
+   {
+      $$ = $2;
+   }
 
 variable_assignment :
    expr T_EQ expr
@@ -661,6 +684,13 @@ expr :
       $$ = new ast::node::Node();
       $$->setKind(ast::node::Kind::GROUP);
       $$->pushChild($2);
+   }
+   | T_OP expr_list T_CP
+   {
+      $$ = new ast::node::Tuple();
+      $$->eat($2);
+
+      delete $2;
    }
    | qualified_id
    {

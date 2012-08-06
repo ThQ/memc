@@ -100,6 +100,9 @@ class Symbol
    std::vector<st::Symbol*>
    getParents ();
 
+   inline bool
+   hasChildren() {return _children.size() != 0;}
+
    /**
     * Hints a name for the symbol : it does not actually set it. This is useful
     * for anonymous blocks (if, while, for, ...).
@@ -142,6 +145,9 @@ class Symbol
 
    inline bool
    isPointerType() const {return is(st::POINTER);}
+
+   bool
+   isTupleType() const {return is(st::TUPLE_TYPE);}
 
    bool
    isReferenceSymbol() const;

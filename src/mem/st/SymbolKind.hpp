@@ -21,7 +21,8 @@ typedef enum {
    ARRAY=12,
    ALIAS=13,
    INT_TYPE=14,
-   MACRO=15
+   MACRO=15,
+   TUPLE_TYPE=16
 } SymbolKind;
 
 

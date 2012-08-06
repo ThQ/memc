@@ -14,6 +14,7 @@
 #include "mem/st/PointerType.hpp"
 #include "mem/st/PrimitiveType.hpp"
 #include "mem/st/Symbol.hpp"
+#include "mem/st/TupleType.hpp"
 #include "mem/st/Var.hpp"
 #include "mem/st/visitor/Visitor.hpp"
 

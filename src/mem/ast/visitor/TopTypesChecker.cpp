@@ -202,11 +202,13 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
 {
    DEBUG_REQUIRE (func_node != NULL);
    DEBUG_REQUIRE (func_sym != NULL);
+   DEBUG_REQUIRE (func_node->ReturnTypeNode() != NULL);
 
    node::Text* ret_ty_node = static_cast<node::Text*>(
       func_node->ReturnTypeNode());
 
    visitExpr(func_sym, ret_ty_node);
+   assert (ret_ty_node != NULL);
    func_node->setBoundSymbol(func_sym);
 
    if (ret_ty_node->BoundSymbol()->Name() != "void")

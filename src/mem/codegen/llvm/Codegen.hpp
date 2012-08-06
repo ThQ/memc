@@ -20,6 +20,7 @@
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/String.hpp"
+#include "mem/ast/node/Tuple.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/While.hpp"
 #include "mem/codegen/ICodegen.hpp"
@@ -272,6 +273,12 @@ class Codegen : public mem::codegen::ICodegen
    cgString (ast::node::String* n);
 
    void
+   codegenTupleType (st::TupleType* t);
+
+   void
+   codegenTupleTypes ();
+
+   void
    cgVarAssignStatement (ast::node::VarAssign* node);
 
    void
@@ -288,6 +295,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    codegenFunctionBodies (ast::node::Root* root_n);
+
+   llvm::Value*
+   codegenTuple (ast::node::Tuple* n);
 
    virtual void
    gen (ast::node::Node* root);

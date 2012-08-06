@@ -149,6 +149,32 @@ getSymbol (Symbol* scope, std::string sym_name)
    return res;
 }
 
+TupleType*
+getTupleType (Symbol* scope, TypeVector tys)
+{
+   st::Symbol* child = NULL;
+   Symbol::SymbolCollectionIterator i;
+
+   for (i = scope->Children().begin(); i != scope->Children().end(); ++i)
+   {
+      child = i->second;
+      if (child->isTupleType())
+      {
+         if (static_cast<st::TupleType*>(child)->hasTypes(tys))
+         {
+            return static_cast<st::TupleType*>(child);
+         }
+      }
+   }
+
+   // TupleType is not found, create it
+   st::TupleType* tuple_ty = new st::TupleType();
+   tuple_ty->addTypes(tys);
+   scope->addChild(tuple_ty);
+
+   return tuple_ty;
+}
+
 ArrayType*
 getUnsizedArrayType (ArrayType* sized_array)
 {

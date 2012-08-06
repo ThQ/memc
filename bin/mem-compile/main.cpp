@@ -3,6 +3,8 @@
 
 int main (int argc, char** argv)
 {
+   DEBUG_PRINT("[Running in DEBUG mode]\n");
+
    opt::Options opts;
    opts.addStrOpt("--dump-ast-xml", "",
       "Dump the Abstract Syntax Tree as XML");

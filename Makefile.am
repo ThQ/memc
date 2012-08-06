@@ -38,6 +38,8 @@ src_mem_ast_node = \
  src/mem/ast/node/Root.cpp \
  src/mem/ast/node/String.cpp \
  src/mem/ast/node/Text.cpp \
+ src/mem/ast/node/Tuple.cpp \
+ src/mem/ast/node/TupleType.cpp \
  src/mem/ast/node/Type.cpp \
  src/mem/ast/node/Use.cpp \
  src/mem/ast/node/VarAssign.cpp \
@@ -98,6 +100,7 @@ src_mem_st = \
  src/mem/st/PointerType.cpp \
  src/mem/st/Symbol.cpp \
  src/mem/st/SymbolTable.cpp \
+ src/mem/st/TupleType.cpp \
  src/mem/st/Type.cpp \
  src/mem/st/util.cpp \
  src/mem/st/Var.cpp

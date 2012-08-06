@@ -56,6 +56,9 @@ class XmlDumper : public IDumper
    visitPrimitiveType (st::PrimitiveType* s);
 
    virtual bool
+   visitTupleType (st::TupleType* s);
+
+   virtual bool
    visitVar (st::Var* var_sym);
 
    virtual bool
