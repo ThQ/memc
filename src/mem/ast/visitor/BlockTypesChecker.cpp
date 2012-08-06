@@ -866,7 +866,7 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
 
    visitExpr(scope, value_node);
 
-   if (value_node->ExprType() == parent_func->ReturnType())
+   if (checkAssignment(value_node, parent_func->ReturnType()))
    {
       n->setExprType(parent_func->ReturnType());
    }
