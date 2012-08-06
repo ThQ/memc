@@ -14,12 +14,20 @@ namespace mem { namespace st {
 class PointerType : public Type
 {
    //--------------------------------------------------------------------------
-   // FIELDS
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   Type* _pointed_type;
-   int _ptr_level;
+   /**
+    * Default constructor.
+    */
+   PointerType ();
+
+   /**
+    * Destructor.
+    */
+   virtual
+   ~PointerType ();
 
 
    //--------------------------------------------------------------------------
@@ -44,23 +52,6 @@ class PointerType : public Type
 
 
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTOR
-   //--------------------------------------------------------------------------
-   public:
-
-   /**
-    * Default constructor.
-    */
-   PointerType ();
-
-   /**
-    * Destructor.
-    */
-   virtual
-   ~PointerType ();
-
-
-   //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -78,11 +69,26 @@ class PointerType : public Type
    inline Symbol*
    getChild (std::string name) {return _pointed_type->getChild(name);}
 
+   /**
+    * Return the first non-pointer parent.
+    */
    Type*
    getNonPointerParent ();
 
+   /**
+    * True if this pointer type points to an array type.
+    */
    bool
    isPointerToArray () { return _pointed_type->isArrayType();}
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   Type* _pointed_type;
+   int _ptr_level;
 };
 
 

@@ -4,6 +4,9 @@
 namespace mem { namespace st {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
 PointerType::PointerType ()
 {
    _pointed_type = NULL;
@@ -15,6 +18,11 @@ PointerType::PointerType ()
 PointerType::~PointerType ()
 {
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 Type*
 PointerType::getNonPointerParent ()

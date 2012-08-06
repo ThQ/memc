@@ -10,15 +10,9 @@ namespace mem { namespace st {
 
 class Field : public Var
 {
-   //--------------------------------------------------------------------------
-   // FIELDS
-   //--------------------------------------------------------------------------
-   public:
-
-   int _field_index;
 
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTORS
+   // CONSTRUCTORS / DESTRUCTOR
    // -------------------------------------------------------------------------
    public:
 
@@ -27,12 +21,15 @@ class Field : public Var
     */
    Field();
 
+
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
+
    GETTER(FieldIndex, int) {return _field_index;}
    SETTER(FieldIndex, int) {_field_index = val;}
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -41,6 +38,14 @@ class Field : public Var
 
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Ptr");return false;}
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   int _field_index;
 };
 
 } }

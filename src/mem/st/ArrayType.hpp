@@ -17,14 +17,6 @@ namespace mem { namespace st {
 class ArrayType : public Type
 {
    //--------------------------------------------------------------------------
-   // FIELDS
-   //--------------------------------------------------------------------------
-   protected:
-
-   st::Type* _item_type;
-   int _array_length;
-
-   //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
    public:
@@ -33,6 +25,7 @@ class ArrayType : public Type
     * Default constructor.
     */
    ArrayType();
+
 
    //--------------------------------------------------------------------------
    // PROPERTIES
@@ -47,15 +40,6 @@ class ArrayType : public Type
 
 
    //--------------------------------------------------------------------------
-   // PROTECTED METHODS
-   //--------------------------------------------------------------------------
-   public:
-
-   void
-   _computeByteSize();
-
-
-   //--------------------------------------------------------------------------
    // PUBLIC METHODS
    //--------------------------------------------------------------------------
    public:
@@ -63,8 +47,29 @@ class ArrayType : public Type
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Array");return false;}
 
+   /**
+    * Return true if the array is sized (staticaly allocated).
+    */
    bool
    hasLength() const {return _array_length != -1;}
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   void
+   _computeByteSize();
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   st::Type* _item_type;
+   int _array_length;
+
 };
 
 } }

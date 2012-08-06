@@ -4,7 +4,7 @@ namespace mem { namespace st {
 
 
 //-----------------------------------------------------------------------------
-// CONSTRUCTORS / DESTRUCTORS
+// CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 Symbol::Symbol ()
 {

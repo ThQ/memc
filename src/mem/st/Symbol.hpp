@@ -25,20 +25,22 @@ class Symbol
    typedef std::map<std::string, Symbol*> SymbolCollection;
    typedef SymbolCollection::iterator SymbolCollectionIterator;
 
-   //--------------------------------------------------------------------------
-   // FIELDS
-   //--------------------------------------------------------------------------
-   protected:
 
-   size_t _child_count;
-   SymbolCollection _children;
-   unsigned int _depth;
-   SymbolKind _kind;
-   ::mem::Metadata* _md;
-   std::string _name;
-   Symbol* _parent;
-   fs::position::Range _pos;
-   int _size;
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTORS
+   //--------------------------------------------------------------------------
+   public:
+
+   /**
+    * Default constructor.
+    */
+   Symbol ();
+
+   /**
+    * Destructor.
+    */
+   virtual
+   ~Symbol ();
 
 
    //--------------------------------------------------------------------------
@@ -79,23 +81,6 @@ class Symbol
 
 
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTORS
-   //--------------------------------------------------------------------------
-   public:
-
-   /**
-    * Default constructor.
-    */
-   Symbol ();
-
-   /**
-    * Destructor.
-    */
-   virtual
-   ~Symbol ();
-
-
-   //--------------------------------------------------------------------------
    // PUBLIC METHODS
    //--------------------------------------------------------------------------
    public:
@@ -115,6 +100,10 @@ class Symbol
    std::vector<st::Symbol*>
    getParents ();
 
+   /**
+    * Hints a name for the symbol : it does not actually set it. This is useful
+    * for anonymous blocks (if, while, for, ...).
+    */
    void
    hintName (Symbol* parent, std::string hint);
 
@@ -180,6 +169,22 @@ class Symbol
     */
    inline const char*
    gQualifiedNameCstr() { return this->gQualifiedName().c_str();}
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   size_t _child_count;
+   SymbolCollection _children;
+   unsigned int _depth;
+   SymbolKind _kind;
+   ::mem::Metadata* _md;
+   std::string _name;
+   Symbol* _parent;
+   fs::position::Range _pos;
+   int _size;
 };
 
 

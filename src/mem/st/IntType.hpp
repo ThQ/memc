@@ -23,10 +23,14 @@ class IntType : public PrimitiveType
     */
    IntType ();
 
+   /**
+    * Construct an integer type given its name and size.
+    */
    IntType (std::string name, int size);
 
+
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTION
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 

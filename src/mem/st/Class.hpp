@@ -17,8 +17,6 @@ namespace mem { namespace st {
  */
 class Class : public Type
 {
-   public: int _cur_field_index;
-
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
@@ -48,7 +46,7 @@ class Class : public Type
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC METHODS
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -62,6 +60,10 @@ class Class : public Type
    int
    getAbsoluteFieldCount ();
 
+   /**
+    * Given a relative field index in a class type, return its absolute field
+    * index.
+    */
    int
    getFieldAbsoluteIndex (int field_relative_index);
 
@@ -78,8 +80,16 @@ class Class : public Type
    /**
     * Checks wether a class depends on another (directly or indirectly).
     */
-    bool
-    isDependingOn (Class* cls);
+   bool
+   isDependingOn (Class* cls);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   int _cur_field_index;
 };
 
 
