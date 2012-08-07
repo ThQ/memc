@@ -454,12 +454,15 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    */
    if (value_ty->isPointerType())
    {
-      for (int i = 0; i <= static_cast<st::PointerType*>(value_ty)->IndirectionLevel(); ++i)
+      for (int i = 0; i < static_cast<st::PointerType*>(value_ty)->IndirectionLevel(); ++i)
       {
          val = new llvm::LoadInst(val, "", _cur_bb);
       }
    }
-   idx.push_back(_createInt32Constant(0));
+   if (!value_ty->isPointerType() && ! static_cast<st::PointerType*>(value_ty)->isPointerToArray())
+   {
+      idx.push_back(_createInt32Constant(0));
+   }
    idx.push_back(index);
 
    // Compute address
