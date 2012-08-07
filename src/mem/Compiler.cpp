@@ -52,7 +52,7 @@ Compiler::addMacro (ast::macro::Macro* macro)
    DEBUG_REQUIRE (macro != NULL);
 
    st::Macro* macro_sym = macro->getSymbol();
-   symbols._root->addChild(macro_sym);
+   symbols.System()->addChild(macro_sym);
 }
 
 void
@@ -89,7 +89,7 @@ Compiler::dumpSt ()
       st::visitor::XmlDumper dumper;
       dumper._out = &st_dump_file;
       dumper.setup();
-      dumper.visitPreorder(symbols._root);
+      dumper.visitPreorder(symbols.Root());
 
       st_dump_file.close();
       _logger->debug("SymbolTable dumped to %s (XML)", dump_path.c_str());
@@ -378,7 +378,7 @@ Compiler::runStVisitors ()
    {
       _logger->debug("[%s] running...", st_visitors[i]->gNameCstr());
       st_visitors[i]->setup();
-      st_visitors[i]->visitPreorder(symbols.gRoot());
+      st_visitors[i]->visitPreorder(symbols.Root());
       st_visitors[i]->tearDown();
    }
 }

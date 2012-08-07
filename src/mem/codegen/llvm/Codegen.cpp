@@ -1224,7 +1224,7 @@ void
 Codegen::codegenTupleTypes ()
 {
    st::Symbol::SymbolCollection::iterator i;
-   for (i = _st->gRoot()->Children().begin(); i != _st->gRoot()->Children().end(); ++i)
+   for (i = _st->System()->Children().begin(); i != _st->System()->Children().end(); ++i)
    {
       if (i->second->isTupleType())
       {

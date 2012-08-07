@@ -16,7 +16,7 @@ UseAlias::visit (node::Node* node)
    {
       case node::Kind::USE:
          std::string file_ns_name = static_cast<node::Use*>(node)->gValue();
-         st::Symbol* file_sym = st::util::lookupSymbol(_symbols->gRoot(), st::util::splitQualifiedName(file_ns_name));
+         st::Symbol* file_sym = st::util::lookupSymbol(_symbols->Root(), st::util::splitQualifiedName(file_ns_name));
 
          if (file_sym != NULL)
          {

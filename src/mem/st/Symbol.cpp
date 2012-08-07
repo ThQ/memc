@@ -6,6 +6,7 @@ namespace mem { namespace st {
 //-----------------------------------------------------------------------------
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
+
 Symbol::Symbol ()
 {
    _child_count = 0;
@@ -13,7 +14,6 @@ Symbol::Symbol ()
    _kind = UNKNOWN;
    _md = NULL;
    _parent = NULL;
-   _size = 0;
 }
 
 Symbol::~Symbol ()
@@ -167,6 +167,7 @@ Symbol::isReferenceSymbol() const
       default:
          return false;
    }
+   DEBUG_UNREACHABLE();
 }
 
 

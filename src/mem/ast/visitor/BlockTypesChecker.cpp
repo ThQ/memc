@@ -946,7 +946,7 @@ BlockTypesChecker::visitTuple (st::Symbol* scope, node::Tuple* n)
 
    if (!an_expr_failed)
    {
-      st::TupleType* tuple_ty = st::util::getTupleType(_symbols->gRoot(), tys);
+      st::TupleType* tuple_ty = st::util::getTupleType(_symbols->System(), tys);
       n->setExprType(tuple_ty);
       ensureSizedExprType(n);
    }
@@ -973,7 +973,7 @@ BlockTypesChecker::visitTupleType (st::Symbol* scope, node::TupleType* n)
       tys.push_back(n->getChild(i)->ExprType());
    }
 
-   st::TupleType* tuple_ty = st::util::getTupleType(_symbols->gRoot(), tys);
+   st::TupleType* tuple_ty = st::util::getTupleType(_symbols->System(), tys);
 
    if (tuple_ty != NULL)
    {

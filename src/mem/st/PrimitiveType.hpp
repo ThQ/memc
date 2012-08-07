@@ -7,7 +7,7 @@
 
 namespace mem { namespace st {
 
-
+// A base class for all primitive types : int, float, void, etc.
 class PrimitiveType : public Type
 {
    //--------------------------------------------------------------------------
@@ -15,9 +15,7 @@ class PrimitiveType : public Type
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    PrimitiveType ();
 
 

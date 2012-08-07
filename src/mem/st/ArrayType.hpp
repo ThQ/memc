@@ -8,12 +8,10 @@
 namespace mem { namespace st {
 
 
-/**
- * A base class for Array types.
- *
- * If an array type has a length, then it is staticaly declared, ortherwise it
- * is dynamicaly allocated.
- */
+// A base class for Array types.
+//
+// If an array type has a length, then it is staticaly declared, ortherwise it
+// is dynamicaly allocated.
 class ArrayType : public Type
 {
    //--------------------------------------------------------------------------
@@ -21,9 +19,7 @@ class ArrayType : public Type
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    ArrayType();
 
 
@@ -47,9 +43,7 @@ class ArrayType : public Type
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Array");return false;}
 
-   /**
-    * Return true if the array is sized (staticaly allocated).
-    */
+   // Return true if the array is sized (staticaly allocated).
    bool
    hasLength() const {return _array_length != -1;}
 

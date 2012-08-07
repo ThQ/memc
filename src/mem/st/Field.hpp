@@ -10,15 +10,12 @@ namespace mem { namespace st {
 
 class Field : public Var
 {
-
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    // -------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Field();
 
 

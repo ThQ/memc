@@ -10,18 +10,16 @@
 namespace mem { namespace st {
 
 
-/**
- * A symbol to represent functions.
- *
- * Several properties :
- * - Functions have parameters, each having the type Arg
- * - Functions have a return type
- * - Functions can have children, first each parameter is added as a child,
- *   then each variable at the top of the function body is also listed.
- *
- * Functions are nodes of a linked list which lists all functions. This is
- * useful when code generating.
- */
+// A symbol to represent functions.
+//
+// Several properties :
+// - Functions have parameters, each having the type Arg
+// - Functions have a return type
+// - Functions can have children, first each parameter is added as a child,
+//   then each variable at the top of the function body is also listed.
+//
+// Functions are nodes of a linked list which lists all functions. This is
+// useful when code generating.
 class Func: public Type
 {
    //--------------------------------------------------------------------------
@@ -29,14 +27,10 @@ class Func: public Type
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Func();
 
-   /**
-    * Default destructor.
-    */
+   // Default destructor.
    ~Func();
 
 
@@ -70,15 +64,11 @@ class Func: public Type
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Add a function parameter given its name and type.
-    */
+   // Add a function parameter given its name and type.
    st::Arg*
    addParam (std::string name, st::Type* ty);
 
-   /**
-    * Return the Nth parameter.
-    */
+   // Return the Nth parameter.
    st::Var*
    getParam (int i);
 
@@ -91,7 +81,6 @@ class Func: public Type
    bool _has_body;
    bool _is_entry_point;
    std::vector<Arg*> _params;
-   //Func* _overloaded_func;
    Type* _return_type;
    Func* _next_function;
 };

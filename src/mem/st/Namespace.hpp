@@ -10,14 +10,12 @@ namespace mem { namespace st {
 
 class Namespace : public Symbol
 {
-   public: Namespace ();
-   public: Type* get_type (Type*& dest, std::string type_name);
-   public: Namespace* get_namespace (Namespace*& dest, char* name, size_t name_len);
-   public: bool has_symbol (std::string name);
-   //public: virtual void print ();
-   // @FIXME Pretty sure these are useless
-   public: Type* push (Type* type);
-   public: Namespace* push (Namespace* ns);
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   Namespace ();
 };
 
 

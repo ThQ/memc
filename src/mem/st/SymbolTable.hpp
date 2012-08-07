@@ -18,13 +18,10 @@
 
 namespace mem { namespace st {
 
-
+// The class that manages all the symbols used.
 class SymbolTable
 {
-   public: Namespace* _root;
-   public: Namespace* _home;
-   public: Namespace* _system;
-   public: inline Namespace* gRoot () {return _root;}
+   //public: inline Namespace* gRoot () {return _root;}
    public: std::map<std::string, st::Type*> _types;
    public: std::map<std::string, st::Type*> gTypes (){return _types;}
 
@@ -40,14 +37,10 @@ class SymbolTable
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    SymbolTable ();
 
-   /**
-    * Destructor.
-    */
+   // Destructor.
    ~SymbolTable ();
 
 
@@ -55,7 +48,6 @@ class SymbolTable
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
-
 
    // FunctionLinkedListHead
    GETTER(FunctionLinkedListHead, Func*) {return _func_ll_head;}
@@ -65,11 +57,14 @@ class SymbolTable
    GETTER(FunctionLinkedListTail, Func*) {return _func_ll_tail;}
    SETTER(FunctionLinkedListTail, Func*) {_func_ll_tail = val;}
 
-   // Home
+   // The `home' namespace
    GETTER(Home, Namespace*) {return _home;}
 
-   // System
+   // The `system' namespace
    GETTER(System, Namespace*) {return _system;}
+
+   // The top level namespace
+   GETTER(Root, Namespace*) {return _root;}
 
 
    //--------------------------------------------------------------------------
@@ -88,19 +83,46 @@ class SymbolTable
    bool register_symbol (std::string path, Symbol* sym);
 #endif
 
+   // True if the symbol is the void type.
    inline bool
    isVoidType (st::Symbol* s) {return s == _core_types._void;}
 
+   // Lookup a symbol from a given scope.
+   //
+   // It starts from the home namespace, then switches to the system namespace.
    st::Symbol*
    lookupSymbol (st::Symbol* scope, std::string symbol_id);
 
+   // Lookup a symbol in a scope until a top scope is reached.
    st::Symbol*
    lookupSymbolUntil (st::Symbol* cur_scope, std::string symbol_id, st::Symbol* top_scope);
-   /**
-    * Add a function to the function linked list.
-    */
+
+   // Add a function to the function linked list.
    void
    registerFunction (Func* func);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   // The root namespace.
+   //
+   // Every symbol created must be added to this namespace, directly or
+   // indirectly.
+   Namespace* _root;
+
+   // The home namespace.
+   //
+   // Symbols created by the user must be added to this namespace.
+   Namespace* _home;
+
+   // The system namespace.
+   //
+   // Symbols created at start up must be added to this namespace. The user
+   // should never add anything to this.
+   Namespace* _system;
 };
 
 

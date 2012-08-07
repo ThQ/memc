@@ -16,9 +16,7 @@
 namespace mem { namespace st {
 
 
-/**
- * A base class for all symbols stored in the symbol table.
- */
+// A base class for all symbols stored in the symbol table.
 class Symbol
 {
    public:
@@ -31,14 +29,10 @@ class Symbol
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Symbol ();
 
-   /**
-    * Destructor.
-    */
+   // Destructor.
    virtual
    ~Symbol ();
 
@@ -85,42 +79,43 @@ class Symbol
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Appends a child symbol.
-    */
+   // Appends a child symbol.
    virtual bool
    addChild (Symbol* symb);
 
-   /**
-    * Returns a child given its name.
-    */
+   // Returns a child given its name.
    virtual Symbol*
    getChild (std::string name);
 
    std::vector<st::Symbol*>
    getParents ();
 
+   // True if the symbol has children.
    inline bool
    hasChildren() {return _children.size() != 0;}
 
-   /**
-    * Hints a name for the symbol : it does not actually set it. This is useful
-    * for anonymous blocks (if, while, for, ...).
-    */
+   // Hints a name for the symbol.
+   //
+   // It does not actually set it. This is useful for anonymous blocks
+   // (if, while, for, ...).
    void
    hintName (Symbol* parent, std::string hint);
 
-   /**
-    * Returns true if the symbol is of a given kind.
-    */
+   // Returns true if the symbol is of a given kind.
    inline bool
    is (SymbolKind kind) const {return _kind == kind;};
 
    inline bool
-   isArgSymbol() const {return is(st::ARG);}
+   isAliasSymbol() const {return is(st::ALIAS);}
+
+   bool
+   isAnyPrimitiveType () const;
+
+   bool
+   isAnyType () const;
 
    inline bool
-   isAliasSymbol() const {return is(st::ALIAS);}
+   isArgSymbol() const {return is(st::ARG);}
 
    inline bool
    isArrayType() const {return is(st::ARRAY);}
@@ -141,38 +136,28 @@ class Symbol
    isMacro () const {return is(st::MACRO);}
 
    inline bool
-   isPrimitiveType() const {return is(st::PRIMITIVE_TYPE);}
-
-   inline bool
    isPointerType() const {return is(st::POINTER);}
 
-   bool
-   isTupleType() const {return is(st::TUPLE_TYPE);}
+   inline bool
+   isPrimitiveType() const {return is(st::PRIMITIVE_TYPE);}
 
    bool
    isReferenceSymbol() const;
 
+   bool
+   isTupleType() const {return is(st::TUPLE_TYPE);}
+
    inline bool
    isVarSymbol() const {return is(st::VAR);}
 
-   bool
-   isAnyPrimitiveType () const;
-
-   bool
-   isAnyType () const;
-
-   /**
-    * Returns the qualified name of the symbol.
-    *
-    * If this symbol is named <Socket> and its parent name is <net>, then it
-    * will return <net.Socket>
-    */
+   // Returns the qualified name of the symbol.
+   //
+   // If this symbol is named <Socket> and its parent name is <net>, then it
+   // will return <net.Socket>
    virtual std::string
    gQualifiedName();
 
-   /**
-    * Returns the qualified name as a char pointer.
-    */
+   // Returns the qualified name as a char pointer.
    inline const char*
    gQualifiedNameCstr() { return this->gQualifiedName().c_str();}
 
@@ -182,15 +167,31 @@ class Symbol
    //--------------------------------------------------------------------------
    protected:
 
+   // The number of children.
    size_t _child_count;
+
+   // A hash map of all the children.
    SymbolCollection _children;
+
+   // The depth of the symbol in the whole symbol hierarchy.
    unsigned int _depth;
+
+   // The kind of the symbol.
    SymbolKind _kind;
+
+   // Any metadata about the symbol.
    ::mem::Metadata* _md;
+
+   // The name (id) of the symbol.
+   //
+   // It does not include the names of the parents.
    std::string _name;
+
+   // The symbol's parent.
    Symbol* _parent;
+
+   // The position in the source where the symbol was encoutered.
    fs::position::Range _pos;
-   int _size;
 };
 
 

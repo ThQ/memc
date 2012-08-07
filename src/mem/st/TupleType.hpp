@@ -7,7 +7,10 @@
 
 namespace mem { namespace st {
 
-
+// A base class for all tuple types.
+//
+// A tuple is like a class type except its fields are unnamed.
+// Tuple types must always be created in the `system' namespace.
 class TupleType : public Type
 {
    //--------------------------------------------------------------------------
@@ -15,9 +18,7 @@ class TupleType : public Type
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    TupleType();
 
 
@@ -37,9 +38,11 @@ class TupleType : public Type
    virtual bool
    addChild (Symbol* s);
 
+   // Add the types in @tys to the tuple subtypes.
    bool
    addTypes (TypeVector tys);
 
+   // True if the types @tys are the subtypes of the tuple.
    bool
    hasTypes (TypeVector tys);
 
@@ -49,14 +52,19 @@ class TupleType : public Type
    //--------------------------------------------------------------------------
    protected:
 
+   // Recompute the type name.
+   //
+   // This is done every time a subtype is added.
    void
    _recomputeName ();
+
 
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
+   // The types of the components of the tuple.
    TypeVector _subtypes;
 };
 

@@ -8,9 +8,7 @@
 namespace mem { namespace st {
 
 
-/**
- * A base class for signed integer types.
- */
+// A base class for signed integer types.
 class IntType : public PrimitiveType
 {
    //--------------------------------------------------------------------------
@@ -18,14 +16,10 @@ class IntType : public PrimitiveType
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    IntType ();
 
-   /**
-    * Construct an integer type given its name and size.
-    */
+   // Construct an integer type given its name and size.
    IntType (std::string name, int size);
 
 

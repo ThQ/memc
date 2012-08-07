@@ -10,11 +10,9 @@
 namespace mem { namespace st {
 
 
-/**
- * A base class representing Class types.
- *
- * FIXME : Byte size does take into account ancestor's fields.
- */
+// A base class representing Class types.
+//
+// FIXME : Byte size does take into account ancestor's fields.
 class Class : public Type
 {
    //--------------------------------------------------------------------------
@@ -38,9 +36,7 @@ class Class : public Type
    // PROPERTIES
    //--------------------------------------------------------------------------
 
-   /**
-    * Returns the parent class in the type hierarchy.
-    */
+   // The parent class in the type hierarchy.
    GETTER(ParentClass, st::Class*) { return static_cast<st::Class*>(_parent);}
    SETTER(ParentClass, st::Class*) { _parent = val; }
 
@@ -60,26 +56,23 @@ class Class : public Type
    int
    getAbsoluteFieldCount ();
 
-   /**
-    * Given a relative field index in a class type, return its absolute field
-    * index.
-    */
+   // Given a relative field index in a class type, return its absolute field
+   // index.
    int
    getFieldAbsoluteIndex (int field_relative_index);
 
-   /**
-    * Get a list of all the fields in the class type, including the ancestor's
-    * fields.
-    */
+   // Get a list of all the fields in the class type, including the ancestor's
+   // fields.
    std::vector<st::Field*>
    getOrderedFields();
 
+   // True if the class type has fields of its own.
+   //
+   // FIXME: This should take into account the ancestor's fields.
    inline bool
    hasFields () {return _cur_field_index > 0;}
 
-   /**
-    * Checks wether a class depends on another (directly or indirectly).
-    */
+   // Checks wether a class depends on another (directly or indirectly).
    bool
    isDependingOn (Class* cls);
 
