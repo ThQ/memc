@@ -309,7 +309,11 @@ Compiler::run ()
 
    // Need to set this before parsing command line arguments because it can
    // raise warnings
+#ifdef NDEBUG
    _logger->setLevel(log::INFO);
+#else
+   _logger->setLevel(log::DEBUG);
+#endif
 
    if (_opts->isSet("--log-level"))
    {
