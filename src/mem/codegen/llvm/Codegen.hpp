@@ -2,11 +2,18 @@
 #define _MEM__CODEGEN__LLVM__CODEGEN__HPP_
 
 
+#include <llvm/CodeGen/AsmPrinter.h>
 #include <llvm/DerivedTypes.h>
 #include <llvm/LLVMContext.h>
+#include <llvm/PassManager.h>
 #include <llvm/Module.h>
 #include <llvm/Support/IRBuilder.h>
 #include <llvm/Support/raw_ostream.h>
+#include <llvm/Target/TargetData.h>
+#include <llvm/Target/TargetMachine.h>
+#include "llvm/Support/FormattedStream.h"
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/TargetSelect.h>
 #include <map>
 #include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryOp.hpp"

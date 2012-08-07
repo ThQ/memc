@@ -11,6 +11,8 @@ Codegen::Codegen ()
    _exit_block = NULL;
    _module = NULL;
    _st = NULL;
+   llvm::InitializeNativeTarget();
+
 }
 
 std::string
@@ -1492,6 +1494,39 @@ Codegen::codegenTuple (ast::node::Tuple* n)
 std::string
 Codegen::getLlvmByteCode ()
 {
+#if 0
+   const llvm::Target* target = NULL;
+
+   for (llvm::TargetRegistry::iterator it = llvm::TargetRegistry::begin(),
+           ie = llvm::TargetRegistry::end(); it != ie; ++it)
+   {
+      if (strcmp(it->getName(),"x86")==0)
+      {
+         target = &*it;
+      }
+   }
+
+   if (target != NULL)
+   {
+      std::string err;
+      llvm::raw_fd_ostream obj_file("/home/thomas/test.s", err);
+      llvm::formatted_raw_ostream out(obj_file);
+      DEBUG_PRINTF("Errors ? %s\n", err.c_str());
+
+      llvm::TargetMachine* t = target->createTargetMachine(_module->getTargetTriple(), "", "");
+      assert (t != NULL);
+      llvm::PassManager pm;
+      pm.add(new llvm::TargetData(_module));
+      t->addPassesToEmitFile(pm, out, llvm::TargetMachine::CGFT_AssemblyFile,llvm::CodeGenOpt::Less);
+      pm.run(*_module);
+
+   }
+   else
+   {
+      DEBUG_PRINT("Architecture not supported\n");
+   }
+#endif
+
    std::string bc;
    llvm::raw_string_ostream stream(bc);
    _module->print(stream, NULL);
