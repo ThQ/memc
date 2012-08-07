@@ -59,7 +59,7 @@ Number::getStringFromVal ()
          break;
 
       case 'c':
-         s << (char)_val;
+         s << (short)_val;
          break;
 
       default:
