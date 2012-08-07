@@ -13,10 +13,17 @@ Compiler::Compiler ()
 
    gTOKENIZER.setLogger(_logger);
 
+   addDecorator(new decorator::External());
+   addDecorator(new decorator::Require());
+
+   addMacro(new ast::macro::PtrMacros());
+
+   // Setup AST visitors
    addAstVisitor(new ast::visitor::UseAlias());
    addAstVisitor(new ast::visitor::Prechecker());
    addAstVisitor(new ast::visitor::FindClasses());
    addAstVisitor(new ast::visitor::TopTypesChecker());
+   addAstVisitor(new ast::visitor::Decorate(_decorators));
    addAstVisitor(new ast::visitor::BlockTypesChecker());
    //addAstVisitor(new ast::visitor::TypeMatch());
    addAstVisitor(new ast::visitor::CheckValidity());
@@ -27,7 +34,7 @@ Compiler::Compiler ()
    st::util::setupInts(this->symbols, this->symbols.gCoreTypes());
    st::util::setupVoid(this->symbols, this->symbols.gCoreTypes());
 
-   addMacro(new ast::macro::PtrMacros());
+
 }
 
 Compiler::~Compiler ()
@@ -43,6 +50,17 @@ Compiler::~Compiler ()
    for (size_t i = 0; i < st_visitors.size(); ++i)
    {
       delete st_visitors[i];
+   }
+}
+
+void
+Compiler::addDecorator (decorator::Decorator* dec)
+{
+   DEBUG_REQUIRE (dec != NULL);
+
+   if (_decorators.find(dec->Name()) == _decorators.end())
+   {
+      _decorators[dec->Name()] = dec;
    }
 }
 

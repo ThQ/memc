@@ -122,6 +122,9 @@ class Node
    inline bool
    hasMetadata() const {return _md != NULL;}
 
+   void
+   insertChild (Node* n);
+
    inline bool
    isAmpersandNode() const {return isKind(Kind::AMPERSAND);}
 
@@ -142,6 +145,9 @@ class Node
 
    inline bool
    isClassNode() const {return isKind(Kind::CLASS);}
+
+   inline bool
+   isDecoratorNode() const {return isKind(Kind::DECORATOR);}
 
    inline bool
    isDotNode() const {return isKind(Kind::DOT);}
@@ -294,6 +300,9 @@ class Node
     */
    void
    unlink ();
+
+   void
+   unlinkChildren ();
 };
 
 

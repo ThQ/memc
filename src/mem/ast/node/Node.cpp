@@ -95,6 +95,20 @@ Node::get_type_name (unsigned int type)
     return kKIND_NAMES[type];
 }
 
+void
+Node::insertChild (Node* n)
+{
+   n->_parent = this;
+   if (_first_child != NULL)
+   {
+      _first_child->_prev = n;
+      n->_next = _first_child;
+   }
+   _first_child = n;
+   n->_depth = this->_depth + 1;
+   _child_count ++;
+}
+
 bool
 Node::isAssignable ()
 {
@@ -220,11 +234,20 @@ Node::replaceChild (Node* search, Node* replace)
 void
 Node::unlink ()
 {
+   _child_count = 0;
    _parent = NULL;
    _last_child = NULL;
    _first_child = NULL;
    _prev = NULL;
    _next = NULL;
+}
+
+void
+Node::unlinkChildren ()
+{
+   _child_count = 0;
+   _last_child = NULL;
+   _first_child = NULL;
 }
 
 

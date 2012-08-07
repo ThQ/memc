@@ -23,6 +23,19 @@ Func::BodyNode ()
    return NULL;
 }
 
+Decorator*
+Func::DecoratorNode () const
+{
+   for (size_t i = 0; i < ChildCount(); ++i)
+   {
+      if (getChild(i)->isDecoratorNode())
+      {
+         return static_cast<Decorator*>(getChild(i));
+      }
+   }
+   return NULL;
+}
+
 Node*
 Func::ParamsNode ()
 {
@@ -41,7 +54,7 @@ Func::ReturnTypeNode ()
 {
    for (size_t i = 0 ; i < ChildCount() ; ++i)
    {
-      if (!getChild(i)->isFuncParamsNode() && !getChild(i)->isBlockNode())
+      if (!getChild(i)->isFuncParamsNode() && !getChild(i)->isBlockNode() && !getChild(i)->isDecoratorNode())
       {
          return getChild(i);
       }

@@ -15,6 +15,7 @@
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/BlockTypesChecker.hpp"
 #include "mem/ast/visitor/CheckValidity.hpp"
+#include "mem/ast/visitor/Decorate.hpp"
 #include "mem/ast/visitor/FindClasses.hpp"
 #include "mem/ast/visitor/FindEntryPoint.hpp"
 #include "mem/ast/visitor/FindUse.hpp"
@@ -24,6 +25,8 @@
 #include "mem/ast/visitor/UseAlias.hpp"
 #include "mem/ast/visitor/XmlDumper.hpp"
 #include "mem/codegen/llvm/Codegen.hpp"
+#include "mem/decorator/External.hpp"
+#include "mem/decorator/Require.hpp"
 #include "mem/fs/File.hpp"
 #include "mem/fs/FileManager.hpp"
 #include "mem/lang/Bison.hpp"
@@ -67,6 +70,7 @@ class Compiler
    std::queue<std::string> _parse_queue;
    st::SymbolTable symbols;
    Toolbox _tools;
+   decorator::DecoratorMap _decorators;
 
    //--------------------------------------------------------------------------
    // PROPERTIES
@@ -103,6 +107,9 @@ class Compiler
     */
    inline void
    addAstVisitor (ast::visitor::Visitor* visitor){ast_visitors.push_back(visitor);}
+
+   void
+   addDecorator (decorator::Decorator* decorator);
 
    void
    addMacro (ast::macro::Macro* macro);

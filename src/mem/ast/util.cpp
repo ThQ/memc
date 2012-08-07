@@ -4,6 +4,46 @@
 namespace mem { namespace ast { namespace util {
 
 
+node::Call*
+createCall (std::string qualified_name, ast::node::Node* arg)
+{
+   ast::node::Call* call = new ast::node::Call();
+
+   ast::node::FinalId* caller_id = new ast::node::FinalId();
+   caller_id->sValue(qualified_name);
+
+
+   ast::node::Node* arg_list = new ast::node::Node();
+   arg_list->setKind(ast::node::Kind::EXPRESSION_LIST);
+   arg_list->pushChild(arg);
+
+   ast::node::Dot* dot = NULL;
+   ast::node::Text* part_id = NULL;
+   ast::node::Node* prev = NULL;
+   std::vector<std::string> id_parts = mem::Util::split(qualified_name, '.');
+   for (size_t i = 0; i < id_parts.size(); ++i)
+   {
+      if (i == 0)
+      {
+         part_id = new ast::node::FinalId();
+         part_id->sValue(id_parts[i]);
+         prev = part_id;
+      }
+      else
+      {
+         part_id = new ast::node::Text();
+         part_id->setKind(ast::node::Kind::ID);
+         part_id->sValue(id_parts[i]);
+
+         dot = new ast::node::Dot();
+         dot->pushChildren(prev, part_id);
+         prev = dot;
+      }
+   }
+   call->pushChildren(prev, arg_list);
+   return call;
+}
+
 node::File*
 getFileNode (node::Node* cur_node)
 {

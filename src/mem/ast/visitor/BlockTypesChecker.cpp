@@ -26,7 +26,7 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::Func* func_sym, 
          err->sExpectedParamCount(func_sym->ParamCount());
          err->sParamCount(params->ChildCount());
          err->format();
-         err->setPosition(params->copyPosition());
+         //err->setPosition(params->copyPosition());
          log(err);
       }
       else

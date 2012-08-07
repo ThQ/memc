@@ -47,6 +47,9 @@ class Func: public Type
    GETTER(IsEntryPoint, bool) {return _is_entry_point;}
    SETTER(IsEntryPoint, bool) {_is_entry_point = val;}
 
+   GETTER(IsExternal, bool) {return _is_external;}
+   SETTER(IsExternal, bool) {_is_external = val;}
+
    // NextFunction
    GETTER(NextFunction, Func*) {return _next_function;}
    SETTER(NextFunction, Func*) {_next_function = val;}
@@ -80,6 +83,7 @@ class Func: public Type
 
    bool _has_body;
    bool _is_entry_point;
+   bool _is_external;
    std::vector<Arg*> _params;
    Type* _return_type;
    Func* _next_function;

@@ -174,6 +174,9 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Type*
    _getVoidTy ();
 
+   llvm::Type*
+   _getVoidPointerLlvmType () {return llvm::Type::getInt32PtrTy(_module->getContext());}
+
    bool
    _mustBeLoaded (ast::node::Node* n);
 

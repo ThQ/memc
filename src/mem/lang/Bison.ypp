@@ -16,6 +16,7 @@
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/CastOp.hpp"
 #include "mem/ast/node/Class.hpp"
+#include "mem/ast/node/Decorator.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/FinalId.hpp"
@@ -267,8 +268,14 @@ use_file :
 metadata :
    T_AROBASE T_ID T_NEWLINE
    {
-      $$ = new ast::node::Text();
+      $$ = new ast::node::Decorator();
       $$->sValue($2->c_str());
+   }
+   | T_AROBASE T_ID T_OP expr T_CP T_NEWLINE
+   {
+      $$ = new ast::node::Decorator();
+      $$->sValue($2->c_str());
+      $$->pushChild($4);
    }
 
 //=============================================================================
@@ -325,15 +332,13 @@ function_name:
    }
    | metadata T_ID
    {
-      Metadata* md = new Metadata();
-      md->set($1->gValue(), "");
-
       ast::node::Func* func = new ast::node::Func();
+      func->pushChild($1);
       func->sValue($2->c_str());
-      func->setMetadata(md);
+      //func->setMetadata(md);
       $$ = func;
 
-      delete $1;
+      //delete $1;
       delete $2;
    }
 

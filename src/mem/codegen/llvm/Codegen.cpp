@@ -105,7 +105,7 @@ Codegen::_getCodegenFuncName (st::Func* func)
 {
    std::string name = "";
 
-   if (func->Metadata()->has("external"))
+   if (func->IsExternal())
    {
       name = func->Name();
    }
@@ -203,7 +203,8 @@ Codegen::_getLlvmTy (st::Type* mem_ty)
    {
       if (ty == NULL)
       {
-         DEBUG_PRINTF("Type `%s' not found.\n", mem_ty->NameCstr());
+         DEBUG_PRINTF("Type symbol `%s' {Kind: %d} has no associated LLVM type\n",
+            mem_ty->gQualifiedNameCstr(), mem_ty->Kind());
       }
    }
 
@@ -315,7 +316,8 @@ Codegen::gen (ast::node::Node* root)
    assert (_st != NULL);
    _module = new llvm::Module("top", llvm::getGlobalContext());
 
-   _classes["void*"] = llvm::Type::getInt32PtrTy(_module->getContext());
+   st::PointerType* void_ptr = st::util::getPointerType(_st->_core_types._void);
+   _classes[void_ptr->gQualifiedName()] = _getVoidPointerLlvmType();
 
    _stack.push();
 
@@ -991,7 +993,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
 
    // External function
    std::vector<llvm::Type*> params;
-   if (func_sym->Metadata()->has("external"))
+   if (func_sym->IsExternal())
    {
       st::Var* func_param = NULL;
       for (size_t i = 0; i < func_sym->ParamCount(); ++i)
@@ -1005,15 +1007,7 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
    llvm::FunctionType* func_ty = llvm::FunctionType::get(
       _getFuncReturnTy(func_node), params, false);
 
-   llvm::GlobalValue::LinkageTypes func_link;
-   if (func_sym->Metadata()->has("external"))
-   {
-      func_link = llvm::GlobalValue::ExternalLinkage;
-   }
-   else
-   {
-      func_link = llvm::GlobalValue::ExternalLinkage;
-   }
+   llvm::GlobalValue::LinkageTypes func_link = llvm::GlobalValue::ExternalLinkage;
 
    llvm::Function* func = llvm::Function::Create(func_ty,
       func_link,
@@ -1116,7 +1110,7 @@ Codegen::codegenMemoryFunctions ()
    malloc_tys.push_back(llvm::Type::getInt32Ty(_module->getContext()));
 
    llvm::FunctionType* malloc_ty = llvm::FunctionType::get(
-      _getLlvmTy("void*"),
+      _getVoidPointerLlvmType(),
       malloc_tys,
       /*isVarArg=*/false);
 
@@ -1414,7 +1408,7 @@ Codegen::codegenFunctionType (st::Func* func_ty)
 
    // External function
    std::vector<llvm::Type*> params;
-   if (func_ty->Metadata()->has("external"))
+   if (func_ty->IsExternal())
    {
       st::Var* func_param = NULL;
       for (size_t i = 0; i < func_ty->ParamCount(); ++i)
@@ -1425,19 +1419,26 @@ Codegen::codegenFunctionType (st::Func* func_ty)
       }
    }
 
+   // -----------
+   // Return type
+   // -----------
    llvm::FunctionType* func_lty = NULL;
    st::Type* return_ty = func_ty->ReturnType();
+   llvm::Type* return_lty = NULL;
    if (!_st->isVoidType(return_ty))
    {
-      func_lty = llvm::FunctionType::get(_getLlvmTy(return_ty), params, false);
+      return_lty = _getLlvmTy(return_ty);
    }
    else
    {
-      func_lty = llvm::FunctionType::get(_getVoidTy(), params, false);
+      return_lty = _getVoidTy();
    }
+   assert (return_lty != NULL);
+   func_lty = llvm::FunctionType::get(return_lty, params, false);
+   assert (func_lty != NULL);
 
    llvm::GlobalValue::LinkageTypes func_link;
-   if (func_ty->Metadata()->has("external"))
+   if (func_ty->IsExternal())
    {
       func_link = llvm::GlobalValue::ExternalLinkage;
    }

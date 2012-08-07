@@ -20,6 +20,7 @@ src_mem_ast_node = \
  src/mem/ast/node/Call.cpp \
  src/mem/ast/node/CastOp.cpp \
  src/mem/ast/node/Class.cpp \
+ src/mem/ast/node/Decorator.cpp \
  src/mem/ast/node/Dot.cpp \
  src/mem/ast/node/Field.cpp \
  src/mem/ast/node/File.cpp \
@@ -48,6 +49,7 @@ src_mem_ast_node = \
 src_mem_ast_visitor = \
  src/mem/ast/visitor/BlockTypesChecker.cpp \
  src/mem/ast/visitor/CheckValidity.cpp \
+ src/mem/ast/visitor/Decorate.cpp \
  src/mem/ast/visitor/FindClasses.cpp \
  src/mem/ast/visitor/FindEntryPoint.cpp \
  src/mem/ast/visitor/FindUse.cpp \
@@ -60,6 +62,9 @@ src_mem_ast_visitor = \
  src/mem/ast/visitor/XmlDumper.cpp
 src_mem_codegen_llvm = \
  src/mem/codegen/llvm/Codegen.cpp
+src_mem_decorator = \
+ src/mem/decorator/External.cpp \
+ src/mem/decorator/Require.cpp
 src_mem_dep = \
  src/mem/dep/Dep.cpp \
  src/mem/dep/Tree.cpp
@@ -161,6 +166,7 @@ memc_SOURCES =  \
  $(src_mem_ast_visitor) \
  $(src_mem_codegen) \
  $(src_mem_codegen_llvm) \
+ $(src_mem_decorator) \
  $(src_mem_dep) \
  $(src_mem_fs) \
  $(src_mem_fs_position) \
