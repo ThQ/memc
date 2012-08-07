@@ -1137,7 +1137,7 @@ Codegen::cgNewExpr (ast::node::New* node)
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(type_node->BoundSymbol());
       int type_byte_size = static_cast<st::Type*>(type_node->getChild(0)->BoundSymbol())->ByteSize();
       llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1));
-      llvm::Value* obj_size = llvm::ConstantInt::get(_classes["int"], type_byte_size);
+      llvm::Value* obj_size = _createInt32Constant(type_byte_size);
       byte_size = llvm::BinaryOperator::Create(llvm::Instruction::Mul, num_obj, obj_size, "", _cur_bb);
    }
    else
@@ -1255,7 +1255,7 @@ Codegen::cgReturnStatement (ast::node::Node* node)
 llvm::Value*
 Codegen::cgString (ast::node::String* n)
 {
-   st::Type* mem_ty = st::util::lookupArrayType(_st->_root, "char", n->gValue().size() + 1);
+   st::Type* mem_ty = st::util::lookupArrayType(_st->System(), "char", n->gValue().size() + 1);
    assert(mem_ty != NULL);
 
    llvm::Type* llvm_ty = _getLlvmTy(mem_ty);
@@ -1425,7 +1425,7 @@ Codegen::codegenFunctionType (st::Func* func_ty)
 
    llvm::FunctionType* func_lty = NULL;
    st::Type* return_ty = func_ty->ReturnType();
-   if (return_ty->gQualifiedName() != "void")
+   if (!_st->isVoidType(return_ty))
    {
       func_lty = llvm::FunctionType::get(_getLlvmTy(return_ty), params, false);
    }

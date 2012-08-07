@@ -4,7 +4,7 @@ AC_CONFIG_HEADERS([src/config.h])
 AC_CHECK_PROGS(llvm, [llvm-config llvm-config-3.0])
 AC_SUBST(LLVM_CPPFLAGS, $($llvm --cppflags))
 AC_SUBST(LLVM_LDADD, $($llvm --ldflags --libs nativecodegen | tr '\n' ' '))
-CPPFLAGS="-D __STDC_LIMIT_MACROS=1 -D __STDC_CONSTANT_MACROS=1 -O0"
+CPPFLAGS="-D __STDC_LIMIT_MACROS=1 -D __STDC_CONSTANT_MACROS=1"
 AM_PATH_PYTHON(,,[:])
 AM_PROG_CC_C_O
 # Search for libdl (Ubuntu requires explicity linking against it)

@@ -279,7 +279,7 @@ lookupSymbol (Symbol* scope, std::string symbol_name)
 
    if (scope != NULL && symbol_name.size() != 0)
    {
-      res= getSymbol(scope, symbol_name);
+      res = getSymbol(scope, symbol_name);
 
       // Symbol is not found, maybe it is a pointer
       if (res == NULL)
@@ -450,10 +450,10 @@ setupBool (SymbolTable& st, CoreTypes& core_types)
    core_types._bool = new st::IntType();
    core_types._bool->setName("bool");
    core_types._bool->setByteSize(sizeof(bool));
-   util::registerType(&st, st.gRoot(), core_types._bool);
+   util::registerType(&st, st.System(), core_types._bool);
 
-   st.gRoot()->addChild(new st::Var("true", core_types._bool));
-   st.gRoot()->addChild(new st::Var("false", core_types._bool));
+   st.System()->addChild(new st::Var("true", core_types._bool));
+   st.System()->addChild(new st::Var("false", core_types._bool));
 }
 
 void
@@ -461,7 +461,7 @@ setupBugType (SymbolTable& st, CoreTypes& core_types)
 {
    core_types._bug_type = new st::PrimitiveType();
    core_types._bug_type->setName("#BadType");
-   util::registerType(&st, st.gRoot(), core_types._bug_type);
+   util::registerType(&st, st.System(), core_types._bug_type);
 }
 
 void
@@ -469,35 +469,35 @@ setupInts (SymbolTable& st, CoreTypes& core_types)
 {
    // Type : char
    core_types._char = new st::IntType("char", sizeof(char));
-   util::registerType(&st, st.gRoot(), core_types._char);
+   util::registerType(&st, st.System(), core_types._char);
 
    // Type : short
    core_types._short = new st::IntType("short", sizeof(short));
-   util::registerType(&st, st.gRoot(), core_types._short);
+   util::registerType(&st, st.System(), core_types._short);
 
    // Type : int
    core_types._int = new st::IntType("int", sizeof(int));
-   util::registerType(&st, st.gRoot(), core_types._int);
+   util::registerType(&st, st.System(), core_types._int);
 
    // Type : long
    core_types._long = new st::IntType("long", sizeof(long));
-   util::registerType(&st, st.gRoot(), core_types._long);
+   util::registerType(&st, st.System(), core_types._long);
 
    // Type : i8
    core_types._i8 = new st::IntType("i8", 1);
-   util::registerType(&st, st.gRoot(), core_types._i8);
+   util::registerType(&st, st.System(), core_types._i8);
 
    // Type : i16
    core_types._i16 = new st::IntType("i16", 2);
-   util::registerType(&st, st.gRoot(), core_types._i16);
+   util::registerType(&st, st.System(), core_types._i16);
 
    // Type : i32
    core_types._i32 = new st::IntType("i32", 4);
-   util::registerType(&st, st.gRoot(), core_types._i32);
+   util::registerType(&st, st.System(), core_types._i32);
 
    // Type : i64
    core_types._i64 = new st::IntType("i64", 8);
-   util::registerType(&st, st.gRoot(), core_types._i64);
+   util::registerType(&st, st.System(), core_types._i64);
 }
 
 void
@@ -505,9 +505,9 @@ setupVoid (SymbolTable& st, CoreTypes& core_types)
 {
    core_types._void = new st::PrimitiveType();
    core_types._void->setName("void");
-   util::registerType(&st, st.gRoot(), core_types._void);
+   util::registerType(&st, st.System(), core_types._void);
 
-   st.gRoot()->addChild(new st::Var("null", core_types._void));
+   st.System()->addChild(new st::Var("null", core_types._void));
 }
 
 std::vector<std::string>

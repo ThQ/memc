@@ -153,7 +153,7 @@ Compiler::parse (std::string file_path)
 
    std::string ns_name = Util::getNamespaceNameFromPath(file_path);
    std::vector<std::string> ns_parts = Util::split(ns_name, '.');
-   st::Namespace* file_sym = st::util::createNamespace(symbols._root, ns_parts);
+   st::Namespace* file_sym = st::util::createNamespace(symbols.Home(), ns_parts);
    assert(file_sym != NULL);
 
    std::vector<std::string> paths_tried;

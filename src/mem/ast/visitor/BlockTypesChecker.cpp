@@ -672,13 +672,14 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (id_node != NULL);
 
-   st::Symbol* sym = st::util::lookupSymbol(scope, id_node->gValue());
+   st::Symbol* sym = _symbols->lookupSymbol(scope, id_node->gValue());
 
    if (sym != NULL)
    {
+      id_node->setBoundSymbol(sym);
+
       st::Type* expr_ty = st::util::getExprType(sym);
 
-      id_node->setBoundSymbol(sym);
       if (expr_ty != NULL)
       {
          id_node->setExprType(expr_ty);

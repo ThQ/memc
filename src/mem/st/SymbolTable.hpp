@@ -22,6 +22,8 @@ namespace mem { namespace st {
 class SymbolTable
 {
    public: Namespace* _root;
+   public: Namespace* _home;
+   public: Namespace* _system;
    public: inline Namespace* gRoot () {return _root;}
    public: std::map<std::string, st::Type*> _types;
    public: std::map<std::string, st::Type*> gTypes (){return _types;}
@@ -54,6 +56,7 @@ class SymbolTable
    //--------------------------------------------------------------------------
    public:
 
+
    // FunctionLinkedListHead
    GETTER(FunctionLinkedListHead, Func*) {return _func_ll_head;}
    SETTER(FunctionLinkedListHead, Func*) {_func_ll_head = val;}
@@ -62,12 +65,18 @@ class SymbolTable
    GETTER(FunctionLinkedListTail, Func*) {return _func_ll_tail;}
    SETTER(FunctionLinkedListTail, Func*) {_func_ll_tail = val;}
 
+   // Home
+   GETTER(Home, Namespace*) {return _home;}
+
+   // System
+   GETTER(System, Namespace*) {return _system;}
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
-
+#if 0
    Class* create_class (std::string full_class_name);
    bool create_type (Type* anonymous_type, std::string full_type_name);
    Namespace* create_namespace (std::string name);
@@ -77,7 +86,16 @@ class SymbolTable
    bool has_namespace (std::string ns_name);
    //Func* register_function (std::string func_full_name);
    bool register_symbol (std::string path, Symbol* sym);
+#endif
 
+   inline bool
+   isVoidType (st::Symbol* s) {return s == _core_types._void;}
+
+   st::Symbol*
+   lookupSymbol (st::Symbol* scope, std::string symbol_id);
+
+   st::Symbol*
+   lookupSymbolUntil (st::Symbol* cur_scope, std::string symbol_id, st::Symbol* top_scope);
    /**
     * Add a function to the function linked list.
     */
