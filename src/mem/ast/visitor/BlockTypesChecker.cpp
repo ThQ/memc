@@ -11,7 +11,7 @@ BlockTypesChecker::BlockTypesChecker ()
 }
 
 void
-BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::Func* func_sym, node::Node* params)
+BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::FunctionType* func_sym, node::Node* params)
 {
    DEBUG_REQUIRE (func_sym != NULL);
 
@@ -20,10 +20,10 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::Func* func_sym, 
 
    if (params != NULL)
    {
-      if (func_sym->ParamCount() != param_count)
+      if (func_sym->ArgumentCount() != param_count)
       {
          log::BadParameterCount* err = new log::BadParameterCount();
-         err->sExpectedParamCount(func_sym->ParamCount());
+         err->sExpectedParamCount(func_sym->ArgumentCount());
          err->sParamCount(params->ChildCount());
          err->format();
          //err->setPosition(params->copyPosition());
@@ -37,7 +37,7 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::Func* func_sym, 
          // function definition.
          for (size_t i = 0; i < params->ChildCount(); ++i)
          {
-            checkAssignment(params->getChild(i), func_sym->getParam(skip_first_param + i)->Type());
+            checkAssignment(params->getChild(i), func_sym->getArgument(skip_first_param + i));
          }
       }
    }
@@ -449,7 +449,18 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
 
          if (call_node->hasParamsNode())
          {
-            checkCallParameters(call_node->Caller(), base_func, call_node->ParamsNode());
+            checkCallParameters(call_node->Caller(), base_func->Type(), call_node->ParamsNode());
+         }
+      }
+      else if (st::util::isFunctorType(base_object->ExprType()))
+      {
+         st::PointerType* ptr_ty = static_cast<st::PointerType*>(base_object->ExprType());
+         st::FunctionType* func_ty = static_cast<st::FunctionType*>(ptr_ty->getNonPointerParent());
+         call_node->setExprType(func_ty->ReturnType());
+
+         if (call_node->hasParamsNode())
+         {
+            checkCallParameters(NULL, func_ty, call_node->ParamsNode());
          }
       }
       else

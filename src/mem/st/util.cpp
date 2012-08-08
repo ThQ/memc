@@ -235,6 +235,19 @@ getUnsizedArrayType (Type* base_ty)
    return NULL;
 }
 
+bool
+isFunctorType (Symbol* s)
+{
+   DEBUG_PRINTF("is %s a functor ? %d\n", s->gQualifiedNameCstr(), s->Kind());
+   if (s->isPointerType())
+   {
+      Type* pointed_ty = static_cast<st::PointerType*>(s)->getNonPointerParent();
+      DEBUG_PRINTF("is %s a func type ?\n", pointed_ty->gQualifiedNameCstr());
+      if (pointed_ty->isFunctionType()) return true;
+   }
+   return false;
+}
+
 ArrayType*
 lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
 {

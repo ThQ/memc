@@ -24,7 +24,7 @@ class Node
    public:
 
    st::Symbol* _bound_type;
-   unsigned int _child_count;
+   size_t _child_count;
    unsigned long _depth;
    st::Type* _exp_type;
    Node* _first_child;
@@ -47,7 +47,7 @@ class Node
    SETTER(BoundSymbol, st::Symbol*) {_bound_type = val;}
 
    // ChildCount
-   GETTER(ChildCount, size_t) {return this->_child_count;}
+   GETTER(ChildCount, size_t) {return _child_count;}
 
    // Depth
    void Depth (unsigned long depth);

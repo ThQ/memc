@@ -67,6 +67,9 @@ getUnsizedArrayType (st::ArrayType* sized_arr);
 ArrayType*
 getUnsizedArrayType (st::Type* base_ty);
 
+bool
+isFunctorType (Symbol* s);
+
 ArrayType*
 lookupArrayType (Symbol* scope, std::string base_ty_name, int size);
 

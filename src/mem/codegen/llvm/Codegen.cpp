@@ -403,7 +403,7 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
    switch (node->Kind())
    {
       case ast::node::Kind::FINAL_ID:
-         if (node->ExprType()->isPointerType() && static_cast<st::PointerType*>(node->ExprType())->PointedType()->isFunctionType())
+         if (node->BoundSymbol()->isFuncSymbol())
          {
             DEBUG_PRINT("Don't load functor\n");
             return false;
@@ -630,15 +630,34 @@ Codegen::cgCallExpr (ast::node::Call* node)
    DEBUG_REQUIRE (node != NULL);
    DEBUG_REQUIRE (node->CallerNode() != NULL);
 
-   st::Func* func_sym = static_cast<st::Func*>(
-      node->CallerNode()->BoundSymbol());
+   llvm::Value* callee = NULL;
+   st::Type* caller_node_ty = node->CallerNode()->ExprType();
+   st::FunctionType* func_ty = NULL;
+
+   if (caller_node_ty->isFunctionType())
+   {
+      func_ty = static_cast<st::FunctionType*>(caller_node_ty);
+      callee = _functions[_getCodegenFuncName(static_cast<st::Func*>(node->CallerNode()->BoundSymbol()))];
+   }
+   else if (st::util::isFunctorType(caller_node_ty))
+   {
+      func_ty = static_cast<st::FunctionType*>(static_cast<st::PointerType*>(caller_node_ty)->getNonPointerParent());
+      DEBUG_PRINTF("CAller node : %s\n", node->CallerNode()->KindNameCstr());
+      callee = cgExprAndLoad(node->CallerNode(), func_ty);
+   }
+   else
+   {
+      assert(false);
+   }
+
+   assert(func_ty->isFunctionType());
    std::vector<llvm::Value*> params;
 
    // Instance call
    if (node->Caller() != NULL)
    {
       llvm::Value* caller = cgExprAndLoad(node->getChild(0)->getChild(0));
-      st::Type* caller_expected_ty = func_sym->getParam(0)->Type();
+      st::Type* caller_expected_ty = func_ty->getArgument(0);
 
       // Function belongs to an ancestor of the caller type, we have to cast
       // the caller
@@ -653,40 +672,36 @@ Codegen::cgCallExpr (ast::node::Call* node)
 
    if (node->ParamsNode() != NULL)
    {
+      assert(func_ty->ArgumentCount() == node->ParamsNode()->ChildCount());
       ast::node::Node* cur_param_node = NULL;
-      st::Var* cur_param = NULL;
       llvm::Value* param_value = NULL;
       for (size_t i = 0; i < node->ParamsNode()->ChildCount(); ++i)
       {
          cur_param_node = node->ParamsNode()->getChild(i);
-         cur_param = func_sym->getParam(i);
-
-         param_value = cgExprAndLoad(cur_param_node, cur_param->Type());
-
+         param_value = cgExprAndLoad(cur_param_node, func_ty->getArgument(i));
          params.push_back(param_value);
       }
    }
 
+   /*
    IF_DEBUG
    {
       if (_functions[_getCodegenFuncName(func_sym)] == NULL)
       {
          DEBUG_PRINTF("Cannot find function with name `%s'\n",
-            _getCodegenFuncName(func_sym).c_str());
+            _getCodegenFuncName(func_ty).c_str());
       }
    }
    assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
-
+   */
    llvm::CallInst* call = NULL;
-   call = llvm::CallInst::Create(_functions[_getCodegenFuncName(func_sym)],
-      params, "", _cur_bb);
+   call = llvm::CallInst::Create(callee, params, "", _cur_bb);
 
-   if (call != NULL && func_sym->ReturnType()->Name() == "void")
+   if (call != NULL && !_st->isVoidType(func_ty->ReturnType()))
    {
       call->setDoesNotReturn(true);
    }
-
-   DEBUG_ENSURE (call != NULL);
+   //DEBUG_ENSURE (call != NULL);
 
    return call;
 }

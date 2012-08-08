@@ -9,6 +9,7 @@
 
 namespace mem { namespace st {
 
+
 class FunctionType: public Type
 {
    //--------------------------------------------------------------------------
@@ -30,7 +31,6 @@ class FunctionType: public Type
 
    // Arguments
    GETTER (Arguments, TypeVector) {return _arguments;}
-   SETTER (Arguments, TypeVector) {_arguments = val;}
 
    // ParamCount
    GETTER(ArgumentCount, size_t) {return _arguments.size();}
