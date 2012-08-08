@@ -130,6 +130,9 @@ class Symbol
    isFuncSymbol() const {return is(st::FUNCTION);}
 
    inline bool
+   isFunctionType() const {return is(st::FUNCTION_TYPE);}
+
+   inline bool
    isIntType () const {return is(st::INT_TYPE);}
 
    inline bool

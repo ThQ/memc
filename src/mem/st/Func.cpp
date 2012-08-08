@@ -15,6 +15,7 @@ Func::Func ()
    _is_external = false;
    _return_type = NULL;
    _next_function = NULL;
+   _type = NULL;
 }
 
 Func::~Func ()

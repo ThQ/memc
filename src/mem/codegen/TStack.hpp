@@ -10,12 +10,12 @@
 namespace mem { namespace codegen {
 
 
-template <class T>
+template <class K, class V>
 class TStack
 {
-   private: std::deque<std::map<std::string, T> > _vars;
+   private: std::deque<std::map<K, V> > _vars;
 
-   public: T get (std::string name)
+   public: V get (K name)
    {
       assert (_vars.size() > 0);
 
@@ -29,7 +29,7 @@ class TStack
          if (i == 0) break;
          --i;
       }
-      T res;
+      V res;
       return res;
    }
 
@@ -40,11 +40,11 @@ class TStack
 
    public: void push ()
    {
-      std::map<std::string, T> p;
+      std::map<K, V> p;
       _vars.push_back(p);
    };
 
-   public: void set (std::string name, T val)
+   public: void set (K name, V val)
    {
       assert (_vars.size() > 0);
       _vars.back()[name] = val;

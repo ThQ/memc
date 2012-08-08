@@ -27,6 +27,7 @@
 #include "mem/codegen/llvm/Codegen.hpp"
 #include "mem/decorator/External.hpp"
 #include "mem/decorator/Require.hpp"
+#include "mem/decorator/Virtual.hpp"
 #include "mem/fs/File.hpp"
 #include "mem/fs/FileManager.hpp"
 #include "mem/lang/Bison.hpp"

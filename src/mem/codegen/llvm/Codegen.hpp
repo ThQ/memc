@@ -43,18 +43,18 @@
 namespace mem { namespace codegen { namespace llvm_ {
 
 
-/**
- * Emit LLVM assembly from an AST and a ST.
- *
- * References :
- * - LLVM assembly language reference
-     <http://http://llvm.org/docs/LangRef.html>
- * - Try LLVM online (can generate C++ or LLVM assembly from C/C++)
-     <http://llvm.org/demo/>
- * - API documentation for llvm::IRBuilder (an helper class to generate LLVM
-     instructions)
-     <http://llvm.org/docs/doxygen/html/classllvm_1_1IRBuilder.html>
- */
+// Emit LLVM assembly from an AST and a ST.
+//
+// References :
+// - LLVM assembly language reference
+//   <http://http://llvm.org/docs/LangRef.html>
+// - Try LLVM online (can generate C++ or LLVM assembly from C/C++)
+//   <http://llvm.org/demo/>
+// - API documentation for llvm::IRBuilder (an helper class to generate LLVM
+//   instructions)
+//   <http://llvm.org/docs/doxygen/html/classllvm_1_1IRBuilder.html>
+//
+// FIXME: We should create an helper class for all LLVM type creation
 class Codegen : public mem::codegen::ICodegen
 {
    //--------------------------------------------------------------------------
@@ -62,14 +62,14 @@ class Codegen : public mem::codegen::ICodegen
    //--------------------------------------------------------------------------
    protected:
 
-   std::map<std::string, llvm::Type*> _classes;
+   std::map<st::Type*, llvm::Type*> _type_bindings;
    llvm::BasicBlock* _cur_bb;
    llvm::Function* _cur_func;
    llvm::BasicBlock* _exit_block;
    std::map<std::string, llvm::Function*> _functions;
    llvm::Module* _module;
    st::SymbolTable* _st;
-   TStack<llvm::Value*> _stack;
+   TStack<st::Symbol*, llvm::Value*> _stack;
 
 
    //--------------------------------------------------------------------------
@@ -92,6 +92,27 @@ class Codegen : public mem::codegen::ICodegen
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
+
+   llvm::Type*
+   _codegenArrayType (st::ArrayType* t);
+
+   llvm::StructType*
+   _codegenClassType (st::Class* cls_symb);
+
+   llvm::FunctionType*
+   _codegenFunctionType (st::FunctionType* t);
+
+   llvm::PointerType*
+   _codegenPointerType (st::PointerType* t);
+
+   llvm::Type*
+   _codegenPrimitiveType (st::PrimitiveType* t);
+
+   llvm::StructType*
+   _codegenTupleType (st::TupleType* t);
+
+   llvm::Type*
+   _codegenType (st::Type* ty);
 
    inline llvm::BasicBlock*
    _createBasicBlock(std::string name="")
@@ -156,8 +177,10 @@ class Codegen : public mem::codegen::ICodegen
    llvm::Type*
    _getLlvmIntTy (size_t size);
 
+   /*
    inline llvm::Type*
    _getLlvmTy (std::string st_name) {llvm::Type* ty= _classes[st_name];assert(ty != NULL);return ty;}
+   */
 
    llvm::Type*
    _getLlvmTy (st::Symbol* mem_ty) {return _getLlvmTy(static_cast<st::Type*>(mem_ty));}
@@ -210,9 +233,6 @@ class Codegen : public mem::codegen::ICodegen
 
    llvm::Value*
    cgCallExpr (ast::node::Call* node);
-
-   void
-   cgClass (st::Class* cls_symb);
 
    llvm::Value*
    cgCompOp (ast::node::BinaryOp* node);
@@ -281,9 +301,6 @@ class Codegen : public mem::codegen::ICodegen
 
    llvm::Value*
    cgString (ast::node::String* n);
-
-   void
-   codegenTupleType (st::TupleType* t);
 
    void
    codegenTupleTypes ();

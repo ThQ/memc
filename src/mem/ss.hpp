@@ -24,14 +24,14 @@
    #define DEBUG_PRINTF(format, ...)
 #endif
 #ifndef NDEBUG
-   #define DEBUG_PRINTF(format, ...) printf("%s:%d (%s) [DEBUG] ", __FILE__, __LINE__, __FUNCTION__);printf(format, __VA_ARGS__)
+   #define DEBUG_PRINTF(format, ...) printf("[ DEBUG ] @%s:%d (%s) ", __FILE__, __LINE__, __FUNCTION__);printf(format, __VA_ARGS__)
 #endif
 
 #ifdef NDEBUG
    #define DEBUG_PRINT(str)
 #endif
 #ifndef NDEBUG
-   #define DEBUG_PRINT(str) printf("%s:%d (%s) [DEBUG] %s", __FILE__, __LINE__, __FUNCTION__,  str)
+   #define DEBUG_PRINT(str) printf("[ DEBUG ] @%s:%d (%s) %s", __FILE__, __LINE__, __FUNCTION__,  str)
 #endif
 
 

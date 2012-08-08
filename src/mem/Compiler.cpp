@@ -15,6 +15,7 @@ Compiler::Compiler ()
 
    addDecorator(new decorator::External());
    addDecorator(new decorator::Require());
+   addDecorator(new decorator::Virtual());
 
    addMacro(new ast::macro::PtrMacros());
 

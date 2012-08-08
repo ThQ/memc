@@ -4,6 +4,7 @@
 
 #include <vector>
 #include "mem/st/Arg.hpp"
+#include "mem/st/FunctionType.hpp"
 #include "mem/st/Type.hpp"
 
 
@@ -47,8 +48,13 @@ class Func: public Type
    GETTER(IsEntryPoint, bool) {return _is_entry_point;}
    SETTER(IsEntryPoint, bool) {_is_entry_point = val;}
 
+   // IsExternal
    GETTER(IsExternal, bool) {return _is_external;}
    SETTER(IsExternal, bool) {_is_external = val;}
+
+   // IsVirtual
+   GETTER(IsVirtual, bool) {return _is_virtual;}
+   SETTER(IsVirtual, bool) {_is_virtual = val;}
 
    // NextFunction
    GETTER(NextFunction, Func*) {return _next_function;}
@@ -60,6 +66,10 @@ class Func: public Type
    // ReturnType
    GETTER(ReturnType, Type*) {return _return_type;}
    SETTER(ReturnType, Type*) {_return_type = val;}
+
+   // Type
+   GETTER(Type, class FunctionType*) {return _type;}
+   SETTER(Type, class FunctionType*) {_type = val;}
 
 
    //--------------------------------------------------------------------------
@@ -84,9 +94,11 @@ class Func: public Type
    bool _has_body;
    bool _is_entry_point;
    bool _is_external;
+   bool _is_virtual;
    std::vector<Arg*> _params;
-   Type* _return_type;
+   class Type* _return_type;
    Func* _next_function;
+   FunctionType* _type;
 };
 
 

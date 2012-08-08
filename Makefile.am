@@ -64,7 +64,8 @@ src_mem_codegen_llvm = \
  src/mem/codegen/llvm/Codegen.cpp
 src_mem_decorator = \
  src/mem/decorator/External.cpp \
- src/mem/decorator/Require.cpp
+ src/mem/decorator/Require.cpp \
+ src/mem/decorator/Virtual.cpp
 src_mem_dep = \
  src/mem/dep/Dep.cpp \
  src/mem/dep/Tree.cpp
@@ -97,6 +98,7 @@ src_mem_st = \
  src/mem/st/Class.cpp \
  src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \
+ src/mem/st/FunctionType.cpp \
  src/mem/st/IntType.cpp \
  src/mem/st/Macro.cpp \
  src/mem/st/Namespace.cpp \

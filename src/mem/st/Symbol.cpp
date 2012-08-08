@@ -133,6 +133,7 @@ Symbol::isAnyType () const
       case st::POINTER:
       case st::TUPLE_TYPE:
       case st::ARRAY:
+      case st::FUNCTION_TYPE:
          return true;
       default:
          return false;

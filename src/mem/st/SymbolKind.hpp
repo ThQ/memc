@@ -22,7 +22,8 @@ typedef enum {
    ALIAS=13,
    INT_TYPE=14,
    MACRO=15,
-   TUPLE_TYPE=16
+   TUPLE_TYPE=16,
+   FUNCTION_TYPE=17
 } SymbolKind;
 
 

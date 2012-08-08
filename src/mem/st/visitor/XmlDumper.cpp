@@ -113,8 +113,9 @@ XmlDumper::visitClass (st::Class* cls_sym)
    *_out << "<ClassType name=\"" + cls_sym->Name() + "\"";
    if (cls_sym->ParentType() != NULL)
    {
-      *_out << " parent_type=\"" + cls_sym->ParentType()->gQualifiedName() + "\"";
+      *_out << " parent-type=\"" + cls_sym->ParentType()->gQualifiedName() + "\"";
    }
+   *_out << " absolute-field-count=\"" << cls_sym->getAbsoluteFieldCount() << "\"";
    *_out << " byte-size=\"" << cls_sym->ByteSize() << "\"";
    *_out << ">\n";
    this->visitChildren(cls_sym);
@@ -143,6 +144,10 @@ XmlDumper::visitFunction (st::Func* func_sym)
    if (func_sym->ReturnType() != NULL)
    {
       *_out << " return-type=\"" + func_sym->ReturnType()->gQualifiedName() + "\"";
+   }
+   if (func_sym->Type() != NULL)
+   {
+      *_out << " type=\"" + func_sym->Type()->gQualifiedName() + "\"";
    }
    *_out << ">\n";
    visitChildren(func_sym);

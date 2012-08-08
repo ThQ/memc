@@ -55,10 +55,36 @@ getExprType (Symbol* s)
    }
    else if (s->isFuncSymbol())
    {
-      ret = static_cast<st::Type*>(static_cast<st::Func*>(s)->ReturnType());
+      ret = static_cast<st::Func*>(s)->Type();
+      ret = static_cast<st::FunctionType*>(ret)->FunctorType();
    }
 
    return ret;
+}
+
+FunctionType*
+getFunctionType (Symbol* scope, TypeVector arguments, Type* return_type)
+{
+   DEBUG_PRINTF("getFunctionType(%d)\n", arguments.size());
+   st::Symbol* child = NULL;
+   Symbol::SymbolCollectionIterator i;
+
+   for (i = scope->Children().begin(); i != scope->Children().end(); ++i)
+   {
+      child = i->second;
+      if (child->isFunctionType() && static_cast<st::FunctionType*>(child)->isLike(arguments, return_type))
+      {
+         return static_cast<st::FunctionType*>(child);
+      }
+   }
+
+   // Function type was not found, create it
+   st::FunctionType* func_ty = new st::FunctionType();
+   func_ty->setReturnType(return_type);
+   func_ty->addArguments(arguments);
+   scope->addChild(func_ty);
+
+   return func_ty;
 }
 
 Type*

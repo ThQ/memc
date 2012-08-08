@@ -120,15 +120,8 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (func_decl != NULL);
 
+
    st::Func* func_sym = new st::Func();
-   if (func_decl->hasMetadata())
-   {
-      func_sym->setMetadata(func_decl->Metadata());
-   }
-   else
-   {
-      func_sym->setMetadata(new Metadata());
-   }
    func_sym->setName(func_decl->gValue());
    func_sym->setHasBody(func_decl->BodyNode() != NULL);
    scope->addChild(func_sym);
@@ -156,6 +149,18 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    {
       visitFuncParams(scope, func_params, func_sym);
    }
+
+   // FIXME This should be the only thing to be done here, but while we are
+   // catching on...
+   st::TypeVector func_args;
+   for (size_t i = 0; i < func_sym->ParamCount(); ++i)
+   {
+      func_args.push_back(func_sym->getParam(i)->Type());
+   }
+   st::FunctionType* func_ty = st::util::getFunctionType(_symbols->System(), func_args, func_sym->ReturnType());
+   st::PointerType* functor_ty = st::util::getPointerType(func_ty);
+   func_sym->setType(func_ty);
+   func_ty->setFunctorType(functor_ty);
 }
 
 void
