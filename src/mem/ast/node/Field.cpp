@@ -25,19 +25,19 @@ Field::isValid (NodeValidator* v)
    v->ensure(hasExprType(), "Field must have an expression type");
 
    // Check NAME node
-   v->ensure(NameNode() != NULL);
+   v->ensure(NameNode() != NULL, "Field : Must have a name node");
    if (NameNode() != NULL)
    {
-      v->ensure(NameNode()->isIdNode());
-      v->ensure(NameNode()->hasBoundSymbol());
+      v->ensure(NameNode()->isIdNode(), "Field : Name node must be an ID");
+      v->ensure(NameNode()->hasBoundSymbol(), "Field : Name node must have a bound symbol");
    }
 
+   v->ensure(TypeNode()->hasBoundSymbol(), "Field : Type node must have a bound symbol");
+
    // Check VALUE node
-   v->ensure(ValueNode() != NULL);
    if (ValueNode() != NULL)
    {
-      v->ensure(ValueNode()->hasBoundSymbol());
-      v->ensure(ValueNode()->hasExprType());
+      v->ensure(ValueNode()->hasExprType(), "Field : Value node must have an expression type");
    }
 }
 

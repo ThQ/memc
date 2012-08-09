@@ -117,7 +117,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
    DEBUG_REQUIRE (field != NULL);
 
    node::Text* name_node = static_cast<node::Text*>(field->NameNode());
-   node::Node* type_node = field->ValueNode();
+   node::Node* type_node = field->TypeNode();
    assert (name_node != NULL);
    assert (type_node != NULL);
 
