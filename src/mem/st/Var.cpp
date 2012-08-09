@@ -10,6 +10,7 @@ namespace mem { namespace st {
 
 Var::Var ()
 {
+   _constant_value = NULL;
    _kind = VAR;
    _is_global = false;
    _is_constant = false;
@@ -18,6 +19,7 @@ Var::Var ()
 
 Var::Var (std::string name, class Type* type)
 {
+   _constant_value = NULL;
    _kind = VAR;
    _is_global = false;
    _is_constant = false;
