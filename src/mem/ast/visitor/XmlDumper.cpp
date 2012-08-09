@@ -52,12 +52,6 @@ XmlDumper::visit (node::Node* node)
 
    switch (node->Kind())
    {
-      case node::Kind::NUMBER:
-         *_out << " val=\"";
-         *_out << static_cast<node::Number*>(node)->getStringFromVal();
-         *_out << "\"";
-         break;
-
       case node::Kind::FILE:
          *_out << " id=\"";
          *_out << static_cast<node::File*>(node)->Id();

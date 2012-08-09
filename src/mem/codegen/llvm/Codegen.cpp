@@ -698,8 +698,7 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    if (dest_ty->isIntType() && node->isNumberNode())
    {
       src_ty = dest_ty;
-      int i_val = static_cast<ast::node::Number*>(node)->getInt();
-      val = llvm::ConstantInt::get(_module->getContext(), llvm::APInt(dest_ty->ByteSize() * 8, i_val));
+      val = _type_maker.makeConstant(static_cast<st::Constant*>(node->BoundSymbol()));
    }
    else
    {
@@ -1036,12 +1035,14 @@ Codegen::cgNewExpr (ast::node::New* node)
 llvm::Value*
 Codegen::cgNumberExpr (ast::node::Number* node)
 {
-   assert (node->ConstantValue() != NULL);
+   DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node->BoundSymbol() != NULL);
+   DEBUG_REQUIRE (node->BoundSymbol()->isIntConstant());
 
    // FIXME This works only for signed integers
-   st::IntConstant* i_const = static_cast<st::IntConstant*>(node->ConstantValue());
+   st::IntConstant* i_const = static_cast<st::IntConstant*>(node->BoundSymbol());
    llvm::Value* val = llvm::ConstantInt::get(llvm::getGlobalContext(),
-      llvm::APInt(node->ConstantValue()->ByteSize() * 8, i_const->getSignedValue(), false));
+      llvm::APInt(node->BoundSymbol()->ByteSize() * 8, i_const->getSignedValue(), false));
 
    DEBUG_ENSURE (val != NULL);
 

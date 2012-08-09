@@ -228,6 +228,35 @@ getTupleType (Symbol* scope, TypeVector tys)
 }
 
 ArrayType*
+getSizedArrayType (Type* item_ty, int size)
+{
+   if (item_ty != NULL && item_ty->Parent() != NULL)
+   {
+      std::stringstream arr_ty_name;
+      arr_ty_name << "[" << item_ty->Name() << "," << size << "]";
+      Symbol* sym = item_ty->Parent()->getChild(arr_ty_name.str());
+
+      if (sym == NULL)
+      {
+         st::ArrayType* ty = new ArrayType();
+         ty->setItemType(item_ty);
+         ty->setName(arr_ty_name.str());
+         ty->setArrayLength(size);
+         item_ty->Parent()->addChild(ty);
+
+         return ty;
+      }
+      else
+      {
+         return static_cast<st::ArrayType*>(sym);
+      }
+      DEBUG_UNREACHABLE();
+   }
+   return NULL;
+
+}
+
+ArrayType*
 getUnsizedArrayType (ArrayType* sized_array)
 {
    return getUnsizedArrayType(sized_array->ItemType());

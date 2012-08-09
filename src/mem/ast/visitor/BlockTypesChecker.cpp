@@ -170,43 +170,54 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
    DEBUG_REQUIRE (n != NULL);
 
    st::Symbol* arr_sym = BugType();
+   int arr_size = -1;
+   node::Node* type_n = n->TypeNode();
+   node::Node* length_n = n->LengthNode();
+   st::Type* item_ty = NULL;
 
-   if (n->TypeNode() != NULL)
+   // -----------
+   //  Item type
+   // -----------
+   if (type_n != NULL)
    {
-      visitExpr(scope, n->TypeNode());
-      ensureSymbolIsType(n->TypeNode(), n->TypeNode()->BoundSymbol());
+      visitExpr(scope, type_n);
+      ensureSymbolIsType(type_n, type_n->BoundSymbol());
+      item_ty = static_cast<st::Type*>(type_n->BoundSymbol());
 
-      if (n->LengthNode() != NULL)
-      {
-         visitExpr(scope, n->LengthNode());
-      }
+      assert(item_ty->isAnyType());
+   }
 
-      if (n->TypeNode()->hasBoundSymbol())
+   // ------
+   //  Size
+   // ------
+   if (length_n != NULL)
+   {
+      visitExpr(scope, length_n);
+      if (length_n->isNumberNode()
+         && length_n->hasBoundSymbol()
+         && length_n->BoundSymbol()->isIntConstant())
       {
-         if (n->LengthNode() == NULL)
-         {
-            arr_sym = st::util::getUnsizedArrayType(n->TypeNode()->ExprType());
-         }
-         else
-         {
-            // Array with size
-            if (n->LengthNode()->isNumberNode())
-            {
-               arr_sym = st::util::lookupArrayType(scope,
-               n->TypeNode()->BoundSymbol()->Name(),
-               static_cast<ast::node::Number*>(n->LengthNode())->getInt());
-            }
-            // Array without size
-            else
-            {
-               arr_sym = st::util::getUnsizedArrayType(static_cast<st::Type*>(n->TypeNode()->BoundSymbol()));
-            }
-         }
+         st::IntConstant* i_const = static_cast<st::IntConstant*>(length_n->BoundSymbol());
+         // FIXME This may break since it returns an int64_t
+         arr_size = (int)i_const->getSignedValue();
       }
    }
-   else
+
+   // ------------
+   //  Array type
+   // ------------
+   if (item_ty != NULL)
    {
-      assert(false);
+      // Unsized array
+      if (arr_size == -1)
+      {
+         arr_sym = st::util::getUnsizedArrayType(item_ty);
+      }
+      // Sized array
+      else
+      {
+         arr_sym = st::util::getSizedArrayType(item_ty, arr_size);
+      }
    }
 
    n->setBoundSymbol(arr_sym);
@@ -214,9 +225,9 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
 
    DEBUG_ENSURE (n->hasBoundSymbol());
    DEBUG_ENSURE (n->hasExprType());
-   DEBUG_ENSURE (n->TypeNode() != NULL);
-   DEBUG_ENSURE (n->TypeNode()->hasBoundSymbol());
-   DEBUG_ENSURE (n->TypeNode()->hasExprType());
+   DEBUG_ENSURE (type_n != NULL);
+   DEBUG_ENSURE (type_n->hasBoundSymbol());
+   DEBUG_ENSURE (type_n->hasExprType());
 }
 
 void
@@ -229,7 +240,8 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
    visitExpr (scope, n->IndexNode());
 
    node::Node* value_node = n->ValueNode();
-   st::Symbol* value_ty = value_node->ExprType();
+   node::Node* index_n = n->IndexNode();
+   st::Type* value_ty = value_node->ExprType();
 
    if (value_ty != NULL)
    {
@@ -246,9 +258,18 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
       else if (value_ty->isTupleType())
       {
          // FIXME Nothing super safe here...
-         assert(n->getChild(1)->isNumberNode());
-         int item_index = static_cast<node::Number*>(n->getChild(1))->getInt();
-         n->setExprType(static_cast<st::TupleType*>(value_ty)->Subtypes()[item_index]);
+         if (index_n->isNumberNode()
+            && index_n->hasBoundSymbol()
+            && index_n->BoundSymbol()->isIntConstant())
+         {
+            node::Number* index_nb_n = static_cast<node::Number*>(index_n);
+            st::IntConstant* i_const = static_cast<st::IntConstant*>(index_nb_n->BoundSymbol());
+
+            // FIXME This may break, it returns an int64_t
+            int item_index = (int)i_const->getSignedValue();
+            // FIXME No bound checking...
+            n->setExprType(static_cast<st::TupleType*>(value_ty)->Subtypes()[item_index]);
+         }
       }
       /*
       else if (value_ty->isPointerType())
@@ -826,7 +847,10 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
 void
 BlockTypesChecker::visitNumber (st::Symbol* scope, node::Number* n)
 {
-
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (n->hasBoundSymbol());
+   DEBUG_REQUIRE (n->BoundSymbol()->isIntConstant());
 }
 
 #if 0

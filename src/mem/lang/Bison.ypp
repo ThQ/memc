@@ -960,7 +960,6 @@ literal :
 
             ast::node::Number* c_node = new ast::node::Number();
             c_node->setBoundSymbol(ic);
-            c_node->setChar(i);
             c_node->setExprType(symbols._core_types.gCharTy());
             $$ = c_node;
             break;
@@ -973,7 +972,6 @@ literal :
 
             ast::node::Number* s_node = new ast::node::Number();
             s_node->setBoundSymbol(ic);
-            s_node->setShort(i);
             s_node->setExprType(symbols._core_types.gShortTy());
             $$ = s_node;
             break;
@@ -986,7 +984,6 @@ literal :
 
             ast::node::Number* i_node = new ast::node::Number();
             i_node->setBoundSymbol(ic);
-            i_node->setInt(i);
             i_node->setExprType(symbols._core_types.gIntTy());
             $$ = i_node;
             break;

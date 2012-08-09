@@ -65,6 +65,9 @@ getTupleType (Symbol* scope, TypeVector tys);
 size_t
 getIndirectionCount (std::string type_name);
 
+ArrayType*
+getSizedArrayType (st::Type* item_ty, int size);
+
 /**
  * Get or create an unsized array type from a sized array type.
  */
