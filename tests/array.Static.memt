@@ -1,0 +1,4 @@
+### file
+main () -> int
+ arr :[int, 10]
+ return 1
