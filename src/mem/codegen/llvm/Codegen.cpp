@@ -1007,7 +1007,7 @@ Codegen::cgNewExpr (ast::node::New* node)
    {
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(type_node->BoundSymbol());
       int type_byte_size = static_cast<st::Type*>(type_node->getChild(0)->BoundSymbol())->ByteSize();
-      llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1));
+      llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1), _st->_core_types._int);
       llvm::Value* obj_size = _createInt32Constant(type_byte_size);
       byte_size = llvm::BinaryOperator::Create(llvm::Instruction::Mul, num_obj, obj_size, "", _cur_bb);
    }
