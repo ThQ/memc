@@ -15,20 +15,6 @@ Codegen::Codegen ()
 
 }
 
-void
-Codegen::_dumpStack ()
-{
-   for (size_t i = 0; i < _stack.size(); ++i)
-   {
-      printf("#Frame %d\n", i);
-      std::map<st::Symbol*, llvm::Value*>::iterator j;
-      for (j = _stack._vars[i].begin(); j != _stack._vars[i].end(); ++j)
-      {
-         printf("%s\n", j->first->NameCstr());
-      }
-   }
-}
-
 std::string
 Codegen::_getLlvmTypeName (llvm::Type* ty)
 {
@@ -750,7 +736,6 @@ Codegen::cgFinalIdExpr (ast::node::Text* node)
    {
       if (ty == NULL)
       {
-         _dumpStack();
          DEBUG_PRINTF("Cannot find final id `%s' in the stack\n",
             node->gValueCstr());
       }
@@ -906,13 +891,9 @@ Codegen::cgIfStatement (ast::node::If* node)
    assert (node != NULL);
    assert (_cur_bb != NULL);
 
-   llvm::BasicBlock* cur_bb = _cur_bb;
-   llvm::BasicBlock* origin_exit_block = _exit_block;
-   if (origin_exit_block == NULL) origin_exit_block = _cur_bb;
-
-   bool if_is_last_child = node->Parent()->isLastChild(node);
-
-   // After if
+   // ---------------
+   //  Create blocks
+   // ---------------
    llvm::BasicBlock* true_block = _createBasicBlock("if_true");
    llvm::BasicBlock* false_block = NULL;
    if (node->ElseBlockNode() != NULL)
@@ -921,59 +902,36 @@ Codegen::cgIfStatement (ast::node::If* node)
    }
    llvm::BasicBlock* after_block = _createBasicBlock("if_after");
 
-   // TRUE block
+
+   // -----------
+   //  Condition
+   // -----------
+   llvm::Value* cond = cgExpr(node->ConditionNode());
+
+   _pushNewCondBranchInst(_cur_bb, cond, true_block, after_block);
+
+
+   // ------------
+   //  TRUE block
+   // ------------
    _cur_bb = true_block;
    _exit_block = true_block;
    cgBlock(node->IfBlockNode());
 
-   // FALSE block
+   _pushNewBranchInst(_cur_bb, after_block);
+
+
+   // -------------
+   //  FALSE block
+   // -------------
    if (false_block != NULL)
    {
+      _cur_bb = false_block;
       _exit_block = after_block;
       cgBlock(node->ElseBlockNode());
    }
-   //_exit_block = origin_exit_block;
 
-   _cur_bb = cur_bb;
-   llvm::Value* cond = cgExpr(node->ConditionNode());
-
-   // ---------
-   // BRANCHING
-   // ---------
-
-   // Branching at the end of the TRUE block
-   if (false_block == NULL)
-   {
-      _pushNewBranchInst(_exit_block, after_block);
-   }
-   else
-   {
-      // Branching at the end of the FALSE block
-      _pushNewBranchInst(false_block, after_block);
-   }
-
-   // IF/ELSE
-   llvm::BasicBlock* after_if_block = NULL;
-
-   if (node->hasElseBlockNode())
-   {
-      after_if_block = false_block;
-   }
-   // Only If
-   else
-   {
-      after_if_block = after_block;
-   }
-
-   assert (true_block != NULL);
-   assert (after_if_block != NULL);
-   assert (cond != NULL);
-   assert (cur_bb != NULL);
-
-   _pushNewCondBranchInst(cur_bb, cond, true_block, after_if_block);
-
-   _cur_bb = after_if_block;
-   _exit_block = after_if_block;
+   _cur_bb = after_block;
 }
 
 void
@@ -1141,46 +1099,36 @@ Codegen::cgWhileStatement (ast::node::While* n)
 {
    DEBUG_REQUIRE (n != NULL);
 
-   llvm::BasicBlock* while_head = _createBasicBlock("while_head");
+   llvm::BasicBlock* while_cond = _createBasicBlock("while_head");
    llvm::BasicBlock* while_body = _createBasicBlock("while_body");
    llvm::BasicBlock* while_after = _createBasicBlock("while_after");
-   assert(while_head != NULL && while_body != NULL && while_after != NULL);
 
-   llvm::BasicBlock* origin_block = _cur_bb;
-   if (_exit_block == NULL) _exit_block = while_body;
-   llvm::BasicBlock* origin_exit_block = _exit_block;
+   // Branch to the condition block (from the current block)
+   _pushNewBranchInst(_cur_bb, while_cond);
 
 
-   // ------
-   //  Body
-   // ------
+   // -----------
+   //  Condition
+   // -----------
+   _cur_bb = while_cond;
+   llvm::Value* cond_val = cgExpr(n->ConditionNode());
+   assert(cond_val != NULL);
 
-   // While condition
-   _cur_bb = while_head;
-   llvm::Value* cond = cgExpr(n->ConditionNode());
-   assert(cond != NULL);
+   // Either branch the loop block or skip the loop
+   _pushNewCondBranchInst(while_cond, cond_val, while_body, while_after);
 
-   // While body
+
+   // ------------
+   //  While body
+   // ------------
    _cur_bb = while_body;
-   _exit_block = while_after;
    cgBlock(static_cast<ast::node::Block*>(n->BodyNode()));
 
+   // Branch to the condition block
+   _pushNewBranchInst(_cur_bb, while_cond);
 
-   // -----------
-   //  Branching
-   // -----------
-
-   // Going to the condition block from current block
-   _pushNewBranchInst(origin_block, while_head);
-
-   // Returning to the while condition at the end of the body block
-   _pushNewBranchInst(_cur_bb, while_head);
-
-   // Conditional branching
-   _pushNewCondBranchInst(while_head, cond, while_body, while_after);
 
    _cur_bb = while_after;
-   _exit_block = origin_exit_block;
 }
 
 void

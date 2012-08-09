@@ -85,9 +85,6 @@ class Codegen : public mem::codegen::ICodegen
    inline llvm::GetElementPtrInst*
    _createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx);
 
-   void
-   _dumpStack();
-
    inline void
    _pushNewBranchInst (llvm::BasicBlock* parent, llvm::BasicBlock* dest)
    {
@@ -120,17 +117,6 @@ class Codegen : public mem::codegen::ICodegen
     */
    std::vector<llvm::Type*>
    _getFuncParamsTy (st::Func* func);
-
-   /*
-   inline llvm::Type*
-   _getLlvmTy (std::string st_name) {llvm::Type* ty= _classes[st_name];assert(ty != NULL);return ty;}
-   */
-
-   llvm::Type*
-   _getLlvmTy (st::Symbol* mem_ty) {return _getLlvmTy(static_cast<st::Type*>(mem_ty));}
-
-   llvm::Type*
-   _getLlvmTy (st::Type* mem_ty);
 
    std::string
    _getLlvmTypeName (llvm::Type* ty);
