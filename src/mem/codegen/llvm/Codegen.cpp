@@ -697,7 +697,6 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
 
    if (dest_ty->isIntType() && node->isNumberNode())
    {
-      src_ty = dest_ty;
       val = _type_maker.makeConstant(static_cast<st::Constant*>(node->BoundSymbol()));
    }
    else
