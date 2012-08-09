@@ -29,29 +29,6 @@ Codegen::_dumpStack ()
    }
 }
 
-llvm::Constant*
-Codegen::_getLlvmConstant (st::Constant* c)
-{
-   llvm::Constant* lconst = NULL;
-
-   // FIXME This only works for signed integer values
-   switch (c->Kind())
-   {
-      case st::INT_CONSTANT:
-         st::IntConstant* ic = static_cast<st::IntConstant*>(c);
-         if (ic->IsSigned())
-         {
-            lconst = llvm::ConstantInt::get(_getLlvmTy(c->Type()),
-               static_cast<st::IntConstant*>(c)->getSignedValue(),
-               true); /* Signed */
-         }
-         break;
-   }
-
-   assert(lconst != NULL);
-   return lconst;
-}
-
 std::string
 Codegen::_getLlvmTypeName (llvm::Type* ty)
 {
@@ -127,16 +104,6 @@ Codegen::_createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx)
    return gep_inst;
 }
 
-void
-Codegen::_dumpTypes ()
-{
-   std::map<st::Type*, llvm::Type*>::iterator i;
-   for (i = _type_bindings.begin() ; i != _type_bindings.end(); ++i)
-   {
-      printf("`%s'\n", (*i).first->gQualifiedNameCstr());
-   }
-}
-
 std::string
 Codegen::_getCodegenFuncName (st::Func* func)
 {
@@ -175,236 +142,7 @@ Codegen::_getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty)
    return common_ty;
 }
 
-llvm::Type*
-Codegen::_getLlvmIntTy (size_t size)
-{
-   return llvm::Type::getIntNTy(_module->getContext(), size * 8);
-}
 
-llvm::Type*
-Codegen::_codegenArrayType (st::ArrayType* t)
-{
-   DEBUG_REQUIRE (t != NULL);
-
-   llvm::Type* lty = NULL;
-   llvm::Type* item_lty = _getLlvmTy(t->ItemType());
-
-   if (t->hasLength())
-   {
-      lty = llvm::ArrayType::get(item_lty, t->ArrayLength());
-   }
-   else
-   {
-      lty = llvm::PointerType::get(item_lty, 0);
-   }
-
-   addType(t, lty);
-
-   DEBUG_ENSURE (lty != NULL);
-   return lty;
-}
-
-llvm::StructType*
-Codegen::_codegenClassType (st::Class* cls_sym)
-{
-   DEBUG_REQUIRE (cls_sym != NULL);
-   DEBUG_REQUIRE (cls_sym->isClassType());
-
-   std::vector<llvm::Type*> fields;
-   if (cls_sym->_cur_field_index > 0)
-   {
-      std::vector<st::Field*> f = cls_sym->getOrderedFields();
-      st::Field* field = NULL;
-      for (size_t i=0; i < f.size(); ++i)
-      {
-         assert(f[i] != NULL);
-         field = f[i];
-         fields.push_back(_getLlvmTy(field->Type()));
-      }
-   }
-
-   llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
-      cls_sym->gQualifiedName());
-   if (ty->isOpaque())
-   {
-      ty->setBody(fields, false /* packed */);
-   }
-
-   addType (cls_sym, ty);
-
-   return ty;
-}
-
-llvm::Type*
-Codegen::_codegenEnumType (st::EnumType* t)
-{
-   st::SymbolMapIterator i;
-   for (i = t->Children().begin(); i != t->Children().end(); ++i)
-   {
-      llvm::GlobalVariable* v = new llvm::GlobalVariable(
-        *_module,
-         _getLlvmTy(t->Type()),
-         true, /* isConstant */
-         llvm::GlobalValue::InternalLinkage,
-         _getLlvmConstant(static_cast<st::Var*>(i->second)->ConstantValue()),
-         i->second->gQualifiedName());
-      _stack.setGlobal(i->second, v);
-   }
-   return _getLlvmTy(t->Type());
-}
-
-llvm::FunctionType*
-Codegen::_codegenFunctionType (st::FunctionType* t)
-{
-   std::vector<llvm::Type*> args;
-   for (size_t i = 0; i < t->ArgumentCount(); ++i)
-   {
-      args.push_back(_getLlvmTy(t->getArgument(i)));
-   }
-
-   return llvm::FunctionType::get(_getLlvmTy(t->ReturnType()), args, false);
-}
-
-llvm::PointerType*
-Codegen::_codegenPointerType (st::PointerType* t)
-{
-   return llvm::PointerType::get(_getLlvmTy(t->PointedType()), 0);
-}
-
-llvm::Type*
-Codegen::_codegenPrimitiveType (st::PrimitiveType* t)
-{
-   if (_st->isVoidType(t))
-   {
-      return llvm::Type::getVoidTy(_module->getContext());
-   }
-   return NULL;
-}
-
-llvm::StructType*
-Codegen::_codegenTupleType (st::TupleType* t)
-{
-   DEBUG_REQUIRE (t != NULL);
-   DEBUG_REQUIRE (_type_bindings.find(t) != _type_bindings.end());
-
-   std::vector<llvm::Type*> ltys;
-   for (size_t i=0; i < t->Subtypes().size(); ++i)
-   {
-      ltys.push_back(_getLlvmTy(t->Subtypes()[i]));
-   }
-
-   llvm::StructType* tuple_lty = llvm::StructType::create(ltys, "tuple");
-   addType(t, tuple_lty);
-   return tuple_lty;
-}
-
-llvm::Type*
-Codegen::_codegenType (st::Type* mem_ty)
-{
-   switch (mem_ty->Kind())
-   {
-      case st::ARRAY:
-         return _codegenArrayType(static_cast<st::ArrayType*>(mem_ty));
-
-      case st::CLASS:
-         return _codegenClassType(static_cast<st::Class*>(mem_ty));
-
-      case st::ENUM_TYPE:
-         return _codegenEnumType(static_cast<st::EnumType*>(mem_ty));
-
-      case st::FUNCTION_TYPE:
-         return _codegenFunctionType(static_cast<st::FunctionType*>(mem_ty));
-
-      case st::TUPLE_TYPE:
-         return _codegenTupleType(static_cast<st::TupleType*>(mem_ty));
-
-      case st::INT_TYPE:
-         return _getLlvmIntTy(mem_ty->ByteSize());
-
-      case st::POINTER:
-         return _codegenPointerType(static_cast<st::PointerType*>(mem_ty));
-
-      case st::PRIMITIVE_TYPE:
-         return _codegenPrimitiveType(static_cast<st::PrimitiveType*>(mem_ty));
-
-      default:
-         DEBUG_PRINTF("Unsupported mem type {Kind: %d, Name: %s}\n",
-            mem_ty->Kind(), mem_ty->gQualifiedNameCstr());
-         assert(false);
-   }
-
-   return NULL;
-}
-
-llvm::Type*
-Codegen::_getLlvmTy (st::Type* mem_ty)
-{
-   assert (mem_ty != NULL);
-   llvm::Type* ty = NULL;
-
-   // Type is found
-   if (_type_bindings.find(mem_ty) != _type_bindings.end())
-   {
-      ty = _type_bindings[mem_ty];
-      assert(ty != NULL);
-   }
-   // Type is not already codegened, do it
-   else
-   {
-      ty = _codegenType (mem_ty);
-   }
-      /*
-      if (mem_ty->isPointerType())
-      {
-         st::PointerType* ptr_ty = static_cast<st::PointerType*>(mem_ty);
-
-         // Create the pointer type
-         llvm::Type* base_ty = _getLlvmTy(ptr_ty->PointedType());
-         if (base_ty != NULL)
-         {
-            if (ptr_ty->PointedType()->isArrayType() && !static_cast<st::ArrayType*>(ptr_ty->PointedType())->hasLength())
-            {
-               ty = llvm::PointerType::get(_getLlvmTy(static_cast<st::ArrayType*>(ptr_ty->PointedType())->ItemType()), 0);
-            }
-            else
-            {
-               // TODO What is the second parameter (AddressSpace) ?
-                ty = llvm::PointerType::get(base_ty, 0);
-                _classes[mem_ty->gQualifiedName()] = ty;
-            }
-         }
-      }
-      else if (mem_ty->isArrayType())
-      {
-         st::ArrayType* arr = static_cast<mem::st::ArrayType*>(mem_ty);
-         llvm::Type* base_ty = _getLlvmTy(arr->ItemType());
-         if (base_ty != NULL)
-         {
-            if (arr->hasLength())
-            {
-               ty = llvm::ArrayType::get(base_ty, arr->ArrayLength());
-               _classes[mem_ty->gQualifiedName()] = ty;
-            }
-            else
-            {
-               ty = llvm::PointerType::get(base_ty, 0);
-               _classes[mem_ty->gQualifiedName()] = ty;
-            }
-         }
-      }
-      */
-
-   IF_DEBUG
-   {
-      if (ty == NULL)
-      {
-         DEBUG_PRINTF("Type symbol `%s' {Kind: %d} has no associated LLVM type\n",
-            mem_ty->gQualifiedNameCstr(), mem_ty->Kind());
-      }
-   }
-
-   return ty;
-}
 
 std::vector<llvm::Type*>
 Codegen::_getFuncParamsTy (st::Func* func)
@@ -414,7 +152,7 @@ Codegen::_getFuncParamsTy (st::Func* func)
 
    for (size_t i = 0; i < func->ParamCount(); ++i)
    {
-      cur_ty = _getLlvmTy(func->getParam(i)->Type());
+      cur_ty = _type_maker.get(func->getParam(i)->Type());
       assert (cur_ty != NULL);
       params_ty.push_back(cur_ty);
    }
@@ -429,11 +167,11 @@ Codegen::_getFuncReturnTy (ast::node::Func* func)
 
    if (func->ReturnTypeNode() != NULL)
    {
-      ty = _getLlvmTy(func->ExprType());
+      ty = _type_maker.get(func->ExprType());
    }
    else
    {
-      ty = _getVoidTy();
+      ty = _type_maker.makeVoidType();
    }
 
    IF_DEBUG
@@ -447,12 +185,6 @@ Codegen::_getFuncReturnTy (ast::node::Func* func)
    }
    assert(ty != NULL);
    return ty;
-}
-
-llvm::Type*
-Codegen::_getVoidTy ()
-{
-   return llvm::Type::getVoidTy(_module->getContext());
 }
 
 bool
@@ -480,32 +212,7 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
    return false;
 
 }
-void
-Codegen::addType (st::Type* mem_ty, llvm::Type* llvm_ty)
-{
-   if (mem_ty->isAnyPrimitiveType())
-   {
-      if (mem_ty->isIntType())
-      {
-         _type_bindings[mem_ty] = _getLlvmIntTy(mem_ty->ByteSize());
-         assert(_type_bindings[mem_ty] != NULL);
-      }
-      // Internal type
-      else if (mem_ty->Name()[0] == '#' || mem_ty->Name()=="void")
-      {
-      }
-      else
-      {
-         DEBUG_PRINTF("Unsupported primitive type for type `%s'\n",
-            mem_ty->NameCstr());
-         assert(false);
-      }
-   }
-   else
-   {
-      _type_bindings[mem_ty] = llvm_ty;
-   }
-}
+
 
 void
 Codegen::gen (ast::node::Node* root)
@@ -513,35 +220,14 @@ Codegen::gen (ast::node::Node* root)
    assert (_st != NULL);
    _module = new llvm::Module("top", llvm::getGlobalContext());
 
+   _type_maker.setModule(_module);
+   _type_maker.setStack(&_stack);
+   _type_maker.setSymbolTable(_st);
+
    st::PointerType* void_ptr = st::util::getPointerType(_st->_core_types._void);
-   _type_bindings[void_ptr] = _getVoidPointerLlvmType();
+   _type_maker.bind(void_ptr, _type_maker.makeVoidPointerType());
 
    _stack.push();
-
-   // Codegen classes first...
-   st::Type* ty = NULL;
-   std::map<std::string, st::Type*> types = _st->gTypes();
-   std::map<std::string, st::Type*>::iterator i;
-
-   // Codegen primitives
-   for (i = types.begin() ; i != types.end(); ++i)
-   {
-      ty = (*i).second;
-      if (ty->isAnyPrimitiveType())
-      {
-         //cgPrimitiveType(static_cast<st::PrimitiveType*>(ty));
-      }
-   }
-
-   // Codegen classes
-   for (i = types.begin() ; i != types.end(); ++i)
-   {
-      ty = (*i).second;
-      if (ty->isClassType())
-      {
-         //cgClass(static_cast<st::Class*>(ty));
-      }
-   }
 
    //codegenTupleTypes();
    codegenMemoryFunctions();
@@ -557,18 +243,7 @@ Codegen::cgAmpersandExpr (ast::node::Node* node)
 
    std::string amp_label = "Amp";
 
-
    llvm::Value* base_val = cgExpr(node->getChild(0));
-   /*
-   llvm::Type* dest_ty = _getLlvmTy(node->gExprType());
-   llvm::Value* tmp = new llvm::AllocaInst(dest_ty, NULL, amp_label + ".Alloca", _cur_bb);
-   builder.CreateStore(base_val, tmp);
-   llvm::Value* load = new llvm::LoadInst(tmp, amp_label + ".Load", _cur_bb);
-   //llvm::LoadInst* load = new llvm::LoadInst(base_val, "", _cur_bb);
-   llvm::GetElementPtrInst* gep = llvm::GetElementPtrInst::Create(base_val,
-      _createInt32Constant(0),
-      "dot", _cur_bb);
-   */
 
    return base_val;
 }
@@ -633,14 +308,15 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
 {
    DEBUG_REQUIRE (n != NULL);
 
-   // Taking care of VALUE
+   // -------
+   //  VALUE
+   // -------
    llvm::Value* val = cgExpr(n->ValueNode());
    assert (val != NULL);
-   //val = new llvm::LoadInst(val, "", _cur_bb);
-   //assert (val != NULL);
 
-
-   // Taking care of INDEX
+   // -------
+   //  INDEX
+   // -------
    llvm::Value* index = cgExprAndLoad(n->IndexNode(), _st->gCoreTypes()._int);
    assert (index != NULL);
 
@@ -648,18 +324,9 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    st::Type* value_ty = value_node->ExprType();
 
    std::vector<llvm::Value*> idx;
-   /*
-   if (value_ty->isArrayType()
-      || (value_ty->isPointerType() && static_cast<st::PointerType*>(value_ty)->isPointerToArray()))
-   {
-      val = new llvm::LoadInst(val, "", _cur_bb);
-      //idx.push_back(_createInt32Constant(0));
-   }
-   else if (value_ty->isTupleType())
-   {
-      val = new llvm::LoadInst(val, "", _cur_bb);
-   }
-   */
+
+   // If this is a pointer we have to dereference as much as
+   // (indirection_level - 1)
    if (value_ty->isPointerType())
    {
       for (int i = 0; i < static_cast<st::PointerType*>(value_ty)->IndirectionLevel(); ++i)
@@ -667,6 +334,8 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
          val = new llvm::LoadInst(val, "", _cur_bb);
       }
    }
+
+   // FIXME What ?
    if (!value_ty->isPointerType() && ! static_cast<st::PointerType*>(value_ty)->isPointerToArray())
    {
       idx.push_back(_createInt32Constant(0));
@@ -692,15 +361,18 @@ Codegen::cgCallExpr (ast::node::Call* node)
    st::Type* caller_node_ty = node->CallerNode()->ExprType();
    st::FunctionType* func_ty = NULL;
 
+   // Calling a classic function
    if (caller_node_ty->isFunctionType())
    {
+      st::Func* func = static_cast<st::Func*>(node->CallerNode()->BoundSymbol());
       func_ty = static_cast<st::FunctionType*>(caller_node_ty);
-      callee = _functions[_getCodegenFuncName(static_cast<st::Func*>(node->CallerNode()->BoundSymbol()))];
+      callee = _functions[_getCodegenFuncName(func)];
    }
+   // Calling a functor
    else if (st::util::isFunctorType(caller_node_ty))
    {
-      func_ty = static_cast<st::FunctionType*>(static_cast<st::PointerType*>(caller_node_ty)->getNonPointerParent());
-      DEBUG_PRINTF("CAller node : %s\n", node->CallerNode()->KindNameCstr());
+      st::PointerType* fctor = static_cast<st::PointerType*>(caller_node_ty);
+      func_ty = static_cast<st::FunctionType*>(fctor->getNonPointerParent());
       callee = cgExprAndLoad(node->CallerNode(), func_ty);
    }
    else
@@ -711,7 +383,9 @@ Codegen::cgCallExpr (ast::node::Call* node)
    assert(func_ty->isFunctionType());
    std::vector<llvm::Value*> params;
 
-   // Instance call
+   // ---------------
+   //  Instance call
+   // ---------------
    if (node->Caller() != NULL)
    {
       llvm::Value* caller = cgExprAndLoad(node->getChild(0)->getChild(0));
@@ -721,13 +395,16 @@ Codegen::cgCallExpr (ast::node::Call* node)
       // the caller
       if (node->CallerNode()->ExprType() != caller_expected_ty)
       {
-         caller = new llvm::BitCastInst(caller, _getLlvmTy(caller_expected_ty),
+         caller = new llvm::BitCastInst(caller, _type_maker.get(caller_expected_ty),
             "", _cur_bb);
       }
 
       params.push_back(caller);
    }
 
+   // -----------------
+   //  With parameters
+   // -----------------
    if (node->ParamsNode() != NULL)
    {
       assert(func_ty->ArgumentCount() == node->ParamsNode()->ChildCount());
@@ -740,18 +417,6 @@ Codegen::cgCallExpr (ast::node::Call* node)
          params.push_back(param_value);
       }
    }
-
-   /*
-   IF_DEBUG
-   {
-      if (_functions[_getCodegenFuncName(func_sym)] == NULL)
-      {
-         DEBUG_PRINTF("Cannot find function with name `%s'\n",
-            _getCodegenFuncName(func_ty).c_str());
-      }
-   }
-   assert (_functions[_getCodegenFuncName(func_sym)] != NULL);
-   */
    llvm::CallInst* call = NULL;
    call = llvm::CallInst::Create(callee, params, "", _cur_bb);
 
@@ -759,7 +424,8 @@ Codegen::cgCallExpr (ast::node::Call* node)
    {
       call->setDoesNotReturn(true);
    }
-   //DEBUG_ENSURE (call != NULL);
+
+   DEBUG_ENSURE (call != NULL);
 
    return call;
 }
@@ -774,17 +440,18 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
    st::Type* dest_ty = n->ExprType();
    llvm::Value* val = NULL;
 
+   // Casting between two integer types
    if (src_ty->isIntType() && dest_ty->isIntType())
    {
       // Extending (SAFE)
       if (src_ty->ByteSize() < dest_ty->ByteSize())
       {
-         val = new llvm::SExtInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+         val = new llvm::SExtInst(src_val, _type_maker.get(dest_ty), "", _cur_bb);
       }
       // Truncating (UNSAFE)
       else if (src_ty->ByteSize() > dest_ty->ByteSize())
       {
-         val = new llvm::TruncInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+         val = new llvm::TruncInst(src_val, _type_maker.get(dest_ty), "", _cur_bb);
       }
       else
       {
@@ -792,11 +459,12 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
          val = src_val;
       }
    }
+   // Casting between two pointer types
    else if (src_ty->isPointerType() && dest_ty->isPointerType())
    {
       if (static_cast<st::PointerType*>(dest_ty)->PointedType()->Name() == "void")
       {
-         val = new llvm::BitCastInst(src_val, _getLlvmTy(dest_ty), "", _cur_bb);
+         val = new llvm::BitCastInst(src_val, _type_maker.get(dest_ty), "", _cur_bb);
       }
    }
 
@@ -832,7 +500,8 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
       case ast::node::Kind::OP_GTE:   pred = llvm::ICmpInst::ICMP_SGE; break;
 
       default:
-         DEBUG_PRINTF("Unsupported comparison operator (%s)\n", n->KindName().c_str());
+         DEBUG_PRINTF("Unsupported comparison operator (%s)\n",
+            n->KindName().c_str());
          assert(false);
 
    }
@@ -1043,7 +712,7 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    {
       if (src_ty->isIntType() && dest_ty->isIntType())
       {
-         val = new llvm::SExtInst(val, _getLlvmTy(dest_ty), "", _cur_bb);
+         val = new llvm::SExtInst(val, _type_maker.get(dest_ty), "", _cur_bb);
       }
    }
 
@@ -1160,7 +829,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
          if (func_param != NULL)
          {
             i->setName(func_param->Name());
-            param_lty = _getLlvmTy(func_param->Type());
+            param_lty = _type_maker.get(func_param->Type());
             alloc = new llvm::AllocaInst(param_lty, 0, "", _cur_bb);
             new llvm::StoreInst(&*i, alloc, false, _cur_bb);
             _stack.set(func_param, alloc);
@@ -1206,11 +875,10 @@ Codegen::cgFunctionDef (ast::node::Func* func_node)
       for (size_t i = 0; i < func_sym->ParamCount(); ++i)
       {
          func_param = func_sym->_params[i];
-         params.push_back(_getLlvmTy(func_param->Type()));
+         params.push_back(_type_maker.get(func_param->Type()));
          assert (params[i] != NULL);
       }
    }
-   DEBUG_PRINTF("Func has %d params\n", func_sym->ParamCount());
    llvm::FunctionType* func_ty = llvm::FunctionType::get(
       _getFuncReturnTy(func_node), params, false);
 
@@ -1318,7 +986,7 @@ Codegen::codegenMemoryFunctions ()
    malloc_tys.push_back(llvm::Type::getInt32Ty(_module->getContext()));
 
    llvm::FunctionType* malloc_ty = llvm::FunctionType::get(
-      _getVoidPointerLlvmType(),
+      _type_maker.makeVoidPointerType(),
       malloc_tys,
       /*isVarArg=*/false);
 
@@ -1336,6 +1004,7 @@ Codegen::cgNewExpr (ast::node::New* node)
 
    ast::node::Node* type_node = node->getChild(0);
 
+   // FIXME Spaghetti code !
    if (type_node->BoundSymbol()->isArrayType())
    {
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(type_node->BoundSymbol());
@@ -1347,7 +1016,7 @@ Codegen::cgNewExpr (ast::node::New* node)
    else
    {
       int type_byte_size = static_cast<st::Type*>(type_node->BoundSymbol())->ByteSize();
-      byte_size = llvm::ConstantInt::get(_getLlvmTy(_st->_core_types._int), type_byte_size);
+      byte_size = llvm::ConstantInt::get(_type_maker.get(_st->_core_types._int), type_byte_size);
    }
 
    // Create the call
@@ -1356,8 +1025,8 @@ Codegen::cgNewExpr (ast::node::New* node)
    assert(malloc_call != NULL);
 
    // Cast the return pointer to the appropriate pointer type
-   assert (_getLlvmTy(node->ExprType()) != NULL);
-   llvm::Value* ret = new llvm::BitCastInst(malloc_call, _getLlvmTy(
+   assert (_type_maker.get(node->ExprType()) != NULL);
+   llvm::Value* ret = new llvm::BitCastInst(malloc_call, _type_maker.get(
       node->ExprType()), "new_cast", _cur_bb);
 
    assert (ret != NULL);
@@ -1370,63 +1039,13 @@ Codegen::cgNumberExpr (ast::node::Number* node)
    assert (node->ConstantValue() != NULL);
 
    // FIXME This works only for signed integers
+   st::IntConstant* i_const = static_cast<st::IntConstant*>(node->ConstantValue());
    llvm::Value* val = llvm::ConstantInt::get(llvm::getGlobalContext(),
-      llvm::APInt(node->ConstantValue()->ByteSize() * 8, static_cast<st::IntConstant*>(node->ConstantValue())->getSignedValue(), false));
-   /*
-   switch (node->_format)
-   {
-      case 'c':
-         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
-            llvm::APInt(sizeof(char) * 8, node->getChar(), false));
-         break;
+      llvm::APInt(node->ConstantValue()->ByteSize() * 8, i_const->getSignedValue(), false));
 
-      case 's':
-         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
-            llvm::APInt(sizeof(short) * 8, node->getShort(), false));
-         break;
-
-      case 'i':
-         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
-            llvm::APInt(sizeof(int) * 8, node->getInt(), false));
-         break;
-
-      case 'l':
-         val = llvm::ConstantInt::get(llvm::getGlobalContext(),
-            llvm::APInt(sizeof(long) * 8, node->getLong(), false));
-         break;
-
-      default:
-         assert (false && "Invalid number constant type.");
-   }
-   */
-
-   assert (val != NULL);
+   DEBUG_ENSURE (val != NULL);
 
    return val;
-}
-
-void
-Codegen::cgPrimitiveType (st::PrimitiveType* prim)
-{
-   DEBUG_REQUIRE (prim != NULL);
-
-   llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
-      prim->gQualifiedName());
-   assert(ty != NULL);
-   addType(prim, ty);
-}
-
-void
-Codegen::codegenTupleTypes ()
-{
-   st::Symbol::SymbolCollection::iterator i;
-   for (i = _st->System()->Children().begin(); i != _st->System()->Children().end(); ++i)
-   {
-      if (i->second->isTupleType())
-      {
-         //codegenTupleType (static_cast<st::TupleType*>(i->second));
-      }
-   }
 }
 
 llvm::Value*
@@ -1454,7 +1073,7 @@ Codegen::cgString (ast::node::String* n)
    st::Type* mem_ty = st::util::lookupArrayType(_st->System(), "char", n->gValue().size() + 1);
    assert(mem_ty != NULL);
 
-   llvm::Type* llvm_ty = _getLlvmTy(mem_ty);
+   llvm::Type* llvm_ty = _type_maker.get(mem_ty);
    assert(llvm_ty != NULL);
 
    llvm::Constant* str_val = llvm::ConstantArray::get(_module->getContext(), n->gValue().c_str(), true);
@@ -1495,12 +1114,11 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
       ast::node::Array* arr = static_cast<ast::node::Array*>(node->TypeNode());
       assert (arr->LengthNode() != NULL);
 
-      //var_len = cgExpr(arr->LengthNode());
-      var_ty = _getLlvmTy(node->TypeNode()->BoundSymbol());
+      var_ty = _type_maker.get(node->TypeNode()->BoundSymbol());
    }
    else
    {
-      var_ty = _getLlvmTy(node->ExprType());
+      var_ty = _type_maker.get(node->ExprType());
    }
 
    assert(var_ty != NULL);
@@ -1533,8 +1151,9 @@ Codegen::cgWhileStatement (ast::node::While* n)
    llvm::BasicBlock* origin_exit_block = _exit_block;
 
 
-   // ==================
-   // == CODEGEN BODY ==
+   // ------
+   //  Body
+   // ------
 
    // While condition
    _cur_bb = while_head;
@@ -1547,8 +1166,9 @@ Codegen::cgWhileStatement (ast::node::While* n)
    cgBlock(static_cast<ast::node::Block*>(n->BodyNode()));
 
 
-   // ===============
-   // == BRANCHING ==
+   // -----------
+   //  Branching
+   // -----------
 
    // Going to the condition block from current block
    _pushNewBranchInst(origin_block, while_head);
@@ -1609,18 +1229,15 @@ Codegen::codegenFunctionType (st::Func* func_ty)
    // ----------
    // PARAMETERS
    // ----------
-   // Those are only set for external functions, because, for bodied functions,
-   // the arguments are defined in ::cgFunctionBody.
    std::vector<llvm::Type*> params;
-   //if (func_ty->IsExternal())
+   st::Var* func_param = NULL;
+   // We will set their names in ::codegenFunctionBody so that we append
+   // them to the stack
+   for (size_t i = 0; i < func_ty->ParamCount(); ++i)
    {
-      st::Var* func_param = NULL;
-      for (size_t i = 0; i < func_ty->ParamCount(); ++i)
-      {
-         func_param = func_ty->_params[i];
-         params.push_back(_getLlvmTy(func_param->Type()));
-         assert (params[i] != NULL);
-      }
+      func_param = func_ty->_params[i];
+      params.push_back(_type_maker.get(func_param->Type()));
+      assert (params[i] != NULL);
    }
 
    // -----------
@@ -1631,11 +1248,11 @@ Codegen::codegenFunctionType (st::Func* func_ty)
    llvm::Type* return_lty = NULL;
    if (!_st->isVoidType(return_ty))
    {
-      return_lty = _getLlvmTy(return_ty);
+      return_lty = _type_maker.get(return_ty);
    }
    else
    {
-      return_lty = _getVoidTy();
+      return_lty = _type_maker.makeVoidType();
    }
    assert (return_lty != NULL);
    func_lty = llvm::FunctionType::get(return_lty, params, false);
@@ -1658,23 +1275,6 @@ Codegen::codegenFunctionType (st::Func* func_ty)
    func->setCallingConv(llvm::CallingConv::C);
    _cur_func = func;
 
-   /*
-   // ---------
-   // ARGUMENTS
-   // ---------
-   if (!func_ty->IsExternal())
-   {
-      st::Var* func_param = NULL;
-      llvm::Type* param_lty = NULL;
-      for (size_t i = 0; i < func_ty->ParamCount(); ++i)
-      {
-         func_param = func_ty->getParam(i);
-         param_lty = _getLlvmTy(func_param->Type());
-         new llvm::Argument(param_lty, func_param->Name());//, func);
-      }
-   }
-   */
-
    // Don't codegen a body for a virtual/external function
    if (func_ty->HasBody())
    {
@@ -1693,7 +1293,7 @@ Codegen::codegenTuple (ast::node::Tuple* n)
    DEBUG_REQUIRE (n != NULL);
 
    st::TupleType* tuple_ty = static_cast<st::TupleType*>(n->ExprType());
-   llvm::Type* tuple_lty = _getLlvmTy(tuple_ty);
+   llvm::Type* tuple_lty = _type_maker.get(tuple_ty);
    llvm::AllocaInst* var = new llvm::AllocaInst(tuple_lty, 0, "", _cur_bb);
 
    llvm::Value* field = NULL;
@@ -1718,6 +1318,10 @@ std::string
 Codegen::getLlvmByteCode ()
 {
 #if 0
+   // Don't delete that !
+   //
+   // I seem to be on the right track but for some reason, no code is emited
+
    const llvm::Target* target = NULL;
 
    for (llvm::TargetRegistry::iterator it = llvm::TargetRegistry::begin(),

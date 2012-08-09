@@ -62,7 +62,8 @@ src_mem_ast_visitor = \
  src/mem/ast/visitor/Visitor.cpp \
  src/mem/ast/visitor/XmlDumper.cpp
 src_mem_codegen_llvm = \
- src/mem/codegen/llvm/Codegen.cpp
+ src/mem/codegen/llvm/Codegen.cpp \
+ src/mem/codegen/llvm/TypeMaker.cpp
 src_mem_decorator = \
  src/mem/decorator/External.cpp \
  src/mem/decorator/Overriding.cpp \

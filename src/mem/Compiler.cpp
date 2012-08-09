@@ -144,7 +144,7 @@ Compiler::emitCode ()
       }
 
       mem::codegen::llvm_::Codegen cg;
-      cg.SymbolTable(&symbols);
+      cg.setSymbolTable(&symbols);
       cg.gen(&ast);
 
       // Dump LLVM bytecode

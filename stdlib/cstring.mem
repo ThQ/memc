@@ -83,6 +83,5 @@ reverseSubstring (s :[char]*, start :int, length :int) -> [char]*
 //
 // param(s) : The C string to reverse
 // return : A pointer to the original C string
-@inline
 reverse (s :[char]*) -> [char]*
    return reverseSubstring(s, 0, getLength(s))
