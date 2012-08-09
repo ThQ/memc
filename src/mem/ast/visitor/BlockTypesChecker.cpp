@@ -1153,6 +1153,8 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
       }
       else
       {
+         var_decl_node->setBoundSymbol(BugType());
+
          log::VariableAlreadyDefined* err = new log::VariableAlreadyDefined();
          err->sVarName(var_decl_node->Name());
          err->setPosition(var_decl_node->copyPosition());
