@@ -80,7 +80,7 @@ TopTypesChecker::visitEnum (st::Symbol* scope, node::Enum* n)
 
    st::EnumType* enum_ty = new st::EnumType();
    enum_ty->setName(n->gValue());
-   _symbols->Home()->addChild(enum_ty);
+   scope->addChild(enum_ty);
    n->setBoundSymbol(enum_ty);
 
    if (n->ChildCount() > 0)
