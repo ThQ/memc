@@ -61,6 +61,19 @@ TypeChecker::ensureClassType (node::Node* expr)
 }
 
 bool
+TypeChecker::ensureConstantExpr (node::Node* expr)
+{
+   if (expr == NULL || !expr->hasBoundSymbol() || !expr->BoundSymbol()->isAnyConstant())
+   {
+      log::ExpectedConstant* err = new log::ExpectedConstant();
+      err->format();
+      log(err);
+      return false;
+   }
+   return true;
+}
+
+bool
 TypeChecker::ensureExprType (node::Node* expr, st::Symbol* expr_type)
 {
    if (expr->hasExprType() && expr->ExprType() != expr_type)

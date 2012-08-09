@@ -183,5 +183,10 @@
       {
          "Type": "st::Symbol*"
       }
+   },
+   "ExpectedConstant":
+   {
+      "type": "Error",
+      "message": "Expected constant expression"
    }
 }

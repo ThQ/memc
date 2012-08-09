@@ -90,6 +90,7 @@ TopTypesChecker::visitEnum (st::Symbol* scope, node::Enum* n)
       {
          var_n = static_cast<node::VarDecl*>(n->getChild(i));
          visitVarDecl(enum_ty, var_n);
+         ensureConstantExpr(var_n->ValueNode());
          var_n->setExprType(enum_ty);
          static_cast<st::Var*>(var_n->BoundSymbol())->setConstantValue(static_cast<st::IntConstant*>(var_n->ValueNode()->BoundSymbol()));
       }
