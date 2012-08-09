@@ -81,8 +81,8 @@ class TestRunner:
       print ""
       self.print_section("Summary")
       print "", self._num_tests, "tests run"
-      print " * Failed:", len(self._failed_tests), "(" + str(len(self._failed_tests)/self._num_tests*100) + "%)"
-      print " * Succeeded:", self._num_tests - len(self._failed_tests), "(" + str(100-(len(self._failed_tests)/self._num_tests)*100) + "%)"
+      print " * Failed:", len(self._failed_tests), "(" + str(1.0 * len(self._failed_tests)/self._num_tests*100) + "%)"
+      print " * Succeeded:", self._num_tests - len(self._failed_tests), "(" + str(100-(1.0 * len(self._failed_tests)/self._num_tests)*100) + "%)"
       print ""
 
    def read_file (self, path):
@@ -121,11 +121,14 @@ class TestRunner:
          line += " Running " + test.name + " "
 
          ret_code = test.run()
-         if ret_code != 0:
+         if ret_code == 0:
+            line += "." * (79 - len(line) - 3) + " OK"
+         elif ret_code == 1:
             self._failed_tests.append(item)
             line += "." * (79 - len(line) - 7) + " FAILED"
          else:
-            line += "." * (79 - len(line) - 3) + " OK"
+            self._failed_tests.append(item)
+            line += "." * (79 - len(line) - 8) + " CRASHED"
          i += 1
          print line
 
