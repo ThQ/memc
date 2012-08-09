@@ -11,12 +11,16 @@ namespace mem { namespace st {
 Var::Var ()
 {
    _kind = VAR;
+   _is_global = false;
+   _is_constant = false;
    _type = NULL;
 }
 
 Var::Var (std::string name, class Type* type)
 {
    _kind = VAR;
+   _is_global = false;
+   _is_constant = false;
    _name.assign(name);
    _type = type;
 }

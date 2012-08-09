@@ -7,8 +7,10 @@
 
 #include "mem/st/ArrayType.hpp"
 #include "mem/st/Class.hpp"
+#include "mem/st/EnumType.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
+#include "mem/st/IntConstant.hpp"
 #include "mem/st/IntType.hpp"
 #include "mem/st/Namespace.hpp"
 #include "mem/st/PointerType.hpp"

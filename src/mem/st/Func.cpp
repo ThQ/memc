@@ -13,6 +13,7 @@ Func::Func ()
    _has_body = false;
    _is_entry_point = false;
    _is_external = false;
+   _is_overriding = false;
    _return_type = NULL;
    _next_function = NULL;
    _type = NULL;

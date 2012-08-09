@@ -133,6 +133,9 @@ class BlockTypesChecker : public TypeChecker
    visitNew (st::Symbol* scope, node::New* node);
 
    void
+   visitNumber (st::Symbol* scope, node::Number* node);
+
+   void
    visitPointer (st::Symbol* scope, node::Ptr* n);
 
    void

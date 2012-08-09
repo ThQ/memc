@@ -2,6 +2,8 @@
 #define _MEM__ST__VAR__HPP
 
 
+#include <inttypes.h>
+#include "mem/st/Constant.hpp"
 #include "mem/st/Symbol.hpp"
 #include "mem/st/Type.hpp"
 
@@ -32,10 +34,19 @@ class Var : public Symbol
    //--------------------------------------------------------------------------
    public:
 
+   GETTER(ConstantValue, Constant*) {return _constant_value;}
+   SETTER(ConstantValue, Constant*) {_constant_value = val;}
+
    // PROPERTY : Type
    GETTER(Type, class st::Type*) {return _type;}
    SETTER(Type, class Type*) {_type = val;}
    SETTER(Type, class Symbol*) {_type = static_cast<class Type*>(val);}
+
+   GETTER(IsConstant, bool) {return _is_constant;}
+   SETTER(IsConstant, bool) {_is_constant = val;}
+
+   GETTER(IsGlobal, bool) {return _is_global;}
+   SETTER(IsGlobal, bool) {_is_global = val;}
 
    virtual Symbol*
    gExprType ();
@@ -57,7 +68,10 @@ class Var : public Symbol
    //--------------------------------------------------------------------------
    protected:
 
+   bool _is_global;
+   bool _is_constant;
    st::Type* _type;
+   st::Constant* _constant_value;
 };
 
 

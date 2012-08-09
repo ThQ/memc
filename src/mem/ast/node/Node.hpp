@@ -153,6 +153,9 @@ class Node
    isDotNode() const {return isKind(Kind::DOT);}
 
    inline bool
+   isEnumNode() const {return isKind(Kind::ENUM);}
+
+   inline bool
    isFieldNode() const {return isKind(Kind::FIELD);}
 
    inline bool

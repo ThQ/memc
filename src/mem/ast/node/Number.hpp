@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include "mem/ast/node/Node.hpp"
+#include "mem/st/IntConstant.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -14,6 +15,7 @@ class Number : public Node
 {
    public: char _format;
    public: long _val;
+   public: st::IntConstant* _constant_value;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUTOR
@@ -60,6 +62,9 @@ class Number : public Node
 
    inline void
    setChar (char c){_format='c';_val = c;}
+
+   GETTER(ConstantValue, st::IntConstant*) {return _constant_value;}
+   SETTER(ConstantValue, st::IntConstant*) {_constant_value = val;}
 };
 
 

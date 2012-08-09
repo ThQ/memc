@@ -49,8 +49,6 @@ FunctionType::getArgument (int i)
 bool
 FunctionType::isLike (TypeVector arguments, Type* return_type)
 {
-   DEBUG_PRINTF("isLike(%d) %s\n", arguments.size(), gQualifiedNameCstr());
-
    if (_return_type != return_type) return false;
    if (_arguments.size() != arguments.size()) return false;
 
@@ -58,7 +56,6 @@ FunctionType::isLike (TypeVector arguments, Type* return_type)
    {
       if (arguments[i] != _arguments[i]) return false;
    }
-   DEBUG_PRINT("yes\n");
    return true;
 }
 

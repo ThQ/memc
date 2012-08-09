@@ -6,6 +6,7 @@ namespace mem { namespace ast { namespace node {
 
 Number::Number ()
 {
+   _constant_value = NULL;
    _type = Kind::NUMBER;
    _format = ' ';
    _val = 0;

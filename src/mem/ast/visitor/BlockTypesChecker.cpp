@@ -514,7 +514,22 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 
          right_node->setBoundSymbol(dot_node->BoundSymbol());
          right_node->setExprType(st::util::getExprType(dot_node->BoundSymbol()));
-         dot_node->setExprType(static_cast<st::Type*>(expr_ty));
+
+         // If we are not accessing a class member, we can just flatten the dot
+         // node by replacing it by final id.
+         if (!left_node->BoundSymbol()->isClassType())
+         {
+            ast::node::FinalId* fid = new ast::node::FinalId();
+            fid->sValue(right_node->BoundSymbol()->Name());
+            fid->setBoundSymbol(right_node->BoundSymbol());
+            fid->setExprType(expr_ty);
+            dot_node->Parent()->replaceChild(dot_node, fid);
+            delete dot_node;
+         }
+         else
+         {
+            dot_node->setExprType(static_cast<st::Type*>(expr_ty));
+         }
 
       }
       else
@@ -530,8 +545,8 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
       }
    }
 
-   DEBUG_ENSURE (dot_node->hasExprType());
-   DEBUG_ENSURE (dot_node->hasBoundSymbol());
+   //DEBUG_ENSURE (dot_node->hasExprType());
+   //DEBUG_ENSURE (dot_node->hasBoundSymbol());
 }
 
 void
@@ -606,6 +621,10 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          visitDeref(scope, node);
          break;
 
+      case node::Kind::ENUM:
+         // Don't do anything, it's taken care of by ::TopTypesChecker.
+         break;
+
       case node::Kind::GROUP:
          visitGroup(scope, node);
          break;
@@ -647,6 +666,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::Kind::NUMBER:
+         visitNumber(scope, util::castTo<node::Number*, node::Kind::NUMBER>(node));
          break;
 
       case node::Kind::STRING:
@@ -803,6 +823,12 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
    DEBUG_ENSURE(new_node->hasExprType());
 }
 
+void
+BlockTypesChecker::visitNumber (st::Symbol* scope, node::Number* n)
+{
+
+}
+
 #if 0
 void
 BlockTypesChecker::visitVarLiteralNumber (st::Type* expected_type,
@@ -839,12 +865,15 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (block != NULL);
 
-   node::Node* st = NULL;
-
-   for (size_t i = 0; i < block->ChildCount(); ++i)
+   if (scope != NULL && block != NULL)
    {
-      st = block->getChild(i);
-      visitExpr(scope, st);
+      node::Node* st = NULL;
+
+      for (size_t i = 0; i < block->ChildCount(); ++i)
+      {
+         st = block->getChild(i);
+         visitExpr(scope, st);
+      }
    }
 }
 

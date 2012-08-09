@@ -38,10 +38,16 @@ class XmlDumper : public IDumper
    visitClass (st::Class* cls_sym);
 
    virtual bool
+   visitEnumType (st::EnumType* enum_ty);
+
+   virtual bool
    visitFunction (st::Func* func_sym);
 
    virtual bool
    visitField (st::Field* s);
+
+   virtual bool
+   visitIntConstant (st::IntConstant* s);
 
    virtual bool
    visitIntType (st::IntType* s);

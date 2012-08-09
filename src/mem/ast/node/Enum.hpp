@@ -1,39 +1,33 @@
-#ifndef _MEM__AST__NODE__FIELD__HPP
-#define _MEM__AST__NODE__FIELD__HPP
+#ifndef _MEM__AST__NODE__ENUM__HPP_
+#define _MEM__AST__NODE__ENUM__HPP_
 
 
 #include "mem/ast/node/Text.hpp"
-#include "mem/ast/node/Type.hpp"
-#include "mem/ast/node/VarDecl.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class Field : public VarDecl
+// An AST node for enumeration declarations
+class Enum: public Text
 {
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
-   Field ();
+   // Default constructor.
+   Enum ();
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
-   std::string
-   get_type_name ();
-
    virtual void
-   isValid(NodeValidator* v);
+   isValid (NodeValidator* v);
 };
-
 
 } } }
 

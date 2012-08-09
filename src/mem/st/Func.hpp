@@ -52,6 +52,10 @@ class Func: public Type
    GETTER(IsExternal, bool) {return _is_external;}
    SETTER(IsExternal, bool) {_is_external = val;}
 
+   // IsOverriding
+   GETTER(IsOverriding, bool) {return _is_overriding;}
+   SETTER(IsOverriding, bool) {_is_overriding = val;}
+
    // IsVirtual
    GETTER(IsVirtual, bool) {return _is_virtual;}
    SETTER(IsVirtual, bool) {_is_virtual = val;}
@@ -92,6 +96,7 @@ class Func: public Type
    public:
 
    bool _has_body;
+   bool _is_overriding;
    bool _is_entry_point;
    bool _is_external;
    bool _is_virtual;

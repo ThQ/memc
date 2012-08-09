@@ -23,7 +23,9 @@ typedef enum {
    INT_TYPE=14,
    MACRO=15,
    TUPLE_TYPE=16,
-   FUNCTION_TYPE=17
+   FUNCTION_TYPE=17,
+   ENUM_TYPE=18,
+   INT_CONSTANT=19
 } SymbolKind;
 
 

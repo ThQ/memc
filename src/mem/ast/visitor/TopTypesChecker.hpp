@@ -6,6 +6,7 @@
 #include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
+#include "mem/ast/node/Enum.hpp"
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
@@ -14,6 +15,7 @@
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/visitor/BlockTypesChecker.hpp"
 #include "mem/fs/position/Range.hpp"
+#include "mem/st/EnumType.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/FunctionType.hpp"
@@ -53,6 +55,9 @@ class TopTypesChecker : public BlockTypesChecker
 
    virtual void
    visitClass (st::Symbol* scope, node::Class* clss);
+
+   virtual void
+   visitEnum (st::Symbol* scope, node::Enum* node);
 
    /**
     * Visit a class field declaration (MEM_NODE_FIELD).

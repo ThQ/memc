@@ -123,17 +123,30 @@ Symbol::hintName (Symbol* parent, std::string hint)
 }
 
 bool
+Symbol::isAnyConstant () const
+{
+   switch (_kind)
+   {
+      case st::INT_CONSTANT:
+         return true;
+      default:
+         return false;
+   }
+   DEBUG_UNREACHABLE();
+}
+bool
 Symbol::isAnyType () const
 {
    switch (_kind)
    {
-      case st::CLASS:
-      case st::INT_TYPE:
-      case st::PRIMITIVE_TYPE:
-      case st::POINTER:
-      case st::TUPLE_TYPE:
       case st::ARRAY:
+      case st::CLASS:
+      case st::ENUM_TYPE:
       case st::FUNCTION_TYPE:
+      case st::INT_TYPE:
+      case st::POINTER:
+      case st::PRIMITIVE_TYPE:
+      case st::TUPLE_TYPE:
          return true;
       default:
          return false;

@@ -26,6 +26,7 @@
 #include "mem/ast/visitor/XmlDumper.hpp"
 #include "mem/codegen/llvm/Codegen.hpp"
 #include "mem/decorator/External.hpp"
+#include "mem/decorator/Overriding.hpp"
 #include "mem/decorator/Require.hpp"
 #include "mem/decorator/Virtual.hpp"
 #include "mem/fs/File.hpp"

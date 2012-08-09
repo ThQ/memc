@@ -40,7 +40,6 @@ class Class : public Type
    GETTER(ParentClass, st::Class*) { return static_cast<st::Class*>(_parent);}
    SETTER(ParentClass, st::Class*) { _parent = val; }
 
-
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------

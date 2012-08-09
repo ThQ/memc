@@ -11,6 +11,7 @@
 #include "mem/st/ArrayType.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/FunctionType.hpp"
+#include "mem/st/IntConstant.hpp"
 #include "mem/st/IntType.hpp"
 #include "mem/st/PrimitiveType.hpp"
 #include "mem/st/PointerType.hpp"
@@ -39,6 +40,15 @@ getExprType (Symbol* s);
 
 FunctionType*
 getFunctionType (Symbol* scope, TypeVector tys, Type* return_type);
+
+IntConstant*
+getNativeShortConstant (Symbol* scope, short i);
+
+IntConstant*
+getNativeCharConstant (Symbol* scope, char i);
+
+IntConstant*
+getNativeIntConstant (Symbol* scope, int i);
 
 Type*
 getPointerBaseType(PointerType* ptr);

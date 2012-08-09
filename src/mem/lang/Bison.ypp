@@ -18,6 +18,7 @@
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Decorator.hpp"
 #include "mem/ast/node/Dot.hpp"
+#include "mem/ast/node/Enum.hpp"
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/FinalId.hpp"
 #include "mem/ast/node/For.hpp"
@@ -84,10 +85,17 @@ int yylex()
 {
    mem::lang::Token t = gTOKENIZER.getNextToken();
 
-   std::string* str = new std::string();
-   str->assign(t.Value());
-
-   yylval.text = str;
+   switch (t.Kind())
+   {
+      case T_ID:
+      case T_OP:
+      case T_STRING:
+      case T_LITERAL_NUMBER:
+         std::string* str = new std::string();
+         str->assign(t.Value());
+         yylval.text = str;
+         break;
+   }
 
    return t.Kind();
 }
@@ -137,6 +145,7 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %token T_DOT
 %token T_DOTDOTDOT
 %token T_ELSE
+%token T_ENUM
 %token T_EQ
 %token T_FOR
 %token T_HASH
@@ -193,6 +202,9 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %type <node> class_members
 %type <node> compound_statement
 %type <node> dot_expr
+%type <node> enum_declaration
+%type <node> enum_block
+%type <node> enum_fields
 %type <node> expr
 %type <node> expr_list
 %type <node> for_statement
@@ -237,6 +249,10 @@ input :
    {
       ast->pushChild($2);
    }
+   | input enum_declaration
+   {
+      ast->pushChild($2);
+   }
    | input function_declaration
    {
       ast->pushChild($2);
@@ -263,6 +279,8 @@ use_file :
    | use_file T_DOT T_ID
    {
       $$->sValue($$->gValue() + '.' + $3->c_str());
+
+      delete $3;
    }
 
 metadata :
@@ -270,12 +288,16 @@ metadata :
    {
       $$ = new ast::node::Decorator();
       $$->sValue($2->c_str());
+
+      delete $2;
    }
    | T_AROBASE T_ID T_OP expr T_CP T_NEWLINE
    {
       $$ = new ast::node::Decorator();
       $$->sValue($2->c_str());
       $$->pushChild($4);
+
+      delete $2;
    }
 
 //=============================================================================
@@ -318,6 +340,47 @@ class_members:
 
 
 //=============================================================================
+// ENUM
+//=============================================================================
+enum_declaration:
+   T_ENUM id enum_block
+   {
+      ast::node::Enum* e = new ast::node::Enum();
+      e->sValue($2->_value);
+      e->eat($3);
+
+      $$ = e;
+
+      delete $2; // id
+      delete $3; // enum_block
+   }
+
+enum_block:
+   T_NEWLINE T_INDENT enum_fields
+   {
+      $$ = $3;
+   }
+
+enum_fields:
+   variable_declaration T_NEWLINE
+   {
+      $$ = new ast::node::Node();
+      $$->pushChild($1);
+   }
+   | enum_fields variable_declaration T_NEWLINE
+   {
+      if ($2 != NULL)
+      {
+         $$->pushChild($2);
+      }
+      else
+      {
+         assert(false);
+      }
+   }
+
+
+//=============================================================================
 // FUNCTION
 //=============================================================================
 
@@ -335,10 +398,8 @@ function_name:
       ast::node::Func* func = new ast::node::Func();
       func->pushChild($1);
       func->sValue($2->c_str());
-      //func->setMetadata(md);
       $$ = func;
 
-      //delete $1;
       delete $2;
    }
 
@@ -894,7 +955,11 @@ literal :
       {
          case 'c':
          {
+            st::IntConstant* ic = st::util::getNativeCharConstant(symbols.System(), (char)i);
+            ic->setType(symbols._core_types.gCharTy());
+
             ast::node::Number* c_node = new ast::node::Number();
+            c_node->setBoundSymbol(ic);
             c_node->setChar(i);
             c_node->setExprType(symbols._core_types.gCharTy());
             $$ = c_node;
@@ -903,7 +968,11 @@ literal :
 
          case 's':
          {
+            st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), (short)i);
+            ic->setType(symbols._core_types.gShortTy());
+
             ast::node::Number* s_node = new ast::node::Number();
+            s_node->setBoundSymbol(ic);
             s_node->setShort(i);
             s_node->setExprType(symbols._core_types.gShortTy());
             $$ = s_node;
@@ -912,7 +981,11 @@ literal :
 
          case 'i':
          {
+            st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), i);
+            ic->setType(symbols._core_types.gIntTy());
+
             ast::node::Number* i_node = new ast::node::Number();
+            i_node->setBoundSymbol(ic);
             i_node->setInt(i);
             i_node->setExprType(symbols._core_types.gIntTy());
             $$ = i_node;
@@ -935,6 +1008,8 @@ literal :
          assert(false);
          //FIXME Couldnt fit this value into a numeric type, so should fail
       }
+
+      delete $1;
    }
    | T_STRING
    {

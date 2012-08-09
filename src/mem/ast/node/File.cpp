@@ -21,7 +21,11 @@ File::isValid (NodeValidator* v)
    {
       child = getChild(i);
 
-      v->ensure(child->isUseNode() || child->isClassNode() || child->isFuncNode(),
+      v->ensure(
+         child->isUseNode()
+         || child->isClassNode()
+         || child->isEnumNode()
+         || child->isFuncNode(),
          "Children of a File node must be either Use, Class or Func");
    }
 }

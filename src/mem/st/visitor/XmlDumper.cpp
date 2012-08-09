@@ -27,6 +27,14 @@ XmlDumper::visit (st::Symbol* sym)
          visitClass(static_cast<st::Class*>(sym));
          break;
 
+      case ENUM_TYPE:
+         visitEnumType(static_cast<st::EnumType*>(sym));
+         break;
+
+      case INT_CONSTANT:
+         visitIntConstant(static_cast<st::IntConstant*>(sym));
+         break;
+
       case FIELD:
          visitField(static_cast<st::Field*>(sym));
          break;
@@ -108,12 +116,24 @@ XmlDumper::visitArrayType (st::ArrayType* s)
 }
 
 bool
+XmlDumper::visitEnumType (st::EnumType* e)
+{
+   *_out << "<EnumType name=\"" + e->Name() + "\"";
+   *_out << " byte-size=\"" << e->ByteSize() << "\"";
+   *_out << ">\n";
+   this->visitChildren(e);
+   *_out << "</EnumType>";
+
+   return true;
+}
+
+bool
 XmlDumper::visitClass (st::Class* cls_sym)
 {
    *_out << "<ClassType name=\"" + cls_sym->Name() + "\"";
-   if (cls_sym->ParentType() != NULL)
+   if (cls_sym->ParentClass() != NULL)
    {
-      *_out << " parent-type=\"" + cls_sym->ParentType()->gQualifiedName() + "\"";
+      *_out << " parent-class=\"" + cls_sym->ParentClass()->gQualifiedName() + "\"";
    }
    *_out << " absolute-field-count=\"" << cls_sym->getAbsoluteFieldCount() << "\"";
    *_out << " byte-size=\"" << cls_sym->ByteSize() << "\"";
@@ -153,6 +173,15 @@ XmlDumper::visitFunction (st::Func* func_sym)
    visitChildren(func_sym);
    *_out << "</Function>";
 
+   return true;
+}
+bool
+XmlDumper::visitIntConstant (st::IntConstant* s)
+{
+   *_out << "<IntConstant name=\"" << s->Name() << "\"";
+   *_out << " byte-size=\"" << s->ByteSize() << "\"";
+   *_out << " signed=\"" << (s->IsSigned() ? "true" : "false") << "\"";
+   *_out << " />\n";
    return true;
 }
 
@@ -226,6 +255,12 @@ XmlDumper::visitVar (st::Var* var_sym)
    if (var_sym->Type() != NULL)
    {
       *_out << " type=\"" + var_sym->Type()->gQualifiedName() + "\"";
+   }
+   *_out << " constant=\"" << (var_sym->IsConstant() ? "true" : "false") << "\"";
+   *_out << " global=\"" << (var_sym->IsGlobal() ? "true" : "false") << "\"";
+   if (var_sym->ConstantValue() != NULL)
+   {
+      *_out << " constant-value=\"" << var_sym->ConstantValue()->gQualifiedName() << "\"";
    }
    *_out << " />\n";
 

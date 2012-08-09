@@ -4,6 +4,7 @@
 
 #include <deque>
 #include <map>
+#include <stdio.h>
 #include <string>
 
 
@@ -13,7 +14,7 @@ namespace mem { namespace codegen {
 template <class K, class V>
 class TStack
 {
-   private: std::deque<std::map<K, V> > _vars;
+   public: std::deque<std::map<K, V> > _vars;
 
    public: V get (K name)
    {
@@ -48,6 +49,17 @@ class TStack
    {
       assert (_vars.size() > 0);
       _vars.back()[name] = val;
+   }
+
+   public: void setGlobal (K name, V val)
+   {
+      assert (_vars.size() > 0);
+      _vars.front()[name] = val;
+   }
+
+   public: inline size_t size()
+   {
+      return _vars.size();
    }
 
 };

@@ -16,6 +16,7 @@
 namespace mem { namespace st {
 
 
+
 // A base class for all symbols stored in the symbol table.
 class Symbol
 {
@@ -41,6 +42,10 @@ class Symbol
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
+
+   // ByteSize
+   GETTER(ByteSize, int) {return _byte_size;}
+   SETTER(ByteSize, int) {_byte_size = val;}
 
    // ChildCount
    GETTER(ChildCount, size_t) {return _children.size();}
@@ -109,6 +114,9 @@ class Symbol
    isAliasSymbol() const {return is(st::ALIAS);}
 
    bool
+   isAnyConstant () const;
+
+   bool
    isAnyPrimitiveType () const;
 
    bool
@@ -122,6 +130,12 @@ class Symbol
 
    inline bool
    isClassType() const {return is(st::CLASS);}
+
+   inline bool
+   isConstantInt() const {return is(st::INT_CONSTANT);}
+
+   inline bool
+   isEnumType() const {return is(st::ENUM_TYPE);}
 
    inline bool
    isFieldSymbol() const {return is(st::FIELD);}
@@ -170,6 +184,10 @@ class Symbol
    //--------------------------------------------------------------------------
    protected:
 
+   // The size in bytes of the symbol. It is only used for types and numeric
+   // constants.
+   int _byte_size;
+
    // The number of children.
    size_t _child_count;
 
@@ -197,6 +215,8 @@ class Symbol
    fs::position::Range _pos;
 };
 
+typedef std::map<std::string, Symbol*> SymbolMap;
+typedef SymbolMap::iterator SymbolMapIterator;
 
 } }
 

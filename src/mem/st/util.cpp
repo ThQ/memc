@@ -65,7 +65,6 @@ getExprType (Symbol* s)
 FunctionType*
 getFunctionType (Symbol* scope, TypeVector arguments, Type* return_type)
 {
-   DEBUG_PRINTF("getFunctionType(%d)\n", arguments.size());
    st::Symbol* child = NULL;
    Symbol::SymbolCollectionIterator i;
 
@@ -85,6 +84,33 @@ getFunctionType (Symbol* scope, TypeVector arguments, Type* return_type)
    scope->addChild(func_ty);
 
    return func_ty;
+}
+
+IntConstant*
+getNativeCharConstant(Symbol* scope, char i)
+{
+   IntConstant* c = new IntConstant();
+   c->setChar(i);
+   scope->addChild(c);
+   return c;
+}
+
+IntConstant*
+getNativeShortConstant(Symbol* scope, short i)
+{
+   IntConstant* c = new IntConstant();
+   c->setShort(i);
+   scope->addChild(c);
+   return c;
+}
+
+IntConstant*
+getNativeIntConstant(Symbol* scope, int i)
+{
+   IntConstant* c = new IntConstant();
+   c->setInt(i);
+   scope->addChild(c);
+   return c;
 }
 
 Type*
@@ -238,11 +264,9 @@ getUnsizedArrayType (Type* base_ty)
 bool
 isFunctorType (Symbol* s)
 {
-   DEBUG_PRINTF("is %s a functor ? %d\n", s->gQualifiedNameCstr(), s->Kind());
    if (s->isPointerType())
    {
       Type* pointed_ty = static_cast<st::PointerType*>(s)->getNonPointerParent();
-      DEBUG_PRINTF("is %s a func type ?\n", pointed_ty->gQualifiedNameCstr());
       if (pointed_ty->isFunctionType()) return true;
    }
    return false;

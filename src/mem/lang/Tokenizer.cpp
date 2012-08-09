@@ -12,6 +12,11 @@ Tokenizer::Tokenizer ()
    _logger = NULL;
 }
 
+Tokenizer::~Tokenizer ()
+{
+   delete _in;
+}
+
 void
 Tokenizer::_backtrack ()
 {
@@ -426,7 +431,18 @@ Tokenizer::_getTokenKindFromId (std::string id)
          break;
 
       case 'e':
-         if (id == "else") kind = T_ELSE;
+         if (id.size() >= 2)
+         {
+            switch (id[1])
+            {
+               case 'l':
+                  if (id == "else") kind = T_ELSE;
+                  break;
+               case 'n':
+                  if (id == "enum") kind = T_ENUM;
+                  break;
+            }
+         }
          break;
 
       case 'i':

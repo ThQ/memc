@@ -14,6 +14,7 @@ Compiler::Compiler ()
    gTOKENIZER.setLogger(_logger);
 
    addDecorator(new decorator::External());
+   addDecorator(new decorator::Overriding());
    addDecorator(new decorator::Require());
    addDecorator(new decorator::Virtual());
 
@@ -41,6 +42,14 @@ Compiler::Compiler ()
 Compiler::~Compiler ()
 {
    delete _logger;
+
+   decorator::DecoratorMap::iterator i;
+
+   for (i = _decorators.begin(); i != _decorators.end(); ++i)
+   {
+      delete i->second;
+   }
+
    // Delete AST visitors
    for (size_t i = 0; i < ast_visitors.size(); ++i)
    {
@@ -72,6 +81,7 @@ Compiler::addMacro (ast::macro::Macro* macro)
 
    st::Macro* macro_sym = macro->getSymbol();
    symbols.System()->addChild(macro_sym);
+   delete macro;
 }
 
 void

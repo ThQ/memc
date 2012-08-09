@@ -15,6 +15,43 @@ Codegen::Codegen ()
 
 }
 
+void
+Codegen::_dumpStack ()
+{
+   for (size_t i = 0; i < _stack.size(); ++i)
+   {
+      printf("#Frame %d\n", i);
+      std::map<st::Symbol*, llvm::Value*>::iterator j;
+      for (j = _stack._vars[i].begin(); j != _stack._vars[i].end(); ++j)
+      {
+         printf("%s\n", j->first->NameCstr());
+      }
+   }
+}
+
+llvm::Constant*
+Codegen::_getLlvmConstant (st::Constant* c)
+{
+   llvm::Constant* lconst = NULL;
+
+   // FIXME This only works for signed integer values
+   switch (c->Kind())
+   {
+      case st::INT_CONSTANT:
+         st::IntConstant* ic = static_cast<st::IntConstant*>(c);
+         if (ic->IsSigned())
+         {
+            lconst = llvm::ConstantInt::get(_getLlvmTy(c->Type()),
+               static_cast<st::IntConstant*>(c)->getSignedValue(),
+               true); /* Signed */
+         }
+         break;
+   }
+
+   assert(lconst != NULL);
+   return lconst;
+}
+
 std::string
 Codegen::_getLlvmTypeName (llvm::Type* ty)
 {
@@ -170,8 +207,8 @@ Codegen::_codegenArrayType (st::ArrayType* t)
 llvm::StructType*
 Codegen::_codegenClassType (st::Class* cls_sym)
 {
+   DEBUG_REQUIRE (cls_sym != NULL);
    DEBUG_REQUIRE (cls_sym->isClassType());
-   DEBUG_REQUIRE (_type_bindings.find(cls_sym) != _type_bindings.end());
 
    std::vector<llvm::Type*> fields;
    if (cls_sym->_cur_field_index > 0)
@@ -196,6 +233,24 @@ Codegen::_codegenClassType (st::Class* cls_sym)
    addType (cls_sym, ty);
 
    return ty;
+}
+
+llvm::Type*
+Codegen::_codegenEnumType (st::EnumType* t)
+{
+   st::SymbolMapIterator i;
+   for (i = t->Children().begin(); i != t->Children().end(); ++i)
+   {
+      llvm::GlobalVariable* v = new llvm::GlobalVariable(
+        *_module,
+         _getLlvmTy(t->Type()),
+         true, /* isConstant */
+         llvm::GlobalValue::InternalLinkage,
+         _getLlvmConstant(static_cast<st::Var*>(i->second)->ConstantValue()),
+         i->second->gQualifiedName());
+      _stack.setGlobal(i->second, v);
+   }
+   return _getLlvmTy(t->Type());
 }
 
 llvm::FunctionType*
@@ -253,6 +308,9 @@ Codegen::_codegenType (st::Type* mem_ty)
 
       case st::CLASS:
          return _codegenClassType(static_cast<st::Class*>(mem_ty));
+
+      case st::ENUM_TYPE:
+         return _codegenEnumType(static_cast<st::EnumType*>(mem_ty));
 
       case st::FUNCTION_TYPE:
          return _codegenFunctionType(static_cast<st::FunctionType*>(mem_ty));
@@ -965,12 +1023,6 @@ Codegen::cgExprAndLoad (ast::node::Node* node)
 llvm::Value*
 Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
 {
-   DEBUG_PRINT("\n");
-   if (node->hasBoundSymbol())
-   {
-      DEBUG_PRINTF("Load ? %s\n", node->BoundSymbol()->gQualifiedNameCstr());
-   }
-
    llvm::Value* val = NULL;
    st::Type* src_ty = node->ExprType();
 
@@ -1031,6 +1083,7 @@ Codegen::cgFinalIdExpr (ast::node::Text* node)
    {
       if (ty == NULL)
       {
+         _dumpStack();
          DEBUG_PRINTF("Cannot find final id `%s' in the stack\n",
             node->gValueCstr());
       }
@@ -1314,8 +1367,12 @@ Codegen::cgNewExpr (ast::node::New* node)
 llvm::Value*
 Codegen::cgNumberExpr (ast::node::Number* node)
 {
-   llvm::Value* val = NULL;
+   assert (node->ConstantValue() != NULL);
 
+   // FIXME This works only for signed integers
+   llvm::Value* val = llvm::ConstantInt::get(llvm::getGlobalContext(),
+      llvm::APInt(node->ConstantValue()->ByteSize() * 8, static_cast<st::IntConstant*>(node->ConstantValue())->getSignedValue(), false));
+   /*
    switch (node->_format)
    {
       case 'c':
@@ -1341,6 +1398,7 @@ Codegen::cgNumberExpr (ast::node::Number* node)
       default:
          assert (false && "Invalid number constant type.");
    }
+   */
 
    assert (val != NULL);
 

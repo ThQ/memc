@@ -1,28 +1,26 @@
-#ifndef _MEM__ST__TYPE__HPP_
-#define _MEM__ST__TYPE__HPP_
+#ifndef _MEM__ST__ENUM_TYPE__HPP_
+#define _MEM__ST__ENUM_TYPE__HPP_
 
 
-#include <vector>
-#include "mem/st/Symbol.hpp"
+#include "mem/st/Type.hpp"
 
 
 namespace mem { namespace st {
 
 
-/**
- * A base class for all mem types.
- */
-class Type: public Symbol
+// A base class for Array types.
+//
+// If an array type has a length, then it is staticaly declared, ortherwise it
+// is dynamicaly allocated.
+class EnumType : public Type
 {
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTOR
+   // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
-   Type();
+   // Default constructor.
+   EnumType();
 
 
    //--------------------------------------------------------------------------
@@ -30,26 +28,19 @@ class Type: public Symbol
    //--------------------------------------------------------------------------
    public:
 
-   GETTER(ParentType, Type*) {return _parent_type;}
-   SETTER(ParentType, Type*) {_parent_type = val;}
-
-   virtual Symbol*
-   gExprType() {return this;}
-
+   GETTER(Type, st::Type*) {return _type;}
+   SETTER(Type, st::Type*) {_type = val; _byte_size = _type->ByteSize();}
 
    //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
+   // PUBLIC METHODS
    //--------------------------------------------------------------------------
    public:
 
-   virtual bool
-   canCastTo (Type* dest_ty) const {return false;}
 
-   inline bool
-   hasByteSize() {return _byte_size != -1;}
-
-   bool
-   isSubclass (Type* parent);
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
 
 
    //--------------------------------------------------------------------------
@@ -57,10 +48,9 @@ class Type: public Symbol
    //--------------------------------------------------------------------------
    protected:
 
-   Type* _parent_type;
-};
+   st::Type* _type;
 
-typedef std::vector<st::Type*> TypeVector;
+};
 
 } }
 

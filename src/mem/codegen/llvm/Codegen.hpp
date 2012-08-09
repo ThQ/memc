@@ -33,6 +33,7 @@
 #include "mem/codegen/ICodegen.hpp"
 #include "mem/codegen/TStack.hpp"
 #include "mem/st/Class.hpp"
+#include "mem/st/EnumType.hpp"
 #include "mem/st/Field.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/PointerType.hpp"
@@ -99,6 +100,9 @@ class Codegen : public mem::codegen::ICodegen
    llvm::StructType*
    _codegenClassType (st::Class* cls_symb);
 
+   llvm::Type*
+   _codegenEnumType (st::EnumType* t);
+
    llvm::FunctionType*
    _codegenFunctionType (st::FunctionType* t);
 
@@ -113,6 +117,9 @@ class Codegen : public mem::codegen::ICodegen
 
    llvm::Type*
    _codegenType (st::Type* ty);
+
+   llvm::Constant*
+   _getLlvmConstant (st::Constant* c);
 
    inline llvm::BasicBlock*
    _createBasicBlock(std::string name="")
@@ -137,6 +144,9 @@ class Codegen : public mem::codegen::ICodegen
 
    inline llvm::GetElementPtrInst*
    _createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx);
+
+   void
+   _dumpStack();
 
    inline void
    _pushNewBranchInst (llvm::BasicBlock* parent, llvm::BasicBlock* dest)

@@ -54,11 +54,11 @@ class Tokenizer
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Tokenizer ();
 
+
+   ~Tokenizer ();
 
    //--------------------------------------------------------------------------
    // PROTECTED FUNCTIONS
