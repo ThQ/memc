@@ -140,7 +140,7 @@ class Compiler
    bool
    isBuildSuccessful () const
    {
-      return _logger->WarningCount() == 0 && _logger->FatalErrorCount() ==0 &&
+      return _logger->FatalErrorCount() ==0 &&
          _logger->ErrorCount()==0;
    }
 
