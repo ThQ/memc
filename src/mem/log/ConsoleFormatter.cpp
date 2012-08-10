@@ -68,7 +68,7 @@ ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
       {
          if (sec_text.data()[i] == '\n')
          {
-            str << "      ";
+            str << "     ";
             str << sec_text.substr(last_nl, i-last_nl);
             str << "\n";
             last_nl = i+1;
@@ -76,7 +76,7 @@ ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
       }
       if (last_nl != sec_text.size())
       {
-         str << "      ";
+         str << "     ";
          str << sec_text.substr(last_nl, sec_text.size()-last_nl);
          str << "\n";
       }
