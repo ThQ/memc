@@ -47,11 +47,6 @@ ConsoleFormatter::format (Message* msg)
    {
       this->format_position(res, msg->Position());
    }
-
-   if (has_details)
-   {
-      res << "\n";//           --------------------------------------------------------------------\n";
-   }
    return res.str();
 }
 
