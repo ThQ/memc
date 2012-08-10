@@ -91,7 +91,7 @@ ConsoleFormatter::format_level_name (std::ostringstream& str, MessageLevel lvl)
       case UNKNOWN:     str << " (?)"; break;
       case INFO:        str << " (I)"; break;
       case DEBUG:       str << " \033[1;30m(D)"; break;
-      case WARNING:     str << " \033[0;31m(W)"; break;
+      case WARNING:     str << " \033[1;34m(W)"; break;
       case ERROR:       str << " \033[1;31m(E)"; break;
       case FATAL_ERROR: str << " \033[1;31m(F)"; break;
    }
