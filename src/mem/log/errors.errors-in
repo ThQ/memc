@@ -192,7 +192,7 @@
    "OverridingFunction":
    {
       "type": "Warning",
-      "message": "Function `$ShadowingFunction' (from `$Class') overrides a function from class `%ShadowedInClass'",
+      "message": "Function `$ShadowingFunction' (from `$Class') overrides a function from class `$ShadowedInClass'",
       "description": "Decorate the function `$ShadowingFunction' with `@overriding'",
       "params":
       {
