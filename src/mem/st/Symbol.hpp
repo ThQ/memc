@@ -60,6 +60,10 @@ class Symbol
    GETTER(Depth, int) {return _depth;}
    SETTER(Depth, int) {_depth = val;}
 
+   // IsInvisible
+   GETTER(IsInvisible, bool) {return _is_invisible;}
+   SETTER(IsInvisible, bool) {_is_invisible = val;}
+
    // Kind
    GETTER(Kind, SymbolKind) {return _kind;}
 
@@ -199,6 +203,8 @@ class Symbol
 
    // The depth of the symbol in the whole symbol hierarchy.
    unsigned int _depth;
+
+   bool _is_invisible;
 
    // The kind of the symbol.
    SymbolKind _kind;

@@ -11,6 +11,7 @@ Symbol::Symbol ()
 {
    _child_count = 0;
    _depth = 0;
+   _is_invisible = false;
    _kind = UNKNOWN;
    _md = NULL;
    _parent = NULL;
@@ -100,7 +101,11 @@ Symbol::gQualifiedName ()
    Symbol* sym = this;
    while (sym != NULL)
    {
-      if (sym->Name().size() != 0)
+      if (sym->Name().size() != 0
+#ifdef NDEBUG
+          && !sym->IsInvisible()
+#endif
+          )
       {
          if (name.size() != 0)
          {
