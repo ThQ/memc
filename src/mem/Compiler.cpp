@@ -100,7 +100,7 @@ Compiler::dumpAst ()
       dumper.tearDown();
 
       dump_file.close();
-      _logger->debug("AST dumped to %s", dump_path.c_str());
+      _logger->info("AST dumped to %s (XML)", dump_path.c_str());
    }
 }
 
@@ -121,7 +121,7 @@ Compiler::dumpSt ()
       dumper.visitPreorder(symbols.Root());
 
       st_dump_file.close();
-      _logger->debug("SymbolTable dumped to %s (XML)", dump_path.c_str());
+      _logger->info("SymbolTable dumped to %s (XML)", dump_path.c_str());
    }
 }
 
@@ -153,7 +153,7 @@ Compiler::emitCode ()
       bc_file << cg.getLlvmByteCode();
       bc_file.close();
 
-      _logger->debug("LLVM ByteCode dumped to %s", llvm_ir_path.c_str());
+      _logger->info("LLVM ByteCode dumped to %s", llvm_ir_path.c_str());
 
       // Generate native code
       std::string out_s = llvm_ir_path  + ".s";
