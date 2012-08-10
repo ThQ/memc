@@ -188,5 +188,17 @@
    {
       "type": "Error",
       "message": "Expected constant expression"
+   },
+   "OverridingFunction":
+   {
+      "type": "Warning",
+      "message": "Function `$ShadowingFunction' (from `$Class') overrides a function from class `%ShadowedInClass'",
+      "description": "Decorate the function `$ShadowingFunction' with `@overriding'",
+      "params":
+      {
+         "ShadowingFunction": "st::Symbol*",
+         "Class": "st::Symbol*",
+         "ShadowedInClass": "st::Symbol*"
+      }
    }
 }

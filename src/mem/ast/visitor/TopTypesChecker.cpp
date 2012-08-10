@@ -47,10 +47,6 @@ TopTypesChecker::visit (node::Node* node)
       }
       case node::Kind::ROOT: break;
       default:
-         DEBUG_PRINTF("Unsupported node type {Kind: %d, Name: %s} at top level\n",
-            node->Kind(),
-            node->KindNameCstr());
-         //assert(false);
          return false;
    }
    return true;
@@ -175,9 +171,9 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (func_decl != NULL);
 
-   // --------------------
-   // Declare the function
-   // --------------------
+   // ----------------------
+   //  Declare the function
+   // ----------------------
    st::Func* func_sym = new st::Func();
    func_sym->setName(func_decl->gValue());
    func_sym->setHasBody(func_decl->BodyNode() != NULL);
@@ -202,16 +198,16 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
       visitFuncParams(scope, func_params, func_sym);
    }
 
-   // ---------------------
-   // Register the function
-   // ---------------------
+   // -----------------------
+   //  Register the function
+   // -----------------------
    node::File* file_node = ast::util::getFileNode(func_decl);
    assert (file_node != NULL);
    file_node->registerFunction(func_decl);
 
-   // -------------------------
-   // Declare the function type
-   // -------------------------
+   // ---------------------------
+   //  Declare the function type
+   // ---------------------------
    st::TypeVector func_args;
    for (size_t i = 0; i < func_sym->ParamCount(); ++i)
    {
@@ -222,34 +218,22 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    func_sym->setType(func_ty);
    func_ty->setFunctorType(functor_ty);
 
-   // -----------
-   // Overloading
-   // -----------
+   // ------------------
+   //  Overriding check
+   // ------------------
    // Try to find a function with the same name in ancestors
    if (scope->isClassType())
    {
-      //DEBUG_PRINTF("Is %s @%x shadowing ?\n", func_sym->gQualifiedNameCstr(), func_sym);
-      DEBUG_PRINTF("Is %s shadowing ?\n", func_sym->gQualifiedNameCstr());
       st::Symbol* shadowed_sym = st::util::lookupSymbol(static_cast<st::Class*>(scope)->ParentClass(), func_decl->gValue());
+
       if (shadowed_sym != NULL && shadowed_sym->isFuncSymbol())
       {
-         DEBUG_PRINTF(" - > YES : Shadowed symbol : %s\n", shadowed_sym->gQualifiedNameCstr());
-#if 0
-         DEBUG_PRINTF(" -> %s is shadowing %s \n",
-            func_sym->gQualifiedNameCstr(),
-            shadowed_sym->gQualifiedNameCstr());
-#endif
-         log::Warning* err = new log::Warning();
-         err->formatMessage("Decorate the function `%s' as `@overriding'", func_sym->NameCstr());
-         err->formatDescription("Function `%s' (from class `%s') is overriding a function from class `%s'",
-            func_sym->NameCstr(),
-            scope->gQualifiedNameCstr(),
-            shadowed_sym->Parent()->gQualifiedNameCstr());
+         log::OverridingFunction* err = new log::OverridingFunction();
+         err->sShadowingFunction(func_sym);
+         err->sClass(scope);
+         err->sShadowedInClass(shadowed_sym->Parent());
+         err->format();
          log(err);
-      }
-      else
-      {
-         DEBUG_PRINT(" -> no\n");
       }
    }
 }
