@@ -59,6 +59,23 @@ FunctionType::isLike (TypeVector arguments, Type* return_type)
    return true;
 }
 
+bool
+FunctionType::isOverridenCandidate (FunctionType* candidate)
+{
+   if (candidate == NULL) return false;
+   if (_arguments.size() != candidate->Arguments().size()) return false;
+   if (_return_type != candidate->ReturnType()) return false;
+
+   for (size_t i = 0; i < _arguments.size(); ++i)
+   {
+      if (!_arguments[i]->canCastTo(candidate->getArgument(i)))
+      {
+         return false;
+      }
+   }
+   return true;
+}
+
 //-----------------------------------------------------------------------------
 // PROTECTED FUNCTIONS
 //-----------------------------------------------------------------------------

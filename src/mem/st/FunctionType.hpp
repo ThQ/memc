@@ -63,6 +63,12 @@ class FunctionType: public Type
    bool
    isLike (TypeVector arguments, Type* return_type);
 
+   bool
+   isLike (FunctionType* func_ty) { return isLike(Arguments(), ReturnType());}
+
+   bool
+   isOverridenCandidate (FunctionType* candidate);
+
    //--------------------------------------------------------------------------
    // PROTECTED FUNCTIONS
    //--------------------------------------------------------------------------

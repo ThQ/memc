@@ -5,9 +5,10 @@ namespace mem { namespace ast { namespace visitor {
 bool
 TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
 {
-   bool is_valid = false;
    st::Type* src_ty = source->ExprType();
 
+   bool is_safe_cast = src_ty->canCastTo(dest_ty);
+   /*
    if (src_ty == dest_ty)
    {
       is_valid = true;
@@ -20,8 +21,9 @@ TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
          is_valid = true;
       }
    }
+   */
 
-   if (!is_valid)
+   if (!is_safe_cast)
    {
       log::CannotAssign* err = new log::CannotAssign();
       err->sTypeName(src_ty->Name());
@@ -29,7 +31,7 @@ TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
       err->format();
       log(err);
    }
-   return is_valid;
+   return is_safe_cast;
 }
 
 bool

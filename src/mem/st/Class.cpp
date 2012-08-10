@@ -39,6 +39,16 @@ Class::addChild (Symbol* s)
    return Type::addChild(s);
 }
 
+bool
+Class::canCastTo (Type* dest_ty) const
+{
+   if (dest_ty->isClassType())
+   {
+      return this == dest_ty || isSubclassOf(static_cast<Class*>(dest_ty));
+   }
+   return false;
+}
+
 int
 Class::getAbsoluteFieldCount ()
 {
@@ -55,6 +65,35 @@ int
 Class::getFieldAbsoluteIndex (int relative_idx)
 {
    return getAbsoluteFieldCount() - _cur_field_index + relative_idx;
+}
+
+FunctionVector
+Class::getFunctionsLike (std::string name, FunctionType* func_ty)
+{
+   st::Symbol* cls = this;
+   st::Symbol* func = NULL;
+   FunctionVector funcs;
+
+   while (cls != NULL)
+   {
+      if (cls->isClassType())
+      {
+         func = cls->getChild(name);
+         if (func != NULL && func->Name() == name)
+         {
+            if (static_cast<st::Func*>(func)->Type()->isOverridenCandidate(func_ty))
+            {
+               funcs.push_back(static_cast<st::Func*>(func));
+            }
+         }
+      }
+      else
+      {
+         break;
+      }
+      cls = cls->Parent();
+   }
+   return funcs;
 }
 
 std::vector<st::Field*>
@@ -129,6 +168,19 @@ Class::isDependingOn (Class* other_cls)
       }
    }
 
+   return false;
+}
+
+bool
+Class::isSubclassOf (Class* cls) const
+{
+   st::Symbol* parent = cls;
+
+   while (parent != NULL)
+   {
+      if (parent == cls) return true;
+      parent = parent->Parent();
+   }
    return false;
 }
 

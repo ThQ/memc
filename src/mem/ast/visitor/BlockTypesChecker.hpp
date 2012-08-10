@@ -63,6 +63,9 @@ class BlockTypesChecker : public TypeChecker
    void
    checkCallParameters (st::Symbol* caller, st::FunctionType* func_sym, node::Node* params);
 
+   st::Func*
+   chooseOverridenFunction (st::FunctionVector funcs, st::TypeVector param_tys);
+
    /**
     * Visitor entry point.
     */
@@ -124,6 +127,12 @@ class BlockTypesChecker : public TypeChecker
    visitFor (st::Symbol* scope, node::For* n);
 
    void
+   visitFunctionCall (st::Symbol* scope, node::Call* call_node);
+
+   void
+   visitFunctorCall (st::Symbol* scope, node::Call* call_node);
+
+   void
    visitGroup (st::Symbol* scope, node::Node* n);
 
    void
@@ -131,6 +140,9 @@ class BlockTypesChecker : public TypeChecker
 
    void
    visitNew (st::Symbol* scope, node::New* node);
+
+   void
+   visitMacroCall (st::Symbol* scope, node::Call* node);
 
    void
    visitNumber (st::Symbol* scope, node::Number* node);

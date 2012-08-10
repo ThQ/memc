@@ -5,6 +5,7 @@ namespace mem { namespace ast { namespace node {
 Call::Call ()
 {
    _caller = NULL;
+   _is_instance_call = false;
    _type = Kind::CALL;
 }
 

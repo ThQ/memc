@@ -226,14 +226,30 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    {
       st::Symbol* shadowed_sym = st::util::lookupSymbol(static_cast<st::Class*>(scope)->ParentClass(), func_decl->gValue());
 
-      if (shadowed_sym != NULL && shadowed_sym->isFuncSymbol())
+      if (shadowed_sym != NULL)
       {
-         log::OverridingFunction* err = new log::OverridingFunction();
-         err->sShadowingFunction(func_sym);
-         err->sClass(scope);
-         err->sShadowedInClass(shadowed_sym->Parent());
-         err->format();
-         log(err);
+         if (shadowed_sym->isFuncSymbol())
+         {
+            log::OverridingFunction* err = new log::OverridingFunction();
+            err->sShadowingFunction(func_sym);
+            err->sClass(scope);
+            err->sShadowedInClass(shadowed_sym->Parent());
+            err->format();
+            log(err);
+
+            if (func_sym->ReturnType() != static_cast<st::Func*>(shadowed_sym)->ReturnType())
+            {
+               log::Message* err = new log::Error();
+               err->formatMessage("Return type was defined as %s (not %s)",
+                  static_cast<st::Func*>(shadowed_sym)->ReturnType()->gQualifiedNameCstr(),
+                  func_sym->ReturnType()->gQualifiedNameCstr());
+               err->formatDescription("Overriding function `%s' is redefining the return type of function `%s'",
+                  func_sym->gQualifiedNameCstr(), 
+                  static_cast<st::Func*>(shadowed_sym)->gQualifiedNameCstr());
+               log(err);
+            }
+         }
+
       }
    }
 }

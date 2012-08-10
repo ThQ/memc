@@ -160,10 +160,10 @@ Node::isValid (NodeValidator* v)
    v->ensure(Parent() != this, "Node cannot have itself as parent");
 }
 
-std::vector<st::Symbol*>
+st::TypeVector
 Node::packChildrenExprTypes ()
 {
-   std::vector<st::Symbol*> expr_types;
+   st::TypeVector expr_types;
    for (size_t i = 0 ; i < ChildCount() ; ++i)
    {
       assert(getChild(i)->ExprType() != NULL);
@@ -211,6 +211,43 @@ Node::Depth (unsigned long depth)
    */
 }
 
+Node*
+Node::removeChild (Node* search)
+{
+   Node* cur = _first_child;
+   while (cur != NULL)
+   {
+      if (cur == search)
+      {
+         if (search->_prev != NULL)
+         {
+            search->_prev->_next = search->_next;
+         }
+         else
+         {
+            // Search was the first child
+            search->_parent->_first_child = search->_next;
+         }
+
+         if (search->_next != NULL)
+         {
+            search->_next->_prev = search->_prev;
+         }
+         else
+         {
+            // Search was the last child
+            search->_parent->_last_child = search->_prev;
+         }
+
+         _child_count--;
+         return search;
+      }
+
+      cur = cur->_next;
+   }
+   return NULL;
+}
+
 bool
 Node::replaceChild (Node* search, Node* replace)
 {
@@ -219,11 +256,29 @@ Node::replaceChild (Node* search, Node* replace)
    {
       if (cur == search)
       {
-         cur->_prev->_next = replace;
-         if (cur->_next != NULL)
+         if (search->_prev != NULL)
          {
-            cur->_next->_prev = replace;
+            search->_prev->_next = replace;
+            replace->_prev = search->_prev;
          }
+         else
+         {
+            // Search was the first child of its parent
+            search->Parent()->_first_child = replace;
+         }
+
+         if (search->_next != NULL)
+         {
+            search->_next->_prev = replace;
+            replace->_next = search->_next;
+         }
+         else
+         {
+            search->Parent()->_last_child = replace;
+         }
+
+         replace->_parent = search->_parent;
+         search->_parent = NULL;
          return true;
       }
       cur = cur->_next;

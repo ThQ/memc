@@ -29,7 +29,7 @@ class IntType : public PrimitiveType
    public:
 
    virtual bool
-   canCastTo(Type* dest_ty) const;
+   canCastTo (Type* dest_ty) const;
 };
 
 

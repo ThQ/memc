@@ -106,6 +106,7 @@ class Func: public Type
    FunctionType* _type;
 };
 
+typedef std::vector<Func*> FunctionVector;
 
 } }
 

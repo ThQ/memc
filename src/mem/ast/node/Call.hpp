@@ -34,6 +34,10 @@ class Call : public Node
    // CallerNode
    GETTER(CallerNode, Node*) {return getChild(0);}
 
+   // IsInstanceCall
+   GETTER(IsInstanceCall, bool) {return _is_instance_call;}
+   SETTER(IsInstanceCall, bool) {_is_instance_call = val;}
+
    // ParamsNode
    GETTER(ParamsNode, Node*) {return getChild(1);}
 
@@ -56,6 +60,7 @@ class Call : public Node
    protected:
 
    st::Symbol* _caller;
+   bool _is_instance_call;
 };
 
 

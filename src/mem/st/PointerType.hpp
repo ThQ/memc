@@ -56,6 +56,9 @@ class PointerType : public Type
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Ptr");return false;}
 
+   virtual bool
+   canCastTo (Type* dest_ty) const;
+
    // Returns a child by its name.
    //
    // We have to override Symbol::getChild here because a pointer does not have

@@ -24,6 +24,20 @@ PointerType::~PointerType ()
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
+bool
+PointerType::canCastTo (Type* dest_ty) const
+{
+   if (dest_ty->isPointerType())
+   {
+      PointerType* dest_ptr_ty = static_cast<PointerType*>(dest_ty);
+      if (IndirectionLevel() == dest_ptr_ty->IndirectionLevel())
+      {
+         return _pointed_type->canCastTo(dest_ptr_ty->PointedType());
+      }
+   }
+   return false;
+}
+
 Type*
 PointerType::getNonPointerParent ()
 {

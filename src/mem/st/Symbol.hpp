@@ -226,6 +226,7 @@ class Symbol
 
 typedef std::map<std::string, Symbol*> SymbolMap;
 typedef SymbolMap::iterator SymbolMapIterator;
+typedef std::vector<Symbol*> SymbolVector;
 
 } }
 

@@ -15,12 +15,20 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::FunctionType* fu
 {
    DEBUG_REQUIRE (func_sym != NULL);
 
-   int param_count = params->ChildCount();
-   if (caller != NULL) param_count ++;
+   int param_count = params != NULL ? params->ChildCount() : 0;
 
    if (params != NULL)
    {
-      if (func_sym->ArgumentCount() != param_count)
+      if (func_sym->ArgumentCount() == param_count)
+      {
+         // Each parameter node must have the same expr type as declared in its
+         // function definition.
+         for (size_t i = 0; i < params->ChildCount(); ++i)
+         {
+            checkAssignment(params->getChild(i), func_sym->getArgument(i));
+         }
+      }
+      else
       {
          log::BadParameterCount* err = new log::BadParameterCount();
          err->sExpectedParamCount(func_sym->ArgumentCount());
@@ -29,18 +37,35 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::FunctionType* fu
          //err->setPosition(params->copyPosition());
          log(err);
       }
-      else
-      {
-         int skip_first_param = caller != NULL ? 1 : 0;
+   }
+}
 
-         // Each parameter node must have the same expr type as declared in its
-         // function definition.
-         for (size_t i = 0; i < params->ChildCount(); ++i)
+st::Func*
+BlockTypesChecker::chooseOverridenFunction (st::FunctionVector funcs, st::TypeVector param_tys)
+{
+   std::vector<int> scores;
+   int max_score = 0;
+   size_t best_func = 0;
+   scores.resize(funcs.size());
+
+   for (size_t func_idx = 0; func_idx < funcs.size(); ++func_idx)
+   {
+      scores[func_idx] = 0;
+      for (size_t j = 0; j < funcs[func_idx]->ParamCount(); ++j)
+      {
+         if (funcs[func_idx]->getParam(j)->Type() == param_tys[j])
          {
-            checkAssignment(params->getChild(i), func_sym->getArgument(skip_first_param + i));
+            scores[func_idx] += (j == 0) ? 2 : 1;
          }
       }
+      if (scores[func_idx] > max_score)
+      {
+         max_score = scores[func_idx];
+         best_func = func_idx;
+      }
    }
+
+   return funcs[best_func];
 }
 
 bool
@@ -436,53 +461,20 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
 
    if (base_object->hasBoundSymbol())
    {
+      // Macro call
       if (base_object->BoundSymbol()->isMacro())
       {
-         st::Macro* macro_sym = static_cast<st::Macro*>(base_object->BoundSymbol());
-         macro::Macro* macro = static_cast<macro::Macro*>(macro_sym->MacroExpander());
-         node::Node* macro_result = macro->expand(call_node);
-         if (call_node->_prev != NULL)
-         {
-            call_node->_prev->_next = macro_result;
-         }
-         if (call_node->_next != NULL)
-         {
-            call_node->_next->_prev = macro_result;
-         }
-         call_node->unlink();
-         delete call_node;
-         visitExpr(scope, macro_result);
+         visitMacroCall(scope, call_node);
       }
+      // Function call
       else if (base_object->BoundSymbol()->isFuncSymbol())
       {
-         if (base_object->isDotNode())
-         {
-            // We are calling an instance object
-            if (static_cast<node::Dot*>(base_object)->LeftNode()->BoundSymbol()->isVarSymbol())
-            {
-               call_node->setCaller(static_cast<node::Dot*>(base_object)->LeftNode()->BoundSymbol());
-            }
-         }
-
-         st::Func* base_func = static_cast<st::Func*>(
-            base_object->BoundSymbol());
-         call_node->setExprType(base_func->ReturnType());
-
-         if (call_node->hasParamsNode())
-         {
-            checkCallParameters(call_node->Caller(), base_func->Type(), call_node->ParamsNode());
-         }
+         visitFunctionCall(scope, call_node);
       }
+      // Function pointer call
       else if (st::util::isFunctorType(base_object->ExprType()))
       {
-         st::PointerType* ptr_ty = static_cast<st::PointerType*>(base_object->ExprType());
-         st::FunctionType* func_ty = static_cast<st::FunctionType*>(ptr_ty->getNonPointerParent());
-         call_node->setExprType(func_ty->ReturnType());
-
-         if (call_node->hasParamsNode())
-         {
-            checkCallParameters(NULL, func_ty, call_node->ParamsNode());
-         }
+         visitFunctorCall(scope, call_node);
       }
       else
       {
@@ -538,7 +530,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 
          // If we are not accessing a class member, we can just flatten the dot
          // node by replacing it by final id.
-         if (!left_node->BoundSymbol()->isClassType())
+         if (left_node->BoundSymbol()->isClassType())
          {
             ast::node::FinalId* fid = new ast::node::FinalId();
             fid->sValue(right_node->BoundSymbol()->Name());
@@ -546,6 +538,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
             fid->setExprType(expr_ty);
             dot_node->Parent()->replaceChild(dot_node, fid);
             delete dot_node;
+            dot_node = NULL;
          }
          else
          {
@@ -770,6 +763,75 @@ BlockTypesChecker::visitFor (st::Symbol* scope, node::For* n)
 
    visitBlock(scope, n->BlockNode());
 }
+void
+BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* call_n)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (call_n != NULL);
+
+   node::Node* base_object = call_n->CallerNode();
+   st::Func* base_func = static_cast<st::Func*>(base_object->BoundSymbol());
+   call_n->setExprType(base_func->ReturnType());
+
+   if (base_object->isDotNode())
+   {
+      node::Dot* dot_n = static_cast<node::Dot*>(base_object);
+      // We are calling an instance object
+      // FIXME Spaghetti
+      if (dot_n->LeftNode()->BoundSymbol()->isVarSymbol())
+      {
+         std::string func_name = static_cast<st::Var*>(dot_n->LeftNode()->BoundSymbol())->Type()->Name();
+         func_name += ".";
+         func_name += dot_n->RightNode()->BoundSymbol()->Name();
+
+         node::FinalId* func_id = new node::FinalId();
+         func_id->sValue(func_name);
+         func_id->setBoundSymbol(base_func);
+         func_id->setExprType(base_func->Type());
+
+         call_n->setCaller(dot_n->LeftNode()->BoundSymbol());
+         call_n->setIsInstanceCall(true);
+         dot_n->Parent()->replaceChild(dot_n, func_id);
+
+         node::Node* obj_n = dot_n->removeChild(dot_n->LeftNode());
+         call_n->ParamsNode()->insertChild(obj_n);
+
+         delete dot_n;
+         dot_n = NULL;
+      }
+   }
+
+   // Search for an overriding function that may fit the same signature
+   // FIXME Spaghetti
+   if (call_n->IsInstanceCall())
+   {
+      st::Class* cls = static_cast<st::Class*>(call_n->CallerNode()->BoundSymbol()->Parent());
+      st::FunctionVector funcs = cls->getFunctionsLike(base_func->Name(), base_func->Type());
+      st::Func* new_func = chooseOverridenFunction (funcs, call_n->ParamsNode()->packChildrenExprTypes());
+      call_n->CallerNode()->setBoundSymbol(new_func);
+   }
+
+   if (call_n->hasParamsNode())
+   {
+      checkCallParameters(call_n->Caller(), base_func->Type(), call_n->ParamsNode());
+   }
+
+   DEBUG_ENSURE(call_n->hasExprType());
+}
+
+void
+BlockTypesChecker::visitFunctorCall (st::Symbol* scope, node::Call* call_n)
+{
+   node::Node* base_object = call_n->CallerNode();
+   st::PointerType* ptr_ty = static_cast<st::PointerType*>(base_object->ExprType());
+   st::FunctionType* func_ty = static_cast<st::FunctionType*>(ptr_ty->getNonPointerParent());
+   call_n->setExprType(func_ty->ReturnType());
+
+   if (call_n->hasParamsNode())
+   {
+      checkCallParameters(NULL, func_ty, call_n->ParamsNode());
+   }
+}
 
 void
 BlockTypesChecker::visitGroup (st::Symbol* scope, node::Node* n)
@@ -815,6 +877,26 @@ BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
 
    DEBUG_ENSURE (if_node->ConditionNode()->hasExprType());
    DEBUG_ENSURE (if_node->ConditionNode()->ExprType()->Name() == "bool");
+}
+
+void
+BlockTypesChecker::visitMacroCall (st::Symbol* scope, node::Call* call_n)
+{
+   node::Node* base_object = call_n->CallerNode();
+   st::Macro* macro_sym = static_cast<st::Macro*>(base_object->BoundSymbol());
+   macro::Macro* macro = static_cast<macro::Macro*>(macro_sym->MacroExpander());
+   node::Node* macro_result = macro->expand(call_n);
+   if (call_n->_prev != NULL)
+   {
+      call_n->_prev->_next = macro_result;
+   }
+   if (call_n->_next != NULL)
+   {
+      call_n->_next->_prev = macro_result;
+   }
+   call_n->unlink();
+   delete call_n;
+   visitExpr(scope, macro_result);
 }
 
 void
@@ -1102,9 +1184,9 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
    node::Node* type_node = var_decl_node->TypeNode();
    node::Node* value_node = var_decl_node->ValueNode();
 
-   // ----------------
-   // Check VALUE node
-   // ----------------
+   // ------------------
+   //  Check VALUE node
+   // ------------------
    // Value is declared
    if (value_node != NULL)
    {
@@ -1113,9 +1195,9 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
       if (!value_node->hasExprType()) value_node->setExprType(BugType());
    }
 
-   // ---------------
-   // Check TYPE node
-   // ---------------
+   // -----------------
+   //  Check TYPE node
+   // -----------------
    if (type_node->isPlaceHolderNode())
    {
       // Type is not explicitly declared (type inference)

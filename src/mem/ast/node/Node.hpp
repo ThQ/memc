@@ -19,22 +19,19 @@ namespace mem { namespace ast { namespace node {
 class Node
 {
    //--------------------------------------------------------------------------
-   // FIELDS
+   // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
    public:
 
-   st::Symbol* _bound_type;
-   size_t _child_count;
-   unsigned long _depth;
-   st::Type* _exp_type;
-   Node* _first_child;
-   Node* _last_child;
-   Node* _next;
-   Node* _parent;
-   fs::position::Range* _position;
-   Node* _prev;
-   mem::Metadata* _md;
-   unsigned int _type;
+   // Default constructor
+   Node ();
+
+   // Initializes a node with a specifid type.
+   Node (unsigned int type);
+
+   // Default destructor
+   virtual
+   ~Node();
 
 
    //--------------------------------------------------------------------------
@@ -78,44 +75,18 @@ class Node
 
 
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTORS
-   //--------------------------------------------------------------------------
-   public:
-
-   /**
-    * Default constructor
-    */
-   Node ();
-
-   /**
-    * Initializes a node with a specifid type.
-    */
-   Node (unsigned int type);
-
-   /**
-    * Default destructor
-    */
-   virtual
-   ~Node();
-
-
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
    inline fs::position::Range*
    copyPosition() { return _position->copy_range();}
 
-   /**
-    * true if it has a symbol bound.
-    */
+   // true if it has a symbol bound.
    inline bool
    hasBoundSymbol () const {return _bound_type != NULL;}
 
-   /**
-    * true if it has an expression type.
-    */
+   // true if it has an expression type.
    inline bool
    hasExprType () const {return _exp_type != NULL;}
 
@@ -128,9 +99,7 @@ class Node
    inline bool
    isAmpersandNode() const {return isKind(Kind::AMPERSAND);}
 
-   /**
-    * true if the node is of type MEM_NODE_AND.
-    */
+   // true if the node is of type MEM_NODE_AND.
    inline bool
    isAndNode() const {return isKind(Kind::OP_AND);}
 
@@ -203,10 +172,8 @@ class Node
    inline bool
    isUseNode() const {return isKind(Kind::USE);}
 
-   /**
-    * Returns true if the node is correctly formed after all the compiler
-    * checks (but before any optimisation).
-    */
+   // Returns true if the node is correctly formed after all the compiler
+   // checks (but before any optimisation).
    virtual void
    isValid (NodeValidator* vld);
 
@@ -216,51 +183,35 @@ class Node
    void
    eat (Node* n);
 
-   /**
-    * Returns the type of the node as a string.
-    */
+   // Returns the type of the node as a string.
    static const char*
    get_type_name (unsigned int type);
 
-   /**
-    * Returns the Nth child.
-    */
+   // Returns the Nth child.
    Node*
    getChild (unsigned int i) const;
 
-   /**
-    * Returns true if the node has children.
-    */
+   // Returns true if the node has children.
    inline bool
    hasChildren () { return _child_count > 0; }
 
-   /**
-    * Returns true if the node is of any text type.
-    */
+   // Returns true if the node is of any text type.
    bool
    isText ();
 
-   /**
-    * Returns true if the node is of a given type.
-    */
+   // Returns true if the node is of a given type.
    inline bool
    isKind (unsigned int kind) const { return _type == kind; }
 
-   /**
-    * Returns a vector of the node's children types.
-    */
-   std::vector<st::Symbol*>
+   // Returns a vector of the node's children types.
+   st::TypeVector
    packChildrenExprTypes ();
 
-   /**
-    * Appends a child node.
-    */
+   // Appends a child node.
    void
    pushChild (Node*);
 
-   /**
-    * Appends 2 children nodes.
-    */
+   // Appends 2 children nodes.
    inline void
    pushChildren (Node* n1, Node* n2)
    {
@@ -268,9 +219,7 @@ class Node
       pushChild(n2);
    }
 
-   /**
-    * Appends 3 children nodes.
-    */
+   // Appends 3 children nodes.
    inline void
    pushChildren (Node* n1, Node* n2, Node* n3)
    {
@@ -279,9 +228,7 @@ class Node
       pushChild(n3);
    }
 
-   /**
-    * Appends 4 children nodes.
-    */
+   // Appends 4 children nodes.
    inline void
    pushChildren (Node* n1, Node* n2, Node* n3, Node* n4)
    {
@@ -291,21 +238,39 @@ class Node
       pushChild(n4);
    }
 
-   /**
-    * Replaces a child node with another node.
-    */
+   Node*
+   removeChild (Node* search);
+
+   // Replaces a child node with another node.
    bool
    replaceChild (Node* search, Node* replace);
 
-   /**
-    * Unlinks this node so that it is not pointed to by its parent, siblings,
-    * etc.
-    */
+   // Unlinks this node so that it is not pointed to by its parent, siblings,
+   // etc.
    void
    unlink ();
 
    void
    unlinkChildren ();
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   st::Symbol* _bound_type;
+   size_t _child_count;
+   unsigned long _depth;
+   st::Type* _exp_type;
+   Node* _first_child;
+   Node* _last_child;
+   Node* _next;
+   Node* _parent;
+   fs::position::Range* _position;
+   Node* _prev;
+   mem::Metadata* _md;
+   unsigned int _type;
 };
 
 

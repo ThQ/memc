@@ -369,6 +369,7 @@ Codegen::cgCallExpr (ast::node::Call* node)
    assert(func_ty->isFunctionType());
    std::vector<llvm::Value*> params;
 
+   /*
    // ---------------
    //  Instance call
    // ---------------
@@ -387,15 +388,16 @@ Codegen::cgCallExpr (ast::node::Call* node)
 
       params.push_back(caller);
    }
+   */
 
    // -----------------
    //  With parameters
    // -----------------
    if (node->ParamsNode() != NULL)
    {
-      assert(func_ty->ArgumentCount() == node->ParamsNode()->ChildCount());
       ast::node::Node* cur_param_node = NULL;
       llvm::Value* param_value = NULL;
+
       for (size_t i = 0; i < node->ParamsNode()->ChildCount(); ++i)
       {
          cur_param_node = node->ParamsNode()->getChild(i);
@@ -403,8 +405,7 @@ Codegen::cgCallExpr (ast::node::Call* node)
          params.push_back(param_value);
       }
    }
-   llvm::CallInst* call = NULL;
-   call = llvm::CallInst::Create(callee, params, "", _cur_bb);
+   llvm::CallInst* call = llvm::CallInst::Create(callee, params, "", _cur_bb);
 
    if (call != NULL && !_st->isVoidType(func_ty->ReturnType()))
    {

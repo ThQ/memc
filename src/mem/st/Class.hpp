@@ -3,6 +3,7 @@
 
 
 #include "mem/st/Field.hpp"
+#include "mem/st/Func.hpp"
 #include "mem/st/Type.hpp"
 #include "mem/st/Var.hpp"
 
@@ -48,6 +49,9 @@ class Class : public Type
    bool
    addChild (st::Symbol* sym);
 
+   virtual bool
+   canCastTo (st::Type* ty) const;
+
    /**
     * Return the number of fields in the class type, taking into account the
     * ancestor's fields.
@@ -59,6 +63,9 @@ class Class : public Type
    // index.
    int
    getFieldAbsoluteIndex (int field_relative_index);
+
+   FunctionVector
+   getFunctionsLike (std::string name, FunctionType* func_ty);
 
    // Get a list of all the fields in the class type, including the ancestor's
    // fields.
@@ -74,6 +81,9 @@ class Class : public Type
    // Checks wether a class depends on another (directly or indirectly).
    bool
    isDependingOn (Class* cls);
+
+   bool
+   isSubclassOf (Class* cls) const;
 
 
    //--------------------------------------------------------------------------
