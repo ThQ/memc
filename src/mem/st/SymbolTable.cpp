@@ -7,10 +7,14 @@ namespace mem { namespace st {
 SymbolTable::SymbolTable ()
 {
    _home = new Namespace();
+#ifndef NDEBUG
    _home->setName("#home");
+#endif
 
    _system = new Namespace();
+#ifndef NDEBUG
    _system->setName("#system");
+#endif
 
    _root = new Namespace();
    _root->addChild(_home);
