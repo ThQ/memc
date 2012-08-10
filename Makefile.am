@@ -186,4 +186,4 @@ memc_SOURCES =  \
  $(src_mem_tool)
 
 memc_LDADD = $(LLVM_LDADD)
-memc_CPPFLAGS=$(LLVM_CPPFLAGS) -UNDEBUG
+memc_CPPFLAGS=$(LLVM_CPPFLAGS)
