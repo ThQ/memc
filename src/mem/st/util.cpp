@@ -592,21 +592,21 @@ setupInts (SymbolTable& st, CoreTypes& core_types)
    core_types._ulong = new st::IntType("ulong", sizeof(unsigned long));
    util::registerType(&st, st.System(), core_types._ulong);
 
-   // Type : i8
-   core_types._i8 = new st::IntType("i8", 1);
-   util::registerType(&st, st.System(), core_types._i8);
+   // Type : int8
+   core_types._int8 = new st::IntType("int8", 1);
+   util::registerType(&st, st.System(), core_types._int8);
 
-   // Type : i16
-   core_types._i16 = new st::IntType("i16", 2);
-   util::registerType(&st, st.System(), core_types._i16);
+   // Type : int16
+   core_types._int16 = new st::IntType("int16", 2);
+   util::registerType(&st, st.System(), core_types._int16);
 
-   // Type : i32
-   core_types._i32 = new st::IntType("i32", 4);
-   util::registerType(&st, st.System(), core_types._i32);
+   // Type : int32
+   core_types._int32 = new st::IntType("int32", 4);
+   util::registerType(&st, st.System(), core_types._int32);
 
-   // Type : i64
-   core_types._i64 = new st::IntType("i64", 8);
-   util::registerType(&st, st.System(), core_types._i64);
+   // Type : int64
+   core_types._int64 = new st::IntType("int64", 8);
+   util::registerType(&st, st.System(), core_types._int64);
 }
 
 void

@@ -14,15 +14,19 @@ class CoreTypes
    IntType* _bool;
    IntType* _char;
    IntType* _long;
-   IntType* _i64;
-   IntType* _i32;
-   IntType* _i16;
-   IntType* _i8;
    IntType* _int;
+   IntType* _int64;
+   IntType* _int32;
+   IntType* _int16;
+   IntType* _int8;
    IntType* _short;
    IntType* _uchar;
    IntType* _ushort;
    IntType* _uint;
+   IntType* _uint64;
+   IntType* _uint32;
+   IntType* _uint16;
+   IntType* _uint8;
    IntType* _ulong;
    Type* _void;
 
