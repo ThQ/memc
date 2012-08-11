@@ -11,19 +11,60 @@ namespace mem { namespace fs { namespace position {
 
 class Range : public Position
 {
-   public: int _column_start;
-   public: inline void sColStart(int col_start) { this->_column_start = col_start; }
-   public: int _column_end;
-   public: inline void sColEnd (int col_end) { this->_column_end = col_end; }
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
-   public: int _line_end;
-   public: inline void sLineEnd (int line) { this->_line_end = line; }
+   Range ();
+   Range (Range pos_start, Range pos_end);
 
-   public: Range ();
-   public: Range (Range pos_start, Range pos_end);
-   public: virtual Position* copy ();
-   public: virtual Range* copy_range();
-   public: virtual PositionType getTypeAt (int column);
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   GETTER(ColumnStart, int) {return _column_start;}
+   SETTER(ColumnStart, int) {_column_start = val;}
+
+   GETTER(ColumnEnd, int) {return _column_end;}
+   SETTER(ColumnEnd, int) {_column_end = val;}
+
+
+   GETTER(LineStart, int) {return _line_start;}
+   SETTER(LineStart, int) {_line_start = val;}
+
+   GETTER(LineEnd, int) {return _line_end;}
+   SETTER(LineEnd, int) {_line_end = val;}
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   void
+   append(fs::position::Range r);
+
+   virtual Position*
+   copy ();
+
+   virtual Range*
+   copy_range();
+
+   void
+   import (Range r);
+
+   virtual PositionType
+   getTypeAt (int column);
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+   int _column_start;
+   int _column_end;
+   int _line_end;
+   int _line_start;
 };
 
 

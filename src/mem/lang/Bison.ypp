@@ -57,18 +57,18 @@ using namespace mem;
    { \
       if (YYID (N)) \
       { \
-         (Current).sLine(YYRHSLOC (Rhs, 1)._line); \
-         (Current).sLineEnd(YYRHSLOC (Rhs, 1)._line_end); \
-         (Current).sColStart(YYRHSLOC (Rhs, 1)._column_start); \
-         (Current).sColEnd(YYRHSLOC (Rhs, N)._column_end); \
+         (Current).setLineStart(YYRHSLOC (Rhs, 1).LineStart()); \
+         (Current).setLineEnd(YYRHSLOC (Rhs, 1).LineEnd()); \
+         (Current).setColumnStart(YYRHSLOC (Rhs, 1).ColumnStart()); \
+         (Current).setColumnEnd(YYRHSLOC (Rhs, N).ColumnEnd()); \
          (Current).sFile(YYRHSLOC(Rhs, 1)._file); \
       } \
       else \
       { \
-         (Current).sLine(YYRHSLOC (Rhs, 0)._line); \
-         (Current).sLineEnd(YYRHSLOC (Rhs, 0)._line_end); \
-         (Current).sColStart(YYRHSLOC (Rhs, 0)._column_end); \
-         (Current).sColEnd(YYRHSLOC (Rhs, 0)._column_end); \
+         (Current).setLineStart(YYRHSLOC (Rhs, 0).LineStart()); \
+         (Current).setLineEnd(YYRHSLOC (Rhs, 0).LineEnd()); \
+         (Current).setColumnStart(YYRHSLOC (Rhs, 0).ColumnEnd()); \
+         (Current).setColumnEnd(YYRHSLOC (Rhs, 0).ColumnEnd()); \
          (Current).sFile(NULL); \
       } \
    } \
@@ -96,7 +96,7 @@ int yylex()
          yylval.text = str;
          break;
    }
-
+   yylloc = t.Location();
    return t.Kind();
 }
 
@@ -288,7 +288,7 @@ metadata :
    {
       $$ = new ast::node::Decorator();
       $$->sValue($2->c_str());
-
+      $$->setPosition(new fs::position::Range(@1, @2));
       delete $2;
    }
    | T_AROBASE T_ID T_OP expr T_CP T_NEWLINE
@@ -296,6 +296,7 @@ metadata :
       $$ = new ast::node::Decorator();
       $$->sValue($2->c_str());
       $$->pushChild($4);
+      $$->setPosition(new fs::position::Range(@1, @5));
 
       delete $2;
    }
@@ -388,6 +389,7 @@ function_name:
    T_ID
    {
       ast::node::Func* func = new ast::node::Func();
+      func->setPosition(@$.copy_range());
       func->sValue($1->c_str());
       $$ = func;
 
@@ -396,6 +398,7 @@ function_name:
    | metadata T_ID
    {
       ast::node::Func* func = new ast::node::Func();
+      func->setPosition(@2.copy_range());
       func->pushChild($1);
       func->sValue($2->c_str());
       $$ = func;
@@ -468,10 +471,12 @@ argument_list:
       $$ = new ast::node::Node();
       $$->setKind(ast::node::Kind::FUNCTION_PARAMETERS);
       $$->pushChild($1);
+      $$->setPosition(@1.copy_range());
    }
    | argument_list T_COMMA argument
    {
       $$->pushChild($3);
+      $$->Position()->append(@3);
    }
 
 argument:
@@ -536,7 +541,7 @@ block:
    T_NEWLINE T_INDENT statements T_DEDENT
    {
       $$ = new ast::node::Block();
-      $$->setPosition(new fs::position::Range(@3, @3));
+      $$->setPosition(@3.copy_range());
       $$->eat($3);
       delete $3;
    }
@@ -619,24 +624,28 @@ type_name:
    qualified_id
    {
       $$ = static_cast<ast::node::Node*>($1);
+      $$->setPosition(@$.copy_range());
    }
    | type_name T_STAR
    {
       ast::node::Ptr* ptr = new ast::node::Ptr();
       ptr->pushChild($1);
       $$ = static_cast<ast::node::Ptr*>(ptr);
+      $$->setPosition(@$.copy_range());
    }
    | T_LBRACKET type_name T_RBRACKET
    {
       ast::node::Array* arr = new ast::node::Array();
       arr->pushChild($2);
       $$ = static_cast<ast::node::Node*>(arr);
+      $$->setPosition(@$.copy_range());
    }
    | T_LBRACKET type_name T_COMMA expr T_RBRACKET
    {
       ast::node::Array* arr = new ast::node::Array();
       arr->pushChildren($2, $4);
       $$ = static_cast<ast::node::Node*>(arr);
+      $$->setPosition(@$.copy_range());
    }
    | tuple_type
 
@@ -702,25 +711,35 @@ id :
    {
       $$ = new ast::node::Text();
       $$->setKind(ast::node::Kind::ID);
-      $$->setPosition(@$.copy_range());
+      $$->setPosition(new fs::position::Range(@$));
       $$->sValue($1->c_str());
 
       delete $1;
    }
 
+/* RECURSIVE */
 qualified_id :
    id
    {
       ast::node::FinalId* n = new ast::node::FinalId();
       n->sValue($1->gValue());
+      n->setPosition(@$.copy_range());
       delete $1;
       $$ = static_cast<ast::node::Text*>(n);
+      assert($$->Position() != NULL);
    }
    | qualified_id T_DOT id
    {
       $$ = new ast::node::Dot();
       $$->pushChildren($1, $3);
-      $$->setPosition(@$.copy_range());
+      if ($$->Position() != NULL)
+      {
+         $$->Position()->append(@$);
+      }
+      else
+      {
+         $$->setPosition(@$.copy_range());
+      }
    }
 
 dot_expr :

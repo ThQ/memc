@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "mem/fs/File.hpp"
 #include "mem/lang/Token.hpp"
 #include "mem/lang/TokenKind.hpp"
 #include "mem/log/errors.hpp"
@@ -30,10 +31,14 @@ class Tokenizer
    char _buffer[kBUFFER_SIZE];
    int _bufferCursor;
    int _bufferSize;
+   int _cur_line;
+   int _cur_column;
+   fs::File* _fs_file;
    std::string _indent_unit;
    int _indent_level;
    bool _eat_space;
    std::istream* _in;
+   fs::position::Range _location;
    log::Logger* _logger;
    int _state;
    int _cur_tok;
@@ -49,6 +54,8 @@ class Tokenizer
    SETTER(EatSpace, bool) {_eat_space = val;}
 
 
+   SETTER(FsFile, fs::File*) {_fs_file = val;}
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -57,7 +64,7 @@ class Tokenizer
    // Default constructor.
    Tokenizer ();
 
-
+   // Destructor
    ~Tokenizer ();
 
    //--------------------------------------------------------------------------
@@ -71,6 +78,12 @@ class Tokenizer
    void
    _dumpBuffer ();
 
+   inline void
+   _endToken ()
+   {
+      _location.setLineEnd(_cur_line);
+      _location.setColumnEnd(_cur_column);
+   }
    char
    _escapeChar(char c) const ;
 
@@ -126,11 +139,46 @@ class Tokenizer
    _pushEndTokens ();
 
    inline void
-   _pushToken (int kind) { Token t(kind, _tokenBuffer); _token_queue.push(t); _state = T_YACC_UNDEFINED; }
+   _pushToken (int kind)
+   {
+      _endToken();
+
+      Token t(kind, _tokenBuffer);
+      t.setLocation(_location);
+      _token_queue.push(t);
+      _state = T_YACC_UNDEFINED;
+      _startToken();
+   }
 
    inline void
-   _pushToken (int kind, std::string val) { Token t(kind, val); _token_queue.push(t); _state = T_YACC_UNDEFINED; }
+   _pushToken (int kind, std::string val)
+   {
+      _endToken();
 
+      Token t(kind, val);
+      t.setLocation(_location);
+      _token_queue.push(t);
+      _state = T_YACC_UNDEFINED;
+      _startToken();
+   }
+
+   inline void
+   _resetLocation ()
+   {
+      _location.setLineStart(1);
+      _location.setLineEnd(1);
+      _location.setColumnEnd(1);
+      _location.setColumnStart(1);
+   }
+
+   inline void
+   _startToken ()
+   {
+      _location.setLineStart(_cur_line);
+      _location.setColumnStart(_cur_column);
+      _location.setLineEnd(_cur_line);
+      _location.setColumnEnd(_cur_column);
+   }
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS

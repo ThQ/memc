@@ -33,11 +33,6 @@ ConsoleFormatter::format (Message* msg)
 
    bool has_details = msg->SecondaryText() != "" || msg->Position() != NULL;
 
-
-   /*if (has_details)
-   {
-      res << "           --------------------------------------------------------------------\n";
-   }*/
    if (msg->SecondaryText() != "")
    {
       this->format_description(res, msg);
@@ -103,24 +98,25 @@ ConsoleFormatter::format_message (std::ostringstream& str, Message* msg)
 }
 
 void
-ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Position* pos)
+ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Position* pos_a)
 {
+   fs::position::Range* pos = static_cast<fs::position::Range*>(pos_a);
    if (pos->_file != NULL)
    {
-      str << "     \n     @ ";
+      str << "     @ ";
       str << pos->gFile()->gPath();
       str << ":";
-      str << pos->gLine();
+      str << pos->LineStart();
       str << "\n";
 
       str << "     > ";
-      if (pos->gLine() > 0 && pos->gFile()->isLineInFile(pos->gLine()-1))
+      if (pos->LineStart() > 0 && pos->gFile()->isLineInFile(pos->LineStart()-1))
       {
-         std::string context_line = pos->gFile()->getLineCstr(pos->gLine()-1);
+         std::string context_line = pos->gFile()->getLineCstr(pos->LineStart()-1);
          str << context_line;
          str << "\n       ";
 
-         for (size_t i = 1 ; i <= context_line.length() ; ++i)
+         for (size_t i = 1 ; i < context_line.length() ; ++i)
          {
             switch (pos->getTypeAt(i))
             {
@@ -133,14 +129,14 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
       }
       else
       {
-         str << "~~BOGUS LINE (";
-         str << pos->_line;
-         str << ")~~\n";
+         str << "<bad line:";
+         str << pos->LineStart();
+         str << ">\n";
       }
    }
    else
    {
-      str << "       @  {path:???}\n";
+      str << "       @  <invalid file>\n";
    }
 }
 

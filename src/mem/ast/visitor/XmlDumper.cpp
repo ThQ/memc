@@ -47,8 +47,14 @@ XmlDumper::visit (node::Node* node)
 
       if (node->Position() != NULL)
       {
-         *_out << " line=\"";
-         *_out << node->Position()->gLine();
+         *_out << " position-start=\"";
+         *_out << node->Position()->LineStart();
+         *_out << ":";
+         *_out << node->Position()->ColumnStart();
+         *_out << "\" position-end=\"";
+         *_out << node->Position()->LineEnd();
+         *_out << ":";
+         *_out << node->Position()->ColumnEnd();
          *_out << "\"";
       }
 

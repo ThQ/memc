@@ -12,7 +12,7 @@
 	},
 	"CallNonFunction":
 	{
-		"message": "Trying to call an object ($ObjectName) that is not a function, but a $ObjectTypeName",
+		"message": "`$ObjectName' is not a function, but a $ObjectTypeName",
 		"type": "Error",
 		"params":
 		{
@@ -140,7 +140,7 @@
    "CannotAssign":
    {
       "type": "Error",
-      "message": "Cannot assign value of type $TypeName, when $ExpectedTypeName was expected",
+      "message": "Expected expression of type `$ExpectedTypeName', but got `$TypeName'",
       "params":
       {
          "TypeName": "std::string",

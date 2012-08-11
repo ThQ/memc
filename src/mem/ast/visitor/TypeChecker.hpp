@@ -41,7 +41,7 @@ class TypeChecker : public Visitor
    ensureSymbolIsType (node::Node* node, st::Symbol* sym);
 
    void
-   logSymbolNotFound (st::Symbol* scope, std::string symbol_name);
+   logSymbolNotFound (st::Symbol* scope, node::Node* node, std::string symbol_name);
 };
 
 

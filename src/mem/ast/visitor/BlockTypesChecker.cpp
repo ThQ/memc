@@ -104,7 +104,7 @@ BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::Node* node)
       }
       else
       {
-         logSymbolNotFound(scope, ptr_base_ty->gQualifiedName() + "*");
+         logSymbolNotFound(scope, node->getChild(0), ptr_base_ty->gQualifiedName() + "*");
          node->setExprType(BugType());
       }
 
@@ -483,6 +483,7 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
          log::CallNonFunction* err = new log::CallNonFunction();
          err->sObjectName(base_object->BoundSymbol()->Name());
          err->sObjectTypeName(base_object->BoundSymbol()->gQualifiedName());
+         err->setPosition(base_object->Position()->copy());
          err->format();
          log(err);
       }
@@ -549,7 +550,6 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
          {
             dot_node->setExprType(static_cast<st::Type*>(expr_ty));
          }
-
       }
       else
       {
@@ -744,12 +744,7 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
       id_node->setBoundSymbol(BugType());
       id_node->setExprType(BugType());
 
-      log::SymbolNotFound* err = new log::SymbolNotFound();
-      err->sSymbolName(id_node->gValue());
-      err->sScopeName(scope->gQualifiedName());
-      //err->setPosition(id_node->copyPosition());
-      err->format();
-      log(err);
+      logSymbolNotFound(scope, id_node, id_node->gValue());
    }
 
    DEBUG_ENSURE(id_node->hasBoundSymbol());

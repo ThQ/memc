@@ -201,6 +201,7 @@ Compiler::parse (std::string file_path)
       // TODO We are actually reading each file twice, lang::Tokenizer should
       // populate fs::File
       gTOKENIZER.setInputFile(file->gPath());
+      gTOKENIZER.setFsFile(file);
       gTOKENIZER.reset();
       yyparse(this->fm, file_node, this->symbols, _logger, file);
 

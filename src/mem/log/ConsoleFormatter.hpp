@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <vector>
 #include "mem/fs/position/Position.hpp"
+#include "mem/fs/position/Range.hpp"
 #include "mem/log/Formatter.hpp"
 
 

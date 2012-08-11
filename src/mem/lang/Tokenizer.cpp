@@ -7,6 +7,9 @@ Tokenizer::Tokenizer ()
 {
    _bufferCursor = 0;
    _bufferSize = 0;
+   _cur_column = 0;
+   _cur_line = 1;
+   _fs_file = NULL;
    _indent_level = 0;
    _eat_space = true;
    _logger = NULL;
@@ -22,6 +25,7 @@ Tokenizer::_backtrack ()
 {
    //DEBUG_PRINT("backtrack\n");
    _bufferCursor --;
+   _cur_column --;
 }
 
 void
@@ -89,20 +93,17 @@ Tokenizer::_escapeChar (char c_in) const
 void
 Tokenizer::_readSome (int n)
 {
-   //printf("<readSome(%d)>\n", n);
    _dumpBuffer();
 
    _in->read(&_buffer[_bufferCursor], n);
    _bufferSize += _in->gcount();
 
    _dumpBuffer();
-   //printf("</readSome>\n");
 }
 
 void
 Tokenizer::_shiftBufferLeft (int n)
 {
-   //printf("<shiftBufferLeft(%d)>\n", n);
    if (n > 0)
    {
       _dumpBuffer();
@@ -119,14 +120,13 @@ Tokenizer::_shiftBufferLeft (int n)
       _bufferSize -= n;
       _dumpBuffer();
    }
-   //printf("</shiftBufferLeft>\n");
 }
 
 char*
 Tokenizer::_getNChars (int n)
 {
    _dumpBuffer();
-   //printf("<getNChars(%d)>\n", n);
+
    // Not enough data in the buffer
    if ((_bufferCursor + n) > _bufferSize)
    {
@@ -137,13 +137,11 @@ Tokenizer::_getNChars (int n)
       }
       _readSome(n);
    }
-   else
-   {
-   }
 
    char* ptr = &(_buffer[_bufferCursor]);
    _bufferCursor += n;
-   //printf("</getNChars>\n");
+   _cur_column += n;
+
    return ptr;
 }
 
@@ -153,7 +151,6 @@ Tokenizer::_processTokenStart (char c)
    bool emit_token = false;
    char c2 = 0;
 
-   //printf("_processTokenStart\n");
    switch (c)
    {
       case '(': _pushToken(T_OP, "("); break;
@@ -179,8 +176,8 @@ Tokenizer::_processTokenStart (char c)
          }
          else
          {
-            _pushToken(T_BANG, "!");
             _backtrack();
+            _pushToken(T_BANG, "!");
          }
          break;
       }
@@ -193,8 +190,8 @@ Tokenizer::_processTokenStart (char c)
          }
          else
          {
-            _pushToken(T_DIV, "/");
             _backtrack();
+            _pushToken(T_DIV, "/");
          }
          break;
       }
@@ -207,8 +204,8 @@ Tokenizer::_processTokenStart (char c)
          }
          else
          {
-            _pushToken(T_MINUS, "-");
             _backtrack();
+            _pushToken(T_MINUS, "-");
          }
          break;
       }
@@ -225,8 +222,8 @@ Tokenizer::_processTokenStart (char c)
          }
          else
          {
-            _pushToken(T_GT, ">");
             _backtrack();
+            _pushToken(T_GT, ">");
          }
          break;
       }
@@ -243,8 +240,8 @@ Tokenizer::_processTokenStart (char c)
          }
          else
          {
-            _pushToken(T_LT, "<");
             _backtrack();
+            _pushToken(T_LT, "<");
          }
          break;
       }
@@ -257,14 +254,16 @@ Tokenizer::_processTokenStart (char c)
          }
          else
          {
-            _pushToken(T_EQ, "=");
             _backtrack();
+            _pushToken(T_EQ, "=");
          }
          break;
       }
-      case 10: // NL
+      case 10: // NEWLINE
       {
          _pushToken(T_NEWLINE);
+         _cur_line ++;
+         _cur_column = 1;
          _state = T_NEWLINE;
          _cur_tok = T_NEWLINE;
          break;
@@ -314,7 +313,6 @@ Tokenizer::getNextToken ()
 
    while (_token_queue.size() == 0)
    {
-   //DEBUG_PRINTF("========= getNextToken ==========\n", "");
       _readNextToken();
    }
 
@@ -329,9 +327,14 @@ Tokenizer::getNextToken ()
    t = _token_queue.front();
    _token_queue.pop();
 
-   //DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"}\n",
-     //t.Kind(), t.Value().c_str());
+#if 0
+   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"} @ %d:%d..%d:%d\n",
+     t.Kind(), t.Value().c_str(),
+     t.Location().LineStart(), t.Location().ColumnStart(),
+     t.Location().LineEnd(), t.Location().ColumnEnd());
+#endif
 
+   t.Location().sFile(_fs_file);
    return t;
 }
 
@@ -341,7 +344,6 @@ Tokenizer::_getIndentTokenKind (std::string indent)
    // First time we see indentation
    if (_indent_unit.size() == 0 && indent.size() != 0)
    {
-      //printf("First time indent\n");
       _indent_unit = indent;
       _indent_level = 1;
       _pushToken(T_INDENT, indent);
@@ -481,12 +483,14 @@ Tokenizer::reset ()
    _bufferCursor = 0;
    _bufferSize = 0;
    _state = T_YACC_UNDEFINED;
+   _resetLocation();
+   _cur_line = 1;
+   _cur_column = 0;
 }
 
 void
 Tokenizer::_readNextToken ()
 {
-   //printf("EOF? %d | cursor=size? %d\n", _in->eof(), _bufferCursor==_bufferSize);
    _tokenBuffer = "";
    char c;
    _cur_tok = T_YACC_END;
@@ -519,8 +523,8 @@ Tokenizer::_readNextToken ()
             }
             else
             {
-               _pushToken(_getTokenKindFromId(_tokenBuffer));
                _backtrack();
+               _pushToken(_getTokenKindFromId(_tokenBuffer));
                return;
             }
             break;
@@ -550,8 +554,8 @@ Tokenizer::_readNextToken ()
             }
             else
             {
-               _pushToken(T_LITERAL_NUMBER);
                _backtrack();
+               _pushToken(T_LITERAL_NUMBER);
                return;
             }
             break;
@@ -564,8 +568,8 @@ Tokenizer::_readNextToken ()
             }
             else
             {
-               _pushToken(T_SPACE);
                _backtrack();
+               _pushToken(T_SPACE);
                return;
             }
             break;
@@ -593,6 +597,10 @@ Tokenizer::_readNextToken ()
             {
                _state = T_INDENT;
                _backtrack();
+            }
+            else
+            {
+               _cur_line ++;
             }
             break;
          }

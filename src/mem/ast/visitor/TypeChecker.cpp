@@ -28,6 +28,7 @@ TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
       log::CannotAssign* err = new log::CannotAssign();
       err->sTypeName(src_ty->Name());
       err->sExpectedTypeName(dest_ty->Name());
+      err->setPosition(source->Position()->copy());
       err->format();
       log(err);
    }
@@ -148,13 +149,13 @@ TypeChecker::ensureSymbolIsType (node::Node* node, st::Symbol* sym)
 }
 
 void
-TypeChecker::logSymbolNotFound (st::Symbol* scope, std::string symbol_name)
+TypeChecker::logSymbolNotFound (st::Symbol* scope, node::Node* node, std::string symbol_name)
 {
    log::SymbolNotFound* err = new log::SymbolNotFound();
    err->sSymbolName(symbol_name);
-   err->sScopeName(scope->Name());
+   err->sScopeName(scope->gQualifiedName());
    err->format();
-   //err->setPosition(right_node->copyPosition());
+   err->setPosition(node->copyPosition());
    log(err);
 }
 
