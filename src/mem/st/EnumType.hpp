@@ -32,9 +32,12 @@ class EnumType : public Type
    SETTER(Type, st::Type*) {_type = val; _byte_size = _type->ByteSize();}
 
    //--------------------------------------------------------------------------
-   // PUBLIC METHODS
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
+
+   virtual bool
+   canCastTo (class Type* dest_ty) const {return dest_ty == this;}
 
 
    //--------------------------------------------------------------------------

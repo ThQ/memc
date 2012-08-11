@@ -43,6 +43,9 @@ class ArrayType : public Type
    virtual inline bool
    addChild (Symbol* s) {assert(false && "Cannot add child to Array");return false;}
 
+   virtual bool
+   canCastTo (Type* dest_ty) const;
+
    // Return true if the array is sized (staticaly allocated).
    bool
    hasLength() const {return _array_length != -1;}

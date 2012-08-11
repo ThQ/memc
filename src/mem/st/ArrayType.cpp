@@ -14,6 +14,20 @@ ArrayType::ArrayType ()
    _array_length = -1;
    _item_type = NULL;
 }
+//-----------------------------------------------------------------------------
+// PROTECTED FUNCTIONS
+//-----------------------------------------------------------------------------
+
+bool
+ArrayType::canCastTo (Type* dest_ty) const
+{
+  if (dest_ty->isArrayType())
+  {
+      ArrayType* arr_ty = static_cast<ArrayType*>(dest_ty);
+      return arr_ty->ItemType() == _item_type && arr_ty->ArrayLength() == _array_length;
+  }
+  return false;
+}
 
 
 //-----------------------------------------------------------------------------
