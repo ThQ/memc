@@ -160,6 +160,9 @@ class Symbol
    isMacro () const {return is(st::MACRO);}
 
    inline bool
+   isNamespace () const {return is(st::NAMESPACE);}
+
+   inline bool
    isPointerType() const {return is(st::POINTER);}
 
    inline bool
