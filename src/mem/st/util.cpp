@@ -563,17 +563,33 @@ setupInts (SymbolTable& st, CoreTypes& core_types)
    core_types._char = new st::IntType("char", sizeof(char));
    util::registerType(&st, st.System(), core_types._char);
 
+   // Type : uchar
+   core_types._uchar = new st::IntType("uchar", sizeof(unsigned char));
+   util::registerType(&st, st.System(), core_types._uchar);
+
    // Type : short
    core_types._short = new st::IntType("short", sizeof(short));
    util::registerType(&st, st.System(), core_types._short);
+
+   // Type : ushort
+   core_types._ushort = new st::IntType("ushort", sizeof(unsigned short));
+   util::registerType(&st, st.System(), core_types._ushort);
 
    // Type : int
    core_types._int = new st::IntType("int", sizeof(int));
    util::registerType(&st, st.System(), core_types._int);
 
+   // Type : uint
+   core_types._uint = new st::IntType("uint", sizeof(unsigned int));
+   util::registerType(&st, st.System(), core_types._uint);
+
    // Type : long
    core_types._long = new st::IntType("long", sizeof(long));
    util::registerType(&st, st.System(), core_types._long);
+
+   // Type : ulong
+   core_types._ulong = new st::IntType("ulong", sizeof(unsigned long));
+   util::registerType(&st, st.System(), core_types._ulong);
 
    // Type : i8
    core_types._i8 = new st::IntType("i8", 1);
