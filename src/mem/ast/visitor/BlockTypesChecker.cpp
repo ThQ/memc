@@ -378,8 +378,16 @@ BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
    visitExpr(scope, n->LeftNode());
    visitExpr(scope, n->RightNode());
 
+   st::Type* left_ty = n->LeftNode()->ExprType();
+   st::Type* right_ty = n->RightNode()->ExprType();
+
    // FIXME Must check that type is a primitive type
-   if (n->LeftNode()->ExprType() == n->RightNode()->ExprType())
+
+   if (left_ty->isIntType() && right_ty->isIntType())
+   {
+      n->setExprType(_core_types->gBoolTy());
+   }
+   else if (left_ty == right_ty)
    {
       n->setExprType(_core_types->gBoolTy());
    }

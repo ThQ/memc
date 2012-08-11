@@ -496,12 +496,19 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
 
    ast::node::Node* left_val_node = n->LeftNode();
    ast::node::Node* right_val_node = n->RightNode();
+   st::Type* left_ty = left_val_node->ExprType();
+   st::Type* right_ty = right_val_node->ExprType();
 
-   st::Type* expected_operand_ty = _getLowestCommonType(
-      left_val_node->ExprType(), right_val_node->ExprType());
+   st::Type* expected_operand_ty = NULL;
+   if (left_ty->isIntType() && right_ty->isIntType())
+   {
+      expected_operand_ty = st::util::getBiggestIntType(
+         static_cast<st::IntType*>(left_ty),
+         static_cast<st::IntType*>(right_ty));
+   }
 
-   llvm::Value* left_val = cgExprAndLoad(left_val_node);
-   llvm::Value* right_val = cgExprAndLoad(right_val_node);
+   llvm::Value* left_val = cgExprAndLoad(left_val_node, expected_operand_ty);
+   llvm::Value* right_val = cgExprAndLoad(right_val_node, expected_operand_ty);
 
    llvm::ICmpInst::Predicate pred;
 
