@@ -509,11 +509,11 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
    node::Node* right_node = dot_node->RightNode();
 
    visitExpr(scope, left_node);
-   visitFinalId(left_node->ExprType(), static_cast<node::FinalId*>(right_node));
+   visitFinalId(left_node->BoundSymbol(), static_cast<node::FinalId*>(right_node));
 
    assert(right_node->isIdNode());
 
-   if (left_node->hasExprType())
+   if (left_node->hasBoundSymbol())
    {
       dot_node->setBoundSymbol(right_node->BoundSymbol());
 
@@ -530,12 +530,17 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 
          // If we are not accessing a class member, we can just flatten the dot
          // node by replacing it by final id.
-         if (left_node->BoundSymbol()->isClassType())
+         if (left_node->BoundSymbol()->isClassType()
+            || left_node->BoundSymbol()->isEnumType()
+            || left_node->BoundSymbol()->isNamespace())
          {
             ast::node::FinalId* fid = new ast::node::FinalId();
             fid->sValue(right_node->BoundSymbol()->Name());
             fid->setBoundSymbol(right_node->BoundSymbol());
-            fid->setExprType(expr_ty);
+            if (expr_ty->isAnyType())
+            {
+               fid->setExprType(expr_ty);
+            }
             dot_node->Parent()->replaceChild(dot_node, fid);
             delete dot_node;
             dot_node = NULL;
