@@ -15,6 +15,37 @@ Codegen::Codegen ()
 
 }
 
+llvm::Value*
+Codegen::_castLlvmValue (llvm::Value* val, st::Type* src_ty, st::Type* dest_ty)
+{
+   // Casting between two integer types
+   if (src_ty->isIntType() && dest_ty->isIntType())
+   {
+      // Extending (SAFE)
+      if (src_ty->ByteSize() < dest_ty->ByteSize())
+      {
+         val = new llvm::SExtInst(val, _type_maker.get(dest_ty), "", _cur_bb);
+      }
+      // Truncating (UNSAFE)
+      else if (src_ty->ByteSize() > dest_ty->ByteSize())
+      {
+         val = new llvm::TruncInst(val, _type_maker.get(dest_ty), "", _cur_bb);
+      }
+   }
+   // Casting between two pointer types
+   else if (src_ty->isPointerType() && dest_ty->isPointerType())
+   {
+      if (!_st->isVoidType(static_cast<st::PointerType*>(dest_ty)->PointedType()))
+      {
+         val = new llvm::BitCastInst(val, _type_maker.get(dest_ty), "", _cur_bb);
+      }
+   }
+
+   DEBUG_ENSURE (val != NULL);
+   return val;
+
+}
+
 std::string
 Codegen::_getLlvmTypeName (llvm::Type* ty)
 {
@@ -297,7 +328,9 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    // -------
    //  VALUE
    // -------
-   llvm::Value* val = cgExpr(n->ValueNode());
+   ast::node::Node* value_node = n->ValueNode();
+   st::Type* value_ty = value_node->ExprType();
+   llvm::Value* val = cgExpr(value_node);
    assert (val != NULL);
 
    // -------
@@ -305,11 +338,6 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    // -------
    llvm::Value* index = cgExprAndLoad(n->IndexNode(), _st->gCoreTypes()._int);
    assert (index != NULL);
-
-   ast::node::Node* value_node = n->ValueNode();
-   st::Type* value_ty = value_node->ExprType();
-
-   std::vector<llvm::Value*> idx;
 
    // If this is a pointer we have to dereference as much as
    // (indirection_level - 1)
@@ -322,7 +350,8 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    }
 
    // FIXME What ?
-   if (!value_ty->isPointerType() && ! static_cast<st::PointerType*>(value_ty)->isPointerToArray())
+   std::vector<llvm::Value*> idx;
+   if (!value_ty->isPointerType())
    {
       idx.push_back(_createInt32Constant(0));
    }
@@ -695,15 +724,13 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
 
    if (src_ty != dest_ty)
    {
-      if (src_ty->isIntType() && dest_ty->isIntType())
-      {
-         val = new llvm::SExtInst(val, _type_maker.get(dest_ty), "", _cur_bb);
-      }
+      val = _castLlvmValue(val, src_ty, dest_ty);
    }
 
    if (val != NULL) must_load = _mustBeLoaded(node);
    if (must_load)
    {
+      assert(val != NULL);
       val = new llvm::LoadInst(val, "", _cur_bb);
    }
 

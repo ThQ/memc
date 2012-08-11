@@ -1,4 +1,5 @@
 ### file
-main () -> int
+main ()
  arr :[int, 10]
- return 1
+ i :int = arr[0]
+ arr[1] = 2

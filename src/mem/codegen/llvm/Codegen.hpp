@@ -61,6 +61,9 @@ class Codegen : public mem::codegen::ICodegen
    //--------------------------------------------------------------------------
    public:
 
+   llvm::Value*
+   _castLlvmValue (llvm::Value* val, st::Type* src_ty, st::Type* dest_ty);
+
    inline llvm::BasicBlock*
    _createBasicBlock(std::string name="")
    {

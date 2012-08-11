@@ -91,7 +91,7 @@ TypeMaker::makeArrayType (st::ArrayType* t)
    }
    else
    {
-      lty = llvm::PointerType::get(item_lty, 0);
+      lty = item_lty; //llvm::PointerType::get(item_lty, 0);
    }
 
    bind(t, lty);
