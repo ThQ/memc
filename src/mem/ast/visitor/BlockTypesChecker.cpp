@@ -726,17 +726,20 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
 
    if (sym != NULL)
    {
-      id_node->setBoundSymbol(sym);
+      if (sym->isAliasSymbol())
+      {
+         id_node->setBoundSymbol(static_cast<st::Alias*>(sym)->Aliased());
+      }
+      else
+      {
+         id_node->setBoundSymbol(sym);
+      }
 
-      st::Type* expr_ty = st::util::getExprType(sym);
+      st::Type* expr_ty = expr_ty = st::util::getExprType(sym);
 
       if (expr_ty != NULL)
       {
          id_node->setExprType(expr_ty);
-      }
-      else
-      {
-         id_node->setExprType(static_cast<st::Type*>(sym));
       }
    }
    else
@@ -748,7 +751,6 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
    }
 
    DEBUG_ENSURE(id_node->hasBoundSymbol());
-   DEBUG_ENSURE(id_node->hasExprType());
 }
 
 void

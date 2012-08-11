@@ -293,7 +293,7 @@ getUnsizedArrayType (Type* base_ty)
 bool
 isFunctorType (Symbol* s)
 {
-   if (s->isPointerType())
+   if (s != NULL && s->isPointerType())
    {
       Type* pointed_ty = static_cast<st::PointerType*>(s)->getNonPointerParent();
       if (pointed_ty->isFunctionType()) return true;
@@ -403,6 +403,7 @@ lookupSymbol (Symbol* scope, std::vector<std::string> parts)
    Symbol* cur_scope = scope;
    Symbol* inner_symbol = NULL;
    size_t i = 0;
+
    while (cur_scope != NULL)
    {
       inner_symbol = cur_scope;

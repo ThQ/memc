@@ -35,8 +35,6 @@ Compiler::Compiler ()
    st::util::setupBugType(this->symbols, this->symbols.gCoreTypes());
    st::util::setupInts(this->symbols, this->symbols.gCoreTypes());
    st::util::setupVoid(this->symbols, this->symbols.gCoreTypes());
-
-
 }
 
 Compiler::~Compiler ()

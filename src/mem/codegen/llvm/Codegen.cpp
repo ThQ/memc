@@ -97,7 +97,7 @@ Codegen::_createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx)
 {
    DEBUG_REQUIRE (base != NULL);
 
-#if 1
+#if 0
    llvm::Type* base_ty = base->getType();
    std::string base_ty_name;
    if (base_ty != NULL)
@@ -212,7 +212,6 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
       case ast::node::Kind::FINAL_ID:
          if (node->BoundSymbol()->isFuncSymbol())
          {
-            DEBUG_PRINT("Don't load functor\n");
             return false;
          }
          return true;

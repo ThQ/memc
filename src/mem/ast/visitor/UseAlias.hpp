@@ -32,6 +32,9 @@ class UseAlias : public Visitor
 
    virtual bool
    visit (node::Node* node);
+
+   void
+   visitUse (node::Use* n);
 };
 
 
