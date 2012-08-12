@@ -1,11 +1,12 @@
 #include "mem/st/Type.hpp"
 
-namespace mem { namespace st {
 
+namespace mem { namespace st {
 
 //-----------------------------------------------------------------------------
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
+
 Type::Type ()
 {
    _parent_type = NULL;
@@ -32,6 +33,5 @@ Type::isSubclass (Type* possible_parent)
    }
    return false;
 }
-
 
 } }

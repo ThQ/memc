@@ -8,25 +8,21 @@
 namespace mem { namespace st {
 
 
-/**
- * A symbol that aliases a namespace.
- *
- * This is currently used to use only the last name part of the module imported.
- * > use m.io.File
- * can then be used as `File.xxx'.
- *
- * FIXME: Should be extended to alias any symbol.
- */
+// A symbol that aliases a namespace.
+//
+// This is currently used to use only the last name part of the module imported.
+// > use m.io.File
+// can then be used as `File.xxx'.
+//
+// FIXME: Should be extended to alias any symbol.
 class Alias : public Symbol
 {
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTORS
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Alias();
 
 

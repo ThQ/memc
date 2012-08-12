@@ -7,7 +7,6 @@
 
 namespace mem { namespace st {
 
-
 class Macro : public Func
 {
    protected:
@@ -18,10 +17,13 @@ class Macro : public Func
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Macro ();
+
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
 
    GETTER(MacroExpander, void*) {return _macro_expander;}
    SETTER(MacroExpander, void*) {_macro_expander = val;}

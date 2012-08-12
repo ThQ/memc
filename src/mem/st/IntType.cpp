@@ -1,7 +1,7 @@
 #include "mem/st/IntType.hpp"
 
-namespace mem { namespace st {
 
+namespace mem { namespace st {
 
 //-----------------------------------------------------------------------------
 // CONSTRUCTORS / DESTRUCTOR
@@ -35,6 +35,5 @@ IntType::canCastTo (Type* dest_ty) const
    }
    return false;
 }
-
 
 } }

@@ -7,7 +7,6 @@
 
 namespace mem { namespace st {
 
-
 // A base class for Array types.
 //
 // If an array type has a length, then it is staticaly declared, ortherwise it
@@ -36,7 +35,7 @@ class ArrayType : public Type
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC METHODS
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -70,7 +69,6 @@ class ArrayType : public Type
 
    st::Type* _item_type;
    int _array_length;
-
 };
 
 } }

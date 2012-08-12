@@ -18,14 +18,10 @@ class Var : public Symbol
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Var ();
 
-   /**
-    * Creates a Var based on its name and type.
-    */
+   // Creates a Var based on its name and type.
    Var (std::string name, class Type* type);
 
 
@@ -37,14 +33,16 @@ class Var : public Symbol
    GETTER(ConstantValue, Constant*) {return _constant_value;}
    SETTER(ConstantValue, Constant*) {_constant_value = val;}
 
-   // PROPERTY : Type
+   // Type
    GETTER(Type, class st::Type*) {return _type;}
    SETTER(Type, class Type*) {_type = val;}
    SETTER(Type, class Symbol*) {_type = static_cast<class Type*>(val);}
 
+   // IsConstant
    GETTER(IsConstant, bool) {return _is_constant;}
    SETTER(IsConstant, bool) {_is_constant = val;}
 
+   // IsGlobal
    GETTER(IsGlobal, bool) {return _is_global;}
    SETTER(IsGlobal, bool) {_is_global = val;}
 

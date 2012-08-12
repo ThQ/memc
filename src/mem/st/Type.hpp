@@ -9,9 +9,7 @@
 namespace mem { namespace st {
 
 
-/**
- * A base class for all mem types.
- */
+// A base class for all mem types.
 class Type: public Symbol
 {
    //--------------------------------------------------------------------------
@@ -19,9 +17,7 @@ class Type: public Symbol
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Type();
 
 
@@ -30,6 +26,7 @@ class Type: public Symbol
    //--------------------------------------------------------------------------
    public:
 
+   // ParentType
    GETTER(ParentType, Type*) {return _parent_type;}
    SETTER(ParentType, Type*) {_parent_type = val;}
 

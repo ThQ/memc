@@ -7,7 +7,7 @@
 
 namespace mem { namespace st {
 
-
+// A base class for the type of the NULL constant.
 class VoidType : public Type
 {
    //--------------------------------------------------------------------------

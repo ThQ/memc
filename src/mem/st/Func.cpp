@@ -1,7 +1,7 @@
 #include "mem/st/Func.hpp"
 
-namespace mem { namespace st {
 
+namespace mem { namespace st {
 
 //-----------------------------------------------------------------------------
 // CONSTRUCTORS / DESTRUCTOR
