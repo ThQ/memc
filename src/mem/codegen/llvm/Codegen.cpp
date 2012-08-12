@@ -211,10 +211,25 @@ Codegen::_getFuncReturnTy (ast::node::Func* func)
 bool
 Codegen::_mustBeLoaded (ast::node::Node* node)
 {
+   if (node->hasBoundSymbol())
+   {
+      if (!node->BoundSymbol()->isAnyConstant() && !node->BoundSymbol()->isFuncSymbol())
+      {
+         DEBUG_PRINTF("Load because bound sym is : %s\n", node->BoundSymbol()->gQualifiedNameCstr());
+         return true;
+      }
+   }
+   else if (node->hasExprType())
+   {
+      //return true;
+   }
+   /*
    switch (node->Kind())
    {
       case ast::node::Kind::FINAL_ID:
-         if (node->BoundSymbol()->isFuncSymbol())
+         if (
+            node->BoundSymbol()->isFuncSymbol()
+            || node->BoundSymbol()->isAnyConstant())
          {
             return false;
          }
@@ -229,6 +244,7 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
       case ast::node::Kind::TUPLE:
          return true;
    }
+   */
    return false;
 
 }
@@ -401,30 +417,15 @@ Codegen::cgCallExpr (ast::node::Call* node)
    assert(func_ty->isFunctionType());
    std::vector<llvm::Value*> params;
 
-   /*
-   // ---------------
-   //  Instance call
-   // ---------------
-   if (node->Caller() != NULL)
-   {
-      llvm::Value* caller = cgExprAndLoad(node->getChild(0)->getChild(0));
-      st::Type* caller_expected_ty = func_ty->getArgument(0);
-
-      // Function belongs to an ancestor of the caller type, we have to cast
-      // the caller
-      if (node->CallerNode()->ExprType() != caller_expected_ty)
-      {
-         caller = new llvm::BitCastInst(caller, _type_maker.get(caller_expected_ty),
-            "", _cur_bb);
-      }
-
-      params.push_back(caller);
-   }
-   */
-
    // -----------------
    //  With parameters
    // -----------------
+   if (node->IsInstanceCall())
+   {
+      ast::node::Node* caller_obj_n = static_cast<ast::node::Dot*>(node->CallerNode())->LeftNode();
+      llvm::Value* caller_obj = cgExprAndLoad(caller_obj_n, caller_obj_n->ExprType());
+      params.push_back(caller_obj);
+   }
    if (node->ParamsNode() != NULL)
    {
       ast::node::Node* cur_param_node = NULL;
@@ -731,7 +732,7 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    {
       val = cgExpr(node);
    }
-   bool must_load = false;
+   bool must_load = _mustBeLoaded(node);
 
 
    if (src_ty != dest_ty)
@@ -740,15 +741,13 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    }
    if (src_ty->isPointerType() && dest_ty->isPointerType())
    {
-
+      st::PointerType* src_ptr_ty = static_cast<st::PointerType*>(src_ty);
+      st::PointerType* dest_ptr_ty = static_cast<st::PointerType*>(dest_ty);
    }
-   else
+
+   if (val != NULL && must_load)
    {
-      if (val != NULL && _mustBeLoaded(node))
-      {
-         assert(val != NULL);
-         val = new llvm::LoadInst(val, "", _cur_bb);
-      }
+      val = new llvm::LoadInst(val, "", _cur_bb);
    }
 
    return val;

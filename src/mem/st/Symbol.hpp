@@ -73,7 +73,17 @@ class Symbol
 
    // Name
    GETTER(Name, std::string) {return _name;}
-   SETTER(Name, std::string) {_name = val;}
+   SETTER(Name, std::string)
+   {
+      if (Parent() != NULL)
+      {
+         Parent()->renameChild(_name, val);
+      }
+      else
+      {
+         _name = val;
+      }
+   }
 
    // NameCstr
    GETTER(NameCstr, const char*) {return Name().c_str();}
@@ -81,6 +91,7 @@ class Symbol
 
    // Parent
    GETTER(Parent, st::Symbol*) {return _parent;}
+   SETTER(Parent, st::Symbol*) {_parent = val;}
 
 
    //--------------------------------------------------------------------------
@@ -194,6 +205,9 @@ class Symbol
    inline const char*
    gQualifiedNameCstr() { return this->gQualifiedName().c_str();}
 
+
+   void
+   renameChild (std::string old_name, std::string new_name);
 
    //--------------------------------------------------------------------------
    // FIELDS

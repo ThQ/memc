@@ -133,6 +133,7 @@ Symbol::isAnyConstant () const
    switch (_kind)
    {
       case st::INT_CONSTANT:
+      case st::NULL_VALUE:
          return true;
       default:
          return false;
@@ -190,5 +191,20 @@ Symbol::isReferenceSymbol() const
    DEBUG_UNREACHABLE();
 }
 
+void
+Symbol::renameChild (std::string old_name, std::string new_name)
+{
+   st::Symbol* sym = NULL;
+   if (_children.find(old_name) != _children.end())
+   {
+      sym = _children[old_name];
+      st::Symbol* parent = sym->Parent();
+      sym->setParent(NULL);
+      sym->setName(new_name);
+      sym->setParent(parent);
+      _children.erase(old_name);
+      _children[new_name] = sym;
+   }
+}
 
 } }

@@ -106,6 +106,14 @@ TypeMaker::makeClassType (st::Class* cls_sym)
    DEBUG_REQUIRE (cls_sym != NULL);
    DEBUG_REQUIRE (cls_sym->isClassType());
 
+   // -------------
+   //  Struct type
+   // -------------
+   llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
+      cls_sym->gQualifiedName());
+
+   bind(cls_sym, ty);
+
    // --------
    //  Fields
    // --------
@@ -122,17 +130,8 @@ TypeMaker::makeClassType (st::Class* cls_sym)
       }
    }
 
-   // -------------
-   //  Struct type
-   // -------------
-   llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
-      cls_sym->gQualifiedName());
-   if (ty->isOpaque())
-   {
-      ty->setBody(fields, false /* packed */);
-   }
+   ty->setBody(fields, false /* packed */);
 
-   bind(cls_sym, ty);
 
    return ty;
 }
@@ -261,6 +260,9 @@ TypeMaker::makeType (st::Type* mem_ty)
 
       case st::PRIMITIVE_TYPE:
          return makePrimitiveType(static_cast<st::PrimitiveType*>(mem_ty));
+
+      case st::VOID_TYPE:
+         return makeVoidType();
 
       default:
          DEBUG_PRINTF("Unsupported mem type {Kind: %d, Name: %s}\n",

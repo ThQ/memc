@@ -173,6 +173,10 @@ XmlDumper::visitFunction (st::Func* func_sym)
    {
       *_out << " type=\"" + func_sym->Type()->gQualifiedName() + "\"";
    }
+   if (func_sym->IsVirtual())
+   {
+      *_out << " virtual=\"true\"";
+   }
    *_out << ">\n";
    visitChildren(func_sym);
    *_out << "</Function>";

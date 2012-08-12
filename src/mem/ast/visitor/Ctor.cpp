@@ -14,21 +14,21 @@ Ctor::initializeField (st::Field* field, node::Block* ctor)
 {
    st::Type* field_ty = field->Type();
 
+   node::FinalId* self_n = new node::FinalId();
+   self_n->sValue("self");
+
+   node::Text* field_name_n = new node::Text();
+   field_name_n->setKind(node::Kind::ID);
+   field_name_n->sValue(field->Name());
+
+   node::Dot* dot_name_n = new node::Dot();
+   dot_name_n->pushChildren(self_n, field_name_n);
+
    // ---------
    //  Integer
    // ---------
    if (field_ty->isIntType())
    {
-      node::FinalId* self_n = new node::FinalId();
-      self_n->sValue("self");
-
-      node::Text* field_name_n = new node::Text();
-      field_name_n->setKind(node::Kind::ID);
-      field_name_n->sValue(field->Name());
-
-      node::Dot* dot_name_n = new node::Dot();
-      dot_name_n->pushChildren(self_n, field_name_n);
-
       st::IntConstant* ic = st::util::getNativeCharConstant(_symbols->System(), 0);
       ic->setType(_symbols->_core_types._char);
 
@@ -46,21 +46,23 @@ Ctor::initializeField (st::Field* field, node::Block* ctor)
    // ---------
    else if (field_ty->isPointerType())
    {
-      node::FinalId* self_n = new node::FinalId();
-      self_n->sValue("self");
+      node::Node* field_val = NULL;
 
-      node::Text* field_name_n = new node::Text();
-      field_name_n->setKind(node::Kind::ID);
-      field_name_n->sValue(field->Name());
-
-      node::Dot* dot_name_n = new node::Dot();
-      dot_name_n->pushChildren(self_n, field_name_n);
-
-      node::FinalId* nul = new node::FinalId();
-      nul->sValue("NULL");
+      if (field->VirtualFunction() != NULL)
+      {
+         node::FinalId* vfn = new node::FinalId();
+         vfn->sValue(field->VirtualFunction()->Name());
+         field_val = vfn;
+      }
+      else
+      {
+         node::FinalId* nul = new node::FinalId();
+         nul->sValue("NULL");
+         field_val = nul;
+      }
 
       node::VarAssign* var_n = new node::VarAssign();
-      var_n->pushChildren(dot_name_n, nul);
+      var_n->pushChildren(dot_name_n, field_val);
 
       ctor->pushChild(var_n);
    }

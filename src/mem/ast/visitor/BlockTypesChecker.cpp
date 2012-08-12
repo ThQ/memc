@@ -467,6 +467,11 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
       visitExprList(scope, call_node->ParamsNode());
    }
 
+   if (base_object->isDotNode())
+   {
+      call_node->setIsInstanceCall(true);
+   }
+
    if (base_object->hasBoundSymbol())
    {
       // Macro call
@@ -518,7 +523,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
    node::Node* right_node = dot_node->RightNode();
 
    visitExpr(scope, left_node);
-   visitFinalId(left_node->BoundSymbol(), static_cast<node::FinalId*>(right_node));
+   visitFinalId(left_node->ExprType(), static_cast<node::FinalId*>(right_node));
 
    assert(right_node->isIdNode());
 
@@ -800,7 +805,7 @@ BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* call_n)
          func_id->setExprType(base_func->Type());
 
          call_n->setCaller(dot_n->LeftNode()->BoundSymbol());
-         call_n->setIsInstanceCall(true);
+         //call_n->setIsInstanceCall(true);
          dot_n->Parent()->replaceChild(dot_n, func_id);
 
          node::Node* obj_n = dot_n->removeChild(dot_n->LeftNode());

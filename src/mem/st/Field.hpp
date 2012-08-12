@@ -2,6 +2,7 @@
 #define _MEM__ST__FIELD__HPP_
 
 
+#include "mem/st/Func.hpp"
 #include "mem/st/Var.hpp"
 
 
@@ -27,6 +28,9 @@ class Field : public Var
    GETTER(FieldIndex, int) {return _field_index;}
    SETTER(FieldIndex, int) {_field_index = val;}
 
+   GETTER(VirtualFunction, Func*) {return _virtual_function;}
+   SETTER(VirtualFunction, Func*) {_virtual_function = val;}
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -43,6 +47,7 @@ class Field : public Var
    public:
 
    int _field_index;
+   Func* _virtual_function;
 };
 
 typedef std::vector<Field*> FieldVector;
