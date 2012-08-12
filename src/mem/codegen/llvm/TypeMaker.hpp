@@ -101,7 +101,7 @@ class TypeMaker
    llvm::Type*
    makeVoidType () {return llvm::Type::getVoidTy(_module->getContext());}
 
-   llvm::Type*
+   llvm::PointerType*
    makeVoidPointerType () {return llvm::Type::getInt32PtrTy(_module->getContext());}
 
 

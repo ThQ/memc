@@ -11,18 +11,16 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-/**
- * Finds <use> statements.
- *
- * Once a file is successfully parsed and syntacticaly correct, this visitor
- * looks for <use> statements in the AST and remembers them so as to inform
- * the compiler.
- *
- * Without this visitor, only the entry point file would be parsed.
- *
- * This is a special visitor as it is run before any other and operates on a
- * partial AST.
- */
+// Finds <use> statements.
+//
+// Once a file is successfully parsed and syntacticaly correct, this visitor
+// looks for <use> statements in the AST and remembers them so as to inform
+// the compiler.
+//
+// Without this visitor, only the entry point file would be parsed.
+//
+// This is a special visitor as it is run before any other and operates on a
+// partial AST.
 class FindUse : public Visitor
 {
    //--------------------------------------------------------------------------
@@ -38,9 +36,7 @@ class FindUse : public Visitor
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor
-    */
+   // Default constructor
    FindUse();
 
 
@@ -49,9 +45,7 @@ class FindUse : public Visitor
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Visitor entry point.
-    */
+   // Visitor entry point.
    virtual bool
    visit (node::Node* node);
 };

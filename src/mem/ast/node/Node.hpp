@@ -80,7 +80,7 @@ class Node
    public:
 
    inline fs::position::Range*
-   copyPosition() { return _position->copy_range();}
+   copyPosition() { return _position != NULL ? _position->copy_range() : NULL;}
 
    // true if it has a symbol bound.
    inline bool

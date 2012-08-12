@@ -218,6 +218,15 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    func_sym->setType(func_ty);
    func_ty->setFunctorType(functor_ty);
 
+   // ----------------
+   //  Ctor specifics
+   // ----------------
+   if (scope->isClassType() && func_sym->Name() == "__ctor__")
+   {
+      st::Class* cls_ty = static_cast<st::Class*>(scope);
+      cls_ty->setDefaultCtor(func_sym);
+   }
+
    // ------------------
    //  Overriding check
    // ------------------
@@ -244,7 +253,7 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
                   static_cast<st::Func*>(shadowed_sym)->ReturnType()->gQualifiedNameCstr(),
                   func_sym->ReturnType()->gQualifiedNameCstr());
                err->formatDescription("Overriding function `%s' is redefining the return type of function `%s'",
-                  func_sym->gQualifiedNameCstr(), 
+                  func_sym->gQualifiedNameCstr(),
                   static_cast<st::Func*>(shadowed_sym)->gQualifiedNameCstr());
                log(err);
             }

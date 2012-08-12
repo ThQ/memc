@@ -106,6 +106,9 @@ TypeMaker::makeClassType (st::Class* cls_sym)
    DEBUG_REQUIRE (cls_sym != NULL);
    DEBUG_REQUIRE (cls_sym->isClassType());
 
+   // --------
+   //  Fields
+   // --------
    std::vector<llvm::Type*> fields;
    if (cls_sym->_cur_field_index > 0)
    {
@@ -119,6 +122,9 @@ TypeMaker::makeClassType (st::Class* cls_sym)
       }
    }
 
+   // -------------
+   //  Struct type
+   // -------------
    llvm::StructType* ty = llvm::StructType::create(_module->getContext(),
       cls_sym->gQualifiedName());
    if (ty->isOpaque())
@@ -140,6 +146,7 @@ TypeMaker::makeConstant (st::Constant* c)
    switch (c->Kind())
    {
       case st::INT_CONSTANT:
+      {
          st::IntConstant* ic = static_cast<st::IntConstant*>(c);
          if (ic->IsSigned())
          {
@@ -147,7 +154,10 @@ TypeMaker::makeConstant (st::Constant* c)
                static_cast<st::IntConstant*>(c)->getSignedValue(),
                true); /* Signed */
          }
-         break;
+      }
+      break;
+      default:
+         assert(false);
    }
 
    assert(lconst != NULL);

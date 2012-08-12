@@ -135,6 +135,10 @@ XmlDumper::visitClass (st::Class* cls_sym)
    {
       *_out << " parent-class=\"" + cls_sym->ParentClass()->gQualifiedName() + "\"";
    }
+   if (cls_sym->DefaultCtor() != NULL)
+   {
+      *_out << " default-ctor=\"" << cls_sym->DefaultCtor()->gQualifiedName() << "\"";
+   }
    *_out << " absolute-field-count=\"" << cls_sym->getAbsoluteFieldCount() << "\"";
    *_out << " byte-size=\"" << cls_sym->ByteSize() << "\"";
    *_out << ">\n";

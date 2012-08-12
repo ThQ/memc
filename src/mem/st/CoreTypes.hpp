@@ -2,7 +2,9 @@
 #define _MEM__MEM__ST__CORE_TYPES__HPP_
 
 #include "mem/st/IntType.hpp"
+#include "mem/st/Null.hpp"
 #include "mem/st/Type.hpp"
+#include "mem/st/VoidType.hpp"
 
 
 namespace mem { namespace st {
@@ -28,7 +30,8 @@ class CoreTypes
    IntType* _uint16;
    IntType* _uint8;
    IntType* _ulong;
-   Type* _void;
+   VoidType* _void;
+   Null* _null;
 
    // -------------------------------------------------------------------------
    // PUBLIC PROPERTIES
@@ -48,7 +51,7 @@ class CoreTypes
    inline Type* gShortTy() {return this->_short;}
 
    // PROPERTY : VoidTy
-   inline Type* gVoidTy() {return this->_void;}
+   inline VoidType* gVoidTy() {return _void;}
 };
 
 } }

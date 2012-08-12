@@ -26,6 +26,7 @@ Compiler::Compiler ()
    addAstVisitor(new ast::visitor::FindClasses());
    addAstVisitor(new ast::visitor::TopTypesChecker());
    addAstVisitor(new ast::visitor::Decorate(_decorators));
+   addAstVisitor(new ast::visitor::Ctor());
    addAstVisitor(new ast::visitor::BlockTypesChecker());
    //addAstVisitor(new ast::visitor::TypeMatch());
    addAstVisitor(new ast::visitor::CheckValidity());

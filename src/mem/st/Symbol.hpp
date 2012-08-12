@@ -163,6 +163,9 @@ class Symbol
    isNamespace () const {return is(st::NAMESPACE);}
 
    inline bool
+   isNullSymbol () const {return is(st::NULL_VALUE);}
+
+   inline bool
    isPointerType() const {return is(st::POINTER);}
 
    inline bool
@@ -176,6 +179,9 @@ class Symbol
 
    inline bool
    isVarSymbol() const {return is(st::VAR);}
+
+   inline bool
+   isVoidType () const {return is(st::VOID_TYPE);}
 
    // Returns the qualified name of the symbol.
    //

@@ -4,6 +4,10 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Func::Func()
 {
    _type = Kind::FUNCTION;
@@ -60,6 +64,27 @@ Func::ReturnTypeNode ()
       }
    }
    return NULL;
+}
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+node::Node*
+Func::createParameter (std::string name, st::Type* ty)
+{
+   node::Text* name_n = new node::Text();
+   name_n->setKind(Kind::ID);
+   name_n->sValue(name);
+
+   node::FinalId* type_n = new node::FinalId();
+   type_n->sValue(ty->Name());
+
+   node::Node* param = new node::Node();
+   param->setKind(Kind::FUNCTION_PARAMETER);
+   param->pushChildren(name_n, type_n);
+
+   return param;
 }
 
 bool

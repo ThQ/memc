@@ -25,7 +25,9 @@ typedef enum {
    TUPLE_TYPE=16,
    FUNCTION_TYPE=17,
    ENUM_TYPE=18,
-   INT_CONSTANT=19
+   INT_CONSTANT=19,
+   VOID_TYPE=20,
+   NULL_VALUE=21
 } SymbolKind;
 
 

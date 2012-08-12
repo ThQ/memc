@@ -21,6 +21,10 @@ Codegen::_castLlvmValue (llvm::Value* val, st::Type* src_ty, st::Type* dest_ty)
    // Casting between two integer types
    if (src_ty->isIntType() && dest_ty->isIntType())
    {
+      if (src_ty->ByteSize() == dest_ty->ByteSize())
+      {
+         // Don't do anything
+      }
       // Extending (SAFE)
       if (src_ty->ByteSize() < dest_ty->ByteSize())
       {
@@ -242,8 +246,8 @@ Codegen::gen (ast::node::Node* root)
 
    st::PointerType* void_ptr = st::util::getPointerType(_st->_core_types._void);
    _type_maker.bind(void_ptr, _type_maker.makeVoidPointerType());
-
    _stack.push();
+   _stack.set(_st->_core_types._null, llvm::ConstantPointerNull::get(_type_maker.makeVoidPointerType()));
 
    //codegenTupleTypes();
    codegenMemoryFunctions();
@@ -453,8 +457,9 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
    llvm::Value* src_val = cgExprAndLoad(n->ValueNode());
    st::Type* src_ty = n->ValueNode()->ExprType();
    st::Type* dest_ty = n->ExprType();
-   llvm::Value* val = NULL;
+   llvm::Value* val = _castLlvmValue(src_val, src_ty, dest_ty);
 
+   /*
    // Casting between two integer types
    if (src_ty->isIntType() && dest_ty->isIntType())
    {
@@ -482,6 +487,7 @@ Codegen::cgCastExpr (ast::node::CastOp* n)
          val = new llvm::BitCastInst(src_val, _type_maker.get(dest_ty), "", _cur_bb);
       }
    }
+   */
 
    DEBUG_ENSURE (val != NULL);
    return val;
@@ -732,12 +738,17 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    {
       val = _castLlvmValue(val, src_ty, dest_ty);
    }
-
-   if (val != NULL) must_load = _mustBeLoaded(node);
-   if (must_load)
+   if (src_ty->isPointerType() && dest_ty->isPointerType())
    {
-      assert(val != NULL);
-      val = new llvm::LoadInst(val, "", _cur_bb);
+
+   }
+   else
+   {
+      if (val != NULL && _mustBeLoaded(node))
+      {
+         assert(val != NULL);
+         val = new llvm::LoadInst(val, "", _cur_bb);
+      }
    }
 
    return val;
@@ -993,11 +1004,12 @@ Codegen::cgNewExpr (ast::node::New* node)
    llvm::Value* byte_size = NULL;
 
    ast::node::Node* type_node = node->getChild(0);
+   st::Type* obj_ty = static_cast<st::Type*>(type_node->BoundSymbol());
 
    // FIXME Spaghetti code !
    if (type_node->BoundSymbol()->isArrayType())
    {
-      st::ArrayType* arr_ty = static_cast<st::ArrayType*>(type_node->BoundSymbol());
+      st::ArrayType* arr_ty = static_cast<st::ArrayType*>(obj_ty);
       int type_byte_size = static_cast<st::Type*>(type_node->getChild(0)->BoundSymbol())->ByteSize();
       llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1), _st->_core_types._int);
       llvm::Value* obj_size = _createInt32Constant(type_byte_size);
@@ -1005,11 +1017,13 @@ Codegen::cgNewExpr (ast::node::New* node)
    }
    else
    {
-      int type_byte_size = static_cast<st::Type*>(type_node->BoundSymbol())->ByteSize();
+      int type_byte_size = static_cast<st::Type*>(obj_ty)->ByteSize();
       byte_size = llvm::ConstantInt::get(_type_maker.get(_st->_core_types._int), type_byte_size);
    }
 
-   // Create the call
+   // -------------
+   //  Malloc call
+   // -------------
    llvm::Value* malloc_call = llvm::CallInst::Create(_functions["malloc"],
       byte_size, "", _cur_bb);
    assert(malloc_call != NULL);
@@ -1018,6 +1032,20 @@ Codegen::cgNewExpr (ast::node::New* node)
    assert (_type_maker.get(node->ExprType()) != NULL);
    llvm::Value* ret = new llvm::BitCastInst(malloc_call, _type_maker.get(
       node->ExprType()), "new_cast", _cur_bb);
+
+   // ------------------
+   //  Constructor call
+   // ------------------
+   if (obj_ty->isClassType())
+   {
+      st::Class* cls_ty = static_cast<st::Class*>(obj_ty);
+      if (cls_ty->DefaultCtor() != NULL)
+      {
+         llvm::CallInst::Create(
+            _functions[cls_ty->DefaultCtor()->gQualifiedName()],
+            ret, "", _cur_bb);
+      }
+   }
 
    assert (ret != NULL);
    return ret;
@@ -1123,6 +1151,23 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
       llvm::Value* var_val = cgExprAndLoad(node->ValueNode(), node->ExprType());
       assert (var_val != NULL);
       new llvm::StoreInst(var_val, var, _cur_bb);
+   }
+
+   // ------------------
+   //  Constructor call
+   // ------------------
+   st::Type* obj_ty = static_cast<st::Type*>(node->TypeNode()->BoundSymbol());
+   // Static allocation
+   // (Calling the constructor for dynamic objects is done in ::cgNewExpr)
+   if (obj_ty->isClassType() && node->ValueNode() == NULL)
+   {
+      st::Class* cls_ty = static_cast<st::Class*>(obj_ty);
+      if (cls_ty->DefaultCtor() != NULL)
+      {
+         llvm::CallInst::Create(
+            _functions[cls_ty->DefaultCtor()->gQualifiedName()],
+            var, "", _cur_bb);
+      }
    }
 
    _stack.set(node->BoundSymbol(), var);

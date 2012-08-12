@@ -13,6 +13,7 @@
 #include "mem/st/FunctionType.hpp"
 #include "mem/st/IntConstant.hpp"
 #include "mem/st/IntType.hpp"
+#include "mem/st/Null.hpp"
 #include "mem/st/PrimitiveType.hpp"
 #include "mem/st/PointerType.hpp"
 #include "mem/st/SymbolTable.hpp"

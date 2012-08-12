@@ -73,8 +73,10 @@ class PointerType : public Type
 
    // True if this pointer type points to an array type.
    bool
-   isPointerToArray () { return _pointed_type->isArrayType();}
+   isPointerToArray () { return _pointed_type->isArrayType(); }
 
+   bool
+   isPointerToClass () { return _pointed_type->isClassType(); }
 
    //--------------------------------------------------------------------------
    // FIELDS

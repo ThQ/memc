@@ -49,7 +49,7 @@ getExprType (Symbol* s)
    {
       ret = static_cast<st::Field*>(s)->Type();
    }
-   else if (s->isVarSymbol())
+   else if (s->isVarSymbol() || s->isNullSymbol())
    {
       ret = static_cast<st::Var*>(s)->Type();
    }
@@ -523,7 +523,7 @@ parseArrayTypeName (std::string name, std::string& base_ty_name,
       }
       else
       {
-         base_ty_name = name[1, name.size()-2];
+         //base_ty_name = name[1, name.size()-2];
       }
       return true;
    }
@@ -628,11 +628,13 @@ setupInts (SymbolTable& st, CoreTypes& core_types)
 void
 setupVoid (SymbolTable& st, CoreTypes& core_types)
 {
-   core_types._void = new st::PrimitiveType();
-   core_types._void->setName("void");
+   core_types._void = new st::VoidType();
    util::registerType(&st, st.System(), core_types._void);
 
-   st.System()->addChild(new st::Var("null", core_types._void));
+   core_types._null = new st::Null();
+   core_types._null->setType(getPointerType(core_types._void));
+
+   st.System()->addChild(core_types._null);
 }
 
 std::vector<std::string>

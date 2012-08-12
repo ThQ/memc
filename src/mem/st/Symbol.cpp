@@ -152,6 +152,7 @@ Symbol::isAnyType () const
       case st::POINTER:
       case st::PRIMITIVE_TYPE:
       case st::TUPLE_TYPE:
+      case st::VOID_TYPE:
          return true;
       default:
          return false;

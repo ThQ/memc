@@ -45,6 +45,8 @@ class Field : public Var
    int _field_index;
 };
 
+typedef std::vector<Field*> FieldVector;
+
 } }
 
 

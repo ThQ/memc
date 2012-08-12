@@ -4,6 +4,7 @@
 
 #include "mem/ast/node/Block.hpp"
 #include "mem/ast/node/Decorator.hpp"
+#include "mem/ast/node/FinalId.hpp"
 #include "mem/ast/node/Text.hpp"
 
 
@@ -43,6 +44,9 @@ class Func: public Text
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
+
+   static node::Node*
+   createParameter (std::string name, st::Type* ty);
 
    bool
    isVirtual ();

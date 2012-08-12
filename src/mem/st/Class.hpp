@@ -37,6 +37,9 @@ class Class : public Type
    // PROPERTIES
    //--------------------------------------------------------------------------
 
+   GETTER(DefaultCtor, Func*) { return _default_ctor;}
+   SETTER(DefaultCtor, Func*) { _default_ctor = val;}
+
    // The parent class in the type hierarchy.
    GETTER(ParentClass, st::Class*) { return static_cast<st::Class*>(_parent);}
    SETTER(ParentClass, st::Class*) { _parent = val; }
@@ -58,6 +61,9 @@ class Class : public Type
     */
    int
    getAbsoluteFieldCount ();
+
+   FieldVector
+   getAllFields ();
 
    // Given a relative field index in a class type, return its absolute field
    // index.
@@ -92,6 +98,7 @@ class Class : public Type
    public:
 
    int _cur_field_index;
+   Func* _default_ctor;
 };
 
 

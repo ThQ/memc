@@ -5,33 +5,45 @@ namespace mem { namespace ast { namespace visitor {
 bool
 TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
 {
-   st::Type* src_ty = source->ExprType();
+   DEBUG_REQUIRE (source != NULL);
+   DEBUG_REQUIRE (dest_ty != NULL);
 
-   bool is_safe_cast = src_ty->canCastTo(dest_ty);
-   /*
-   if (src_ty == dest_ty)
+   bool is_safe_cast = false;
+
+   if (source->hasExprType())
    {
-      is_valid = true;
-   }
-   else if (src_ty->isIntType() && dest_ty->isIntType())
-   {
-      // Safe integer cast
-      if (src_ty->ByteSize() < dest_ty->ByteSize())
+      st::Type* src_ty = source->ExprType();
+
+      is_safe_cast = src_ty->canCastTo(dest_ty);
+      /*
+      if (src_ty == dest_ty)
       {
          is_valid = true;
       }
-   }
-   */
+      else if (src_ty->isIntType() && dest_ty->isIntType())
+      {
+         // Safe integer cast
+         if (src_ty->ByteSize() < dest_ty->ByteSize())
+         {
+            is_valid = true;
+         }
+      }
+      */
 
-   if (!is_safe_cast)
-   {
-      log::CannotAssign* err = new log::CannotAssign();
-      err->sTypeName(src_ty->Name());
-      err->sExpectedTypeName(dest_ty->Name());
-      err->setPosition(source->Position()->copy());
-      err->format();
-      log(err);
+      if (!is_safe_cast)
+      {
+         log::CannotAssign* err = new log::CannotAssign();
+         err->sTypeName(src_ty->Name());
+         err->sExpectedTypeName(dest_ty->Name());
+         if (source->Position() != NULL)
+         {
+            err->setPosition(source->Position()->copy());
+         }
+         err->format();
+         log(err);
+      }
    }
+
    return is_safe_cast;
 }
 
@@ -155,7 +167,10 @@ TypeChecker::logSymbolNotFound (st::Symbol* scope, node::Node* node, std::string
    err->sSymbolName(symbol_name);
    err->sScopeName(scope->gQualifiedName());
    err->format();
-   err->setPosition(node->copyPosition());
+   if (node != NULL)
+   {
+      err->setPosition(node->copyPosition());
+   }
    log(err);
 }
 

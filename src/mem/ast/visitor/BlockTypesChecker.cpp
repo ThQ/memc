@@ -1178,7 +1178,6 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
    }
 
    DEBUG_ENSURE (node->hasExprType());
-   DEBUG_ENSURE (node->ValueNode()->hasExprType());
 }
 
 void

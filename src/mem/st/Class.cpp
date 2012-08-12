@@ -11,6 +11,7 @@ namespace mem { namespace st {
 Class::Class ()
 {
    _cur_field_index = 0;
+   _default_ctor = NULL;
    _kind = CLASS;
 }
 
@@ -59,6 +60,26 @@ Class::getAbsoluteFieldCount ()
    }
    count += _cur_field_index;
    return count;
+}
+
+FieldVector
+Class::getAllFields ()
+{
+   FieldVector fv;
+   if (ParentClass() != NULL)
+   {
+      fv = ParentClass()->getAllFields();
+   }
+
+   SymbolMapIterator i;
+   for (i = _children.begin(); i != _children.end(); ++i)
+   {
+      if (i->second->isFieldSymbol())
+      {
+         fv.push_back(static_cast<Field*>(i->second));
+      }
+   }
+   return fv;
 }
 
 int

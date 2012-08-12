@@ -50,6 +50,7 @@ src_mem_ast_node = \
 src_mem_ast_visitor = \
  src/mem/ast/visitor/BlockTypesChecker.cpp \
  src/mem/ast/visitor/CheckValidity.cpp \
+ src/mem/ast/visitor/Ctor.cpp \
  src/mem/ast/visitor/Decorate.cpp \
  src/mem/ast/visitor/FindClasses.cpp \
  src/mem/ast/visitor/FindEntryPoint.cpp \
@@ -108,6 +109,7 @@ src_mem_st = \
  src/mem/st/IntType.cpp \
  src/mem/st/Macro.cpp \
  src/mem/st/Namespace.cpp \
+ src/mem/st/Null.cpp \
  src/mem/st/Path.cpp \
  src/mem/st/PrimitiveType.cpp \
  src/mem/st/PointerType.cpp \
@@ -116,7 +118,8 @@ src_mem_st = \
  src/mem/st/TupleType.cpp \
  src/mem/st/Type.cpp \
  src/mem/st/util.cpp \
- src/mem/st/Var.cpp
+ src/mem/st/Var.cpp \
+ src/mem/st/VoidType.cpp
 src_mem_st_visitor = \
  src/mem/st/visitor/DepBuilder.cpp \
  src/mem/st/visitor/XmlDumper.cpp \
