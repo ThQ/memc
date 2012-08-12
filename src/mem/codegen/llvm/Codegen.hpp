@@ -250,6 +250,11 @@ class Codegen : public mem::codegen::ICodegen
    std::string
    getLlvmByteCode ();
 
+   void
+   initializeArrayOfClassInstances (st::ArrayType* cls_ty, llvm::Value* arr, bool is_static);
+
+   void
+   initializeClassInstance (st::Class* cls_ty, llvm::Value* val);
 
    //--------------------------------------------------------------------------
    // FIELDS

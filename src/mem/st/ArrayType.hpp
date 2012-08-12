@@ -50,6 +50,10 @@ class ArrayType : public Type
    bool
    hasLength() const {return _array_length != -1;}
 
+   bool
+   isArrayOfClassInstances () const { return _item_type->isClassType(); }
+
+
    //--------------------------------------------------------------------------
    // PROTECTED FUNCTIONS
    //--------------------------------------------------------------------------

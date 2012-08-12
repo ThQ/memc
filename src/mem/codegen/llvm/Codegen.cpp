@@ -1039,12 +1039,12 @@ Codegen::cgNewExpr (ast::node::New* node)
    if (obj_ty->isClassType())
    {
       st::Class* cls_ty = static_cast<st::Class*>(obj_ty);
-      if (cls_ty->DefaultCtor() != NULL)
-      {
-         llvm::CallInst::Create(
-            _functions[cls_ty->DefaultCtor()->gQualifiedName()],
-            ret, "", _cur_bb);
-      }
+      initializeClassInstance(cls_ty, ret);
+   }
+   else if (obj_ty->isArrayType())
+   {
+      st::ArrayType* arr_ty = static_cast<st::ArrayType*>(obj_ty);
+      initializeArrayOfClassInstances(arr_ty, ret, false);
    }
 
    assert (ret != NULL);
@@ -1157,16 +1157,24 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
    //  Constructor call
    // ------------------
    st::Type* obj_ty = static_cast<st::Type*>(node->TypeNode()->BoundSymbol());
-   // Static allocation
-   // (Calling the constructor for dynamic objects is done in ::cgNewExpr)
+   // Single object static allocation
    if (obj_ty->isClassType() && node->ValueNode() == NULL)
    {
       st::Class* cls_ty = static_cast<st::Class*>(obj_ty);
       if (cls_ty->DefaultCtor() != NULL)
       {
-         llvm::CallInst::Create(
-            _functions[cls_ty->DefaultCtor()->gQualifiedName()],
-            var, "", _cur_bb);
+         initializeClassInstance(cls_ty, var);
+      }
+   }
+   // Array static allocation
+   else if (obj_ty->isArrayType() && node->ValueNode() == NULL)
+   {
+
+      st::ArrayType* arr_ty = static_cast<st::ArrayType*>(obj_ty);
+      if (arr_ty->isArrayOfClassInstances())
+      {
+         //llvm::Value* var = new llvm::LoadInst(var, "", _cur_bb);
+         initializeArrayOfClassInstances(arr_ty, var, true);
       }
    }
 
@@ -1185,7 +1193,6 @@ Codegen::cgWhileStatement (ast::node::While* n)
    // Branch to the condition block (from the current block)
    _pushNewBranchInst(_cur_bb, while_cond);
 
-
    // -----------
    //  Condition
    // -----------
@@ -1195,7 +1202,6 @@ Codegen::cgWhileStatement (ast::node::While* n)
 
    // Either branch the loop block or skip the loop
    _pushNewCondBranchInst(while_cond, cond_val, while_body, while_after);
-
 
    // ------------
    //  While body
@@ -1253,9 +1259,9 @@ Codegen::codegenFunctionType (st::Func* func_ty)
       func_name = _getCodegenFuncName(func_ty);
    }
 
-   // ----------
-   // PARAMETERS
-   // ----------
+   // ------------
+   //  PARAMETERS
+   // ------------
    std::vector<llvm::Type*> params;
    st::Var* func_param = NULL;
    // We will set their names in ::codegenFunctionBody so that we append
@@ -1267,9 +1273,9 @@ Codegen::codegenFunctionType (st::Func* func_ty)
       assert (params[i] != NULL);
    }
 
-   // -----------
-   // RETURN TYPE
-   // -----------
+   // -------------
+   //  RETURN TYPE
+   // -------------
    llvm::FunctionType* func_lty = NULL;
    st::Type* return_ty = func_ty->ReturnType();
    llvm::Type* return_lty = NULL;
@@ -1347,7 +1353,7 @@ Codegen::getLlvmByteCode ()
 #if 0
    // Don't delete that !
    //
-   // I seem to be on the right track but for some reason, no code is emited
+   // I seem to be on the right track but, for some reason, no code is emited
 
    const llvm::Target* target = NULL;
 
@@ -1385,6 +1391,64 @@ Codegen::getLlvmByteCode ()
    llvm::raw_string_ostream stream(bc);
    _module->print(stream, NULL);
    return bc;
+}
+
+void
+Codegen::initializeClassInstance (st::Class* cls_ty, llvm::Value* val)
+{
+   if (cls_ty->DefaultCtor() != NULL)
+   {
+      llvm::CallInst::Create(
+         _functions[cls_ty->DefaultCtor()->gQualifiedName()],
+         val, "", _cur_bb);
+   }
+}
+
+void
+Codegen::initializeArrayOfClassInstances (st::ArrayType* arr_ty, llvm::Value* arr, bool is_static)
+{
+   DEBUG_REQUIRE (arr_ty != NULL);
+   DEBUG_REQUIRE (arr_ty->ItemType() != NULL);
+   DEBUG_REQUIRE (arr_ty->ItemType()->isClassType());
+   DEBUG_REQUIRE (arr != NULL);
+
+   llvm::BasicBlock* cond_bb = _createBasicBlock("ctor.cond");
+   llvm::BasicBlock* body_bb = _createBasicBlock("ctor.body");
+   llvm::BasicBlock* after_bb = _createBasicBlock("ctor.after");
+
+   llvm::AllocaInst* counter_var = new llvm::AllocaInst(
+      _type_maker.get(_st->_core_types._int), 0, "ctor.i", _cur_bb);
+   new llvm::StoreInst(_createInt32Constant(0), counter_var, false, _cur_bb);
+   llvm::AllocaInst* counter_max = new llvm::AllocaInst(
+      _type_maker.get(_st->_core_types._int), 0, "ctor.i_max", _cur_bb);
+   new llvm::StoreInst(_createInt32Constant(arr_ty->ArrayLength()), counter_max, false, _cur_bb);
+
+   // --------
+   //  Before
+   // --------
+   llvm::BranchInst::Create(cond_bb, _cur_bb);
+
+   // -----------
+   //  Condition
+   // -----------
+   llvm::Value* cond_value = new llvm::ICmpInst(*cond_bb, llvm::ICmpInst::ICMP_SLT, counter_var, counter_max);
+   llvm::BranchInst::Create(body_bb, after_bb, cond_value, cond_bb);
+
+   // ------
+   //  Body
+   // ------
+   llvm::Value* counter_val = new llvm::LoadInst(counter_var, "", body_bb);
+   std::vector<llvm::Value*> gep_idx;
+   if (is_static) gep_idx.push_back(_createInt32Constant(0));
+   gep_idx.push_back(counter_val);
+   llvm::Value* item_val = llvm::GetElementPtrInst::Create(arr, gep_idx,
+      "", body_bb);
+   _cur_bb = body_bb;
+   initializeClassInstance(static_cast<st::Class*>(arr_ty->ItemType()), item_val);
+
+   llvm::BranchInst::Create(cond_bb, body_bb);
+
+   _cur_bb = after_bb;
 }
 
 } } }
