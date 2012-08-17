@@ -975,11 +975,11 @@ literal :
          case 'c':
          {
             st::IntConstant* ic = st::util::getNativeCharConstant(symbols.System(), (char)i);
-            ic->setType(symbols._core_types.gCharTy());
+            ic->setType(symbols._core_types.CharType());
 
             ast::node::Number* c_node = new ast::node::Number();
             c_node->setBoundSymbol(ic);
-            c_node->setExprType(symbols._core_types.gCharTy());
+            c_node->setExprType(symbols._core_types.CharType());
             $$ = c_node;
             break;
          }
@@ -987,11 +987,11 @@ literal :
          case 's':
          {
             st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), (short)i);
-            ic->setType(symbols._core_types.gShortTy());
+            ic->setType(symbols._core_types.ShortType());
 
             ast::node::Number* s_node = new ast::node::Number();
             s_node->setBoundSymbol(ic);
-            s_node->setExprType(symbols._core_types.gShortTy());
+            s_node->setExprType(symbols._core_types.ShortType());
             $$ = s_node;
             break;
          }
@@ -999,11 +999,11 @@ literal :
          case 'i':
          {
             st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), i);
-            ic->setType(symbols._core_types.gIntTy());
+            ic->setType(symbols._core_types.IntType());
 
             ast::node::Number* i_node = new ast::node::Number();
             i_node->setBoundSymbol(ic);
-            i_node->setExprType(symbols._core_types.gIntTy());
+            i_node->setExprType(symbols._core_types.IntType());
             $$ = i_node;
             break;
          }

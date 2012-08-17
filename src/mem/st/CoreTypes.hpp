@@ -13,45 +13,74 @@ class CoreTypes
 {
    public:
    Type* _bug_type;
-   IntType* _bool;
-   IntType* _char;
-   IntType* _long;
-   IntType* _int;
-   IntType* _int64;
-   IntType* _int32;
-   IntType* _int16;
-   IntType* _int8;
-   IntType* _short;
-   IntType* _uchar;
-   IntType* _ushort;
-   IntType* _uint;
-   IntType* _uint64;
-   IntType* _uint32;
-   IntType* _uint16;
-   IntType* _uint8;
-   IntType* _ulong;
-   VoidType* _void;
+   IntType* _bool_ty;
+   IntType* _char_ty;
+   IntType* _long_ty;
+   IntType* _int_ty;
+   IntType* _int64_ty;
+   IntType* _int32_ty;
+   IntType* _int16_ty;
+   IntType* _int8_ty;
+   IntType* _short_ty;
+   IntType* _uchar_ty;
+   IntType* _ushort_ty;
+   IntType* _uint_ty;
+   IntType* _uint64_ty;
+   IntType* _uint32_ty;
+   IntType* _uint16_ty;
+   IntType* _uint8_ty;
+   IntType* _ulong_ty;
+   VoidType* _void_ty;
    Null* _null;
 
-   // -------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
-   // -------------------------------------------------------------------------
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
    public:
 
-   // PROPERTY : BoolTy
-   inline Type* gBoolTy() {return this->_bool;}
+   CoreTypes ();
 
-   // PROPERTY : CharTy
-   inline Type* gCharTy() {return this->_char;}
 
-   // PROPERTY : IntTy
-   inline Type* gIntTy() {return this->_int;}
+   //--------------------------------------------------------------------------
+   // PUBLIC PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
 
-   // PROPERTY : ShortTy
-   inline Type* gShortTy() {return this->_short;}
+   GETTER(BoolType, class IntType*) { return _bool_ty; }
 
-   // PROPERTY : VoidTy
-   inline VoidType* gVoidTy() {return _void;}
+   GETTER(CharType, class IntType*) { return _char_ty; }
+
+   GETTER(ShortType, class IntType*) { return _short_ty; }
+
+   GETTER(IntType, class IntType*) { return _int_ty; }
+
+   GETTER(LongType, class IntType*) { return _long_ty; }
+
+   GETTER(Int8Type, class IntType*) { return _int8_ty; }
+
+   GETTER(Int16Type, class IntType*) { return _int16_ty; }
+
+   GETTER(Int32Type, class IntType*) { return _int32_ty; }
+
+   GETTER(Int64Type, class IntType*) { return _int64_ty; }
+
+   GETTER(UCharType, class IntType*) { return _uchar_ty; }
+
+   GETTER(UShortType, class IntType*) { return _ushort_ty; }
+
+   GETTER(UIntType, class IntType*) { return _uint_ty; }
+
+   GETTER(UInt8Type, class IntType*) { return _uint8_ty; }
+
+   GETTER(UInt16Type, class IntType*) { return _uint16_ty; }
+
+   GETTER(UInt32Type, class IntType*) { return _uint32_ty; }
+
+   GETTER(UInt64Type, class IntType*) { return _uint64_ty; }
+
+   GETTER(ULongType, class IntType*) { return _ulong_ty; }
+
+   GETTER(VoidType, VoidType*) { return _void_ty; }
 };
 
 } }

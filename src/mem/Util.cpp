@@ -100,7 +100,7 @@ Util::getIntStringLength (double nb)
 
    while (max_int_len++)
    {
-      if (nb < pow(10, max_int_len))
+      if (nb < pow(static_cast<double>(10), max_int_len))
       {
          break;
       }

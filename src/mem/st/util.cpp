@@ -534,13 +534,10 @@ registerType (SymbolTable* st, Symbol* scope, Type* ty)
 void
 setupBool (SymbolTable& st, CoreTypes& core_types)
 {
-   core_types._bool = new st::IntType();
-   core_types._bool->setName("bool");
-   core_types._bool->setByteSize(sizeof(bool));
-   util::registerType(&st, st.System(), core_types._bool);
+   util::registerType(&st, st.System(), core_types.BoolType());
 
-   st.System()->addChild(new st::Var("true", core_types._bool));
-   st.System()->addChild(new st::Var("false", core_types._bool));
+   st.System()->addChild(new st::Var("true", core_types.BoolType()));
+   st.System()->addChild(new st::Var("false", core_types.BoolType()));
 }
 
 void
@@ -554,79 +551,31 @@ setupBugType (SymbolTable& st, CoreTypes& core_types)
 void
 setupInts (SymbolTable& st, CoreTypes& core_types)
 {
-   // Type : char
-   core_types._char = new st::IntType("char", sizeof(char));
-   util::registerType(&st, st.System(), core_types._char);
-
-   // Type : uchar
-   core_types._uchar = new st::IntType("uchar", sizeof(unsigned char));
-   util::registerType(&st, st.System(), core_types._uchar);
-
-   // Type : short
-   core_types._short = new st::IntType("short", sizeof(short));
-   util::registerType(&st, st.System(), core_types._short);
-
-   // Type : ushort
-   core_types._ushort = new st::IntType("ushort", sizeof(unsigned short));
-   util::registerType(&st, st.System(), core_types._ushort);
-
-   // Type : int
-   core_types._int = new st::IntType("int", sizeof(int));
-   util::registerType(&st, st.System(), core_types._int);
-
-   // Type : uint
-   core_types._uint = new st::IntType("uint", sizeof(unsigned int));
-   util::registerType(&st, st.System(), core_types._uint);
-
-   // Type : long
-   core_types._long = new st::IntType("long", sizeof(long));
-   util::registerType(&st, st.System(), core_types._long);
-
-   // Type : ulong
-   core_types._ulong = new st::IntType("ulong", sizeof(unsigned long));
-   util::registerType(&st, st.System(), core_types._ulong);
-
-   // Type : int8
-   core_types._int8 = new st::IntType("int8", 1);
-   util::registerType(&st, st.System(), core_types._int8);
-
-   // Type : uint8
-   core_types._uint8 = new st::IntType("uint8", 1);
-   util::registerType(&st, st.System(), core_types._uint8);
-
-   // Type : int16
-   core_types._int16 = new st::IntType("int16", 2);
-   util::registerType(&st, st.System(), core_types._int16);
-
-   // Type : uint16
-   core_types._uint16 = new st::IntType("uint16", 2);
-   util::registerType(&st, st.System(), core_types._uint16);
-
-   // Type : int32
-   core_types._int32 = new st::IntType("int32", 4);
-   util::registerType(&st, st.System(), core_types._int32);
-
-   // Type : uint32
-   core_types._uint32 = new st::IntType("uint32", 4);
-   util::registerType(&st, st.System(), core_types._uint32);
-
-   // Type : int64
-   core_types._int64 = new st::IntType("int64", 8);
-   util::registerType(&st, st.System(), core_types._int64);
-
-   // Type : uint64
-   core_types._uint64 = new st::IntType("uint64", 8);
-   util::registerType(&st, st.System(), core_types._uint64);
+   util::registerType(&st, st.System(), core_types.CharType());
+   util::registerType(&st, st.System(), core_types.UCharType());
+   util::registerType(&st, st.System(), core_types.ShortType());
+   util::registerType(&st, st.System(), core_types.UShortType());
+   util::registerType(&st, st.System(), core_types.IntType());
+   util::registerType(&st, st.System(), core_types.UIntType());
+   util::registerType(&st, st.System(), core_types.LongType());
+   util::registerType(&st, st.System(), core_types.ULongType());
+   util::registerType(&st, st.System(), core_types.Int8Type());
+   util::registerType(&st, st.System(), core_types.Int16Type());
+   util::registerType(&st, st.System(), core_types.Int32Type());
+   util::registerType(&st, st.System(), core_types.Int64Type());
+   util::registerType(&st, st.System(), core_types.UInt8Type());
+   util::registerType(&st, st.System(), core_types.UInt16Type());
+   util::registerType(&st, st.System(), core_types.UInt32Type());
+   util::registerType(&st, st.System(), core_types.UInt64Type());
 }
 
 void
 setupVoid (SymbolTable& st, CoreTypes& core_types)
 {
-   core_types._void = new st::VoidType();
-   util::registerType(&st, st.System(), core_types._void);
+   util::registerType(&st, st.System(), core_types.VoidType());
 
    core_types._null = new st::Null();
-   core_types._null->setType(getPointerType(core_types._void));
+   core_types._null->setType(getPointerType(core_types.VoidType()));
 
    st.System()->addChild(core_types._null);
 }

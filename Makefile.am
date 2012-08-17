@@ -101,6 +101,7 @@ src_mem_st = \
  src/mem/st/ArrayType.cpp \
  src/mem/st/Class.cpp \
  src/mem/st/Constant.cpp \
+ src/mem/st/CoreTypes.cpp \
  src/mem/st/EnumType.cpp \
  src/mem/st/Field.cpp \
  src/mem/st/Func.cpp \

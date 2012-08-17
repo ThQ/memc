@@ -385,11 +385,11 @@ BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
 
    if (left_ty->isIntType() && right_ty->isIntType())
    {
-      n->setExprType(_core_types->gBoolTy());
+      n->setExprType(_core_types->BoolType());
    }
    else if (left_ty == right_ty)
    {
-      n->setExprType(_core_types->gBoolTy());
+      n->setExprType(_core_types->BoolType());
    }
    else
    {
@@ -446,7 +446,7 @@ BlockTypesChecker::visitLogicalExpr (st::Symbol* scope, node::Node* expr_node)
       ensureBoolExpr(expr_node->getChild(0));
       ensureBoolExpr(expr_node->getChild(1));
 
-      expr_node->setExprType(_core_types->gBoolTy());
+      expr_node->setExprType(_core_types->BoolType());
    }
 
    DEBUG_ENSURE (expr_node->hasExprType());
@@ -1058,7 +1058,8 @@ BlockTypesChecker::visitString (st::Symbol* scope, node::String* n)
 {
    DEBUG_REQUIRE(n != NULL);
 
-   st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(_symbols->_core_types.gCharTy());
+   st::IntType* char_ty = _symbols->_core_types.CharType();
+   st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(char_ty);
    n->setExprType(st::util::getPointerType(unsized_arr_ty));
 
    DEBUG_ENSURE (n->hasExprType());
