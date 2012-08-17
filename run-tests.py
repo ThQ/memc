@@ -1,10 +1,11 @@
 import os
 import os.path
 import subprocess
+import sys
 
 kCWD=os.getcwd()
 kTEST_DIR = kCWD + "/tests"
-kMEMC = "memc"
+kMEMC = sys.argv[1]
 kBIN = kCWD + "/build/memt"
 kMEM_SRC=os.getcwd() + "/build/test.mem"
 kREPORT_DIR = kCWD + "/build/test-reports"
@@ -105,7 +106,7 @@ class TestRunner:
       return ret_code
 
    def run_all (self):
-      self.print_section("Running tests...")
+      self.print_section("Running tests for `" + kMEMC + "'...")
       self._num_tests = len(os.listdir(kTEST_DIR))
 
       i = 1
