@@ -46,41 +46,41 @@ class CoreTypes
    //--------------------------------------------------------------------------
    public:
 
-   GETTER(BoolType, class IntType*) { return _bool_ty; }
+   GETTER(BoolTy, class IntType*) { return _bool_ty; }
 
-   GETTER(CharType, class IntType*) { return _char_ty; }
+   GETTER(CharTy, class IntType*) { return _char_ty; }
 
-   GETTER(ShortType, class IntType*) { return _short_ty; }
+   GETTER(ShortTy, class IntType*) { return _short_ty; }
 
-   GETTER(IntType, class IntType*) { return _int_ty; }
+   GETTER(IntTy, class IntType*) { return _int_ty; }
 
-   GETTER(LongType, class IntType*) { return _long_ty; }
+   GETTER(LongTy, class IntType*) { return _long_ty; }
 
-   GETTER(Int8Type, class IntType*) { return _int8_ty; }
+   GETTER(Int8Ty, class IntType*) { return _int8_ty; }
 
-   GETTER(Int16Type, class IntType*) { return _int16_ty; }
+   GETTER(Int16Ty, class IntType*) { return _int16_ty; }
 
-   GETTER(Int32Type, class IntType*) { return _int32_ty; }
+   GETTER(Int32Ty, class IntType*) { return _int32_ty; }
 
-   GETTER(Int64Type, class IntType*) { return _int64_ty; }
+   GETTER(Int64Ty, class IntType*) { return _int64_ty; }
 
-   GETTER(UCharType, class IntType*) { return _uchar_ty; }
+   GETTER(UCharTy, class IntType*) { return _uchar_ty; }
 
-   GETTER(UShortType, class IntType*) { return _ushort_ty; }
+   GETTER(UShortTy, class IntType*) { return _ushort_ty; }
 
-   GETTER(UIntType, class IntType*) { return _uint_ty; }
+   GETTER(UIntTy, class IntType*) { return _uint_ty; }
 
-   GETTER(UInt8Type, class IntType*) { return _uint8_ty; }
+   GETTER(UInt8Ty, class IntType*) { return _uint8_ty; }
 
-   GETTER(UInt16Type, class IntType*) { return _uint16_ty; }
+   GETTER(UInt16Ty, class IntType*) { return _uint16_ty; }
 
-   GETTER(UInt32Type, class IntType*) { return _uint32_ty; }
+   GETTER(UInt32Ty, class IntType*) { return _uint32_ty; }
 
-   GETTER(UInt64Type, class IntType*) { return _uint64_ty; }
+   GETTER(UInt64Ty, class IntType*) { return _uint64_ty; }
 
-   GETTER(ULongType, class IntType*) { return _ulong_ty; }
+   GETTER(ULongTy, class IntType*) { return _ulong_ty; }
 
-   GETTER(VoidType, VoidType*) { return _void_ty; }
+   GETTER(VoidTy, VoidType*) { return _void_ty; }
 };
 
 } }

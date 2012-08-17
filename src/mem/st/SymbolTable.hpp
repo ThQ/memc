@@ -85,7 +85,7 @@ class SymbolTable
 
    // True if the symbol is the void type.
    inline bool
-   isVoidType (st::Symbol* s) {return s == _core_types.VoidType();}
+   isVoidType (st::Symbol* s) {return s == _core_types.VoidTy();}
 
    // Lookup a symbol from a given scope.
    //

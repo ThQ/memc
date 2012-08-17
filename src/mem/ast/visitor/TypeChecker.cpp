@@ -51,7 +51,7 @@ bool
 TypeChecker::ensureBoolExpr (node::Node* expr)
 {
    assert (expr != NULL);
-   return ensureExprType(expr, _core_types->BoolType());
+   return ensureExprType(expr, _core_types->BoolTy());
 }
 
 bool
