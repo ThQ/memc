@@ -1,7 +1,7 @@
 #ifndef _MEM__CODEGEN__LLVM__CODEGEN__HPP_
 #define _MEM__CODEGEN__LLVM__CODEGEN__HPP_
 
-#ifndef NO_LLVM
+#ifdef HAS_LLVM
 
 #include <map>
 #include "mem/ast/node/Array.hpp"
