@@ -388,7 +388,6 @@ Compiler::run ()
 
    _logger->finish();
 
-   llvm::llvm_shutdown();
 }
 
 void

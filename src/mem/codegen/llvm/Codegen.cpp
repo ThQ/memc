@@ -1478,6 +1478,12 @@ Codegen::initializeArrayOfClassInstances (st::ArrayType* arr_ty, llvm::Value* ar
    _cur_bb = after_bb;
 }
 
+void
+Codegen::tearDown ()
+{
+   llvm::llvm_shutdown();
+}
+
 } } }
 
 #endif // HAS_LLVM

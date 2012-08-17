@@ -3,6 +3,7 @@
 
 #ifdef HAS_LLVM
 
+#include <llvm/Support/ManagedStatic.h>
 #include <map>
 #include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
@@ -256,6 +257,9 @@ class Codegen : public mem::codegen::ICodegen
 
    void
    initializeValue (st::Type* ty, llvm::Value* val);
+
+   void
+   tearDown ();
 
    //--------------------------------------------------------------------------
    // FIELDS
