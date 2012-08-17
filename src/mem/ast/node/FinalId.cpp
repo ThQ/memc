@@ -9,6 +9,19 @@ FinalId::FinalId ()
    _type = Kind::FINAL_ID;
 }
 
+Node*
+FinalId::copy () const
+{
+   FinalId* n = new FinalId ();
+   n->sValue(this->gValue());
+   n->setBoundSymbol(BoundSymbol());
+   n->setExprType(ExprType());
+   if (Position() != NULL)
+   {
+      n->setPosition(Position()->copy_range());
+   }
+   return n;
+}
 
 void
 FinalId::isValid (NodeValidator* v)

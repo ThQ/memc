@@ -59,6 +59,9 @@ class Type: public Symbol
 
 typedef std::vector<st::Type*> TypeVector;
 
+st::Type*
+castToType (Symbol* s);
+
 } }
 
 

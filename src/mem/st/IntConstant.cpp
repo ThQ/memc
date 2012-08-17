@@ -13,4 +13,17 @@ IntConstant::IntConstant ()
    _type = NULL;
 }
 
+
+//-----------------------------------------------------------------------------
+// STATIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+IntConstant*
+castToIntConstant (Symbol* s)
+{
+   assert (s != NULL);
+   assert (s->isIntConstant());
+   return static_cast<IntConstant*>(s);
+}
+
 } }

@@ -34,4 +34,16 @@ Type::isSubclass (Type* possible_parent)
    return false;
 }
 
+//-----------------------------------------------------------------------------
+// STATIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+st::Type*
+castToType (Symbol* s)
+{
+   assert (s != NULL);
+   assert (s->isAnyType());
+   return static_cast<Type*>(s);
+}
+
 } }

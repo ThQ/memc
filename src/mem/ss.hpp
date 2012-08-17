@@ -9,9 +9,9 @@
 #include <stdio.h>
 #endif
 
-#define GETTER(name, type) public: type name() const
-#define GETTER_REF(name, type) public: type & name()
-#define SETTER(name, type) public: void set ## name(type val)
+#define GETTER(name, type) type name() const
+#define GETTER_REF(name, type) type & name()
+#define SETTER(name, type) void set ## name(type val)
 
 #ifdef NDEBUG
    #define IF_DEBUG if(false)

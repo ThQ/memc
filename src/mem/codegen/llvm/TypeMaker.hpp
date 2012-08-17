@@ -76,6 +76,9 @@ class TypeMaker
    llvm::Constant*
    makeConstant (st::Constant* c);
 
+   llvm::Constant*
+   makeDefaultConstant (st::Type* c);
+
    llvm::Type*
    makeEnumType (st::EnumType* t);
 

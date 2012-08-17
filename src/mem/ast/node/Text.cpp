@@ -27,5 +27,12 @@ Text::sValue (std::string value)
    _value.assign(value);
 }
 
+Node*
+Text::copy () const
+{
+   Text* n = new Text();
+   n->sValue(n->gValue());
+   return n;
+}
 
 } } }

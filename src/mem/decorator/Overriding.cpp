@@ -14,8 +14,13 @@ Overriding::decorate (ast::node::Node* n)
    DEBUG_REQUIRE (n->isDecoratorNode());
    DEBUG_REQUIRE (n->Parent()->isFuncNode());
 
+   //FIXME Do something here
    st::Func* func_sym = static_cast<st::Func*>(n->Parent()->BoundSymbol());
-   func_sym->setIsOverriding(true);
+   if (!func_sym->IsOverriding())
+   {
+      DEBUG_PRINT("Function is decorated `@overriding' but does not override a function");
+   }
+   //func_sym->setIsOverriding(true);
 
    return true;
 }

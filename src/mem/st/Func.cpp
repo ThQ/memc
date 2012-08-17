@@ -13,7 +13,9 @@ Func::Func ()
    _has_body = false;
    _is_entry_point = false;
    _is_external = false;
-   _is_overriding = false;
+   //_is_overriding = false;
+   _is_virtual = false;
+   _overriden_func = NULL;
    _return_type = NULL;
    _next_function = NULL;
    _type = NULL;
@@ -52,6 +54,18 @@ st::Var*
 Func::getParam (int i)
 {
    return _params[i];
+}
+
+//-----------------------------------------------------------------------------
+// STATIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+st::Func*
+castToFunc (Symbol* s)
+{
+   assert (s != NULL);
+   assert (s->isFuncSymbol());
+   return static_cast<Func*>(s);
 }
 
 } }

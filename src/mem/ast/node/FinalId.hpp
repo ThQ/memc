@@ -26,6 +26,9 @@ class FinalId : public Text
    //--------------------------------------------------------------------------
    public:
 
+   virtual Node*
+   copy () const;
+
    virtual void
    isValid (NodeValidator* v);
 };

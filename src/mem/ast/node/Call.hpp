@@ -50,6 +50,9 @@ class Call : public Node
    bool
    hasParamsNode() {return ChildCount()==2;}
 
+   void
+   insertParam (Node* node);
+
    virtual void
    isValid(NodeValidator* vld);
 

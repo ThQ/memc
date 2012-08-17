@@ -27,7 +27,7 @@ copy (s :[char]*) -> [char]*
 // param(val) : the integer to convert
 // param(base) : the base in which to convert the integer
 // return : a C string representation of @val
-fromInt (val :int, base :int) -> [char]*
+from (val :long, base :int) -> [char]*
    base_chars := "0123456789abcdef"
    ret := new [char, 34 :int]
 

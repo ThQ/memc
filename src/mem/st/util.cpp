@@ -517,7 +517,7 @@ parseArrayTypeName (std::string name, std::string& base_ty_name,
       size_t comma_pos = name.find_first_of(',');
       if (comma_pos != std::string::npos)
       {
-         base_ty_name = name[1, comma_pos];
+         //base_ty_name = name[1, comma_pos];
          // FIXME This may fail badly
          array_len = atoi(name.substr(comma_pos+1,name.size()-2).c_str());
       }

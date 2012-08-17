@@ -9,6 +9,7 @@ namespace mem { namespace st {
 
 Class::Class ()
 {
+   _byte_size = 0;
    _cur_field_index = 0;
    _default_ctor = NULL;
    _kind = CLASS;
@@ -29,6 +30,7 @@ Class::addChild (Symbol* s)
    if (s->Kind() == FIELD)
    {
       st::Field* field = static_cast<Field*>(s);
+      assert(field->Type() != NULL);
       field->setFieldIndex(_cur_field_index);
       _cur_field_index++;
 
@@ -101,7 +103,7 @@ Class::getFunctionsLike (std::string name, FunctionType* func_ty)
          func = cls->getChild(name);
          if (func != NULL && func->Name() == name)
          {
-            if (static_cast<st::Func*>(func)->Type()->isOverridenCandidate(func_ty))
+            if (st::castToFunc(func)->Type()->isOverridenCandidate(func_ty))
             {
                funcs.push_back(static_cast<st::Func*>(func));
             }
@@ -202,6 +204,24 @@ Class::isSubclassOf (Class* cls) const
       parent = parent->Parent();
    }
    return false;
+}
+
+
+//-----------------------------------------------------------------------------
+// PROTECTED FUNCTIONS
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// STATIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+Class*
+castToClassType (Symbol* s)
+{
+   assert (s != NULL);
+   assert (s->isClassType());
+   return static_cast<Class*>(s);
 }
 
 } }

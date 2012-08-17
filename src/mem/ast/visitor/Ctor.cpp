@@ -24,6 +24,20 @@ Ctor::initializeField (st::Field* field, node::Block* ctor)
    node::Dot* dot_name_n = new node::Dot();
    dot_name_n->pushChildren(self_n, field_name_n);
 
+   if (field->VirtualFunction() != NULL)
+   {
+      node::Node* field_val = NULL;
+      node::FinalId* vfn = new node::FinalId();
+      vfn->sValue(field->VirtualFunction()->Name());
+      field_val = vfn;
+      assert (field_val != NULL);
+
+      node::VarAssign* var_n = new node::VarAssign();
+      var_n->pushChildren(dot_name_n, field_val);
+
+      ctor->pushChild(var_n);
+   }
+   /*
    // ---------
    //  Integer
    // ---------
@@ -60,12 +74,14 @@ Ctor::initializeField (st::Field* field, node::Block* ctor)
          nul->sValue("NULL");
          field_val = nul;
       }
+      assert (field_val != NULL);
 
       node::VarAssign* var_n = new node::VarAssign();
       var_n->pushChildren(dot_name_n, field_val);
 
       ctor->pushChild(var_n);
    }
+   */
 }
 
 bool
@@ -127,7 +143,7 @@ Ctor::visitClass (class node::Class* n)
    //  Function
    // ----------
    node::Func* func_n = new node::Func();
-   func_n->sValue("__ctor__");
+   func_n->sValue("$ctor");
    func_n->pushChildren(params_n, return_n, body_n);
 
    n->insertChild(func_n);

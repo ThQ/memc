@@ -12,6 +12,8 @@ CheckValidity::CheckValidity ()
 bool
 CheckValidity::visit (node::Node* node)
 {
+   DEBUG_REQUIRE (node != NULL);
+
    _node_vld.setup();
    assert (_node_vld._is_valid == true);
 

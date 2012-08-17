@@ -118,7 +118,7 @@ TypeMaker::makeClassType (st::Class* cls_sym)
    //  Fields
    // --------
    std::vector<llvm::Type*> fields;
-   if (cls_sym->_cur_field_index > 0)
+   if (1)//cls_sym->_cur_field_index > 0)
    {
       std::vector<st::Field*> f = cls_sym->getOrderedFields();
       st::Field* field = NULL;
@@ -146,11 +146,11 @@ TypeMaker::makeConstant (st::Constant* c)
    {
       case st::INT_CONSTANT:
       {
-         st::IntConstant* ic = static_cast<st::IntConstant*>(c);
+         st::IntConstant* ic = st::castToIntConstant(c);
          if (ic->IsSigned())
          {
             lconst = llvm::ConstantInt::get(get(c->Type()),
-               static_cast<st::IntConstant*>(c)->getSignedValue(),
+               st::castToIntConstant(c)->getSignedValue(),
                true); /* Signed */
          }
       }
@@ -161,6 +161,26 @@ TypeMaker::makeConstant (st::Constant* c)
 
    assert(lconst != NULL);
    return lconst;
+}
+
+llvm::Constant*
+TypeMaker::makeDefaultConstant (st::Type* t)
+{
+   llvm::Constant* cns = NULL;
+   if (t->isIntType())
+   {
+      st::IntType* int_ty = st::castToIntType(t);
+      cns = llvm::ConstantInt::get(get(t), 0, true /* is signed */);
+   }
+   else if (t->isPointerType())
+   {
+      cns = llvm::ConstantPointerNull::get(static_cast<llvm::PointerType*>(get(t)));
+   }
+   else
+   {
+      assert(false);
+   }
+   return cns;
 }
 
 llvm::Type*
@@ -174,7 +194,7 @@ TypeMaker::makeEnumType (st::EnumType* t)
          get(t->Type()),
          true, /* isConstant */
          llvm::GlobalValue::InternalLinkage,
-         makeConstant(static_cast<st::Var*>(i->second)->ConstantValue()),
+         makeConstant(st::castToVar(i->second)->ConstantValue()),
          i->second->gQualifiedName());
       _stack->setGlobal(i->second, v);
    }
@@ -241,7 +261,7 @@ TypeMaker::makeType (st::Type* mem_ty)
          return makeArrayType(static_cast<st::ArrayType*>(mem_ty));
 
       case st::CLASS:
-         return makeClassType(static_cast<st::Class*>(mem_ty));
+         return makeClassType(st::castToClassType(mem_ty));
 
       case st::ENUM_TYPE:
          return makeEnumType(static_cast<st::EnumType*>(mem_ty));
@@ -256,7 +276,7 @@ TypeMaker::makeType (st::Type* mem_ty)
          return makeIntType(mem_ty->ByteSize());
 
       case st::POINTER:
-         return makePointerType(static_cast<st::PointerType*>(mem_ty));
+         return makePointerType(st::castToPointerType(mem_ty));
 
       case st::PRIMITIVE_TYPE:
          return makePrimitiveType(static_cast<st::PrimitiveType*>(mem_ty));

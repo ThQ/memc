@@ -18,7 +18,7 @@ class Text: public Node
    //--------------------------------------------------------------------------
 
    // PROPERTY : Value
-   public: std::string gValue() { return this->_value;}
+   public: std::string gValue() const { return this->_value;}
    public: const char* gValueCstr() {return this->_value.c_str();}
    public: void sValue (const char* value);
    public: void sValue (const char* value, size_t len);
@@ -29,10 +29,17 @@ class Text: public Node
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Text ();
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual Node*
+   copy () const;
 };
 
 

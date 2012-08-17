@@ -16,6 +16,7 @@ class Token
    std::string _value;
    fs::position::Range _location;
 
+   public:
    GETTER(Kind, int) {return _kind;}
    SETTER(Kind, int) {_kind = val;}
 

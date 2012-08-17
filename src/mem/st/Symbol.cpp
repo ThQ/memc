@@ -192,6 +192,19 @@ Symbol::isReferenceSymbol() const
 }
 
 void
+Symbol::rename (std::string new_name)
+{
+   if (Parent() != NULL)
+   {
+      Parent()->renameChild(Name(), new_name);
+   }
+   else
+   {
+      setName(new_name);
+   }
+}
+
+void
 Symbol::renameChild (std::string old_name, std::string new_name)
 {
    st::Symbol* sym = NULL;

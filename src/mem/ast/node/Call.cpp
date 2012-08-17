@@ -10,6 +10,21 @@ Call::Call ()
 }
 
 void
+Call::insertParam (Node* node)
+{
+   assert(ChildCount() >= 1);
+
+   if (ParamsNode() == NULL)
+   {
+      node::Node* params = new node::Node();
+      params->setKind(Kind::EXPRESSION_LIST);
+      pushChild(params);
+      assert (ChildCount() == 2);
+   }
+   ParamsNode()->insertChild(node);
+}
+
+void
 Call::isValid (NodeValidator* v)
 {
    // Check SELF

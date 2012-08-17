@@ -53,8 +53,8 @@ class Func: public Type
    SETTER(IsExternal, bool) {_is_external = val;}
 
    // IsOverriding
-   GETTER(IsOverriding, bool) {return _is_overriding;}
-   SETTER(IsOverriding, bool) {_is_overriding = val;}
+   GETTER(IsOverriding, bool) {return _overriden_func != NULL;}
+   //SETTER(IsOverriding, bool) {_is_overriding = val;}
 
    // IsVirtual
    GETTER(IsVirtual, bool) {return _is_virtual;}
@@ -66,6 +66,10 @@ class Func: public Type
 
    // ParamCount
    GETTER(ParamCount, size_t) {return _params.size();}
+
+   // OverridenFunction
+   GETTER(OverridenFunction, Func*) {return _overriden_func;}
+   SETTER(OverridenFunction, Func*) {_overriden_func = val;}
 
    // ReturnType
    GETTER(ReturnType, Type*) {return _return_type;}
@@ -96,15 +100,19 @@ class Func: public Type
    public:
 
    bool _has_body;
-   bool _is_overriding;
+   //bool _is_overriding;
    bool _is_entry_point;
    bool _is_external;
    bool _is_virtual;
+   st::Func* _overriden_func;
    std::vector<Arg*> _params;
    class Type* _return_type;
    Func* _next_function;
    FunctionType* _type;
 };
+
+st::Func*
+castToFunc (st::Symbol* s);
 
 typedef std::vector<Func*> FunctionVector;
 

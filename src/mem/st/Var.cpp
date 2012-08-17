@@ -52,4 +52,16 @@ Var::gExprType ()
    return _type;
 }
 
+//-----------------------------------------------------------------------------
+// STATIC FUNCTIONS
+//-----------------------------------------------------------------------------
+Var*
+castToVar (Symbol* s)
+{
+   assert (s != NULL);
+   assert (s->isVarSymbol());
+   return static_cast<Var*>(s);
+}
+
+
 } }

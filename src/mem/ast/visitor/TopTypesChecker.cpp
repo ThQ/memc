@@ -88,7 +88,7 @@ TopTypesChecker::visitEnum (st::Symbol* scope, node::Enum* n)
          visitVarDecl(enum_ty, var_n);
          ensureConstantExpr(var_n->ValueNode());
          var_n->setExprType(enum_ty);
-         static_cast<st::Var*>(var_n->BoundSymbol())->setConstantValue(static_cast<st::IntConstant*>(var_n->ValueNode()->BoundSymbol()));
+         static_cast<st::Var*>(var_n->BoundSymbol())->setConstantValue(st::castToIntConstant(var_n->ValueNode()->BoundSymbol()));
       }
       enum_ty->setType(static_cast<node::VarDecl*>(n->getChild(0))->ValueNode()->ExprType());
 
@@ -98,7 +98,7 @@ TopTypesChecker::visitEnum (st::Symbol* scope, node::Enum* n)
       st::Var* field = NULL;
       for (i = enum_ty->Children().begin(); i != enum_ty->Children().end(); ++i)
       {
-         field = static_cast<st::Var*>(i->second);
+         field = st::castToVar(i->second);
          field->setType(enum_ty);
          field->setIsGlobal(true);
          field->setIsConstant(true);
@@ -221,9 +221,9 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    // ----------------
    //  Ctor specifics
    // ----------------
-   if (scope->isClassType() && func_sym->Name() == "__ctor__")
+   if (scope->isClassType() && func_sym->Name() == "$ctor")
    {
-      st::Class* cls_ty = static_cast<st::Class*>(scope);
+      st::Class* cls_ty = st::castToClassType(scope);
       cls_ty->setDefaultCtor(func_sym);
    }
 
@@ -233,20 +233,21 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    // Try to find a function with the same name in ancestors
    if (scope->isClassType())
    {
-      st::Symbol* shadowed_sym = st::util::lookupSymbol(static_cast<st::Class*>(scope)->ParentClass(), func_decl->gValue());
+      st::Symbol* shadowed_sym = st::util::lookupSymbol(st::castToClassType(scope)->ParentClass(), func_decl->gValue());
 
       if (shadowed_sym != NULL)
       {
+         func_sym->setOverridenFunction(st::castToFunc(shadowed_sym));
+
          if (shadowed_sym->isFuncSymbol())
          {
             log::OverridingFunction* err = new log::OverridingFunction();
-            err->sShadowingFunction(func_sym);
-            err->sClass(scope);
-            err->sShadowedInClass(shadowed_sym->Parent());
+            err->sFunction(func_sym);
+            err->sOverridenFunction(shadowed_sym->Parent());
             err->format();
             log(err);
 
-            if (func_sym->ReturnType() != static_cast<st::Func*>(shadowed_sym)->ReturnType())
+            if (func_sym->ReturnType() != st::castToFunc(shadowed_sym)->ReturnType())
             {
                log::Message* err = new log::Error();
                err->formatMessage("Return type was defined as %s (not %s)",
@@ -284,13 +285,13 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
       {
          // Add parameter to function symbol parameters
          param_sym = func_sym->addParam(name_node->gValueCstr(),
-            static_cast<st::Type*>(type_node->ExprType()));
+            st::castToType(type_node->ExprType()));
 
          // Add parameter to the symbol table of the block
          if (type_node->hasExprType()
             && ensureSizedExprType(type_node))
          {
-            param_sym->setType(static_cast<st::Class*>(type_node->ExprType()));
+            param_sym->setType(type_node->ExprType());
          }
          func_sym->addChild(param_sym);
 
@@ -327,7 +328,7 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
 
    if (func_node->ReturnTypeNode()->hasExprType())
    {
-      func_sym->setReturnType(static_cast<st::Class*>(ret_ty_node->ExprType()));
+      func_sym->setReturnType(ret_ty_node->ExprType());
       func_node->setExprType(func_sym->ReturnType());
 
       assert(func_sym->ReturnType() != NULL);

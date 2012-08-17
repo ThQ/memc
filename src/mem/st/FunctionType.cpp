@@ -40,8 +40,24 @@ FunctionType::addArguments (TypeVector tys)
    }
 }
 
+bool
+FunctionType::canCastTo (Type* dest_ty) const
+{
+   if (!dest_ty->isFunctionType()) return false;
+
+   st::FunctionType* dest = static_cast<st::FunctionType*>(dest_ty);
+   if (dest->ArgumentCount() != ArgumentCount()) return false;
+   if (dest->ReturnType() != ReturnType()) return false;
+
+   for (size_t i = 0; i < ArgumentCount(); ++i)
+   {
+      if (!getArgument(i)->canCastTo(dest->getArgument(i))) return false;
+   }
+   return true;
+}
+
 st::Type*
-FunctionType::getArgument (int i)
+FunctionType::getArgument (int i) const
 {
    return _arguments[i];
 }

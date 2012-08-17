@@ -37,12 +37,14 @@ class Class : public Type
    // PROPERTIES
    //--------------------------------------------------------------------------
 
+   virtual GETTER(ByteSize, int) { return ParentClass() != NULL && ParentClass()->isClassType() ? ParentClass()->ByteSize() + _byte_size : _byte_size;}
+
    GETTER(DefaultCtor, Func*) { return _default_ctor;}
    SETTER(DefaultCtor, Func*) { _default_ctor = val;}
 
    // The parent class in the type hierarchy.
    GETTER(ParentClass, st::Class*) { return static_cast<st::Class*>(_parent);}
-   SETTER(ParentClass, st::Class*) { _parent = val; }
+   SETTER(ParentClass, st::Class*) { _parent = val;  }
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -91,7 +93,6 @@ class Class : public Type
    bool
    isSubclassOf (Class* cls) const;
 
-
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
@@ -101,6 +102,8 @@ class Class : public Type
    Func* _default_ctor;
 };
 
+Class*
+castToClassType (Symbol* s);
 
 } }
 

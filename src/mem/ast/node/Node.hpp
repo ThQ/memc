@@ -79,6 +79,9 @@ class Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual Node*
+   copy () const {assert(false);return NULL;}
+
    inline fs::position::Range*
    copyPosition() { return _position != NULL ? _position->copy_range() : NULL;}
 

@@ -11,39 +11,39 @@
 
 namespace mem { namespace ast { namespace visitor {
 
-/**
- * Checks the validity of each node in the final AST (before optimisation).
- *
- * Once we know the AST is expected to be valid we run this final test so as to
- * ensure its validity is perfect. In theory this should not raise any error.
- * In practice, if it raises an error :
- * 1/ The isValid function of the supposed invalid node is bogus (false positive)
- * 2/ There is a real bug that needs to be fixed (and it will be hard)
- */
+// Checks the validity of each node in the final AST (before optimisation).
+//
+// Once we know the AST is expected to be valid we run this final test so as to
+// ensure its validity is perfect. In theory this should not raise any error.
+// In practice, if it raises an error :
+// 1/ The isValid function of the supposed invalid node is bogus (false positive)
+// 2/ There is a real bug that needs to be fixed (and it will be hard)
 class CheckValidity : public Visitor
 {
-   public: node::NodeValidator _node_vld;
-
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    CheckValidity();
 
 
    //--------------------------------------------------------------------------
-   // PUBLIC METHODS
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Visitor entry point.
-    */
+   // Visitor entry point.
    virtual bool visit (node::Node* node);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   node::NodeValidator _node_vld;
 };
 
 

@@ -36,4 +36,15 @@ IntType::canCastTo (Type* dest_ty) const
    return false;
 }
 
+//-----------------------------------------------------------------------------
+// STATIC FUNCTIONS
+//-----------------------------------------------------------------------------
+IntType*
+castToIntType (Symbol* s)
+{
+   assert (s != NULL);
+   assert (s->isIntType());
+   return static_cast<IntType*>(s);
+}
+
 } }

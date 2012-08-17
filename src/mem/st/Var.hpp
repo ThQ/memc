@@ -72,6 +72,8 @@ class Var : public Symbol
    st::Constant* _constant_value;
 };
 
+Var*
+castToVar (Symbol* s);
 
 } }
 

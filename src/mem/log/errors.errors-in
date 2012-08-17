@@ -12,7 +12,7 @@
 	},
 	"CallNonFunction":
 	{
-		"message": "`$ObjectName' is not a function, but a $ObjectTypeName",
+		"message": "Expected function, but `$ObjectName' has type `$ObjectTypeName'",
 		"type": "Error",
 		"params":
 		{
@@ -192,13 +192,12 @@
    "OverridingFunction":
    {
       "type": "Warning",
-      "message": "Function `$ShadowingFunction' (from `$Class') overrides a function from class `$ShadowedInClass'",
-      "description": "Decorate the function `$ShadowingFunction' with `@overriding'",
+      "message": "Function `$Function' overrides `$OverridenFunction'",
+      "description": "Decorate the function `$Function' with `@overriding'",
       "params":
       {
-         "ShadowingFunction": "st::Symbol*",
-         "Class": "st::Symbol*",
-         "ShadowedInClass": "st::Symbol*"
+         "Function": "st::Symbol*",
+         "OverridenFunction": "st::Symbol*"
       }
    }
 }

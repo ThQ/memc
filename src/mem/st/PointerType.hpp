@@ -99,6 +99,8 @@ class PointerType : public Type
    int _ptr_level;
 };
 
+PointerType*
+castToPointerType (Symbol* s);
 
 } }
 

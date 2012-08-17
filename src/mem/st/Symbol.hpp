@@ -44,8 +44,8 @@ class Symbol
    public:
 
    // ByteSize
-   GETTER(ByteSize, int) {return _byte_size;}
-   SETTER(ByteSize, int) {_byte_size = val;}
+   virtual GETTER(ByteSize, int) {return _byte_size;}
+   virtual SETTER(ByteSize, int) {_byte_size = val;}
 
    // ChildCount
    GETTER(ChildCount, size_t) {return _children.size();}
@@ -205,9 +205,14 @@ class Symbol
    inline const char*
    gQualifiedNameCstr() { return this->gQualifiedName().c_str();}
 
+   void
+   rename (std::string new_name);
 
    void
    renameChild (std::string old_name, std::string new_name);
+
+   void
+   renameChild (st::Symbol* sym, std::string new_name) {renameChild(sym->Name(), new_name);}
 
    //--------------------------------------------------------------------------
    // FIELDS

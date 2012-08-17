@@ -56,9 +56,12 @@ class FunctionType: public Type
    void
    addArguments (TypeVector tys);
 
+   virtual bool
+   canCastTo (Type* dest_ty) const;
+
    // Return the Nth parameter.
    st::Type*
-   getArgument (int i);
+   getArgument (int i) const;
 
    bool
    isLike (TypeVector arguments, Type* return_type);

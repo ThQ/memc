@@ -240,6 +240,10 @@ SymbolTable::register_function (std::string func_full_name)
 st::Symbol*
 SymbolTable::lookupSymbol (st::Symbol* scope, std::string symbol_id)
 {
+   if (scope->isPointerType())
+   {
+      scope = static_cast<st::PointerType*>(scope)->getNonPointerParent();
+   }
    st::Symbol* symbol = lookupSymbolUntil(scope, symbol_id, _root);
    if (symbol == NULL)
    {

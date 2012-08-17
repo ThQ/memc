@@ -32,6 +32,8 @@ class IntType : public PrimitiveType
    canCastTo (Type* dest_ty) const;
 };
 
+IntType*
+castToIntType (Symbol* s);
 
 } }
 

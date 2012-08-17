@@ -53,4 +53,16 @@ PointerType::getNonPointerParent ()
    return NULL;
 }
 
+//-----------------------------------------------------------------------------
+// STATIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+PointerType*
+castToPointerType (Symbol* s)
+{
+   assert (s != NULL);
+   assert (s->isPointerType());
+   return static_cast<PointerType*>(s);
+}
+
 } }

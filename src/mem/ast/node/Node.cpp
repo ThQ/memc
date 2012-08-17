@@ -16,7 +16,7 @@ Node::Node ()
    _next = NULL;
    _parent = NULL;
    _position = NULL;
-   _prev = 0;
+   _prev = NULL;
    _type = Kind::UNKNOWN;
 }
 
@@ -98,6 +98,8 @@ Node::get_type_name (unsigned int type)
 void
 Node::insertChild (Node* n)
 {
+   DEBUG_REQUIRE (n != NULL);
+
    n->_parent = this;
    if (_first_child != NULL)
    {

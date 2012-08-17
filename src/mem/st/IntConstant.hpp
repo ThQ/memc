@@ -40,6 +40,9 @@ class IntConstant : public Constant
    st::Type* _type;
 };
 
+IntConstant*
+castToIntConstant (Symbol* s);
+
 } }
 
 

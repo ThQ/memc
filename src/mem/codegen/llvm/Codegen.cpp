@@ -39,7 +39,7 @@ Codegen::_castLlvmValue (llvm::Value* val, st::Type* src_ty, st::Type* dest_ty)
    // Casting between two pointer types
    else if (src_ty->isPointerType() && dest_ty->isPointerType())
    {
-      if (!_st->isVoidType(static_cast<st::PointerType*>(dest_ty)->PointedType()))
+      if (!_st->isVoidType(st::castToPointerType(dest_ty)->PointedType()))
       {
          val = new llvm::BitCastInst(val, _type_maker.get(dest_ty), "", _cur_bb);
       }
@@ -148,16 +148,16 @@ Codegen::_getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty)
    st::Type* common_ty = NULL;
    if (!left_ty->isPointerType())
    {
-      common_ty = static_cast<st::Type*>(left_ty);
+      common_ty = st::castToType(left_ty);
    }
    else if (!right_ty->isPointerType())
    {
-      common_ty = static_cast<st::Type*>(right_ty);
+      common_ty = st::castToType(right_ty);
    }
    // Both operands are pointers
    else
    {
-      common_ty = st::util::getPointerBaseType(static_cast<st::PointerType*>(left_ty));
+      common_ty = st::util::getPointerBaseType(st::castToPointerType(left_ty));
    }
 
    return common_ty;
@@ -213,9 +213,9 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
 {
    if (node->hasBoundSymbol())
    {
-      if (!node->BoundSymbol()->isAnyConstant() && !node->BoundSymbol()->isFuncSymbol())
+      if (!node->BoundSymbol()->isAnyConstant()
+         && !node->BoundSymbol()->isFuncSymbol())
       {
-         DEBUG_PRINTF("Load because bound sym is : %s\n", node->BoundSymbol()->gQualifiedNameCstr());
          return true;
       }
    }
@@ -362,7 +362,7 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    // (indirection_level - 1)
    if (value_ty->isPointerType())
    {
-      for (int i = 0; i < static_cast<st::PointerType*>(value_ty)->IndirectionLevel(); ++i)
+      for (int i = 0; i < st::castToPointerType(value_ty)->IndirectionLevel(); ++i)
       {
          val = new llvm::LoadInst(val, "", _cur_bb);
       }
@@ -398,14 +398,14 @@ Codegen::cgCallExpr (ast::node::Call* node)
    // Calling a classic function
    if (caller_node_ty->isFunctionType())
    {
-      st::Func* func = static_cast<st::Func*>(node->CallerNode()->BoundSymbol());
+      st::Func* func = st::castToFunc(node->CallerNode()->BoundSymbol());
       func_ty = static_cast<st::FunctionType*>(caller_node_ty);
       callee = _functions[_getCodegenFuncName(func)];
    }
    // Calling a functor
    else if (st::util::isFunctorType(caller_node_ty))
    {
-      st::PointerType* fctor = static_cast<st::PointerType*>(caller_node_ty);
+      st::PointerType* fctor = st::castToPointerType(caller_node_ty);
       func_ty = static_cast<st::FunctionType*>(fctor->getNonPointerParent());
       callee = cgExprAndLoad(node->CallerNode(), func_ty);
    }
@@ -420,12 +420,6 @@ Codegen::cgCallExpr (ast::node::Call* node)
    // -----------------
    //  With parameters
    // -----------------
-   if (node->IsInstanceCall())
-   {
-      ast::node::Node* caller_obj_n = static_cast<ast::node::Dot*>(node->CallerNode())->LeftNode();
-      llvm::Value* caller_obj = cgExprAndLoad(caller_obj_n, caller_obj_n->ExprType());
-      params.push_back(caller_obj);
-   }
    if (node->ParamsNode() != NULL)
    {
       ast::node::Node* cur_param_node = NULL;
@@ -434,7 +428,12 @@ Codegen::cgCallExpr (ast::node::Call* node)
       for (size_t i = 0; i < node->ParamsNode()->ChildCount(); ++i)
       {
          cur_param_node = node->ParamsNode()->getChild(i);
-         param_value = cgExprAndLoad(cur_param_node, func_ty->getArgument(i));
+         param_value = cgExpr(cur_param_node);//, func_ty->getArgument(i));
+         if (_mustBeLoaded(cur_param_node))
+         {
+            param_value = new llvm::LoadInst(param_value, "", _cur_bb);
+         }
+         param_value = _castLlvmValue(param_value, cur_param_node->ExprType(), func_ty->getArgument(i));
          params.push_back(param_value);
       }
    }
@@ -510,8 +509,8 @@ Codegen::cgCompOp (ast::node::BinaryOp* n)
    if (left_ty->isIntType() && right_ty->isIntType())
    {
       expected_operand_ty = st::util::getBiggestIntType(
-         static_cast<st::IntType*>(left_ty),
-         static_cast<st::IntType*>(right_ty));
+         st::castToIntType(left_ty),
+         st::castToIntType(right_ty));
    }
 
    llvm::Value* left_val = cgExprAndLoad(left_val_node, expected_operand_ty);
@@ -562,21 +561,18 @@ Codegen::cgDotExpr (ast::node::Dot* node)
 
    if (node->LeftNode()->ExprType()->isPointerType())
    {
-      st::PointerType* ptr_ty = static_cast<st::PointerType*>(node->LeftNode()->ExprType());
+      st::PointerType* ptr_ty =st::castToPointerType(node->LeftNode()->ExprType());
       for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
       {
          left_node = new llvm::LoadInst(left_node, "", _cur_bb);
-         assert(left_node != NULL);
-      }
-      for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
-      {
          idx.push_back(_createInt32Constant(0));
+         assert(left_node != NULL);
       }
    }
 
    // Compute the field index in the whole type hierarchy
    st::Field* field = static_cast<st::Field*>(node->BoundSymbol());
-   st::Class* cls_ty = static_cast<st::Class*>(field->Parent());
+   st::Class* cls_ty = st::castToClassType(field->Parent());
    int field_index = cls_ty->getFieldAbsoluteIndex(field->FieldIndex());
 
    idx.push_back(_createInt32Constant(field_index));
@@ -741,8 +737,8 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    }
    if (src_ty->isPointerType() && dest_ty->isPointerType())
    {
-      st::PointerType* src_ptr_ty = static_cast<st::PointerType*>(src_ty);
-      st::PointerType* dest_ptr_ty = static_cast<st::PointerType*>(dest_ty);
+      st::PointerType* src_ptr_ty = st::castToPointerType(src_ty);
+      st::PointerType* dest_ptr_ty = st::castToPointerType(dest_ty);
    }
 
    if (val != NULL && must_load)
@@ -828,7 +824,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
    // Don't try to generate body for a virtual function
    if (func_node->BodyNode() != NULL)
    {
-      st::Func* func_sym = static_cast<st::Func*>(func_node->BoundSymbol());
+      st::Func* func_sym = st::castToFunc(func_node->BoundSymbol());
       assert (func_sym != NULL);
 
       llvm::Function* func = _functions[_getCodegenFuncName(func_sym)];
@@ -881,7 +877,7 @@ void
 Codegen::cgFunctionDef (ast::node::Func* func_node)
 {
    DEBUG_PRINT("\n");
-   st::Func* func_sym = static_cast<st::Func*>(func_node->BoundSymbol());
+   st::Func* func_sym = st::castToFunc(func_node->BoundSymbol());
    std::vector<llvm::Type*> func_ty_args;
    std::string func_name;
 
@@ -1003,20 +999,20 @@ Codegen::cgNewExpr (ast::node::New* node)
    llvm::Value* byte_size = NULL;
 
    ast::node::Node* type_node = node->getChild(0);
-   st::Type* obj_ty = static_cast<st::Type*>(type_node->BoundSymbol());
+   st::Type* obj_ty = st::castToType(type_node->BoundSymbol());
 
    // FIXME Spaghetti code !
    if (type_node->BoundSymbol()->isArrayType())
    {
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(obj_ty);
-      int type_byte_size = static_cast<st::Type*>(type_node->getChild(0)->BoundSymbol())->ByteSize();
+      int type_byte_size = st::castToType(type_node->getChild(0)->BoundSymbol())->ByteSize();
       llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1), _st->_core_types._int);
       llvm::Value* obj_size = _createInt32Constant(type_byte_size);
       byte_size = llvm::BinaryOperator::Create(llvm::Instruction::Mul, num_obj, obj_size, "", _cur_bb);
    }
    else
    {
-      int type_byte_size = static_cast<st::Type*>(obj_ty)->ByteSize();
+      int type_byte_size = st::castToType(obj_ty)->ByteSize();
       byte_size = llvm::ConstantInt::get(_type_maker.get(_st->_core_types._int), type_byte_size);
    }
 
@@ -1037,13 +1033,16 @@ Codegen::cgNewExpr (ast::node::New* node)
    // ------------------
    if (obj_ty->isClassType())
    {
-      st::Class* cls_ty = static_cast<st::Class*>(obj_ty);
-      initializeClassInstance(cls_ty, ret);
+      initializeClassInstance(st::castToClassType(obj_ty), ret);
    }
    else if (obj_ty->isArrayType())
    {
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(obj_ty);
       initializeArrayOfClassInstances(arr_ty, ret, false);
+   }
+   else
+   {
+      assert(false);
    }
 
    assert (ret != NULL);
@@ -1058,7 +1057,7 @@ Codegen::cgNumberExpr (ast::node::Number* node)
    DEBUG_REQUIRE (node->BoundSymbol()->isIntConstant());
 
    // FIXME This works only for signed integers
-   st::IntConstant* i_const = static_cast<st::IntConstant*>(node->BoundSymbol());
+   st::IntConstant* i_const = st::castToIntConstant(node->BoundSymbol());
    llvm::Value* val = llvm::ConstantInt::get(llvm::getGlobalContext(),
       llvm::APInt(node->BoundSymbol()->ByteSize() * 8, i_const->getSignedValue(), false));
 
@@ -1111,7 +1110,7 @@ Codegen::cgString (ast::node::String* n)
 void
 Codegen::cgVarAssignStatement (ast::node::VarAssign* node)
 {
-   st::Type* right_ty = static_cast<st::Type*>(node->ValueNode()->ExprType());
+   st::Type* right_ty = st::castToType(node->ValueNode()->ExprType());
    llvm::Value* left_val = cgExpr(node->NameNode());
    llvm::Value* right_val = cgExprAndLoad(node->ValueNode(), node->ExprType());
 
@@ -1155,11 +1154,11 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
    // ------------------
    //  Constructor call
    // ------------------
-   st::Type* obj_ty = static_cast<st::Type*>(node->TypeNode()->BoundSymbol());
+   st::Type* obj_ty = st::castToType(node->TypeNode()->BoundSymbol());
    // Single object static allocation
    if (obj_ty->isClassType() && node->ValueNode() == NULL)
    {
-      st::Class* cls_ty = static_cast<st::Class*>(obj_ty);
+      st::Class* cls_ty = st::castToClassType(obj_ty);
       if (cls_ty->DefaultCtor() != NULL)
       {
          initializeClassInstance(cls_ty, var);
@@ -1395,6 +1394,34 @@ Codegen::getLlvmByteCode ()
 void
 Codegen::initializeClassInstance (st::Class* cls_ty, llvm::Value* val)
 {
+   // 0 initialize
+   llvm::Constant* init = llvm::ConstantAggregateZero::get(_type_maker.get(cls_ty));
+   llvm::StoreInst* inst = new llvm::StoreInst(init, val, "", _cur_bb);
+
+   /*
+   // Initialize the virtual functions
+   std::vector<llvm::Constant*> vals;
+   st::FieldVector fields = cls_ty->getAllFields();
+   st::Field* field = NULL;
+   llvm::Constant* cnst = NULL;
+   llvm::GetElementPtrInst* gep = NULL;
+   std::vector<llvm::Value*> gep_idx;
+   for (size_t i = 0; i < fields.size(); ++i)
+   {
+      field = fields[i];
+      assert(field != NULL && field->isFieldSymbol());
+      if (field->VirtualFunction() != NULL)
+      {
+         DEBUG_PRINT("VFN\n");
+         cnst = _functions[field->VirtualFunction()->Name()];
+         gep_idx.clear();
+         gep_idx.push_back(_createInt32Constant(0));
+         gep_idx.push_back(_createInt32Constant(field->FieldIndex()));
+         gep = llvm::GetElementPtrInst::Create(val, gep_idx);
+         new llvm::StoreInst(gep, cnst, "", _cur_bb);
+      }
+   }
+   */
    if (cls_ty->DefaultCtor() != NULL)
    {
       llvm::CallInst::Create(
@@ -1443,7 +1470,7 @@ Codegen::initializeArrayOfClassInstances (st::ArrayType* arr_ty, llvm::Value* ar
    llvm::Value* item_val = llvm::GetElementPtrInst::Create(arr, gep_idx,
       "", body_bb);
    _cur_bb = body_bb;
-   initializeClassInstance(static_cast<st::Class*>(arr_ty->ItemType()), item_val);
+   initializeClassInstance(st::castToClassType(arr_ty->ItemType()), item_val);
 
    llvm::BranchInst::Create(cond_bb, body_bb);
 
