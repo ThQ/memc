@@ -1,6 +1,7 @@
 #ifndef _MEM__CODEGEN__LLVM__CODEGEN__HPP_
 #define _MEM__CODEGEN__LLVM__CODEGEN__HPP_
 
+#ifndef NO_LLVM
 
 #include <map>
 #include "mem/ast/node/Array.hpp"
@@ -274,4 +275,5 @@ class Codegen : public mem::codegen::ICodegen
 
 } } }
 
+#endif // NO_LLVM
 #endif

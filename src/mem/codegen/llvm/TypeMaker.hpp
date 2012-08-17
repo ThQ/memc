@@ -1,6 +1,7 @@
 #ifndef _MEM__CODEGEN__LLVM__TYPE_MAKER__HPP_
 #define _MEM__CODEGEN__LLVM__TYPE_MAKER__HPP_
 
+#ifndef NO_LLVM
 
 #include <llvm/CodeGen/AsmPrinter.h>
 #include <llvm/DerivedTypes.h>
@@ -121,4 +122,5 @@ class TypeMaker
 
 } } }
 
+#endif // NO_LLVM
 #endif

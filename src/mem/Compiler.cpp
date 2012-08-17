@@ -129,6 +129,7 @@ Compiler::emitCode ()
 {
    if (_opts->hasArguments())
    {
+#ifndef NO_LLVM
       std::string llvm_ir_path = "./mem.bc";
       std::string bin_path = "./mem.out";
 
@@ -171,6 +172,7 @@ Compiler::emitCode ()
          _logger->fatalError("Couldn't generate binary as %s",
             bin_path.c_str());
       }
+#endif // NO_LLVM
    }
 }
 

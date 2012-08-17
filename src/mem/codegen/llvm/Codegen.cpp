@@ -101,7 +101,7 @@ Codegen::_createGepInst(llvm::Value* base, std::vector<llvm::Value*> idx)
 {
    DEBUG_REQUIRE (base != NULL);
 
-#if 0
+#if 1
    llvm::Type* base_ty = base->getType();
    std::string base_ty_name;
    if (base_ty != NULL)
@@ -566,15 +566,18 @@ Codegen::cgDotExpr (ast::node::Dot* node)
    }
    std::vector<llvm::Value*> idx;
 
+   int indirection_level = 0;
    if (node->LeftNode()->ExprType()->isPointerType())
    {
-      st::PointerType* ptr_ty =st::castToPointerType(node->LeftNode()->ExprType());
-      for (int i = 0; i < ptr_ty->IndirectionLevel(); ++i)
-      {
-         left_node = new llvm::LoadInst(left_node, "", _cur_bb);
-         idx.push_back(_createInt32Constant(0));
-         assert(left_node != NULL);
-      }
+      st::PointerType* ptr_ty = st::castToPointerType(node->LeftNode()->ExprType());
+      indirection_level = ptr_ty->IndirectionLevel();
+   }
+
+   for (int i = 0; i <= indirection_level; ++i)
+   {
+      left_node = new llvm::LoadInst(left_node, "", _cur_bb);
+      idx.push_back(_createInt32Constant(0));
+      assert(left_node != NULL);
    }
 
    // Compute the field index in the whole type hierarchy
