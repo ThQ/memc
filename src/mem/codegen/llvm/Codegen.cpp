@@ -219,10 +219,17 @@ Codegen::_mustBeLoaded (ast::node::Node* node)
          return true;
       }
    }
-   else if (node->hasExprType())
+
+   if (node->hasExprType())
    {
       //return true;
    }
+
+   if (node->isKind(ast::node::Kind::BRACKET_OP))
+   {
+      return true;
+   }
+
    /*
    switch (node->Kind())
    {
@@ -1033,7 +1040,7 @@ Codegen::cgNewExpr (ast::node::New* node)
    // ------------------
    if (obj_ty->isClassType())
    {
-      initializeClassInstance(st::castToClassType(obj_ty), ret);
+      initializeValue(st::castToClassType(obj_ty), ret);
    }
    else if (obj_ty->isArrayType())
    {
@@ -1161,7 +1168,7 @@ Codegen::cgVarDeclStatement (ast::node::VarDecl* node)
       st::Class* cls_ty = st::castToClassType(obj_ty);
       if (cls_ty->DefaultCtor() != NULL)
       {
-         initializeClassInstance(cls_ty, var);
+         initializeValue(cls_ty, var);
       }
    }
    // Array static allocation
@@ -1392,41 +1399,30 @@ Codegen::getLlvmByteCode ()
 }
 
 void
-Codegen::initializeClassInstance (st::Class* cls_ty, llvm::Value* val)
+Codegen::initializeValue (st::Type* ty, llvm::Value* val)
 {
-   // 0 initialize
-   llvm::Constant* init = llvm::ConstantAggregateZero::get(_type_maker.get(cls_ty));
-   llvm::StoreInst* inst = new llvm::StoreInst(init, val, "", _cur_bb);
-
-   /*
-   // Initialize the virtual functions
-   std::vector<llvm::Constant*> vals;
-   st::FieldVector fields = cls_ty->getAllFields();
-   st::Field* field = NULL;
-   llvm::Constant* cnst = NULL;
-   llvm::GetElementPtrInst* gep = NULL;
-   std::vector<llvm::Value*> gep_idx;
-   for (size_t i = 0; i < fields.size(); ++i)
+   if (ty->isClassType())
    {
-      field = fields[i];
-      assert(field != NULL && field->isFieldSymbol());
-      if (field->VirtualFunction() != NULL)
+      st::Class* cls_ty = st::castToClassType(ty);
+
+      // 0 initialize
+      llvm::Constant* init = llvm::ConstantAggregateZero::get(_type_maker.get(cls_ty));
+      new llvm::StoreInst(init, val, "", _cur_bb);
+
+      // Call constructor
+      if (cls_ty->DefaultCtor() != NULL)
       {
-         DEBUG_PRINT("VFN\n");
-         cnst = _functions[field->VirtualFunction()->Name()];
-         gep_idx.clear();
-         gep_idx.push_back(_createInt32Constant(0));
-         gep_idx.push_back(_createInt32Constant(field->FieldIndex()));
-         gep = llvm::GetElementPtrInst::Create(val, gep_idx);
-         new llvm::StoreInst(gep, cnst, "", _cur_bb);
+         llvm::CallInst::Create(
+            _functions[cls_ty->DefaultCtor()->gQualifiedName()],
+            val, "", _cur_bb);
       }
    }
-   */
-   if (cls_ty->DefaultCtor() != NULL)
+   else if (ty->isIntType())
    {
-      llvm::CallInst::Create(
-         _functions[cls_ty->DefaultCtor()->gQualifiedName()],
-         val, "", _cur_bb);
+      st::IntType* int_ty = st::castToIntType(ty);
+
+      llvm::Constant* init = llvm::ConstantInt::get(_type_maker.get(int_ty), 0, true);
+      new llvm::StoreInst(init, val, "", _cur_bb);
    }
 }
 
@@ -1434,8 +1430,9 @@ void
 Codegen::initializeArrayOfClassInstances (st::ArrayType* arr_ty, llvm::Value* arr, bool is_static)
 {
    DEBUG_REQUIRE (arr_ty != NULL);
+   DEBUG_REQUIRE (arr_ty->isArrayType());
    DEBUG_REQUIRE (arr_ty->ItemType() != NULL);
-   DEBUG_REQUIRE (arr_ty->ItemType()->isClassType());
+   DEBUG_REQUIRE (arr_ty->ItemType()->isAnyType());
    DEBUG_REQUIRE (arr != NULL);
 
    llvm::BasicBlock* cond_bb = _createBasicBlock("ctor.cond");
@@ -1470,7 +1467,7 @@ Codegen::initializeArrayOfClassInstances (st::ArrayType* arr_ty, llvm::Value* ar
    llvm::Value* item_val = llvm::GetElementPtrInst::Create(arr, gep_idx,
       "", body_bb);
    _cur_bb = body_bb;
-   initializeClassInstance(st::castToClassType(arr_ty->ItemType()), item_val);
+   initializeValue(arr_ty->ItemType(), item_val);
 
    llvm::BranchInst::Create(cond_bb, body_bb);
 

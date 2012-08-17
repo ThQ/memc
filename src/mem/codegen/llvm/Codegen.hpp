@@ -254,7 +254,7 @@ class Codegen : public mem::codegen::ICodegen
    initializeArrayOfClassInstances (st::ArrayType* cls_ty, llvm::Value* arr, bool is_static);
 
    void
-   initializeClassInstance (st::Class* cls_ty, llvm::Value* val);
+   initializeValue (st::Type* ty, llvm::Value* val);
 
    //--------------------------------------------------------------------------
    // FIELDS
