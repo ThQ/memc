@@ -2,7 +2,6 @@
 #define _MEM__ST__VAR__HPP
 
 
-#include <inttypes.h>
 #include "mem/st/Constant.hpp"
 #include "mem/st/Symbol.hpp"
 #include "mem/st/Type.hpp"

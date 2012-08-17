@@ -180,16 +180,10 @@ getSymbol (Symbol* scope, std::string sym_name)
 
    if (scope != NULL && sym_name.size() != 0)
    {
-      Symbol* origin_scope = scope;
-
       while (scope != NULL)
       {
-         //DEBUG_PRINTF("looking sym <%s> in <%s>\n", sym_name.c_str(), scope->Name().c_str());
          res = scope->getChild(sym_name);
-         if (res != NULL)
-         {
-            break;
-         }
+         if (res != NULL) break;
          scope = scope->Parent();
       }
       if (res != NULL && res->isAliasSymbol())

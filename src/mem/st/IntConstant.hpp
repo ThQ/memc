@@ -2,7 +2,7 @@
 #define _MEM__ST__INT_CONSTANT__HPP_
 
 
-#include <inttypes.h>
+#include "cxx.hpp"
 #include "mem/st/Constant.hpp"
 
 
@@ -21,7 +21,7 @@ class IntConstant : public Constant
    // Default constructor.
    IntConstant ();
 
-   int64_t
+   i64
    getSignedValue() {return _signed_value;}
 
    void
@@ -35,8 +35,8 @@ class IntConstant : public Constant
 
    protected:
    bool _is_signed;
-   int64_t _unsigned_value;
-   uint64_t _signed_value;
+   i64 _unsigned_value;
+   ui64 _signed_value;
    st::Type* _type;
 };
 
