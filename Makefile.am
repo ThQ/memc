@@ -157,6 +157,7 @@ src/mem/lang/TokenKind.hpp: src/mem/lang/Bison.hpp
 	$(PYTHON) utils/GenTokenKind.py src/mem/lang/Bison.hpp \
 		src/mem/lang/TokenKind.hpp
 
+windows-prebuild: $(BUILT_SOURCES)
 
 ###############################################################################
 # Programs
