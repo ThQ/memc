@@ -2,4 +2,8 @@
 
 namespace mem { namespace ast { namespace macro {
 
+Macro::~Macro()
+{
+}
+
 } } }

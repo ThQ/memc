@@ -31,8 +31,6 @@ ConsoleFormatter::format (Message* msg)
 
    this->format_message(res, msg);
 
-   bool has_details = msg->SecondaryText() != "" || msg->Position() != NULL;
-
    if (msg->SecondaryText() != "")
    {
       this->format_description(res, msg);

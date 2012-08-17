@@ -82,7 +82,7 @@ TopTypesChecker::visitEnum (st::Symbol* scope, node::Enum* n)
    if (n->ChildCount() > 0)
    {
       node::VarDecl* var_n = NULL;
-      for (int i = 0; i < n->ChildCount(); ++i)
+      for (size_t i = 0; i < n->ChildCount(); ++i)
       {
          var_n = static_cast<node::VarDecl*>(n->getChild(i));
          visitVarDecl(enum_ty, var_n);

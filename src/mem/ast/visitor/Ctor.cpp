@@ -12,8 +12,6 @@ Ctor::Ctor ()
 void
 Ctor::initializeField (st::Field* field, node::Block* ctor)
 {
-   st::Type* field_ty = field->Type();
-
    node::FinalId* self_n = new node::FinalId();
    self_n->sValue("self");
 
@@ -37,51 +35,6 @@ Ctor::initializeField (st::Field* field, node::Block* ctor)
 
       ctor->pushChild(var_n);
    }
-   /*
-   // ---------
-   //  Integer
-   // ---------
-   if (field_ty->isIntType())
-   {
-      st::IntConstant* ic = st::util::getNativeCharConstant(_symbols->System(), 0);
-      ic->setType(_symbols->_core_types._char);
-
-      node::Number* value_n = new node::Number();
-      value_n->setBoundSymbol(ic);
-      value_n->setExprType(_symbols->_core_types._char);
-
-      node::VarAssign* var_n = new node::VarAssign();
-      var_n->pushChildren(dot_name_n, value_n);
-
-      ctor->pushChild(var_n);
-   }
-   // ---------
-   //  Pointer
-   // ---------
-   else if (field_ty->isPointerType())
-   {
-      node::Node* field_val = NULL;
-
-      if (field->VirtualFunction() != NULL)
-      {
-         node::FinalId* vfn = new node::FinalId();
-         vfn->sValue(field->VirtualFunction()->Name());
-         field_val = vfn;
-      }
-      else
-      {
-         node::FinalId* nul = new node::FinalId();
-         nul->sValue("NULL");
-         field_val = nul;
-      }
-      assert (field_val != NULL);
-
-      node::VarAssign* var_n = new node::VarAssign();
-      var_n->pushChildren(dot_name_n, field_val);
-
-      ctor->pushChild(var_n);
-   }
-   */
 }
 
 bool

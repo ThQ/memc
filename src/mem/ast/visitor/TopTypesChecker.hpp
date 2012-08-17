@@ -53,10 +53,10 @@ class TopTypesChecker : public BlockTypesChecker
    virtual bool
    visit (node::Node* node);
 
-   virtual void
+   void
    visitClass (st::Symbol* scope, node::Class* clss);
 
-   virtual void
+   void
    visitEnum (st::Symbol* scope, node::Enum* node);
 
    /**
@@ -67,25 +67,25 @@ class TopTypesChecker : public BlockTypesChecker
     * @param scope A class symbol, the field's parent.
     * @param field The field node to check.
     */
-   virtual void
+   void
    visitField (st::Symbol* scope, node::Field* field);
 
    /**
     * Visit a function declaration (MEM_NODE_FUNCTION_DECLARATION)
     */
-   virtual void
+   void
    visitFuncDecl (st::Symbol* scope, node::Func* func_decl);
 
    /**
     * Visit parameters in function declaration.
     */
-   virtual void
+   void
    visitFuncParams (st::Symbol* scope, node::Node* params_node, st::Func* func);
 
    /**
     * Visit return type in function declaration.
     */
-   virtual void
+   void
    visitFuncReturnType (node::Func* func_node, st::Func* func_sym);
 };
 

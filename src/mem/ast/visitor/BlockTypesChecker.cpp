@@ -345,10 +345,10 @@ BlockTypesChecker::visitCastOperator (st::Symbol* scope, node::CastOp* n)
 
    if (ensureSizedExprType(n))
    {
+      /*
       st::Type* src_ty = n->ValueNode()->ExprType();
       st::Type* dest_ty = st::castToType(n->TypeNode()->BoundSymbol());
 
-      /*
       bool can_cast = false;
 
       // TODO We should be able to cast from a class type to another

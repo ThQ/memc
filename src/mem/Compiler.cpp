@@ -129,7 +129,7 @@ Compiler::emitCode ()
 {
    if (_opts->hasArguments())
    {
-#ifndef HAS_LLVM
+#ifdef HAS_LLVM
       std::string llvm_ir_path = "./mem.bc";
       std::string bin_path = "./mem.out";
 

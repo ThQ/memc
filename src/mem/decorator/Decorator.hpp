@@ -18,8 +18,11 @@ class Decorator
 
    public:
 
+   virtual
+   ~Decorator () {}
+
    virtual bool
-   decorate (ast::node::Node* node) {DEBUG_PRINT("decorator.decorate\n");return false;}
+   decorate (ast::node::Node* node) {return false;}
 
    protected:
 

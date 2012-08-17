@@ -1,3 +1,4 @@
+#ifdef HAS_LLVM
 #include "mem/codegen/llvm/Codegen.hpp"
 
 
@@ -1478,3 +1479,5 @@ Codegen::initializeArrayOfClassInstances (st::ArrayType* arr_ty, llvm::Value* ar
 }
 
 } } }
+
+#endif // HAS_LLVM

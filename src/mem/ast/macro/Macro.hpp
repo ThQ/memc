@@ -15,6 +15,9 @@ class Macro
 {
    public:
 
+   virtual
+   ~Macro ();
+
    virtual st::Macro*
    getSymbol () {return NULL;}
 
