@@ -109,4 +109,10 @@ FunctionType::_computeName ()
    _name += _return_type->gQualifiedName();
 }
 
+FunctionType*
+castToFunctionType (Symbol* s)
+{
+   assert (s->isFunctionType());
+   return static_cast<FunctionType*>(s);
+}
 } }

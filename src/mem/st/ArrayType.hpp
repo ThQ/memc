@@ -71,6 +71,9 @@ class ArrayType : public Type
    int _array_length;
 };
 
+ArrayType*
+castToArrayType (Symbol* s);
+
 } }
 
 

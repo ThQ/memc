@@ -43,6 +43,9 @@ class Dot: public Node
    isValid (NodeValidator* v);
 };
 
+Dot*
+castToDot (Node* s);
+
 } } }
 
 #endif

@@ -17,5 +17,11 @@ Array::isValid (NodeValidator* v)
    // FIXME Validate something here
 }
 
+Array*
+castToArray (Node* n)
+{
+   assert (n->isKind(Kind::ARRAY));
+   return static_cast<Array*>(n);
+}
 
 } } }

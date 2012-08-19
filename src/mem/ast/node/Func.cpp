@@ -93,5 +93,10 @@ Func::isVirtual ()
    return BodyNode() == NULL;
 }
 
-
+Func*
+castToFunc (Node* n)
+{
+   assert (n->isFuncNode());
+   return static_cast<Func*>(n);
+}
 } } }

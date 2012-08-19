@@ -58,6 +58,9 @@ class Func: public Text
    Func* _next_function;
 };
 
+Func*
+castToFunc (Node* n);
+
 
 } } }
 

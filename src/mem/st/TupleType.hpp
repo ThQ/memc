@@ -68,6 +68,9 @@ class TupleType : public Type
    TypeVector _subtypes;
 };
 
+TupleType*
+castToTupleType (Symbol* s);
+
 } }
 
 

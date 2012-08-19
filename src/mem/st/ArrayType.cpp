@@ -49,4 +49,10 @@ ArrayType::_computeByteSize ()
    }
 }
 
+ArrayType*
+castToArrayType (Symbol* s)
+{
+   assert (s->isArrayType());
+   return static_cast<ArrayType*>(s);
+}
 } }

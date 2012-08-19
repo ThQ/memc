@@ -251,11 +251,11 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
             {
                log::Message* err = new log::Error();
                err->formatMessage("Return type was defined as %s (not %s)",
-                  static_cast<st::Func*>(shadowed_sym)->ReturnType()->gQualifiedNameCstr(),
+                  st::castToFunc(shadowed_sym)->ReturnType()->gQualifiedNameCstr(),
                   func_sym->ReturnType()->gQualifiedNameCstr());
                err->formatDescription("Overriding function `%s' is redefining the return type of function `%s'",
                   func_sym->gQualifiedNameCstr(),
-                  static_cast<st::Func*>(shadowed_sym)->gQualifiedNameCstr());
+                  st::castToFunc(shadowed_sym)->gQualifiedNameCstr());
                log(err);
             }
          }

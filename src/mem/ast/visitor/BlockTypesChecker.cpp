@@ -73,7 +73,7 @@ BlockTypesChecker::visit (node::Node* node)
 {
    if (node->isFuncNode())
    {
-      node::Func* func = static_cast<node::Func*>(node);
+      node::Func* func = node::castToFunc(node);
 
       if (func->BodyNode() != NULL)
       {
@@ -277,7 +277,7 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 
       if (value_ty->isArrayType())
       {
-         st::ArrayType* arr = static_cast<st::ArrayType*>(value_ty);
+         st::ArrayType* arr = st::castToArrayType(value_ty);
          n->setExprType(arr->ItemType());
       }
       else if (value_ty->isTupleType())
@@ -287,29 +287,15 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
             && index_n->hasBoundSymbol()
             && index_n->BoundSymbol()->isIntConstant())
          {
-            node::Number* index_nb_n = static_cast<node::Number*>(index_n);
+            node::Number* index_nb_n = node::castToNumber(index_n);
             st::IntConstant* i_const = st::castToIntConstant(index_nb_n->BoundSymbol());
 
             // FIXME This may break, it returns an int64_t
             int item_index = (int)i_const->getSignedValue();
             // FIXME No bound checking...
-            n->setExprType(static_cast<st::TupleType*>(value_ty)->Subtypes()[item_index]);
+            n->setExprType(st::castToTupleType(value_ty)->Subtypes()[item_index]);
          }
       }
-      /*
-      else if (value_ty->isPointerType())
-      {
-         st::Type* ptr_parent = static_cast<st::PointerType*>(value_ty)->PointedType();
-         if (ptr_parent->isArrayType())
-         {
-            n->setExprType(static_cast<st::ArrayType*>(ptr_parent)->ItemType());
-         }
-         else
-         {
-            n->setExprType(ptr_parent);
-         }
-      }
-      */
       else
       {
          log::Error* err = new log::Error();
@@ -470,7 +456,7 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
    if (base_object->isDotNode())
    {
       call_node->setIsInstanceCall(true);
-      node::Dot* dot_n = static_cast<node::Dot*>(base_object);
+      node::Dot* dot_n = node::castToDot(base_object);
 
       node::Node* obj_n = dot_n->LeftNode()->copy();
       call_node->insertParam(obj_n);
@@ -801,7 +787,7 @@ BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* call_n)
    // FIXME Spaghetti
    if (call_n->IsInstanceCall())
    {
-      st::Class* cls = static_cast<st::Class*>(base_func->Parent());
+      st::Class* cls = st::castToClassType(base_func->Parent());
       st::FunctionVector funcs = cls->getFunctionsLike(base_func->Name(), base_func->Type());
       st::Func* new_func = chooseOverridenFunction (funcs, call_n->ParamsNode()->packChildrenExprTypes());
       call_n->CallerNode()->setBoundSymbol(new_func);
@@ -820,7 +806,7 @@ BlockTypesChecker::visitFunctorCall (st::Symbol* scope, node::Call* call_n)
 {
    node::Node* base_object = call_n->CallerNode();
    st::PointerType* ptr_ty = st::castToPointerType(base_object->ExprType());
-   st::FunctionType* func_ty = static_cast<st::FunctionType*>(ptr_ty->getNonPointerParent());
+   st::FunctionType* func_ty = st::castToFunctionType(ptr_ty->getNonPointerParent());
    call_n->setExprType(func_ty->ReturnType());
 
    if (call_n->hasParamsNode())
@@ -909,7 +895,7 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
 
    if (ty_node->BoundSymbol()->isArrayType())
    {
-      st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(static_cast<st::ArrayType*>(ty_node->BoundSymbol()));
+      st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(st::castToArrayType(ty_node->BoundSymbol()));
       st::Type* ptr_ty = st::util::getPointerType(unsized_arr_ty);
       new_node->setExprType(ptr_ty);
    }

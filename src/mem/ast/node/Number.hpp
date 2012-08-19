@@ -32,6 +32,8 @@ class Number : public Node
    isValid (NodeValidator* vld);
 };
 
+Number*
+castToNumber (Node* n);
 
 } } }
 

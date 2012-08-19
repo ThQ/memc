@@ -90,6 +90,8 @@ class FunctionType: public Type
    PointerType* _functor_type;
 };
 
+FunctionType*
+castToFunctionType (Symbol* s);
 
 } }
 

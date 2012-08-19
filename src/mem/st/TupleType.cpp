@@ -77,4 +77,11 @@ TupleType::_recomputeName ()
    _name = name;
 }
 
+TupleType*
+castToTupleType (Symbol* s)
+{
+   assert (s->is(st::TUPLE_TYPE));
+   return static_cast<TupleType*>(s);
+}
+
 } }

@@ -39,6 +39,9 @@ class Array: public Node
    isValid (NodeValidator* v);
 };
 
+static Array*
+castToArray (Node* n);
+
 } } }
 
 #endif

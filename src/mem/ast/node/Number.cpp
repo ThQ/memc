@@ -26,4 +26,10 @@ Number::isValid (NodeValidator* v)
    v->ensure(hasBoundSymbol(), "Number must be bounded (to constant symbol)");
 }
 
+Number*
+castToNumber (Node* n)
+{
+   assert (n->isKind(Kind::NUMBER));
+   return static_cast<Number*>(n);
+}
 } } }

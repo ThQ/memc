@@ -17,4 +17,10 @@ Dot::isValid (NodeValidator* v)
    // FIXME Validate the number of children (2) of their types
 }
 
+Dot*
+castToDot (Node* n)
+{
+   assert (n->isDotNode());
+   return static_cast<Dot*>(n);
+}
 } } }
