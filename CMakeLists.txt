@@ -30,7 +30,7 @@ else()
 	STRING(REPLACE "\n" " " LLVM_LIBS "${LLVM_LIBS}")
 	STRING(REPLACE "\r" " " LLVM_LIBS "${LLVM_LIBS}")
 	STRING(REGEX REPLACE " $" "" LLVM_LIBS "${LLVM_LIBS}")
-	set(CMAKE_CXX_FLAGS ${LLVM_CPP_FLAGS})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CPP_FLAGS}")
 	#set(CMAKE_EXE_LINKER_FLAGS "-lpthread -lffi -ldl ${CMAKE_EXE_LINKER_FLAGS}")
 	INCLUDE(CheckLibraryExists)
 	find_library(LIB_DL NAMES dl dld)
@@ -215,6 +215,9 @@ set(memc_SOURCES
 	${memc_SRC}/mem/st/visitor/Visitor.cpp
 	${memc_SRC}/mem/tool/CommandChain.cpp
 	${memc_SRC}/mem/tool/Toolbox.cpp)
+
+# Build configurations
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -UNDEBUG")
 
 # Configuration file
 
