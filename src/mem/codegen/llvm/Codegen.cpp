@@ -1,6 +1,6 @@
-#ifdef HAS_LLVM
 #include "mem/codegen/llvm/Codegen.hpp"
 
+#ifdef HAVE_LLVM
 
 namespace mem { namespace codegen { namespace llvm_ {
 
@@ -268,7 +268,7 @@ Codegen::gen (ast::node::Node* root)
    _type_maker.setStack(&_stack);
    _type_maker.setSymbolTable(_st);
 
-   st::PointerType* void_ptr = st::util::getPointerType(_st->_core_types._void);
+   st::PointerType* void_ptr = st::util::getPointerType(_st->_core_types.VoidTy());
    _type_maker.bind(void_ptr, _type_maker.makeVoidPointerType());
    _stack.push();
    _stack.set(_st->_core_types._null, llvm::ConstantPointerNull::get(_type_maker.makeVoidPointerType()));
@@ -363,7 +363,7 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    // -------
    //  INDEX
    // -------
-   llvm::Value* index = cgExprAndLoad(n->IndexNode(), _st->gCoreTypes()._int);
+   llvm::Value* index = cgExprAndLoad(n->IndexNode(), _st->gCoreTypes().IntTy());
    assert (index != NULL);
 
    // If this is a pointer we have to dereference as much as
@@ -873,7 +873,7 @@ Codegen::cgFunctionBody (ast::node::Func* func_node)
       cgBlock(func_node->BodyNode());
       _stack.pop();
 
-      if (func_sym->ReturnType() == _st->_core_types.gVoidTy())
+      if (func_sym->ReturnType() == _st->_core_types.VoidTy())
       {
          llvm::ReturnInst* t = llvm::ReturnInst::Create(_module->getContext(),
             NULL, _cur_bb);
@@ -1017,14 +1017,14 @@ Codegen::cgNewExpr (ast::node::New* node)
    {
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(obj_ty);
       int type_byte_size = st::castToType(type_node->getChild(0)->BoundSymbol())->ByteSize();
-      llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1), _st->_core_types._int);
+      llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1), _st->_core_types.IntTy());
       llvm::Value* obj_size = _createInt32Constant(type_byte_size);
       byte_size = llvm::BinaryOperator::Create(llvm::Instruction::Mul, num_obj, obj_size, "", _cur_bb);
    }
    else
    {
       int type_byte_size = st::castToType(obj_ty)->ByteSize();
-      byte_size = llvm::ConstantInt::get(_type_maker.get(_st->_core_types._int), type_byte_size);
+      byte_size = llvm::ConstantInt::get(_type_maker.get(_st->_core_types.IntTy()), type_byte_size);
    }
 
    // -------------
@@ -1444,10 +1444,10 @@ Codegen::initializeArrayOfClassInstances (st::ArrayType* arr_ty, llvm::Value* ar
    llvm::BasicBlock* after_bb = _createBasicBlock("ctor.after");
 
    llvm::AllocaInst* counter_var = new llvm::AllocaInst(
-      _type_maker.get(_st->_core_types._int), 0, "ctor.i", _cur_bb);
+      _type_maker.get(_st->_core_types.IntTy()), 0, "ctor.i", _cur_bb);
    new llvm::StoreInst(_createInt32Constant(0), counter_var, false, _cur_bb);
    llvm::AllocaInst* counter_max = new llvm::AllocaInst(
-      _type_maker.get(_st->_core_types._int), 0, "ctor.i_max", _cur_bb);
+      _type_maker.get(_st->_core_types.IntTy()), 0, "ctor.i_max", _cur_bb);
    new llvm::StoreInst(_createInt32Constant(arr_ty->ArrayLength()), counter_max, false, _cur_bb);
 
    // --------
@@ -1486,4 +1486,4 @@ Codegen::tearDown ()
 
 } } }
 
-#endif // HAS_LLVM
+#endif // HAVE_LLVM

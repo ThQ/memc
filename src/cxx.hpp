@@ -29,7 +29,7 @@ typedef __int32 i32;
 typedef __int64 i64;
 
 #else
-#error "Cannot find fixed size integer types (" __FILE__ ")"
+#error "Cannot find fixed size integer types"
 #endif
 
 

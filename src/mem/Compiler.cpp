@@ -129,7 +129,7 @@ Compiler::emitCode ()
 {
    if (_opts->hasArguments())
    {
-#ifdef HAS_LLVM
+#ifdef HAVE_LLVM
       std::string llvm_ir_path = "./mem.bc";
       std::string bin_path = "./mem.out";
 
@@ -172,7 +172,7 @@ Compiler::emitCode ()
          _logger->fatalError("Couldn't generate binary as %s",
             bin_path.c_str());
       }
-#endif // NO_LLVM
+#endif // HAVE_LLVM
    }
 }
 
@@ -353,17 +353,19 @@ Compiler::run ()
 
    if (_opts->isSet("--version"))
    {
-#ifdef PACKAGE_NAME
       std::cout << PACKAGE_NAME " version " PACKAGE_VERSION;
-#else
-      std::cout << "? version ?";
-#endif
       std::cout << " (" __DATE__ " " __TIME__ ")";
       IF_DEBUG
       {
          std::cout << " [DEBUG]";
       }
-      std::cout << "\n";
+      std::cout << "\n\n";
+      std::cout << "       Build date: " << __DATE__ << "\n";
+      std::cout << "       Build time: " << __TIME__ << "\n";
+      std::cout << "         Compiler: " << COMPILER_NAME << "\n";
+      std::cout << "   Compiler flags: " << COMPILER_FLAGS << "\n";
+      std::cout << "          Version: " << PACKAGE_VERSION << "\n";
+      std::cout << "             Yacc: " << YACC_EXE << "\n";
    }
    else if (_opts->isSet("--help"))
    {

@@ -1,6 +1,6 @@
-#ifdef HAS_LLVM
-
 #include "mem/codegen/llvm/TypeMaker.hpp"
+
+#ifdef HAVE_LLVM
 
 namespace mem { namespace codegen { namespace llvm_ {
 
@@ -297,4 +297,4 @@ TypeMaker::makeType (st::Type* mem_ty)
 
 } } }
 
-#endif // HAS_LLVM
+#endif // HAVE_LLVM

@@ -1,9 +1,10 @@
+import argparse
 import json
+import os
+import os.path
 import string
 import sys
 
-kIN = sys.argv[1] #"./src/mem/log/Errors.in"
-kOUT = sys.argv[2] #"./src/mem/log/errors.hpp"
 
 kINDENT = "   "
 kTYPES = ["Error", "Warning", "FatalError"]
@@ -14,6 +15,15 @@ converters = {
 }
 
 
+args_parser = argparse.ArgumentParser(description='Generate a C++ header files with error classes')
+args_parser.add_argument("--template", required=True)
+args_parser.add_argument("--output-hpp-file", required=True)
+args = args_parser.parse_args()
+
+kOUT_HPP_DIR = os.path.dirname(args.output_hpp_file)
+
+if not os.path.isdir(kOUT_HPP_DIR):
+    os.makedirs(kOUT_HPP_DIR)
 class ErrorTypeNotFoundError (Exception):
     pass
 
@@ -86,7 +96,7 @@ class Err:
         return "(\"" + buff + "\"" + params + ")"
 
 
-src = open(kIN)
+src = open(args.template)
 src_json = json.load(src)
 
 hpp = ""
@@ -96,7 +106,7 @@ hpp += "// " + ("-" * 76) + "\n"
 hpp += "// !!! DONT EDIT MANUALLY !!!\n"
 hpp += "// Generated\n"
 hpp += "//    by <" + __file__ + ">\n"
-hpp += "//    from <" + kIN + ">\n"
+hpp += "//    from <" + args.template + ">\n"
 hpp += "// " + ("-" * 76) + "\n"
 hpp += "\n\n"
 hpp += "#include \"mem/st/Symbol.hpp\"\n"
@@ -113,6 +123,7 @@ hpp += "\n\n} }\n"
 hpp += "\n\n#endif\n"
 
 
-fOut = open(kOUT, "w")
-fOut.write(hpp)
-fOut.close()
+fOut = open(args.output_hpp_file, "w")
+if fOut:
+    fOut.write(hpp)
+    fOut.close()

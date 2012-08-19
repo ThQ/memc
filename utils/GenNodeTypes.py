@@ -1,9 +1,25 @@
+import argparse
+import os
+import os.path
 import sys
 
 
-kIn = sys.argv[1]
-kOut = sys.argv[2]
-src = open(kIn)
+args_parser = argparse.ArgumentParser(description='Generate C++ header and source files describing AST node kinds')
+args_parser.add_argument("--template", required=True)
+args_parser.add_argument("--output-cpp-file", required=True)
+args_parser.add_argument("--output-hpp-file", required=True)
+args = args_parser.parse_args()
+
+kOUT_HPP_DIR = os.path.dirname(args.output_hpp_file)
+kOUT_CPP_DIR = os.path.dirname(args.output_cpp_file)
+
+if not os.path.isdir(kOUT_HPP_DIR):
+   os.makedirs(kOUT_HPP_DIR)
+
+if not os.path.isdir(kOUT_CPP_DIR):
+   os.makedirs(kOUT_CPP_DIR)
+
+src = open(args.template)
 
 if src:
    content = src.read()
@@ -22,7 +38,7 @@ if src:
    hpp += "} } }\n"
    hpp += "#endif\n"
 
-   cpp = "#include \"" + kOut + "\"\n"
+   cpp = "#include \"" + args.output_hpp_file + "\"\n"
    cpp += "namespace mem { namespace ast { namespace node {\n"
    cpp += "const char* kKIND_NAMES[] = {\n"
    cpp += "   \"UNKNOWN\",\n   \""
@@ -30,12 +46,12 @@ if src:
    cpp += "\"\n};\n"
    cpp += "} } }\n"
 
-   dest = open(kOut, "w")
+   dest = open(args.output_hpp_file, "w+")
    if dest:
       dest.write(hpp)
       dest.close()
 
-   dest = open(kOut.replace(".hpp", ".cpp"), "w")
+   dest = open(args.output_cpp_file, "w+")
    if dest:
       dest.write(cpp)
       dest.close()

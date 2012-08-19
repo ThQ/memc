@@ -1,7 +1,9 @@
 #ifndef _MEM__CODEGEN__LLVM__CODEGEN__HPP_
 #define _MEM__CODEGEN__LLVM__CODEGEN__HPP_
 
-#ifdef HAS_LLVM
+#include "config.h"
+
+#ifdef HAVE_LLVM
 
 #include <llvm/Support/ManagedStatic.h>
 #include <map>
@@ -279,5 +281,5 @@ class Codegen : public mem::codegen::ICodegen
 
 } } }
 
-#endif // NO_LLVM
+#endif // HAVE_LLVM
 #endif

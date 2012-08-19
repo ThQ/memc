@@ -983,7 +983,6 @@ literal :
             $$ = c_node;
             break;
          }
-
          case 's':
          {
             st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), (short)i);
@@ -995,7 +994,6 @@ literal :
             $$ = s_node;
             break;
          }
-
          case 'i':
          {
             st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), i);
@@ -1007,10 +1005,6 @@ literal :
             $$ = i_node;
             break;
          }
-
-         defaut:
-            printf("Strange number in source");
-            assert(false);
       }
 
       assert ($$ != NULL);
