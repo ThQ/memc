@@ -8,7 +8,7 @@ enable_language(CXX)
 
 include(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
 
-find_program(PYTHON python)
+find_package(PythonInterp)
 find_program(BISON bison)
 find_program(LLVM_CONFIG_EXE NAMES "llvm-config" "llvm-config-3.0")
 
@@ -47,7 +47,7 @@ add_custom_command(
 		${memc_BUILT}/mem/ast/node/Kind.hpp
 		${memc_BUILT}/mem/ast/node/Kind.cpp
 	COMMAND
-		${PYTHON} ${memc_UTILS}/GenNodeTypes.py
+		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenNodeTypes.py
 		--template="${memc_SRC}/mem/ast/node/Kind.kind-in"
 		--output-hpp-file="${memc_BUILT}/mem/ast/node/Kind.hpp"
 		--output-cpp-file="${memc_BUILT}/mem/ast/node/Kind.cpp"
@@ -62,7 +62,7 @@ add_custom_target(
 add_custom_command(
 	OUTPUT ${memc_BUILT}/mem/log/errors.hpp
 	COMMAND
-		${PYTHON} ${memc_UTILS}/GenErrorClasses.py
+		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenErrorClasses.py
 		--template="${memc_SRC}/mem/log/errors.errors-in"
 		--output-hpp-file="${memc_BUILT}/mem/log/errors.hpp"
 	DEPENDS
@@ -82,7 +82,7 @@ add_custom_command(
 		-d ${memc_SRC}/mem/lang/Bison.ypp
 		-o ${memc_BUILT}/mem/lang/Bison.cpp
 	COMMAND
-		${PYTHON} ${memc_UTILS}/GenTokenKind.py
+		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenTokenKind.py
 		${memc_BUILT}/mem/lang/Bison.hpp
 		${memc_BUILT}/mem/lang/TokenKind.hpp
 	DEPENDS
