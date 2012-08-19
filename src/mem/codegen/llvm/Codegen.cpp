@@ -574,7 +574,7 @@ Codegen::cgDotExpr (ast::node::Dot* node)
       indirection_level = ptr_ty->IndirectionLevel();
    }
 
-   for (int i = 0; i <= indirection_level; ++i)
+   for (int i = 0; i < indirection_level; ++i)
    {
       left_node = new llvm::LoadInst(left_node, "", _cur_bb);
       idx.push_back(_createInt32Constant(0));
@@ -739,22 +739,25 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    {
       val = cgExpr(node);
    }
-   bool must_load = _mustBeLoaded(node);
+   if (val != NULL)
+   {
+      bool must_load = _mustBeLoaded(node);
 
 
-   if (src_ty != dest_ty)
-   {
-      val = _castLlvmValue(val, src_ty, dest_ty);
-   }
-   if (src_ty->isPointerType() && dest_ty->isPointerType())
-   {
-      st::PointerType* src_ptr_ty = st::castToPointerType(src_ty);
-      st::PointerType* dest_ptr_ty = st::castToPointerType(dest_ty);
-   }
+      if (src_ty != dest_ty)
+      {
+         val = _castLlvmValue(val, src_ty, dest_ty);
+      }
+      if (src_ty->isPointerType() && dest_ty->isPointerType())
+      {
+         st::PointerType* src_ptr_ty = st::castToPointerType(src_ty);
+         st::PointerType* dest_ptr_ty = st::castToPointerType(dest_ty);
+      }
 
-   if (val != NULL && must_load)
-   {
-      val = new llvm::LoadInst(val, "", _cur_bb);
+      if (must_load)
+      {
+         val = new llvm::LoadInst(val, "", _cur_bb);
+      }
    }
 
    return val;
