@@ -226,6 +226,6 @@ configure_file(${memc_SRC}/config.h.in ${memc_BUILT}/config.h)
 
 add_executable(memc ${memc_SOURCES})
 include_directories(${memc_SRC} ${memc_BUILT})
-# The order is important : dl must come after ffi
-target_link_libraries(memc ${CMAKE_DL_LIBS} pthread ffi dl m ${LLVM_LIBS})
+# The order is important : dl must come at the end
+target_link_libraries(memc ${CMAKE_DL_LIBS} pthread ffi m ${LLVM_LIBS} dl)
 
