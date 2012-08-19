@@ -3,8 +3,6 @@
 /src/mem/lang/Bison.h
 build/
 libs/*
-src/config.h
-src/config.h.in
 src/stamp-h1
 src/mem/lang/Bison.cpp
 src/mem/lang/Bison.hpp

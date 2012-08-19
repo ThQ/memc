@@ -1,0 +1,11 @@
+#ifndef _CONFIG__H_
+
+#define COMPILER_NAME "@CMAKE_CXX_COMPILER@"
+#define COMPILER_FLAGS "@CMAKE_CXX_FLAGS@"
+#cmakedefine HAVE_LLVM @HAVE_LLVM@
+#cmakedefine HAVE_STDINT_H @HAVE_STDINT_H@
+#define PACKAGE_NAME "@PROJECT_NAME@"
+#define PACKAGE_VERSION "@memc_VERSION@"
+#define YACC_EXE "@BISON@"
+
+#endif
