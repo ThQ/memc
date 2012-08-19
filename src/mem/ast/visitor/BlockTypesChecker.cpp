@@ -753,7 +753,7 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
          id_node->setBoundSymbol(sym);
       }
 
-      st::Type* expr_ty = expr_ty = st::util::getExprType(sym);
+      st::Type* expr_ty = st::util::getExprType(sym);
 
       if (expr_ty != NULL)
       {

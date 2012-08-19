@@ -147,12 +147,13 @@ src/mem/lang/Bison.hpp src/mem/lang/Bison.cpp: src/mem/lang/Bison.ypp
 # </fix>
 
 src/mem/log/errors.hpp:
-	$(PYTHON) utils/GenErrorClasses.py src/mem/log/errors.errors-in \
-		src/mem/log/errors.hpp
+	$(PYTHON) utils/GenErrorClasses.py --template=src/mem/log/errors.errors-in \
+		--output-hpp-file=src/mem/log/errors.hpp
 
 src/mem/ast/node/Kind.cpp :
-	$(PYTHON) utils/GenNodeTypes.py src/mem/ast/node/Kind.kind-in \
-		src/mem/ast/node/Kind.hpp
+	$(PYTHON) utils/GenNodeTypes.py --template=src/mem/ast/node/Kind.kind-in \
+		--output-hpp-file=src/mem/ast/node/Kind.hpp \
+		--output-cpp-file=src/mem/ast/node/Kind.cpp
 
 src/mem/lang/TokenKind.hpp: src/mem/lang/Bison.hpp
 	$(PYTHON) utils/GenTokenKind.py src/mem/lang/Bison.hpp \

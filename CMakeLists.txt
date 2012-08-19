@@ -8,7 +8,7 @@ enable_language(CXX)
 
 include(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
 
-find_package(PythonInterp)
+find_package(PythonInterp REQUIRED)
 find_program(BISON bison)
 find_program(LLVM_CONFIG_EXE NAMES "llvm-config" "llvm-config-3.0")
 
@@ -26,14 +26,16 @@ else()
 	execute_process(COMMAND ${LLVM_CONFIG_EXE} --cppflags OUTPUT_VARIABLE LLVM_CPP_FLAGS)
 	STRING(REPLACE "\n" " " LLVM_CPP_FLAGS "${LLVM_CPP_FLAGS}")
 	STRING(REPLACE "\r" " " LLVM_CPP_FLAGS "${LLVM_CPP_FLAGS}")
-	#execute_process(COMMAND ${LLVM_CONFIG_EXE} --ldflags OUTPUT_VARIABLE LLVM_LD_FLAGS)
-	execute_process(COMMAND ${LLVM_CONFIG_EXE} --ldflags --libs OUTPUT_VARIABLE LLVM_LIBS)
+	execute_process(COMMAND ${LLVM_CONFIG_EXE}  --libs native codegen OUTPUT_VARIABLE LLVM_LIBS)
 	STRING(REPLACE "\n" " " LLVM_LIBS "${LLVM_LIBS}")
 	STRING(REPLACE "\r" " " LLVM_LIBS "${LLVM_LIBS}")
 	STRING(REGEX REPLACE " $" "" LLVM_LIBS "${LLVM_LIBS}")
 	set(CMAKE_CXX_FLAGS ${LLVM_CPP_FLAGS})
+	#set(CMAKE_EXE_LINKER_FLAGS "-lpthread -lffi -ldl ${CMAKE_EXE_LINKER_FLAGS}")
 	INCLUDE(CheckLibraryExists)
+	find_library(LIB_DL NAMES dl dld)
 	CHECK_LIBRARY_EXISTS(dl dladdr "" HAVE_LIBDL)
+	CHECK_LIBRARY_EXISTS(dl dlopen "" HAVE_LIBDL)
 endif()
 
 CHECK_INCLUDE_FILE("stdint.h" HAVE_STDINT_H)
@@ -220,9 +222,10 @@ set(memc_VERSION_MAJOR 0)
 set(memc_VERSION_MINOR 0)
 set(memc_VERSION_PATCH 1)
 set(memc_VERSION "${memc_VERSION_MAJOR}.${memc_VERSION_MINOR}.${memc_VERSION_PATCH}")
-
 configure_file(${memc_SRC}/config.h.in ${memc_BUILT}/config.h)
 
-include_directories(${memc_SRC} ${memc_BUILT})
 add_executable(memc ${memc_SOURCES})
-target_link_libraries(memc dl ${LLVM_LIBS})
+include_directories(${memc_SRC} ${memc_BUILT})
+# The order is important : dl must come after ffi
+target_link_libraries(memc ${CMAKE_DL_LIBS} pthread ffi dl m ${LLVM_LIBS})
+
