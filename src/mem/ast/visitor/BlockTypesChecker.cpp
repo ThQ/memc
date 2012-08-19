@@ -513,7 +513,15 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
    node::Node* right_node = dot_node->RightNode();
 
    visitExpr(scope, left_node);
-   visitFinalId(left_node->ExprType(), static_cast<node::FinalId*>(right_node));
+   // Left node is a variable container an object
+   if (left_node->hasExprType())
+   {
+      visitFinalId(left_node->ExprType(), static_cast<node::Text*>(right_node));
+   }
+   else
+   {
+      visitFinalId(left_node->BoundSymbol(), static_cast<node::Text*>(right_node));
+   }
 
    assert(right_node->isIdNode());
 
@@ -657,7 +665,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::Kind::FINAL_ID:
-         visitFinalId(scope, util::castTo<node::FinalId*, node::Kind::FINAL_ID>(node));
+         visitFinalId(scope, static_cast<node::Text*>(node));
          break;
 
       case node::Kind::FOR:
@@ -721,7 +729,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 }
 
 void
-BlockTypesChecker::visitFinalId (st::Symbol* scope, node::FinalId* id_node)
+BlockTypesChecker::visitFinalId (st::Symbol* scope, node::Text* id_node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (id_node != NULL);

@@ -90,7 +90,7 @@ Node::getChild (unsigned int i) const
 }
 
 const char*
-Node::get_type_name (unsigned int type)
+Node::get_type_name (int type)
 {
     return kKIND_NAMES[type];
 }
@@ -307,5 +307,18 @@ Node::unlinkChildren ()
    _first_child = NULL;
 }
 
-
+void
+assertKind (Node* n, int k)
+{
+#ifndef NDEBUG
+   if (!n->isKind(k))
+   {
+      DEBUG_PRINTF("Node (@%x) is not a `%s' but a `%s'\n",
+         (int)n,
+         Node::get_type_name(k),
+         Node::get_type_name(n->Kind()));
+      assert (n->isKind(k));
+   }
+#endif
+}
 } } }

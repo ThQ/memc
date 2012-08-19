@@ -19,7 +19,7 @@ New::isValid (NodeValidator* v)
 
    if (ChildCount() == 1)
    {
-      v->ensure(getChild(0)->hasBoundSymbol(),
+      v->ensure(TypeNode()->hasBoundSymbol(),
          "New : first child must have a bound symbol");
    }
 }

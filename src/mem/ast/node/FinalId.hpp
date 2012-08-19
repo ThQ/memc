@@ -33,6 +33,8 @@ class FinalId : public Text
    isValid (NodeValidator* v);
 };
 
+FinalId*
+castToFinalId (Node* n);
 
 } } }
 

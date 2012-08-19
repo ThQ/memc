@@ -29,7 +29,7 @@ Number::isValid (NodeValidator* v)
 Number*
 castToNumber (Node* n)
 {
-   assert (n->isKind(Kind::NUMBER));
+   node::assertKind (n, Kind::NUMBER);
    return static_cast<Number*>(n);
 }
 } } }

@@ -14,7 +14,12 @@ Dot::isValid (NodeValidator* v)
 {
    Node::isValid(v);
 
-   // FIXME Validate the number of children (2) of their types
+   v->ensure(ChildCount() == 2, "Dot must have exactly 2 children");
+   if (ChildCount() == 2)
+   {
+      v->ensure(LeftNode()->isDotNode() || LeftNode()->isFinalIdNode(),
+         "Left node must be either a DOT node or an ID node");
+   }
 }
 
 Dot*

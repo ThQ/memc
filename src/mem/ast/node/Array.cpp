@@ -14,7 +14,11 @@ Array::isValid (NodeValidator* v)
 {
    Node::isValid(v);
 
-   // FIXME Validate something here
+   v->ensure(ChildCount() >= 1 && ChildCount() <= 2, "ARRAY node must have 1 or 2 children");
+   if (TypeNode() != NULL)
+   {
+      v->ensure(TypeNode()->hasBoundSymbol(), "ARRAY : type node must have a bound symbol");
+   }
 }
 
 Array*

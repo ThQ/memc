@@ -96,7 +96,9 @@ Func::isVirtual ()
 Func*
 castToFunc (Node* n)
 {
-   assert (n->isFuncNode());
+   assertKind (n, Kind::FUNCTION);
    return static_cast<Func*>(n);
 }
+
+
 } } }

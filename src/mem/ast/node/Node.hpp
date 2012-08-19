@@ -188,7 +188,7 @@ class Node
 
    // Returns the type of the node as a string.
    static const char*
-   get_type_name (unsigned int type);
+   get_type_name (int type);
 
    // Returns the Nth child.
    Node*
@@ -273,9 +273,11 @@ class Node
    fs::position::Range* _position;
    Node* _prev;
    mem::Metadata* _md;
-   unsigned int _type;
+   int _type;
 };
 
+void
+assertKind (Node* n, int k);
 
 } } }
 

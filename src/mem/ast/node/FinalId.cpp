@@ -32,5 +32,11 @@ FinalId::isValid (NodeValidator* v)
    v->ensure(hasBoundSymbol(), "FinalId must have a bound symbol");
 }
 
+FinalId*
+castToFinalId (Node* n)
+{
+   ast::node::assertKind (n, Kind::FINAL_ID);
+   return static_cast<FinalId*>(n);
+}
 
 } } }

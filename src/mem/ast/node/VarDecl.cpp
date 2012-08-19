@@ -22,6 +22,7 @@ VarDecl::isValid (NodeValidator* v)
    {
       // Check NAME node
       v->ensure(NameNode()->hasBoundSymbol(), "VarDecl : Name node must have a bound symbol");
+      v->ensure(NameNode()->isIdNode(), "VarDecl : Name node must be an ID");
    }
 
    if (TypeNode() != NULL)
@@ -29,6 +30,7 @@ VarDecl::isValid (NodeValidator* v)
       // Check TYPE node
       v->ensure(TypeNode()->hasExprType(), "VarDecl : Type node must have an expression type");
       v->ensure(TypeNode()->hasBoundSymbol(), "VarDecl : Type node must have a bound symbol");
+      v->ensure(TypeNode()->isFinalIdNode(), "VarDecl : Type node must be a FINAL ID");
    }
 }
 
