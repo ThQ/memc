@@ -43,6 +43,16 @@ CHECK_INCLUDE_FILE("stdint.h" HAVE_STDINT_H)
 #------------------------------------------------------------------------------
 # CUSTOM COMMANDS
 #------------------------------------------------------------------------------
+# Testing
+add_custom_target(
+	test
+	COMMAND
+		${PYTHON_EXECUTABLE}
+		${memc_UTILS}/RunTests.py
+		--memc-exe=${CMAKE_CURRENT_BINARY_DIR}/memc
+		--test-dir=${CMAKE_CURRENT_SOURCE_DIR}/tests
+		--report-dir=${CMAKE_CURRENT_BINARY_DIR}/test-reports)
+
 # Node kinds
 add_custom_command(
 	OUTPUT

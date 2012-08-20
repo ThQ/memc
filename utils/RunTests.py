@@ -1,15 +1,25 @@
+import argparse
 import os
 import os.path
 import subprocess
 import sys
 
-kCWD=os.getcwd()
-kTEST_DIR = kCWD + "/tests"
-kMEMC = sys.argv[1]
-kBIN = kCWD + "/build/memt"
-kMEM_SRC=os.getcwd() + "/build/test.mem"
-kREPORT_DIR = kCWD + "/build/test-reports"
+args_parser = argparse.ArgumentParser(description='Test a memc executable')
+args_parser.add_argument("--memc-exe", required=True)
+args_parser.add_argument("--test-dir", required=True)
+args_parser.add_argument("--report-dir", required=True)
+args = args_parser.parse_args()
 
+kCWD=os.getcwd()
+kTEST_DIR = args.test_dir
+kMEMC = args.memc_exe
+kREPORT_DIR = args.report_dir
+
+if not os.path.isdir(kREPORT_DIR):
+   os.makedirs(kREPORT_DIR)
+
+kBIN = os.path.join(kREPORT_DIR, "memt")
+kMEM_SRC = os.path.join(kREPORT_DIR, "test.mem")
 
 class TextOutsideOfSectionError (Exception):
    pass
@@ -67,24 +77,33 @@ class TestFile:
             f.write(self.sections["file"])
             f.close()
 
+class TestLogger:
+   def log (self, msg):
+      print msg,
+   def logln (self, msg):
+      print msg
+
 class TestRunner:
    def __init__ (self):
       self._failed_tests = []
       self._num_tests = 0
+      self._logger = TestLogger()
 
-   def print_section (self, name):
-      print "=" * 79
-      print " " + name
-      print "=" * 79
-      print ""
+   def log_section (self, name):
+      section = "=" * 79 + "\n"
+      section += " " + name + "\n"
+      section += "-" * 79
+      self._logger.logln(section)
 
    def print_summary (self):
+      percent_failed = int(round(1.0 * len(self._failed_tests)/self._num_tests*100, 0))
+      percent_passed = int(round(100-(1.0 * len(self._failed_tests)/self._num_tests)*100, 0))
       print ""
-      self.print_section("Summary")
-      print "", self._num_tests, "tests run"
-      print " * Failed:", len(self._failed_tests), "(" + str(1.0 * len(self._failed_tests)/self._num_tests*100) + "%)"
-      print " * Succeeded:", self._num_tests - len(self._failed_tests), "(" + str(100-(1.0 * len(self._failed_tests)/self._num_tests)*100) + "%)"
-      print ""
+      self.log_section("Summary")
+      summary = str(self._num_tests) + " tests run\n"
+      summary += " - Failed: " + str(len(self._failed_tests)) + " (" + str(percent_failed) + "%)\n"
+      summary += " - Passed: " + str(self._num_tests - len(self._failed_tests)) + " (" +  str(percent_passed) + "%)"
+      self._logger.logln(summary)
 
    def read_file (self, path):
       contents = ""
@@ -106,7 +125,10 @@ class TestRunner:
       return ret_code
 
    def run_all (self):
-      self.print_section("Running tests for `" + kMEMC + "'...")
+      self.log_section("Running tests for `" + kMEMC + "'...")
+      print("Test directory: " + kTEST_DIR)
+      print("Reports directory: " + kREPORT_DIR)
+      print("")
       self._num_tests = len(os.listdir(kTEST_DIR))
 
       i = 1
@@ -119,7 +141,7 @@ class TestRunner:
 
          line = ""
          line += "[" + str(int(1.0*i/self._num_tests*100)).rjust(3) + "%]"
-         line += " Running " + test.name + " "
+         line += " " + test.name + " "
 
          ret_code = test.run()
          if ret_code == 0:
