@@ -1,0 +1,55 @@
+#ifndef _MEM__AST__VISITOR__STATS__HPP_
+#define _MEM__AST__VISITOR__STATS__HPP_
+
+
+#include <map>
+#include <sstream>
+#include "mem/ast/visitor/Visitor.hpp"
+
+
+namespace mem { namespace ast { namespace visitor {
+
+
+// Generate statistics the AST
+class Stats : public Visitor
+{
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   Stats ();
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual bool
+   visit (node::Node* node);
+
+   virtual bool
+   tearDown ();
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   void
+   _incrementNodeKindUsage (int Kind);
+
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   std::map<int, int> _kind_usages;
+};
+
+
+} } }
+
+#endif
