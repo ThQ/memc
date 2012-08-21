@@ -165,6 +165,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/visitor/FindEntryPoint.cpp
 	${memc_SRC}/mem/ast/visitor/FindUse.cpp
 	${memc_SRC}/mem/ast/visitor/Prechecker.cpp
+	${memc_SRC}/mem/ast/visitor/Stats.cpp
 	${memc_SRC}/mem/ast/visitor/TopTypesChecker.cpp
 	${memc_SRC}/mem/ast/visitor/TypeChecker.cpp
 	${memc_SRC}/mem/ast/visitor/TypeMatch.cpp

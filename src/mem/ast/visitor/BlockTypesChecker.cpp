@@ -866,7 +866,6 @@ BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
    }
 
    DEBUG_ENSURE (if_node->ConditionNode()->hasExprType());
-   DEBUG_ENSURE (if_node->ConditionNode()->ExprType()->Name() == "bool");
 }
 
 void

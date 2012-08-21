@@ -20,6 +20,7 @@
 #include "mem/ast/visitor/FindEntryPoint.hpp"
 #include "mem/ast/visitor/FindUse.hpp"
 #include "mem/ast/visitor/Prechecker.hpp"
+#include "mem/ast/visitor/Stats.hpp"
 #include "mem/ast/visitor/TopTypesChecker.hpp"
 #include "mem/ast/visitor/TypeMatch.hpp"
 #include "mem/ast/visitor/UseAlias.hpp"

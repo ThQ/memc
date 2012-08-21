@@ -105,6 +105,11 @@ class Message
 };
 
 
+class Info : public Message
+{
+   public: Info () { _level = log::INFO; }
+};
+
 class Warning : public Message
 {
    public: Warning () { _level = log::WARNING; }

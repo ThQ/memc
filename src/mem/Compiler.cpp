@@ -31,6 +31,7 @@ Compiler::Compiler ()
    //addAstVisitor(new ast::visitor::TypeMatch());
    addAstVisitor(new ast::visitor::CheckValidity());
    addAstVisitor(new ast::visitor::FindEntryPoint());
+   addAstVisitor(new ast::visitor::Stats());
 
    st::util::setupBool(this->symbols, this->symbols.gCoreTypes());
    st::util::setupBugType(this->symbols, this->symbols.gCoreTypes());
