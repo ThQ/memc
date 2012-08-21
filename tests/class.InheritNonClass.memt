@@ -4,4 +4,4 @@ class BadClass < int
 
 main () -> int
  a :BadClass
- return 0 :int
+ return 0

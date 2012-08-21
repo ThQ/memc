@@ -8,6 +8,7 @@
 #define PASS (0);
 #include <stdio.h>
 #include <string.h>
+#include "langmem/Tokenizer.hpp"
 #include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryExpression.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
@@ -37,10 +38,9 @@
 #include "mem/fs/File.hpp"
 #include "mem/fs/FileManager.hpp"
 #include "mem/fs/position/Range.hpp"
-#include "mem/lang/Tokenizer.hpp"
 #include "mem/log/Logger.hpp"
 #include "mem/st/SymbolTable.hpp"
-#include "mem/Compiler.hpp"
+#include "memc/Compiler.hpp"
 #include "mem/number.hpp"
 
 using namespace mem;
@@ -74,16 +74,16 @@ using namespace mem;
    } \
    while (YYID (0))
 
-extern mem::lang::Tokenizer gTOKENIZER;
+extern langmem::Tokenizer gTOKENIZER;
 }
 
 %code {
 
-mem::lang::Tokenizer gTOKENIZER;
+langmem::Tokenizer gTOKENIZER;
 
 int yylex()
 {
-   mem::lang::Token t = gTOKENIZER.getNextToken();
+   langmem::Token t = gTOKENIZER.getNextToken();
 
    switch (t.Kind())
    {

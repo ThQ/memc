@@ -6,12 +6,12 @@
 copySubstring (s :[char]*, start :int, length :int) -> [char]*
    new_s := new [char, length + 1]
    i :int = 0
-   c :char = s[start]
+   c :char = @s[start]
    while i < length
-      new_s[i] = c
+      @new_s[i] = c
       i = i + 1
-      c = s[start + i]
-   new_s[length] = 0
+      c = @s[start + i]
+   @new_s[length] = 0
    return new_s
 
 // Copy the whole C string @s
@@ -34,12 +34,12 @@ from (val :long, base :int) -> [char]*
    i := 0 :int
 
    while val >= base
-      ret[i] = base_chars[val % base]
+      @ret[i] = @base_chars[val % base]
       val = val / base
       i = i + 1
 
-   ret[i] = base_chars[val % base]
-   ret[i + 1] = 0
+   @ret[i] = @base_chars[val % base]
+   @ret[i + 1] = 0
 
    reverseSubstring(ret, 0, i)
 
@@ -53,7 +53,7 @@ getLength (s :[char]*) -> int
    len :int = 0
    c :char = 1
    while c != 0
-      c = s[len]
+      c = @s[len]
       len = len + 1
    return len
 
@@ -63,7 +63,6 @@ getLength (s :[char]*) -> int
 // param(length) : How many chars to reverse
 // return : the original C string pointer
 reverseSubstring (s :[char]*, start :int, length :int) -> [char]*
-   str := s
    i :int = 0
    num :int = 0
    if (length % 2) == (0 :int)
@@ -73,9 +72,9 @@ reverseSubstring (s :[char]*, start :int, length :int) -> [char]*
 
    swap :char = 0
    while i < num
-      swap = str[i]
-      str[i] = str[start + length - i]
-      str[start + length - i] = swap
+      swap = @s[i]
+      @s[i] = @s[start + length - i]
+      @s[start + length - i] = swap
       i = i + 1
    return s
 

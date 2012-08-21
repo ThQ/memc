@@ -7,7 +7,6 @@
 #include <sstream>
 #include <stdio.h>
 #include <string>
-#include "mem/Metadata.hpp"
 #include "mem/ss.hpp"
 #include "mem/fs/position/Range.hpp"
 #include "mem/st/SymbolKind.hpp"
@@ -66,10 +65,6 @@ class Symbol
 
    // Kind
    GETTER(Kind, SymbolKind) {return _kind;}
-
-   // Metadata
-   GETTER(Metadata, ::mem::Metadata*) {return _md;}
-   SETTER(Metadata, ::mem::Metadata*) {_md = val;}
 
    // Name
    GETTER(Name, std::string) {return _name;}
@@ -236,9 +231,6 @@ class Symbol
 
    // The kind of the symbol.
    SymbolKind _kind;
-
-   // Any metadata about the symbol.
-   ::mem::Metadata* _md;
 
    // The name (id) of the symbol.
    //

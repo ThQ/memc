@@ -13,7 +13,6 @@ Symbol::Symbol ()
    _depth = 0;
    _is_invisible = false;
    _kind = UNKNOWN;
-   _md = NULL;
    _parent = NULL;
 }
 
@@ -24,7 +23,6 @@ Symbol::~Symbol ()
    {
       delete i->second;
    }
-   delete _md;
 }
 
 

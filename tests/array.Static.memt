@@ -1,5 +1,0 @@
-### file
-main ()
- arr :[int, 10]
- i :int = arr[0]
- arr[1] = 2

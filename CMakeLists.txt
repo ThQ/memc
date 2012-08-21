@@ -17,7 +17,7 @@ set(memc_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(memc_UTILS ${CMAKE_CURRENT_SOURCE_DIR}/utils)
 
 file(MAKE_DIRECTORY ${memc_BUILT})
-file(MAKE_DIRECTORY ${memc_BUILT}/mem/lang)
+file(MAKE_DIRECTORY ${memc_BUILT}/langmem)
 
 if(${LLVM_CONFIG_EXE} STREQUAL "LLVM_CONFIG_EXE-NOTFOUND")
 	message(WARNING "llvm-config executable not found, compiling without native code generation")
@@ -87,24 +87,24 @@ add_custom_target(
 # Bison parser + Token kinds
 add_custom_command(
 	OUTPUT
-		${memc_BUILT}/mem/lang/Bison.hpp
-		${memc_BUILT}/mem/lang/Bison.cpp
+		${memc_BUILT}/langmem/Bison.hpp
+		${memc_BUILT}/langmem/Bison.cpp
 	COMMAND
 		${BISON} -y
-		-d ${memc_SRC}/mem/lang/Bison.ypp
-		-o ${memc_BUILT}/mem/lang/Bison.cpp
+		-d ${memc_SRC}/langmem/Bison.ypp
+		-o ${memc_BUILT}/langmem/Bison.cpp
 	COMMAND
 		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenTokenKind.py
-		${memc_BUILT}/mem/lang/Bison.hpp
-		${memc_BUILT}/mem/lang/TokenKind.hpp
+		${memc_BUILT}/langmem/Bison.hpp
+		${memc_BUILT}/langmem/TokenKind.hpp
 	DEPENDS
 		${BISON}
-		${memc_SRC}/mem/lang/Bison.ypp)
+		${memc_SRC}/langmem/Bison.ypp)
 add_custom_target(
 	bison-parser ALL
 	DEPENDS
-		${memc_BUILT}/mem/lang/Bison.hpp
-		${memc_BUILT}/mem/lang/Bison.cpp)
+		${memc_BUILT}/langmem/Bison.hpp
+		${memc_BUILT}/langmem/Bison.cpp)
 
 
 #------------------------------------------------------------------------------
@@ -114,9 +114,6 @@ add_custom_target(
 project(memc CXX)
 
 set(memc_SOURCES
-	${CMAKE_CURRENT_SOURCE_DIR}/bin/mem-compile/main.cpp
-	${memc_SRC}/mem/Compiler.cpp
-	${memc_SRC}/mem/Metadata.cpp
 	${memc_SRC}/mem/number.cpp
 	${memc_SRC}/mem/Util.cpp
 	${memc_SRC}/mem/ast/util.cpp
@@ -186,16 +183,12 @@ set(memc_SOURCES
 	${memc_SRC}/mem/fs/position/Cursor.cpp
 	${memc_SRC}/mem/fs/position/Position.cpp
 	${memc_SRC}/mem/fs/position/Range.cpp
-	${memc_BUILT}/mem/lang/Bison.cpp
-	${memc_SRC}/mem/lang/Tokenizer.cpp
 	${memc_SRC}/mem/log/ConsoleFormatter.cpp
 	${memc_SRC}/mem/log/ConsoleLogger.cpp
 	${memc_SRC}/mem/log/Formatter.cpp
 	${memc_SRC}/mem/log/Logger.cpp
 	${memc_SRC}/mem/log/Message.cpp
 	${memc_SRC}/mem/log/XmlFormatter.cpp
-	${memc_SRC}/mem/opt/Option.cpp
-	${memc_SRC}/mem/opt/Options.cpp
 	${memc_SRC}/mem/st/Alias.cpp
 	${memc_SRC}/mem/st/Arg.cpp
 	${memc_SRC}/mem/st/ArrayType.cpp
@@ -224,8 +217,14 @@ set(memc_SOURCES
 	${memc_SRC}/mem/st/visitor/DepBuilder.cpp
 	${memc_SRC}/mem/st/visitor/XmlDumper.cpp
 	${memc_SRC}/mem/st/visitor/Visitor.cpp
-	${memc_SRC}/mem/tool/CommandChain.cpp
-	${memc_SRC}/mem/tool/Toolbox.cpp)
+	${memc_SRC}/memc/opt/Option.cpp
+	${memc_SRC}/memc/opt/Options.cpp
+	${memc_SRC}/memc/tool/CommandChain.cpp
+	${memc_SRC}/memc/tool/Toolbox.cpp
+	${memc_SRC}/memc/Compiler.cpp
+	${memc_SRC}/memc/main.cpp
+	${memc_BUILT}/langmem/Bison.cpp
+	${memc_SRC}/langmem/Tokenizer.cpp)
 
 # Build configurations
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -UNDEBUG")

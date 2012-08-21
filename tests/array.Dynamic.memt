@@ -1,5 +1,0 @@
-### file
-main ()
- arr := new [int, 10]
- arr[0] = 1
- i := arr[1]

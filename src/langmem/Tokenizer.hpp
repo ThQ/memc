@@ -8,15 +8,15 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "langmem/Token.hpp"
+#include "langmem/TokenKind.hpp"
 #include "mem/fs/File.hpp"
-#include "mem/lang/Token.hpp"
-#include "mem/lang/TokenKind.hpp"
 #include "mem/log/errors.hpp"
 #include "mem/log/Logger.hpp"
 #include "mem/ss.hpp"
 
 
-namespace mem { namespace lang {
+namespace langmem {
 
 
 class Tokenizer
@@ -33,13 +33,13 @@ class Tokenizer
    int _bufferSize;
    int _cur_line;
    int _cur_column;
-   fs::File* _fs_file;
+   mem::fs::File* _fs_file;
    std::string _indent_unit;
    int _indent_level;
    bool _eat_space;
    std::istream* _in;
-   fs::position::Range _location;
-   log::Logger* _logger;
+   mem::fs::position::Range _location;
+   mem::log::Logger* _logger;
    int _state;
    int _cur_tok;
    std::queue<Token> _token_queue;
@@ -50,11 +50,12 @@ class Tokenizer
    //--------------------------------------------------------------------------
    public:
 
-   SETTER(Logger, log::Logger*) { _logger = val;}
+   SETTER(Logger, mem::log::Logger*) { _logger = val;}
    SETTER(EatSpace, bool) {_eat_space = val;}
 
 
-   SETTER(FsFile, fs::File*) {_fs_file = val;}
+   SETTER(FsFile, mem::fs::File*) {_fs_file = val;}
+
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -66,6 +67,25 @@ class Tokenizer
 
    // Destructor
    ~Tokenizer ();
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   Token
+   getNextToken ();
+
+   bool
+   isFinished ();
+
+   void
+   reset ();
+
+   inline void
+   setInputFile (std::string fpath) { _in = new std::ifstream(fpath.c_str(), std::ifstream::in); };
+
 
    //--------------------------------------------------------------------------
    // PROTECTED FUNCTIONS
@@ -179,26 +199,9 @@ class Tokenizer
       _location.setLineEnd(_cur_line);
       _location.setColumnEnd(_cur_column);
    }
-
-   //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
-   //--------------------------------------------------------------------------
-   public:
-
-   Token
-   getNextToken ();
-
-   bool
-   isFinished ();
-
-   void
-   reset ();
-
-   inline void
-   setInputFile (std::string fpath) { _in = new std::ifstream(fpath.c_str(), std::ifstream::in); };
 };
 
 
-} }
+}
 
 #endif

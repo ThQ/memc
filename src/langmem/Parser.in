@@ -1,0 +1,6 @@
+function =
+	type_name T_FUCK
+	$
+
+type_name =
+  T_SUPER_ID | T_ID

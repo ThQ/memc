@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <vector>
-#include "mem/Metadata.hpp"
 #include "mem/ss.hpp"
 #include "mem/ast/node/Kind.hpp"
 #include "mem/ast/node/NodeValidator.hpp"
@@ -62,10 +61,6 @@ class Node
    GETTER(KindName, std::string) {return get_type_name(_type);}
    GETTER(KindNameCstr, const char*) {return get_type_name(_type);}
 
-   // Metadata
-   GETTER(Metadata, class mem::Metadata*) {return _md;}
-   SETTER(Metadata, class Metadata*) {_md = val;}
-
    // Parent
    GETTER(Parent, Node*) {return _parent;}
 
@@ -92,9 +87,6 @@ class Node
    // true if it has an expression type.
    inline bool
    hasExprType () const {return _exp_type != NULL;}
-
-   inline bool
-   hasMetadata() const {return _md != NULL;}
 
    void
    insertChild (Node* n);
@@ -272,7 +264,6 @@ class Node
    Node* _parent;
    fs::position::Range* _position;
    Node* _prev;
-   mem::Metadata* _md;
    int _type;
 };
 

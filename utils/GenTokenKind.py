@@ -6,8 +6,8 @@ kOUT = sys.argv[2]
 print(kIN)
 
 def make_out_header (kinds):
-   out ="#ifndef _MEM__LANG__TOKEN_KIND__HPP_\n"
-   out += "#define _MEM__LANG__TOKEN_KIND__HPP_\n\n"
+   out ="#ifndef _LANGMEM__TOKEN_KIND__HPP_\n"
+   out += "#define _LANGMEM__TOKEN_KIND__HPP_\n\n"
    out += "// " + ("-" * 76) + "\n"
    out += "// !!! DONT EDIT MANUALLY !!!\n"
    out += "// Generated\n"
@@ -15,7 +15,7 @@ def make_out_header (kinds):
    out += "//    from <" + kIN + ">\n"
    out += "// " + ("-" * 76) + "\n"
    out += "\n\n"
-   out += "namespace mem { namespace lang {\n\n"
+   out += "namespace langmem {\n\n"
    out += "typedef enum _TokenKind {\n"
    out += "   T_YACC_END=0,\n"
    out += "   T_YACC_ERROR=1,\n"
@@ -26,7 +26,7 @@ def make_out_header (kinds):
       out += "   " + kind[0] + "=" + kind[1] + ",\n"
 
    out += "} TokenKind;\n\n"
-   out += "} }\n\n"
+   out += "}\n\n"
    out += "#endif\n"
 
    return out

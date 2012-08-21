@@ -1,5 +1,0 @@
-### file
-main ()
- some_size := 10
- arr := new [char, 10]
- a_c :char = arr[0]

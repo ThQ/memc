@@ -1,7 +1,8 @@
-#include "mem/lang/Tokenizer.hpp"
+#include "langmem/Tokenizer.hpp"
 
 
-namespace mem { namespace lang {
+namespace langmem {
+
 
 Tokenizer::Tokenizer ()
 {
@@ -397,7 +398,7 @@ Tokenizer::_getIndentTokenKind (std::string indent)
    }
    else
    {
-      log::BadIndentation* err = new log::BadIndentation();
+      mem::log::BadIndentation* err = new mem::log::BadIndentation();
       err->sDefaultIndentation(_indent_unit);
       err->sIndentation(indent);
       err->format();
@@ -672,4 +673,5 @@ Tokenizer::_pushEndTokens ()
    _pushToken(T_YACC_END, "");
 }
 
-} }
+
+}
