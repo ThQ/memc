@@ -1,8 +1,8 @@
-#include "mem/codegen/llvm/TypeMaker.hpp"
+#include "codegen/llvm/TypeMaker.hpp"
 
 #ifdef HAVE_LLVM
 
-namespace mem { namespace codegen { namespace llvm_ {
+namespace codegen { namespace llvm_ {
 
 
 TypeMaker::TypeMaker ()
@@ -13,7 +13,7 @@ TypeMaker::TypeMaker ()
 }
 
 void
-TypeMaker::bind (st::Type* mem_ty, llvm::Type* llvm_ty)
+TypeMaker::bind (mem::st::Type* mem_ty, llvm::Type* llvm_ty)
 {
    if (mem_ty->isAnyPrimitiveType())
    {
@@ -42,7 +42,7 @@ TypeMaker::bind (st::Type* mem_ty, llvm::Type* llvm_ty)
 void
 TypeMaker::dump ()
 {
-   std::map<st::Type*, llvm::Type*>::iterator i;
+   std::map<mem::st::Type*, llvm::Type*>::iterator i;
    for (i = _type_bindings.begin() ; i != _type_bindings.end(); ++i)
    {
       printf("`%s'\n", (*i).first->gQualifiedNameCstr());
@@ -50,7 +50,7 @@ TypeMaker::dump ()
 }
 
 llvm::Type*
-TypeMaker::get (st::Type* mem_ty)
+TypeMaker::get (mem::st::Type* mem_ty)
 {
    assert (mem_ty != NULL);
    llvm::Type* ty = NULL;
@@ -80,7 +80,7 @@ TypeMaker::get (st::Type* mem_ty)
 }
 
 llvm::Type*
-TypeMaker::makeArrayType (st::ArrayType* t)
+TypeMaker::makeArrayType (mem::st::ArrayType* t)
 {
    DEBUG_REQUIRE (t != NULL);
 
@@ -103,7 +103,7 @@ TypeMaker::makeArrayType (st::ArrayType* t)
 }
 
 llvm::StructType*
-TypeMaker::makeClassType (st::Class* cls_sym)
+TypeMaker::makeClassType (mem::st::Class* cls_sym)
 {
    DEBUG_REQUIRE (cls_sym != NULL);
    DEBUG_REQUIRE (cls_sym->isClassType());
@@ -122,8 +122,8 @@ TypeMaker::makeClassType (st::Class* cls_sym)
    std::vector<llvm::Type*> fields;
    if (1)//cls_sym->_cur_field_index > 0)
    {
-      std::vector<st::Field*> f = cls_sym->getOrderedFields();
-      st::Field* field = NULL;
+      std::vector<mem::st::Field*> f = cls_sym->getOrderedFields();
+      mem::st::Field* field = NULL;
       for (size_t i=0; i < f.size(); ++i)
       {
          assert(f[i] != NULL);
@@ -139,20 +139,20 @@ TypeMaker::makeClassType (st::Class* cls_sym)
 }
 
 llvm::Constant*
-TypeMaker::makeConstant (st::Constant* c)
+TypeMaker::makeConstant (mem::st::Constant* c)
 {
    llvm::Constant* lconst = NULL;
 
    // FIXME This only works for signed integer values
    switch (c->Kind())
    {
-      case st::INT_CONSTANT:
+      case mem::st::INT_CONSTANT:
       {
-         st::IntConstant* ic = st::castToIntConstant(c);
+         mem::st::IntConstant* ic = mem::st::castToIntConstant(c);
          if (ic->IsSigned())
          {
             lconst = llvm::ConstantInt::get(get(c->Type()),
-               st::castToIntConstant(c)->getSignedValue(),
+               mem::st::castToIntConstant(c)->getSignedValue(),
                true); /* Signed */
          }
       }
@@ -166,12 +166,12 @@ TypeMaker::makeConstant (st::Constant* c)
 }
 
 llvm::Constant*
-TypeMaker::makeDefaultConstant (st::Type* t)
+TypeMaker::makeDefaultConstant (mem::st::Type* t)
 {
    llvm::Constant* cns = NULL;
    if (t->isIntType())
    {
-      st::IntType* int_ty = st::castToIntType(t);
+      mem::st::IntType* int_ty = mem::st::castToIntType(t);
       cns = llvm::ConstantInt::get(get(t), 0, true /* is signed */);
    }
    else if (t->isPointerType())
@@ -186,9 +186,9 @@ TypeMaker::makeDefaultConstant (st::Type* t)
 }
 
 llvm::Type*
-TypeMaker::makeEnumType (st::EnumType* t)
+TypeMaker::makeEnumType (mem::st::EnumType* t)
 {
-   st::SymbolMapIterator i;
+   mem::st::SymbolMapIterator i;
    for (i = t->Children().begin(); i != t->Children().end(); ++i)
    {
       llvm::GlobalVariable* v = new llvm::GlobalVariable(
@@ -196,7 +196,7 @@ TypeMaker::makeEnumType (st::EnumType* t)
          get(t->Type()),
          true, /* isConstant */
          llvm::GlobalValue::InternalLinkage,
-         makeConstant(st::castToVar(i->second)->ConstantValue()),
+         makeConstant(mem::st::castToVar(i->second)->ConstantValue()),
          i->second->gQualifiedName());
       _stack->setGlobal(i->second, v);
    }
@@ -204,7 +204,7 @@ TypeMaker::makeEnumType (st::EnumType* t)
 }
 
 llvm::FunctionType*
-TypeMaker::makeFunctionType (st::FunctionType* t)
+TypeMaker::makeFunctionType (mem::st::FunctionType* t)
 {
    std::vector<llvm::Type*> args;
    for (size_t i = 0; i < t->ArgumentCount(); ++i)
@@ -222,13 +222,13 @@ TypeMaker::makeIntType (size_t size)
 }
 
 llvm::PointerType*
-TypeMaker::makePointerType (st::PointerType* t)
+TypeMaker::makePointerType (mem::st::PointerType* t)
 {
    return llvm::PointerType::get(get(t->PointedType()), 0);
 }
 
 llvm::Type*
-TypeMaker::makePrimitiveType (st::PrimitiveType* t)
+TypeMaker::makePrimitiveType (mem::st::PrimitiveType* t)
 {
    if (_st->isVoidType(t))
    {
@@ -238,7 +238,7 @@ TypeMaker::makePrimitiveType (st::PrimitiveType* t)
 }
 
 llvm::StructType*
-TypeMaker::makeTupleType (st::TupleType* t)
+TypeMaker::makeTupleType (mem::st::TupleType* t)
 {
    DEBUG_REQUIRE (t != NULL);
    DEBUG_REQUIRE (_type_bindings.find(t) != _type_bindings.end());
@@ -255,35 +255,35 @@ TypeMaker::makeTupleType (st::TupleType* t)
 }
 
 llvm::Type*
-TypeMaker::makeType (st::Type* mem_ty)
+TypeMaker::makeType (mem::st::Type* mem_ty)
 {
    switch (mem_ty->Kind())
    {
-      case st::ARRAY:
-         return makeArrayType(static_cast<st::ArrayType*>(mem_ty));
+      case mem::st::ARRAY:
+         return makeArrayType(static_cast<mem::st::ArrayType*>(mem_ty));
 
-      case st::CLASS:
-         return makeClassType(st::castToClassType(mem_ty));
+      case mem::st::CLASS:
+         return makeClassType(mem::st::castToClassType(mem_ty));
 
-      case st::ENUM_TYPE:
-         return makeEnumType(static_cast<st::EnumType*>(mem_ty));
+      case mem::st::ENUM_TYPE:
+         return makeEnumType(static_cast<mem::st::EnumType*>(mem_ty));
 
-      case st::FUNCTION_TYPE:
-         return makeFunctionType(static_cast<st::FunctionType*>(mem_ty));
+      case mem::st::FUNCTION_TYPE:
+         return makeFunctionType(static_cast<mem::st::FunctionType*>(mem_ty));
 
-      case st::TUPLE_TYPE:
-         return makeTupleType(static_cast<st::TupleType*>(mem_ty));
+      case mem::st::TUPLE_TYPE:
+         return makeTupleType(static_cast<mem::st::TupleType*>(mem_ty));
 
-      case st::INT_TYPE:
+      case mem::st::INT_TYPE:
          return makeIntType(mem_ty->ByteSize());
 
-      case st::POINTER:
-         return makePointerType(st::castToPointerType(mem_ty));
+      case mem::st::POINTER:
+         return makePointerType(mem::st::castToPointerType(mem_ty));
 
-      case st::PRIMITIVE_TYPE:
-         return makePrimitiveType(static_cast<st::PrimitiveType*>(mem_ty));
+      case mem::st::PRIMITIVE_TYPE:
+         return makePrimitiveType(static_cast<mem::st::PrimitiveType*>(mem_ty));
 
-      case st::VOID_TYPE:
+      case mem::st::VOID_TYPE:
          return makeVoidType();
 
       default:
@@ -295,6 +295,6 @@ TypeMaker::makeType (st::Type* mem_ty)
    return NULL;
 }
 
-} } }
+} }
 
 #endif // HAVE_LLVM

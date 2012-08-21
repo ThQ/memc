@@ -16,7 +16,7 @@
 #include "mem/st/SymbolTable.hpp"
 
 
-namespace mem { namespace codegen {
+namespace codegen {
 
 
 class ICodegen
@@ -25,6 +25,6 @@ class ICodegen
 };
 
 
-} }
+}
 
 #endif

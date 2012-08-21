@@ -8,7 +8,7 @@
 #include <string>
 
 
-namespace mem { namespace codegen {
+namespace codegen {
 
 
 template <class K, class V>
@@ -65,7 +65,7 @@ class TStack
 };
 
 
-} }
+}
 
 
 #endif

@@ -17,7 +17,7 @@
 #include "llvm/Support/FormattedStream.h"
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
-#include "mem/codegen/TStack.hpp"
+#include "codegen/TStack.hpp"
 #include "mem/st/Class.hpp"
 #include "mem/st/EnumType.hpp"
 #include "mem/st/Field.hpp"
@@ -27,9 +27,9 @@
 #include "mem/st/Var.hpp"
 
 
-namespace mem { namespace codegen { namespace llvm_ {
+namespace codegen { namespace llvm_ {
 
-typedef TStack<st::Symbol*,llvm::Value*> LlvmStack;
+typedef TStack<mem::st::Symbol*,llvm::Value*> LlvmStack;
 
 // An helper class to codegen LLVM types
 class TypeMaker
@@ -48,7 +48,7 @@ class TypeMaker
    public:
 
    SETTER(Module, llvm::Module*) {_module = val;}
-   SETTER(SymbolTable, st::SymbolTable*) {_st = val;}
+   SETTER(SymbolTable, mem::st::SymbolTable*) {_st = val;}
    SETTER(Stack, LlvmStack*) {_stack = val;}
 
 
@@ -59,50 +59,50 @@ class TypeMaker
 
    // Bind an ST type with an LLVM type.
    void
-   bind (st::Type* mem_ty, llvm::Type* llvm_ty);
+   bind (mem::st::Type* mem_ty, llvm::Type* llvm_ty);
 
    void
    dump ();
 
    inline llvm::Type*
-   get (st::Symbol* type) {return get(static_cast<st::Type*>(type));}
+   get (mem::st::Symbol* type) {return get(static_cast<mem::st::Type*>(type));}
 
    llvm::Type*
-   get (st::Type* type);
+   get (mem::st::Type* type);
 
    llvm::Type*
-   makeArrayType (st::ArrayType* t);
+   makeArrayType (mem::st::ArrayType* t);
 
    llvm::StructType*
-   makeClassType (st::Class* cls_symb);
+   makeClassType (mem::st::Class* cls_symb);
 
    llvm::Constant*
-   makeConstant (st::Constant* c);
+   makeConstant (mem::st::Constant* c);
 
    llvm::Constant*
-   makeDefaultConstant (st::Type* c);
+   makeDefaultConstant (mem::st::Type* c);
 
    llvm::Type*
-   makeEnumType (st::EnumType* t);
+   makeEnumType (mem::st::EnumType* t);
 
    llvm::FunctionType*
-   makeFunctionType (st::FunctionType* t);
+   makeFunctionType (mem::st::FunctionType* t);
 
    // Returns the LLVM int type of a given length.
    llvm::Type*
    makeIntType (size_t size);
 
    llvm::PointerType*
-   makePointerType (st::PointerType* t);
+   makePointerType (mem::st::PointerType* t);
 
    llvm::Type*
-   makePrimitiveType (st::PrimitiveType* t);
+   makePrimitiveType (mem::st::PrimitiveType* t);
 
    llvm::StructType*
-   makeTupleType (st::TupleType* t);
+   makeTupleType (mem::st::TupleType* t);
 
    llvm::Type*
-   makeType (st::Type* ty);
+   makeType (mem::st::Type* ty);
 
    llvm::Type*
    makeVoidType () {return llvm::Type::getVoidTy(_module->getContext());}
@@ -117,12 +117,12 @@ class TypeMaker
    protected:
 
    llvm::Module* _module;
-   st::SymbolTable* _st;
-   std::map<st::Type*, llvm::Type*> _type_bindings;
+   mem::st::SymbolTable* _st;
+   std::map<mem::st::Type*, llvm::Type*> _type_bindings;
    LlvmStack* _stack;
 };
 
-} } }
+} }
 
 #endif // HAVE_LLVM
 #endif

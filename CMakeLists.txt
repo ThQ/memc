@@ -114,6 +114,8 @@ add_custom_target(
 project(memc CXX)
 
 set(memc_SOURCES
+	${memc_SRC}/codegen/llvm/Codegen.cpp
+	${memc_SRC}/codegen/llvm/TypeMaker.cpp
 	${memc_SRC}/mem/number.cpp
 	${memc_SRC}/mem/Util.cpp
 	${memc_SRC}/mem/ast/util.cpp
@@ -169,8 +171,6 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/visitor/UseAlias.cpp
 	${memc_SRC}/mem/ast/visitor/Visitor.cpp
 	${memc_SRC}/mem/ast/visitor/XmlDumper.cpp
-	${memc_SRC}/mem/codegen/llvm/Codegen.cpp
-	${memc_SRC}/mem/codegen/llvm/TypeMaker.cpp
 	${memc_SRC}/mem/decorator/External.cpp
 	${memc_SRC}/mem/decorator/Overriding.cpp
 	${memc_SRC}/mem/decorator/Require.cpp

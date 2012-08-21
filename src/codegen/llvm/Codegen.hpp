@@ -7,6 +7,9 @@
 
 #include <llvm/Support/ManagedStatic.h>
 #include <map>
+#include "codegen/llvm/TypeMaker.hpp"
+#include "codegen/ICodegen.hpp"
+#include "codegen/TStack.hpp"
 #include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/BracketOp.hpp"
@@ -22,12 +25,9 @@
 #include "mem/ast/node/Tuple.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/While.hpp"
-#include "mem/codegen/llvm/TypeMaker.hpp"
-#include "mem/codegen/ICodegen.hpp"
-#include "mem/codegen/TStack.hpp"
 
 
-namespace mem { namespace codegen { namespace llvm_ {
+namespace codegen { namespace llvm_ {
 
 
 // Emit LLVM assembly from an AST and a ST.
@@ -42,7 +42,7 @@ namespace mem { namespace codegen { namespace llvm_ {
 //   <http://llvm.org/docs/doxygen/html/classllvm_1_1IRBuilder.html>
 //
 // FIXME: We should create an helper class for all LLVM type creation
-class Codegen : public mem::codegen::ICodegen
+class Codegen : public codegen::ICodegen
 {
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -57,7 +57,7 @@ class Codegen : public mem::codegen::ICodegen
    //--------------------------------------------------------------------------
    public:
 
-   SETTER(SymbolTable, st::SymbolTable*) {_st = val;}
+   SETTER(SymbolTable, mem::st::SymbolTable*) {_st = val;}
 
 
    //--------------------------------------------------------------------------
@@ -66,7 +66,7 @@ class Codegen : public mem::codegen::ICodegen
    public:
 
    llvm::Value*
-   _castLlvmValue (llvm::Value* val, st::Type* src_ty, st::Type* dest_ty);
+   _castLlvmValue (llvm::Value* val, mem::st::Type* src_ty, mem::st::Type* dest_ty);
 
    inline llvm::BasicBlock*
    _createBasicBlock(std::string name="")
@@ -108,22 +108,22 @@ class Codegen : public mem::codegen::ICodegen
    _dumpTypes ();
 
    std::string
-   _getCodegenFuncName (st::Func* func);
+   _getCodegenFuncName (mem::st::Func* func);
 
-   st::Type*
-   _getLowestCommonType (st::Symbol* left_ty, st::Symbol* right_ty);
+   mem::st::Type*
+   _getLowestCommonType (mem::st::Symbol* left_ty, mem::st::Symbol* right_ty);
 
    /**
     * Returns the LLVM type associated with an AST function node.
     */
    llvm::Type*
-   _getFuncReturnTy (ast::node::Func* func);
+   _getFuncReturnTy (mem::ast::node::Func* func);
 
    /**
     * Returns the LLVM types associated with the parameters of a ST function.
     */
    std::vector<llvm::Type*>
-   _getFuncParamsTy (st::Func* func);
+   _getFuncParamsTy (mem::st::Func* func);
 
    std::string
    _getLlvmTypeName (llvm::Type* ty);
@@ -135,130 +135,130 @@ class Codegen : public mem::codegen::ICodegen
    _getVoidTy ();
 
    bool
-   _mustBeLoaded (ast::node::Node* n);
+   _mustBeLoaded (mem::ast::node::Node* n);
 
    llvm::Value*
-   cgAmpersandExpr (ast::node::Node* node);
+   cgAmpersandExpr (mem::ast::node::Node* node);
 
    llvm::Value*
-   cgBinaryExpr (ast::node::Node* node);
+   cgBinaryExpr (mem::ast::node::Node* node);
 
    inline void
-   cgBlock (ast::node::Node* block)
+   cgBlock (mem::ast::node::Node* block)
    {
       assert(block->isBlockNode());
-      cgBlock(static_cast<ast::node::Block*>(block));
+      cgBlock(static_cast<mem::ast::node::Block*>(block));
    }
 
    void
-   cgBlock (ast::node::Block* block);
+   cgBlock (mem::ast::node::Block* block);
 
    llvm::Value*
-   cgBracketOpExpr (ast::node::BracketOp* n);
+   cgBracketOpExpr (mem::ast::node::BracketOp* n);
 
    llvm::Value*
-   cgCastExpr (ast::node::CastOp* n);
+   cgCastExpr (mem::ast::node::CastOp* n);
 
    llvm::Value*
-   cgCallExpr (ast::node::Call* node);
+   cgCallExpr (mem::ast::node::Call* node);
 
    llvm::Value*
-   cgCompOp (ast::node::BinaryOp* node);
+   cgCompOp (mem::ast::node::BinaryOp* node);
 
    llvm::Value*
-   cgDotExpr (ast::node::Dot* node);
+   cgDotExpr (mem::ast::node::Dot* node);
 
    void
-   cgFile (ast::node::File* file_node);
+   cgFile (mem::ast::node::File* file_node);
 
    llvm::Value*
-   cgFinalIdExpr (ast::node::Text* node);
+   cgFinalIdExpr (mem::ast::node::Text* node);
 
    /**
     * Codegen a node.
     */
    llvm::Value*
-   cgExpr (ast::node::Node* node);
+   cgExpr (mem::ast::node::Node* node);
 
    llvm::Value*
-   cgExprAndLoad (ast::node::Node* node);
+   cgExprAndLoad (mem::ast::node::Node* node);
 
    llvm::Value*
-   cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty);
+   cgExprAndLoad (mem::ast::node::Node* node, mem::st::Type* dest_ty);
 
    /**
     * Codegen a node and generate a LLVM Load instruction if necessary.
     */
     /*
    llvm::Value*
-   cgExprAndLoad (ast::node::Node* node, st::Symbol* source_ty, st::Symbol* dest_ty);
+   cgExprAndLoad (mem::ast::node::Node* node, mem::st::Symbol* source_ty, mem::st::Symbol* dest_ty);
 
    llvm::Value*
-   cgExprAndLoad (ast::node::Node* src, st::Symbol* dest_ty);
+   cgExprAndLoad (mem::ast::node::Node* src, mem::st::Symbol* dest_ty);
    */
 
    void
-   cgFunctionBody (ast::node::Func* func_node);
+   cgFunctionBody (mem::ast::node::Func* func_node);
 
    void
-   cgFunctionDef (ast::node::Func* func_node);
+   cgFunctionDef (mem::ast::node::Func* func_node);
 
    void
-   cgForStatement (ast::node::For* n);
+   cgForStatement (mem::ast::node::For* n);
 
    void
-   cgIfStatement (ast::node::If* node);
+   cgIfStatement (mem::ast::node::If* node);
 
    void
    codegenMemoryFunctions ();
 
    llvm::Value*
-   cgNewExpr (ast::node::New* node);
+   cgNewExpr (mem::ast::node::New* node);
 
    llvm::Value*
-   cgNumberExpr (ast::node::Number* node);
+   cgNumberExpr (mem::ast::node::Number* node);
 
    llvm::Value*
-   cgDerefExpr (ast::node::Node* node);
+   cgDerefExpr (mem::ast::node::Node* node);
 
    void
-   cgReturnStatement (ast::node::Node* node);
+   cgReturnStatement (mem::ast::node::Node* node);
 
    llvm::Value*
-   cgString (ast::node::String* n);
+   cgString (mem::ast::node::String* n);
 
    void
-   cgVarAssignStatement (ast::node::VarAssign* node);
+   cgVarAssignStatement (mem::ast::node::VarAssign* node);
 
    void
-   cgVarDeclStatement (ast::node::VarDecl* node);
+   cgVarDeclStatement (mem::ast::node::VarDecl* node);
 
    void
-   cgWhileStatement (ast::node::While* n);
+   cgWhileStatement (mem::ast::node::While* n);
 
    void
    codegenFunctionDeclarations ();
 
    void
-   codegenFunctionType (st::Func* func_ty);
+   codegenFunctionType (mem::st::Func* func_ty);
 
    void
-   codegenFunctionBodies (ast::node::Root* root_n);
+   codegenFunctionBodies (mem::ast::node::Root* root_n);
 
    llvm::Value*
-   codegenTuple (ast::node::Tuple* n);
+   codegenTuple (mem::ast::node::Tuple* n);
 
    virtual void
-   gen (ast::node::Node* root);
+   gen (mem::ast::node::Node* root);
 
    std::string
    getLlvmByteCode ();
 
    void
-   initializeArrayOfClassInstances (st::ArrayType* cls_ty, llvm::Value* arr, bool is_static);
+   initializeArrayOfClassInstances (mem::st::ArrayType* cls_ty, llvm::Value* arr, bool is_static);
 
    void
-   initializeValue (st::Type* ty, llvm::Value* val);
+   initializeValue (mem::st::Type* ty, llvm::Value* val);
 
    void
    tearDown ();
@@ -273,13 +273,13 @@ class Codegen : public mem::codegen::ICodegen
    llvm::BasicBlock* _exit_block;
    std::map<std::string, llvm::Function*> _functions;
    llvm::Module* _module;
-   st::SymbolTable* _st;
-   TStack<st::Symbol*, llvm::Value*> _stack;
+   mem::st::SymbolTable* _st;
+   TStack<mem::st::Symbol*, llvm::Value*> _stack;
    TypeMaker _type_maker;
 };
 
 
-} } }
+} }
 
 #endif // HAVE_LLVM
 #endif
