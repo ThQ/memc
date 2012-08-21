@@ -366,6 +366,7 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
    llvm::Value* index = cgExprAndLoad(n->IndexNode(), _st->gCoreTypes().IntTy());
    assert (index != NULL);
 
+   /*
    // If this is a pointer we have to dereference as much as
    // (indirection_level - 1)
    if (value_ty->isPointerType())
@@ -375,10 +376,11 @@ Codegen::cgBracketOpExpr (ast::node::BracketOp* n)
          val = new llvm::LoadInst(val, "", _cur_bb);
       }
    }
+   */
 
    // FIXME What ?
    std::vector<llvm::Value*> idx;
-   if (!value_ty->isPointerType())
+   if (0)//value_ty->isArrayType())
    {
       idx.push_back(_createInt32Constant(0));
    }
@@ -741,20 +743,7 @@ Codegen::cgExprAndLoad (ast::node::Node* node, st::Type* dest_ty)
    }
    if (val != NULL)
    {
-      bool must_load = _mustBeLoaded(node);
-
-
-      if (src_ty != dest_ty)
-      {
-         val = _castLlvmValue(val, src_ty, dest_ty);
-      }
-      if (src_ty->isPointerType() && dest_ty->isPointerType())
-      {
-         st::PointerType* src_ptr_ty = st::castToPointerType(src_ty);
-         st::PointerType* dest_ptr_ty = st::castToPointerType(dest_ty);
-      }
-
-      if (must_load)
+      if (_mustBeLoaded(node))
       {
          val = new llvm::LoadInst(val, "", _cur_bb);
       }
@@ -786,6 +775,15 @@ Codegen::cgFinalIdExpr (ast::node::Text* node)
    DEBUG_REQUIRE (node->hasBoundSymbol());
 
    llvm::Value* ty = _stack.get(node->BoundSymbol());
+
+   if (node->ExprType()->isArrayType())
+   {
+      std::vector<llvm::Value*> idx;
+      idx.push_back(_createInt32Constant(0));
+      idx.push_back(_createInt32Constant(0));
+      ty = _createGepInst(ty, idx);
+   }
+
    IF_DEBUG
    {
       if (ty == NULL)
@@ -1018,10 +1016,12 @@ Codegen::cgNewExpr (ast::node::New* node)
    // FIXME Spaghetti code !
    if (type_node->BoundSymbol()->isArrayType())
    {
+      ast::node::Node* arr_ty_n = type_node->getChild(0);
+      ast::node::Node* length_n = type_node->getChild(1);
       st::ArrayType* arr_ty = static_cast<st::ArrayType*>(obj_ty);
-      int type_byte_size = st::castToType(type_node->getChild(0)->BoundSymbol())->ByteSize();
-      llvm::Value* num_obj = cgExprAndLoad(type_node->getChild(1), _st->_core_types.IntTy());
-      llvm::Value* obj_size = _createInt32Constant(type_byte_size);
+      st::Type* arr_ty_ty = st::castToType(arr_ty_n->BoundSymbol());
+      llvm::Value* num_obj = cgExprAndLoad(length_n, _st->_core_types.IntTy());
+      llvm::Value* obj_size = _createInt32Constant(arr_ty_ty->ByteSize());
       byte_size = llvm::BinaryOperator::Create(llvm::Instruction::Mul, num_obj, obj_size, "", _cur_bb);
    }
    else
@@ -1083,7 +1083,18 @@ Codegen::cgNumberExpr (ast::node::Number* node)
 llvm::Value*
 Codegen::cgDerefExpr (ast::node::Node* node)
 {
-   llvm::Value* val = cgExpr(node->getChild(0));
+   ast::node::Node* val_n = node->getChild(0);
+   llvm::Value* val = cgExpr(val_n);
+#if 1
+   st::Type* node_ty = val_n->ExprType();
+   if (node_ty->isPointerType() && st::castToPointerType(node_ty)->isPointerToArray())
+   {
+   DEBUG_PRINT("deref arr\n");
+      std::vector<llvm::Value*> idx;
+      idx.push_back(_createInt32Constant(0));
+      val = _createGepInst(val, idx);
+   }
+#endif
    return new llvm::LoadInst(val, "", _cur_bb);
 }
 

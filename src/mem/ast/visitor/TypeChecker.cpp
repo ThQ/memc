@@ -95,8 +95,8 @@ TypeChecker::ensureExprType (node::Node* expr, st::Symbol* expr_type)
    {
       // @FIXME Prints the same types, why ?
       log::SpecificTypeExpected* err = new log::SpecificTypeExpected();
-      err->sExpectedTypeName(expr->ExprType()->gQualifiedName());
-      err->sTypeName(expr_type->gQualifiedName());
+      err->sTypeName(expr->ExprType()->gQualifiedName());
+      err->sExpectedTypeName(expr_type->gQualifiedName());
       if (expr->Position() != NULL)
       {
          err->setPosition(expr->copyPosition());

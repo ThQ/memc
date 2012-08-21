@@ -220,7 +220,8 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
       visitExpr(scope, length_n);
       if (length_n->isNumberNode()
          && length_n->hasBoundSymbol()
-         && length_n->BoundSymbol()->isIntConstant())
+         && length_n->BoundSymbol()->isIntConstant()
+         && length_n->ExprType()->canCastTo(_symbols->_core_types.IntTy()))
       {
          st::IntConstant* i_const = st::castToIntConstant(length_n->BoundSymbol());
          // FIXME This may break since it returns an int64_t
@@ -270,11 +271,6 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 
    if (value_ty != NULL)
    {
-      if (value_ty->isPointerType())
-      {
-         value_ty = st::castToPointerType(value_ty)->getNonPointerParent();
-      }
-
       if (value_ty->isArrayType())
       {
          st::ArrayType* arr = st::castToArrayType(value_ty);
@@ -299,7 +295,8 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
       else
       {
          log::Error* err = new log::Error();
-         err->setPrimaryText("Subscripted value is not of array or tuple type (nor a pointer to those types)");
+         err->setPrimaryText("Subscripted value is not of array or tuple type");
+         err->setPosition(value_node->copyPosition());
          _logger->log(err);
       }
    }

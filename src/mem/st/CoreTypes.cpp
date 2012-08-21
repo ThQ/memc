@@ -10,9 +10,9 @@ CoreTypes::CoreTypes ()
    _bool_ty = new st::IntType("bool", sizeof(bool));
 
    _short_ty = new st::IntType("short", sizeof(short));
-   _char_ty = new st::IntType("char", sizeof(short));
-   _int_ty = new st::IntType("int", sizeof(short));
-   _long_ty = new st::IntType("long", sizeof(short));
+   _char_ty = new st::IntType("char", sizeof(char));
+   _int_ty = new st::IntType("int", sizeof(int));
+   _long_ty = new st::IntType("long", sizeof(long));
 
    _ushort_ty = new st::IntType("ushort", sizeof(unsigned short));
    _uchar_ty = new st::IntType("uchar", sizeof(unsigned short));

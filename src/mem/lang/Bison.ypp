@@ -970,6 +970,7 @@ literal :
       int i = 0;
       char nb_format = number::parseIntNumber(*$1, i);
 
+#if 0
       switch (nb_format)
       {
          case 'c':
@@ -996,6 +997,7 @@ literal :
          }
          case 'i':
          {
+#endif
             st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), i);
             ic->setType(symbols._core_types.IntTy());
 
@@ -1003,9 +1005,11 @@ literal :
             i_node->setBoundSymbol(ic);
             i_node->setExprType(symbols._core_types.IntTy());
             $$ = i_node;
+#if 0
             break;
          }
       }
+#endif
 
       assert ($$ != NULL);
 

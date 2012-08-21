@@ -57,7 +57,7 @@
 	"SpecificTypeExpected":
 	{
 		"type": "Error",
-		"message": "Expression of type $ExpectedTypeName expected, but got $TypeName instead",
+		"message": "Expression of type `$ExpectedTypeName' expected, but got `$TypeName' instead",
 		"params":
 		{
 			"ExpectedTypeName": "std::string",
