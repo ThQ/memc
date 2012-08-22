@@ -23,6 +23,7 @@ Compiler::Compiler ()
    addMacro(new mem::ast::macro::PtrMacros());
 
    // Setup AST visitors
+   addAstVisitor(new mem::ast::visitor::CoherenceChecker());
    addAstVisitor(new mem::ast::visitor::UseAlias());
    addAstVisitor(new mem::ast::visitor::Prechecker());
    addAstVisitor(new mem::ast::visitor::FindClasses());
@@ -196,16 +197,12 @@ Compiler::parse (std::string file_path)
 
    if (file != NULL)
    {
-      /*
-      ast::node::File* file_node = new ast::node::File();
+      mem::ast::node::File* file_node = NULL;
+      file_node = _parser->parse (file);
       file_node->setBoundSymbol(file_sym);
       file_node->setId(ns_name);
       file_node->setIncludePath(file->_include_path);
       file_node->setPath(file_path);
-      */
-
-      mem::ast::node::File* file_node = NULL;
-      file_node = _parser->parse (file);
       ast.pushChild(file_node);
 
       mem::ast::visitor::FindUse find_use;

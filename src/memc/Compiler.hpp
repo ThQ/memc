@@ -16,6 +16,7 @@
 #include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/BlockTypesChecker.hpp"
 #include "mem/ast/visitor/CheckValidity.hpp"
+#include "mem/ast/visitor/CoherenceChecker.hpp"
 #include "mem/ast/visitor/Ctor.hpp"
 #include "mem/ast/visitor/Decorate.hpp"
 #include "mem/ast/visitor/FindClasses.hpp"
