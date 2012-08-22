@@ -158,6 +158,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/node/While.cpp
 	${memc_SRC}/mem/ast/visitor/BlockTypesChecker.cpp
 	${memc_SRC}/mem/ast/visitor/CheckValidity.cpp
+	${memc_SRC}/mem/ast/visitor/CoherenceChecker.cpp
 	${memc_SRC}/mem/ast/visitor/Ctor.cpp
 	${memc_SRC}/mem/ast/visitor/Decorate.cpp
 	${memc_SRC}/mem/ast/visitor/FindClasses.cpp
