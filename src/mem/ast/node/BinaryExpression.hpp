@@ -7,11 +7,16 @@
 
 namespace mem { namespace ast { namespace node {
 
-   class BinaryExpression : public Text
-   {
-      public: BinaryExpression ();
-      public: BinaryExpression (char* op, size_t op_len, Node* left_node, Node* right_node);
-   };
+
+class BinaryExpression : public Text
+{
+   public: BinaryExpression ();
+   public: BinaryExpression (char* op, size_t op_len, Node* left_node, Node* right_node);
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+};
+
 
 } } }
 

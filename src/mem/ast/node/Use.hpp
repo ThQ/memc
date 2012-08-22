@@ -20,6 +20,9 @@ class Use: public Text
     */
    Use ();
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS

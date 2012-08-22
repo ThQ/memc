@@ -26,6 +26,9 @@ class Return : public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // ValueNode
    GETTER(ValueNode, Node*) {return getChild(0);}
 

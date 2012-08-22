@@ -26,6 +26,9 @@ class Decorator : public Text
    //--------------------------------------------------------------------------
    public:
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

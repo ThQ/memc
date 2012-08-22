@@ -10,6 +10,12 @@
 
 namespace mem { namespace ast { namespace visitor {
 
+struct KindStats
+{
+   int usages;
+   int unit_memory_size;
+   int total_memory_size;
+};
 
 // Generate statistics the AST
 class Stats : public Visitor
@@ -33,21 +39,13 @@ class Stats : public Visitor
    virtual bool
    tearDown ();
 
-   //--------------------------------------------------------------------------
-   // PROTECTED FUNCTIONS
-   //--------------------------------------------------------------------------
-   protected:
-
-   void
-   _incrementNodeKindUsage (int Kind);
-
 
    //--------------------------------------------------------------------------
    // PROTECTED FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   std::map<int, int> _kind_usages;
+   std::map<int, KindStats> _kind_usages;
 };
 
 

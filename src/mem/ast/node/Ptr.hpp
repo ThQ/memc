@@ -27,6 +27,9 @@ class Ptr: public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // TypeNode
    GETTER(TypeNode, node::Node*) {return getChild(0);}
 

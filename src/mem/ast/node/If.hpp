@@ -45,6 +45,9 @@ class If: public Node
    // ElseBlockNode
    GETTER(ElseBlockNode, node::Node*) {return static_cast<Block*>(getChild(2));}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

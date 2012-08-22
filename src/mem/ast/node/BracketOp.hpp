@@ -32,6 +32,8 @@ class BracketOp: public Node
    // IndexNode
    GETTER(IndexNode, node::Node*) {return getChild(1);}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

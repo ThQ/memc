@@ -20,6 +20,9 @@ class FinalId : public Text
     */
    FinalId ();
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

@@ -19,6 +19,9 @@ class TupleType : public Text
     * Default constructor.
     */
    TupleType ();
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 };
 
 

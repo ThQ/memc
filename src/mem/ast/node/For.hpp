@@ -39,6 +39,9 @@ class For: public Node
    // BlockNode
    GETTER(BlockNode, node::Node*) {return static_cast<Block*>(getChild(3));}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

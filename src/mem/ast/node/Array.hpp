@@ -28,6 +28,8 @@ class Array: public Node
    GETTER(TypeNode, Node*) {return getChild(0);}
    GETTER(LengthNode, Node*) {return getChild(1);}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

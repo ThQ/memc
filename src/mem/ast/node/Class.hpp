@@ -28,6 +28,11 @@ class Class : public Type
 
    Node*
    gParentTypeNode ();
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
+
 };
 
 

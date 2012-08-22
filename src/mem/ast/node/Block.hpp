@@ -19,6 +19,10 @@ class Block : public Node
     * Default constructor.
     */
    Block ();
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 };
 
 

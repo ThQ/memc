@@ -29,6 +29,9 @@ class Dot: public Node
    // LeftNode
    GETTER(LeftNode, node::Node*) {return getChild(0);}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // RightNode
    GETTER(RightNode, node::Node*) {return getChild(1);}
 

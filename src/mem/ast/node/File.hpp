@@ -54,6 +54,9 @@ class File : public Node
    // IncludePath
    SETTER(IncludePath, std::string) {_include_path = val;}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // Path
    SETTER(Path, std::string) {_path = val;}
 

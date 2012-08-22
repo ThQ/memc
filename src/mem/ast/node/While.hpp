@@ -33,6 +33,9 @@ class While : public Node
    // BodyNode
    GETTER(BodyNode, Node*) {return this->getChild(1);}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // PUBLIC METHODS

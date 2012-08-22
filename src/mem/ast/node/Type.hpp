@@ -19,6 +19,9 @@ class Type : public Text
     * Default constructor.
     */
    Type ();
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 };
 
 

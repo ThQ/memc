@@ -26,6 +26,9 @@ class VarAssign : public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // NameNode
    GETTER(NameNode, Text*) {return static_cast<Text*>(getChild(0));}
 

@@ -19,6 +19,9 @@ class Primitive : public Type
     * Default constructor.
     */
    Primitive ();
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 };
 
 

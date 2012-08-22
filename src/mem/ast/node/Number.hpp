@@ -22,6 +22,8 @@ class Number : public Node
    // Default constructor.
    Number ();
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS

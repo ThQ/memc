@@ -32,6 +32,9 @@ class CastOp: public Node
    // RightNode
    GETTER(TypeNode, node::Node*) {return getChild(1);}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

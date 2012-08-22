@@ -40,6 +40,9 @@ class Func: public Text
    GETTER(NextFunction, Func*) {return _next_function;}
    SETTER(NextFunction, Func*) {_next_function = val;}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    //--------------------------------------------------------------------------
    // FUNCTIONS
    //--------------------------------------------------------------------------

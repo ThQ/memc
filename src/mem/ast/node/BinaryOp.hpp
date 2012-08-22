@@ -32,6 +32,9 @@ class BinaryOp: public Text // FIXME Inherit from Text so as to please bison
    inline node::Node*
    RightNode() {return getChild(1);}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

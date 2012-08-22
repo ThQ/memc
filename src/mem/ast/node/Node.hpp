@@ -61,6 +61,9 @@ class Node
    GETTER(KindName, std::string) {return get_type_name(_type);}
    GETTER(KindNameCstr, const char*) {return get_type_name(_type);}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // Parent
    GETTER(Parent, Node*) {return _parent;}
 

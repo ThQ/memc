@@ -19,6 +19,9 @@ class Root : public Node
     * Default constructor.
     */
    Root ();
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 };
 
 

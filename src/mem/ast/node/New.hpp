@@ -26,6 +26,9 @@ class New : public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // TypeNode
    GETTER(TypeNode, Node*) {return getChild(0);}
 

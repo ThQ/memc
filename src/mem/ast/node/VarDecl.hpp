@@ -27,6 +27,9 @@ class VarDecl : public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // Name
    GETTER(Name, std::string) {return NameNode()->_value;}
 

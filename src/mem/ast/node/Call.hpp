@@ -37,6 +37,9 @@ class Call : public Node
    GETTER(IsInstanceCall, bool) {return _is_instance_call;}
    SETTER(IsInstanceCall, bool) {_is_instance_call = val;}
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
+
    // ParamsNode
    GETTER(ParamsNode, Node*) {return getChild(1);}
 

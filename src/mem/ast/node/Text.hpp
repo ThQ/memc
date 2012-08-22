@@ -32,6 +32,8 @@ class Text: public Node
    // Default constructor.
    Text ();
 
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Node);}
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
