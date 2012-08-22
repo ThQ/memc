@@ -1,0 +1,6 @@
+### file
+class A
+ field :int
+main () -> int
+ field := new A
+ return 0

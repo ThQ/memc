@@ -1,0 +1,4 @@
+### file
+main ()
+ arr :[int]*
+ i :int = @arr[0]
