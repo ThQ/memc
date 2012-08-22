@@ -2,7 +2,6 @@
 #define _MEM__AST__NODE__CLASS__HPP_
 
 
-#include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Type.hpp"
 
 

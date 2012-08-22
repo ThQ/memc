@@ -18,7 +18,7 @@ Stats::tearDown ()
    stats << "---------------\n";
    for (it = _kind_usages.begin(); it != _kind_usages.end(); ++it)
    {
-      stats << ast::node::Node::get_type_name(it->first) << ": ";
+      stats << node::Node::get_type_name(it->first) << ": ";
       stats << it->second << "\n";
       total_node_count += it->second;
    }

@@ -2,7 +2,6 @@
 #define _MEM__AST__NODE__CALL__HPP_
 
 
-#include <string>
 #include "mem/ast/node/Node.hpp"
 
 

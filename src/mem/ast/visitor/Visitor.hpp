@@ -9,6 +9,11 @@
 #include "mem/st/SymbolTable.hpp"
 
 
+namespace mem { namespace ast { namespace node {
+class Node;
+} } }
+
+
 namespace mem { namespace ast { namespace visitor {
 
 

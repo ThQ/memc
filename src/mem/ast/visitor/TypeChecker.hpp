@@ -2,12 +2,15 @@
 #define _MEM__AST__VISITOR__TYPE_CHECKER__HPP_
 
 
-#include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 #include "mem/log/Message.hpp"
 #include "mem/st/ArrayType.hpp"
 #include "mem/st/Symbol.hpp"
 
+
+namespace mem { namespace ast { namespace node {
+class Node;
+} } }
 
 namespace mem { namespace ast { namespace visitor {
 

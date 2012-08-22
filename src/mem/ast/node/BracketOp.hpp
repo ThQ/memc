@@ -2,8 +2,7 @@
 #define _MEM__AST__NODE__BRACKET_OP__HPP_
 
 
-#include "mem/ast/node/Block.hpp"
-#include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/Node.hpp"
 
 
 namespace mem { namespace ast { namespace node {

@@ -4,6 +4,7 @@
 
 #include <map>
 #include <sstream>
+#include "mem/ast/node/Node.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 
 
