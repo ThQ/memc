@@ -224,6 +224,7 @@ set(memc_SOURCES
 	${memc_SRC}/memc/Compiler.cpp
 	${memc_SRC}/memc/main.cpp
 	${memc_BUILT}/langmem/Bison.cpp
+	${memc_SRC}/langmem/Parser.cpp
 	${memc_SRC}/langmem/Tokenizer.cpp)
 
 # Build configurations

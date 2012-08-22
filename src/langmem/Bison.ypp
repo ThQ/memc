@@ -1,6 +1,5 @@
-%parse-param{mem::fs::FileManager& fm}
 %parse-param{mem::ast::node::Node* ast}
-%parse-param{mem::st::SymbolTable& symbols}
+%parse-param{mem::st::SymbolTable* symbols}
 %parse-param{mem::log::Logger* logger}
 %parse-param{mem::fs::File* file}
 
@@ -8,6 +7,10 @@
 #define PASS (0);
 #include <stdio.h>
 #include <string.h>
+#ifndef INCLUDED_BISON_HPP
+#define INCLUDED_BISON_HPP
+#include "langmem/Bison.hpp"
+#endif
 #include "langmem/Tokenizer.hpp"
 #include "mem/ast/node/Array.hpp"
 #include "mem/ast/node/BinaryExpression.hpp"
@@ -23,9 +26,13 @@
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/FinalId.hpp"
 #include "mem/ast/node/For.hpp"
+#include "mem/ast/node/Func.hpp"
+#include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
+#include "mem/ast/node/Number.hpp"
 #include "mem/ast/node/Primitive.hpp"
 #include "mem/ast/node/Ptr.hpp"
+#include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/Root.hpp"
 #include "mem/ast/node/String.hpp"
 #include "mem/ast/node/Text.hpp"
@@ -40,7 +47,7 @@
 #include "mem/fs/position/Range.hpp"
 #include "mem/log/Logger.hpp"
 #include "mem/st/SymbolTable.hpp"
-#include "memc/Compiler.hpp"
+#include "mem/st/util.hpp"
 #include "mem/number.hpp"
 
 using namespace mem;
@@ -100,8 +107,8 @@ int yylex()
    return t.Kind();
 }
 
-void yyerror(fs::FileManager& fm, ast::node::Node* ast,
-   st::SymbolTable& symbols,
+void yyerror(ast::node::Node* ast,
+   mem::st::SymbolTable* symbols,
    ::mem::log::Logger* logger, // Type ambiguity for gcc-c++ 4.2.1 on FreeBSD
    fs::File* file,
    const char *s)
@@ -123,8 +130,8 @@ void yyerror(fs::FileManager& fm, ast::node::Node* ast,
 %union
 {
    std::string* text;
-   ast::node::Node* node;
-   ast::node::Text* text_node;
+   mem::ast::node::Node* node;
+   mem::ast::node::Text* text_node;
 }
 
 %code {
@@ -262,7 +269,7 @@ input :
 use:
    T_USE use_file
    {
-      $$ = new ast::node::Use();
+      $$ = new mem::ast::node::Use();
       $$->sValue($2->gValue());
       $$->setPosition(new fs::position::Range(@1, @2));
 
@@ -272,7 +279,7 @@ use:
 use_file :
    T_ID
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->sValue($1->c_str());
       delete $1;
    }
@@ -286,14 +293,14 @@ use_file :
 metadata :
    T_AROBASE T_ID T_NEWLINE
    {
-      $$ = new ast::node::Decorator();
+      $$ = new mem::ast::node::Decorator();
       $$->sValue($2->c_str());
       $$->setPosition(new fs::position::Range(@1, @2));
       delete $2;
    }
    | T_AROBASE T_ID T_OP expr T_CP T_NEWLINE
    {
-      $$ = new ast::node::Decorator();
+      $$ = new mem::ast::node::Decorator();
       $$->sValue($2->c_str());
       $$->pushChild($4);
       $$->setPosition(new fs::position::Range(@1, @5));
@@ -308,7 +315,7 @@ metadata :
 class_declaration:
    T_CLASS id class_members
    {
-      ast::node::Class* cls = new ast::node::Class();
+      mem::ast::node::Class* cls = new mem::ast::node::Class();
 
       cls->sValue($2->_value);
       cls->eat($3);
@@ -319,7 +326,7 @@ class_declaration:
    }
    | T_CLASS id T_LT type_name class_members
    {
-      ast::node::Class* cls = new ast::node::Class();
+      mem::ast::node::Class* cls = new mem::ast::node::Class();
 
       cls->sValue($2->_value);
       cls->eat($5);
@@ -333,7 +340,7 @@ class_declaration:
 class_members:
    T_NEWLINE T_INDENT members_declarations
    {
-      $$ = new ast::node::Block();
+      $$ = new mem::ast::node::Block();
       $$->setPosition(new fs::position::Range(@3, @3));
       $$->eat($3);
       delete $3;
@@ -346,7 +353,7 @@ class_members:
 enum_declaration:
    T_ENUM id enum_block
    {
-      ast::node::Enum* e = new ast::node::Enum();
+      mem::ast::node::Enum* e = new mem::ast::node::Enum();
       e->sValue($2->_value);
       e->eat($3);
 
@@ -365,7 +372,7 @@ enum_block:
 enum_fields:
    variable_declaration T_NEWLINE
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->pushChild($1);
    }
    | enum_fields variable_declaration T_NEWLINE
@@ -388,7 +395,7 @@ enum_fields:
 function_name:
    T_ID
    {
-      ast::node::Func* func = new ast::node::Func();
+      mem::ast::node::Func* func = new mem::ast::node::Func();
       func->setPosition(@$.copy_range());
       func->sValue($1->c_str());
       $$ = func;
@@ -397,7 +404,7 @@ function_name:
    }
    | metadata T_ID
    {
-      ast::node::Func* func = new ast::node::Func();
+      mem::ast::node::Func* func = new mem::ast::node::Func();
       func->setPosition(@2.copy_range());
       func->pushChild($1);
       func->sValue($2->c_str());
@@ -421,13 +428,13 @@ function_declaration:
    // Ex: my_function_name() -> my_return_type
    function_name T_OP T_CP return_type_or_null newline_or_block
    {
-      ast::node::Func* n = static_cast<ast::node::Func*>($1);
+      mem::ast::node::Func* n = static_cast<ast::node::Func*>($1);
 
       // Return type
       if ($4 != NULL) n->pushChild($4);
       else
       {
-         ast::node::Text* void_ty = new ast::node::Text();
+         mem::ast::node::Text* void_ty = new mem::ast::node::Text();
          void_ty->setKind(ast::node::Kind::FINAL_ID);
          void_ty->sValue("void");
          n->pushChild(void_ty);
@@ -442,7 +449,7 @@ function_declaration:
    // Ex: my_function_name(my_variable :my_type) :my_return_type
    | function_name T_OP argument_list T_CP return_type_or_null newline_or_block
    {
-      ast::node::Func* n = static_cast<ast::node::Func*>($1);
+      mem::ast::node::Func* n = static_cast<ast::node::Func*>($1);
 
       // Argument list
       n->pushChild($3);
@@ -451,7 +458,7 @@ function_declaration:
       if ($5 != NULL) n->pushChild($5);
       else
       {
-         ast::node::Text* void_ty = new ast::node::Text();
+         mem::ast::node::Text* void_ty = new mem::ast::node::Text();
          void_ty->setKind(ast::node::Kind::FINAL_ID);
          void_ty->sValue("void");
          n->pushChild(void_ty);
@@ -468,7 +475,7 @@ function_declaration:
 argument_list:
    argument
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->setKind(ast::node::Kind::FUNCTION_PARAMETERS);
       $$->pushChild($1);
       $$->setPosition(@1.copy_range());
@@ -482,7 +489,7 @@ argument_list:
 argument:
    id T_SEMICOLON type_name
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->setKind(ast::node::Kind::FUNCTION_PARAMETERS);
       $$->pushChildren($1, $3);
       $$->setPosition(new fs::position::Range(@1, @3));
@@ -498,7 +505,7 @@ if:
    //------------------------------------------------------------------------//
    T_IF expr block
    {
-      $$ = new ast::node::If();
+      $$ = new mem::ast::node::If();
       $$->pushChildren($2, $3);
       $$->setPosition(new fs::position::Range(@1, @2));
    }
@@ -507,7 +514,7 @@ if:
    //------------------------------------------------------------------------//
    | T_IF expr block T_ELSE block
    {
-      $$ = new ast::node::If();
+      $$ = new mem::ast::node::If();
       $$->pushChildren($2, $3, $5);
       $$->setPosition(new fs::position::Range(@1, @5));
    }
@@ -515,7 +522,7 @@ if:
 while:
    T_WHILE expr block
    {
-      $$ = new ast::node::While();
+      $$ = new mem::ast::node::While();
       $$->pushChildren($2, $3);
       $$->setPosition(new fs::position::Range(@1, @3));
    }
@@ -532,7 +539,7 @@ for_iteration_statement:
 for_statement:
    T_FOR for_initialization_statement T_COLON expr T_COLON for_iteration_statement block
    {
-      $$ = new ast::node::For();
+      $$ = new mem::ast::node::For();
       $$->pushChildren($2, $4, $6, $7);//, $4, $6, $7);
       $$->setPosition(new fs::position::Range(@1, @7));
    }
@@ -540,7 +547,7 @@ for_statement:
 block:
    T_NEWLINE T_INDENT statements T_DEDENT
    {
-      $$ = new ast::node::Block();
+      $$ = new mem::ast::node::Block();
       $$->setPosition(@3.copy_range());
       $$->eat($3);
       delete $3;
@@ -550,14 +557,14 @@ statements:
    statement
    {
       assert ($1 != NULL);
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->pushChild($1);
    }
    | statements statement
    {
       if ($$ == 0)
       {
-         $$ = new ast::node::Node();
+         $$ = new mem::ast::node::Node();
       }
       $$->pushChild($2);
    }
@@ -589,7 +596,7 @@ simple_statement:
 return_statement:
    T_RETURN expr
    {
-      $$ = new ast::node::Return();
+      $$ = new mem::ast::node::Return();
       $$->pushChild($2);
    }
 
@@ -597,7 +604,7 @@ return_statement:
 members_declarations:
    member_declaration
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->pushChild($1);
    }
    | members_declarations member_declaration
@@ -612,7 +619,7 @@ member_declaration:
    // Ex: my_variable :my_type
    id T_SEMICOLON type_name T_NEWLINE
    {
-      ast::node::Field* field = new ast::node::Field();
+      mem::ast::node::Field* field = new mem::ast::node::Field();
       field->setPosition(@$.copy_range());
       field->pushChildren($1, $3);
 
@@ -628,21 +635,21 @@ type_name:
    }
    | type_name T_STAR
    {
-      ast::node::Ptr* ptr = new ast::node::Ptr();
+      mem::ast::node::Ptr* ptr = new mem::ast::node::Ptr();
       ptr->pushChild($1);
       $$ = static_cast<ast::node::Ptr*>(ptr);
       $$->setPosition(@$.copy_range());
    }
    | T_LBRACKET type_name T_RBRACKET
    {
-      ast::node::Array* arr = new ast::node::Array();
+      mem::ast::node::Array* arr = new mem::ast::node::Array();
       arr->pushChild($2);
       $$ = static_cast<ast::node::Node*>(arr);
       $$->setPosition(@$.copy_range());
    }
    | T_LBRACKET type_name T_COMMA expr T_RBRACKET
    {
-      ast::node::Array* arr = new ast::node::Array();
+      mem::ast::node::Array* arr = new mem::ast::node::Array();
       arr->pushChildren($2, $4);
       $$ = static_cast<ast::node::Node*>(arr);
       $$->setPosition(@$.copy_range());
@@ -652,7 +659,7 @@ type_name:
 type_list:
    type_name
    {
-      $$ = new ast::node::TupleType();
+      $$ = new mem::ast::node::TupleType();
       $$->pushChild($1);
    }
    | type_list T_COMMA type_name
@@ -670,7 +677,7 @@ tuple_type:
 variable_assignment :
    expr T_EQ expr
    {
-      ast::node::VarAssign* n = new ast::node::VarAssign();
+      mem::ast::node::VarAssign* n = new mem::ast::node::VarAssign();
       n->setPosition(@$.copy_range());
       n->pushChildren($1, $3);
       $$ = (ast::node::Node*)n;
@@ -680,7 +687,7 @@ variable_declaration :
    // Ex: my_variable :my_type
    id T_SEMICOLON type_name
    {
-      ast::node::VarDecl* n = new ast::node::VarDecl();
+      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
       n->setPosition(@$.copy_range());
       n->pushChildren($1, $3);
       $$ = (ast::node::Node*)n;
@@ -688,11 +695,11 @@ variable_declaration :
    // Ex: my_variable := my_function()
    | id T_SEMICOLON T_EQ expr
    {
-      ast::node::Node* ty_place_holder = new ast::node::Node();
+      mem::ast::node::Node* ty_place_holder = new mem::ast::node::Node();
       ty_place_holder->setKind(ast::node::Kind::PLACE_HOLDER);
       ty_place_holder->setPosition(@3.copy_range());
 
-      ast::node::VarDecl* n = new ast::node::VarDecl();
+      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
       n->pushChildren($1, ty_place_holder, $4);
       n->setPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
@@ -700,7 +707,7 @@ variable_declaration :
    // Ex: my_variable :my_type = my_function()
    | id T_SEMICOLON type_name T_EQ expr
    {
-      ast::node::VarDecl* n = new ast::node::VarDecl();
+      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
       n->setPosition(@$.copy_range());
       n->pushChildren($1, $3, $5);
       $$ = (ast::node::Node*)n;
@@ -709,7 +716,7 @@ variable_declaration :
 id :
    T_ID
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::ID);
       $$->setPosition(new fs::position::Range(@$));
       $$->sValue($1->c_str());
@@ -721,7 +728,7 @@ id :
 qualified_id :
    id
    {
-      ast::node::FinalId* n = new ast::node::FinalId();
+      mem::ast::node::FinalId* n = new mem::ast::node::FinalId();
       n->sValue($1->gValue());
       n->setPosition(@$.copy_range());
       delete $1;
@@ -730,7 +737,7 @@ qualified_id :
    }
    | qualified_id T_DOT id
    {
-      $$ = new ast::node::Dot();
+      $$ = new mem::ast::node::Dot();
       $$->pushChildren($1, $3);
       if ($$->Position() != NULL)
       {
@@ -745,7 +752,7 @@ qualified_id :
 dot_expr :
    T_OP expr T_CP T_DOT id
    {
-      $$ = new ast::node::Dot();
+      $$ = new mem::ast::node::Dot();
       $$->setPosition(@$.copy_range());
       $$->pushChildren($2, $5);
    }
@@ -766,13 +773,13 @@ expr :
    /* ex: (1 + 2 + 3) */
    | T_OP expr T_CP
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->setKind(ast::node::Kind::GROUP);
       $$->pushChild($2);
    }
    | T_OP expr_list T_CP
    {
-      $$ = new ast::node::Tuple();
+      $$ = new mem::ast::node::Tuple();
       $$->eat($2);
 
       delete $2;
@@ -787,43 +794,43 @@ expr :
    }
    | T_AMPERSAND expr
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->setKind(ast::node::Kind::AMPERSAND);
       $$->pushChild($2);
    }
    | T_AROBASE expr
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->setKind(ast::node::Kind::DEREF);
       $$->pushChild($2);
    }
    | T_NEW type_name
    {
-      $$ = new ast::node::New();
+      $$ = new mem::ast::node::New();
       $$->setPosition(@$.copy_range());
       $$->pushChild($2);
    }
    | expr T_SEMICOLON type_name
    {
-      $$ = new ast::node::CastOp();
+      $$ = new mem::ast::node::CastOp();
       $$->setPosition(@$.copy_range());
       $$->pushChildren($1, $3);
    }
    | expr T_LBRACKET expr T_RBRACKET
    {
-      $$ = new ast::node::BracketOp();
+      $$ = new mem::ast::node::BracketOp();
       $$->pushChildren($1, $3);
    }
 
 bool_operator:
    T_AND
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_AND);
    }
    | T_OR
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_OR);
    }
 
@@ -831,37 +838,37 @@ comp_operator:
    // ex: true == false
    T_EQ_EQ
    {
-      $$ = new ast::node::BinaryOp();
+      $$ = new mem::ast::node::BinaryOp();
       $$->setKind(ast::node::Kind::OP_EQ_EQ);
    }
    // ex 1 < 2
    | T_LT
    {
-      $$ = new ast::node::BinaryOp();
+      $$ = new mem::ast::node::BinaryOp();
       $$->setKind(ast::node::Kind::OP_LT);
    }
    // ex: 1 <= 2
    | T_LT_EQ
    {
-      $$ = new ast::node::BinaryOp();
+      $$ = new mem::ast::node::BinaryOp();
       $$->setKind(ast::node::Kind::OP_LTE);
    }
    // ex: 1 > 2
    | T_GT
    {
-      $$ = new ast::node::BinaryOp();
+      $$ = new mem::ast::node::BinaryOp();
       $$->setKind(ast::node::Kind::OP_GT);
    }
    // ex: 1 >= 2
    | T_GT_EQ
    {
-      $$ = new ast::node::BinaryOp();
+      $$ = new mem::ast::node::BinaryOp();
       $$->setKind(ast::node::Kind::OP_GTE);
    }
    // ex: 1 != 2
    | T_BANG_EQ
    {
-      $$ = new ast::node::BinaryOp();
+      $$ = new mem::ast::node::BinaryOp();
       $$->setKind(ast::node::Kind::OP_NE);
    }
 
@@ -869,52 +876,52 @@ math_operator:
    // ex: 1 + 2
    T_PLUS
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_PLUS);
    }
    | T_MINUS
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_MINUS);
    }
    | T_STAR
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_MUL);
    }
    | T_DIV
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_DIV);
    }
    | T_GT_GT
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_RSHIFT);
    }
    | T_LT_LT
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_LSHIFT);
    }
    | T_BIT_OR
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_BIT_OR);
    }
    | T_BIT_AND
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_BIT_AND);
    }
    | T_XOR
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_XOR);
    }
    | T_MODULO
    {
-      $$ = new ast::node::Text();
+      $$ = new mem::ast::node::Text();
       $$->setKind(ast::node::Kind::OP_MODULO);
    }
 
@@ -933,7 +940,7 @@ binary_expr:
 expr_list :
    expr
    {
-      $$ = new ast::node::Node();
+      $$ = new mem::ast::node::Node();
       $$->setKind(ast::node::Kind::EXPRESSION_LIST);
       $$->pushChild($1);
    }
@@ -941,7 +948,7 @@ expr_list :
    {
       if ($$ == 0)
       {
-         $$ = new ast::node::Node();
+         $$ = new mem::ast::node::Node();
          $$->setKind(ast::node::Kind::EXPRESSION_LIST);
       }
       $$->pushChild($3);
@@ -951,7 +958,7 @@ call :
    /* ex: my_func() */
    qualified_id T_OP T_CP
    {
-      $$ = new ast::node::Call();
+      $$ = new mem::ast::node::Call();
       $$->setPosition(new fs::position::Range(@1, @3));
       $$->pushChild($1);
    }
@@ -959,7 +966,7 @@ call :
    | qualified_id T_OP expr_list T_CP
    {
       $3->setPosition(@3.copy_range());
-      $$ = new ast::node::Call();
+      $$ = new mem::ast::node::Call();
       $$->setPosition(new fs::position::Range(@1, @4));
       $$->pushChildren($1, $3);
    }
@@ -975,35 +982,35 @@ literal :
       {
          case 'c':
          {
-            st::IntConstant* ic = st::util::getNativeCharConstant(symbols.System(), (char)i);
-            ic->setType(symbols._core_types.CharTy());
+            mem::st::IntConstant* ic = mem::st::util::getNativeCharConstant(symbols->System(), (char)i);
+            ic->setType(symbols->_core_types.CharTy());
 
-            ast::node::Number* c_node = new ast::node::Number();
+            mem::ast::node::Number* c_node = new mem::ast::node::Number();
             c_node->setBoundSymbol(ic);
-            c_node->setExprType(symbols._core_types.CharTy());
+            c_node->setExprType(symbols->_core_types.CharTy());
             $$ = c_node;
             break;
          }
          case 's':
          {
-            st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), (short)i);
-            ic->setType(symbols._core_types.ShortTy());
+            mem::st::IntConstant* ic = mem::st::util::getNativeShortConstant(symbols->System(), (short)i);
+            ic->setType(symbols->_core_types.ShortTy());
 
-            ast::node::Number* s_node = new ast::node::Number();
+            mem::ast::node::Number* s_node = new mem::ast::node::Number();
             s_node->setBoundSymbol(ic);
-            s_node->setExprType(symbols._core_types.ShortTy());
+            s_node->setExprType(symbols->_core_types.ShortTy());
             $$ = s_node;
             break;
          }
          case 'i':
          {
 #endif
-            st::IntConstant* ic = st::util::getNativeShortConstant(symbols.System(), i);
-            ic->setType(symbols._core_types.IntTy());
+            mem::st::IntConstant* ic = mem::st::util::getNativeShortConstant(symbols->System(), i);
+            ic->setType(symbols->_core_types.IntTy());
 
-            ast::node::Number* i_node = new ast::node::Number();
+            mem::ast::node::Number* i_node = new mem::ast::node::Number();
             i_node->setBoundSymbol(ic);
-            i_node->setExprType(symbols._core_types.IntTy());
+            i_node->setExprType(symbols->_core_types.IntTy());
             $$ = i_node;
 #if 0
             break;
@@ -1027,7 +1034,7 @@ literal :
    }
    | T_STRING
    {
-      ast::node::String* str = new ast::node::String();
+      mem::ast::node::String* str = new mem::ast::node::String();
       str->sValue($1->c_str());
       str->setPosition(@1.copy_range());
 

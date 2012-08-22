@@ -6,44 +6,47 @@ namespace memc {
 
 Compiler::Compiler ()
 {
-   _logger = new log::ConsoleLogger();
-   _logger->setFormatter(new log::ConsoleFormatter());
+   _logger = new mem::log::ConsoleLogger();
+   _logger->setFormatter(new mem::log::ConsoleFormatter());
+
+   _parser = new langmem::Parse();
+   _parser->setLogger(_logger);
+   _parser->setSymbolTable(&symbols);
 
    _opts = NULL;
 
-   gTOKENIZER.setLogger(_logger);
+   addDecorator(new mem::decorator::External());
+   addDecorator(new mem::decorator::Overriding());
+   addDecorator(new mem::decorator::Require());
+   addDecorator(new mem::decorator::Virtual());
 
-   addDecorator(new decorator::External());
-   addDecorator(new decorator::Overriding());
-   addDecorator(new decorator::Require());
-   addDecorator(new decorator::Virtual());
-
-   addMacro(new ast::macro::PtrMacros());
+   addMacro(new mem::ast::macro::PtrMacros());
 
    // Setup AST visitors
-   addAstVisitor(new ast::visitor::UseAlias());
-   addAstVisitor(new ast::visitor::Prechecker());
-   addAstVisitor(new ast::visitor::FindClasses());
-   addAstVisitor(new ast::visitor::TopTypesChecker());
-   addAstVisitor(new ast::visitor::Decorate(_decorators));
-   addAstVisitor(new ast::visitor::Ctor());
-   addAstVisitor(new ast::visitor::BlockTypesChecker());
-   //addAstVisitor(new ast::visitor::TypeMatch());
-   addAstVisitor(new ast::visitor::CheckValidity());
-   addAstVisitor(new ast::visitor::FindEntryPoint());
-   addAstVisitor(new ast::visitor::Stats());
+   addAstVisitor(new mem::ast::visitor::UseAlias());
+   addAstVisitor(new mem::ast::visitor::Prechecker());
+   addAstVisitor(new mem::ast::visitor::FindClasses());
+   addAstVisitor(new mem::ast::visitor::TopTypesChecker());
+   addAstVisitor(new mem::ast::visitor::Decorate(_decorators));
+   addAstVisitor(new mem::ast::visitor::Ctor());
+   addAstVisitor(new mem::ast::visitor::BlockTypesChecker());
+   //addAstVisitor(new mem::ast::visitor::TypeMatch());
+   addAstVisitor(new mem::ast::visitor::CheckValidity());
+   addAstVisitor(new mem::ast::visitor::FindEntryPoint());
+   addAstVisitor(new mem::ast::visitor::Stats());
 
-   st::util::setupBool(this->symbols, this->symbols.gCoreTypes());
-   st::util::setupBugType(this->symbols, this->symbols.gCoreTypes());
-   st::util::setupInts(this->symbols, this->symbols.gCoreTypes());
-   st::util::setupVoid(this->symbols, this->symbols.gCoreTypes());
+   mem::st::util::setupBool(this->symbols, this->symbols.gCoreTypes());
+   mem::st::util::setupBugType(this->symbols, this->symbols.gCoreTypes());
+   mem::st::util::setupInts(this->symbols, this->symbols.gCoreTypes());
+   mem::st::util::setupVoid(this->symbols, this->symbols.gCoreTypes());
 }
 
 Compiler::~Compiler ()
 {
    delete _logger;
+   delete _parser;
 
-   decorator::DecoratorMap::iterator i;
+   mem::decorator::DecoratorMap::iterator i;
 
    for (i = _decorators.begin(); i != _decorators.end(); ++i)
    {
@@ -64,7 +67,7 @@ Compiler::~Compiler ()
 }
 
 void
-Compiler::addDecorator (decorator::Decorator* dec)
+Compiler::addDecorator (mem::decorator::Decorator* dec)
 {
    DEBUG_REQUIRE (dec != NULL);
 
@@ -75,11 +78,11 @@ Compiler::addDecorator (decorator::Decorator* dec)
 }
 
 void
-Compiler::addMacro (ast::macro::Macro* macro)
+Compiler::addMacro (mem::ast::macro::Macro* macro)
 {
    DEBUG_REQUIRE (macro != NULL);
 
-   st::Macro* macro_sym = macro->getSymbol();
+   mem::st::Macro* macro_sym = macro->getSymbol();
    symbols.System()->addChild(macro_sym);
    delete macro;
 }
@@ -115,7 +118,7 @@ Compiler::dumpSt ()
       // give one
       std::ofstream st_dump_file(dump_path.c_str());
 
-      st::visitor::XmlDumper dumper;
+      mem::st::visitor::XmlDumper dumper;
       dumper._out = &st_dump_file;
       dumper.setup();
       dumper.visitPreorder(symbols.Root());
@@ -182,32 +185,30 @@ Compiler::parse (std::string file_path)
 {
    _logger->debug("[%s] parsing...", file_path.c_str());
 
-   std::string ns_name = Util::getNamespaceNameFromPath(file_path);
-   std::vector<std::string> ns_parts = Util::split(ns_name, '.');
-   st::Namespace* file_sym = st::util::createNamespace(symbols.Home(), ns_parts);
+   std::string ns_name = mem::Util::getNamespaceNameFromPath(file_path);
+   std::vector<std::string> ns_parts = mem::Util::split(ns_name, '.');
+   mem::st::Namespace* file_sym = mem::st::util::createNamespace(symbols.Home(), ns_parts);
    assert(file_sym != NULL);
 
    std::vector<std::string> paths_tried;
 
-   fs::File* file = fm.tryOpenFile(file_path, paths_tried);
+   mem::fs::File* file = fm.tryOpenFile(file_path, paths_tried);
 
    if (file != NULL)
    {
+      /*
       ast::node::File* file_node = new ast::node::File();
       file_node->setBoundSymbol(file_sym);
       file_node->setId(ns_name);
       file_node->setIncludePath(file->_include_path);
       file_node->setPath(file_path);
+      */
+
+      mem::ast::node::File* file_node = NULL;
+      file_node = _parser->parse (file);
       ast.pushChild(file_node);
 
-      // TODO We are actually reading each file twice, lang::Tokenizer should
-      // populate fs::File
-      gTOKENIZER.setInputFile(file->gPath());
-      gTOKENIZER.setFsFile(file);
-      gTOKENIZER.reset();
-      yyparse(this->fm, file_node, this->symbols, _logger, file);
-
-      ast::visitor::FindUse find_use;
+      mem::ast::visitor::FindUse find_use;
       _logger->debug("Searching for use statements", "");
       find_use.visit_preorder(file_node);
       for (size_t i = 0; i < find_use._uses.size(); ++i)
@@ -215,7 +216,7 @@ Compiler::parse (std::string file_path)
          if (ns_name == find_use._uses[i])
          {
             // FIXME This thing is probably failing, should use a pointer.
-            log::Message warn(log::WARNING);
+            mem::log::Message warn(mem::log::WARNING);
             warn.formatMessage(
                "File {path:%s} is trying to include itself: include ignored.",
                file_path.c_str()
@@ -240,7 +241,7 @@ Compiler::parse (std::string file_path)
          description.append("* {path:" + paths_tried[i] + "}\n");
       }
 
-      log::Message* msg = new log::Error();
+      mem::log::Message* msg = new mem::log::Error();
       msg->formatMessage("Couldn't open file {path:%s}.", file_path.c_str());
       msg->setSecondaryText(description);
       _logger->log(msg);
@@ -279,7 +280,7 @@ Compiler::printBuildSummary ()
    }
    else
    {
-      log::Message* err = new log::FatalError();
+      mem::log::Message* err = new mem::log::FatalError();
       err->setPrimaryText("Build FAILED");
       err->setSecondaryText(sec_text.str());
       _logger->log(err);
@@ -333,7 +334,7 @@ Compiler::run ()
 
    if (formatter_id == "xml")
    {
-      _logger->setFormatter(new log::XmlFormatter());
+      _logger->setFormatter(new mem::log::XmlFormatter());
    }
    _logger->begin();
 
@@ -342,9 +343,9 @@ Compiler::run ()
    // Need to set this before parsing command line arguments because it can
    // raise warnings
 #ifdef NDEBUG
-   _logger->setLevel(log::INFO);
+   _logger->setLevel(mem::log::INFO);
 #else
-   _logger->setLevel(log::DEBUG);
+   _logger->setLevel(mem::log::DEBUG);
 #endif
 
    if (_opts->isSet("--log-level"))

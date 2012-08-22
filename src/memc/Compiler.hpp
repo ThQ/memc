@@ -10,7 +10,7 @@
 #include <vector>
 #include "config.h"
 #include "codegen/llvm/Codegen.hpp"
-#include "langmem/Bison.hpp"
+#include "langmem/Parser.hpp"
 #include "mem/ast/macro/PtrMacros.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Node.hpp"
@@ -46,12 +46,6 @@
 #include "memc/opt/Options.hpp"
 
 
-extern int yyparse(mem::fs::FileManager& fm, mem::ast::node::Node* ast, mem::st::SymbolTable& symbols, mem::log::Logger* logger, mem::fs::File* file);
-extern FILE* yyin;
-extern void reset_lexer();
-extern mem::fs::File* yyfile;
-
-
 namespace memc {
 
 
@@ -64,16 +58,17 @@ class Compiler
    //--------------------------------------------------------------------------
    public:
 
-   ast::node::Root ast;
-   std::vector<ast::visitor::Visitor*> ast_visitors;
-   std::vector<st::visitor::Visitor*> st_visitors;
-   fs::FileManager fm;
-   log::ConsoleLogger* _logger;
+   mem::ast::node::Root ast;
+   std::vector<mem::ast::visitor::Visitor*> ast_visitors;
+   std::vector<mem::st::visitor::Visitor*> st_visitors;
+   mem::fs::FileManager fm;
+   mem::log::ConsoleLogger* _logger;
    opt::Options* _opts;
    std::queue<std::string> _parse_queue;
-   st::SymbolTable symbols;
+   mem::st::SymbolTable symbols;
    Toolbox _tools;
-   decorator::DecoratorMap _decorators;
+   mem::decorator::DecoratorMap _decorators;
+   langmem::Parse* _parser;
 
    //--------------------------------------------------------------------------
    // PROPERTIES
@@ -109,19 +104,19 @@ class Compiler
     * Append an AST visitor to the visitor list (FIFO).
     */
    inline void
-   addAstVisitor (ast::visitor::Visitor* visitor){ast_visitors.push_back(visitor);}
+   addAstVisitor (mem::ast::visitor::Visitor* visitor){ast_visitors.push_back(visitor);}
 
    void
-   addDecorator (decorator::Decorator* decorator);
+   addDecorator (mem::decorator::Decorator* decorator);
 
    void
-   addMacro (ast::macro::Macro* macro);
+   addMacro (mem::ast::macro::Macro* macro);
 
    /**
     * Append an ST visitor to the visitor list (FIFO).
     */
    inline void
-   addStVisitor (st::visitor::Visitor* visitor){st_visitors.push_back(visitor);}
+   addStVisitor (mem::st::visitor::Visitor* visitor){st_visitors.push_back(visitor);}
 
    void
    dumpAst ();
