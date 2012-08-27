@@ -2,26 +2,34 @@
 #define _MEM__AST__NODE__TUPLE__HPP_
 
 
-#include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/NodeList.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class Tuple: public Text
+class Tuple: public NodeList
 {
+   public:
+   static const int kTYPE = Kind::TUPLE;
+
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
-   Tuple();
+   // Default constructor.
+   Tuple ();
+
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER (MemorySize, int) {return sizeof(Tuple);}
 };
 
 

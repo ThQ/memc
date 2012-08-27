@@ -3,6 +3,7 @@
 
 
 #include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/NodeList.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -10,15 +11,20 @@ namespace mem { namespace ast { namespace node {
 
 class Call : public Node
 {
+   public:
+   static const int kTYPE = Kind::CALL;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    Call ();
+
+   // Destructor
+   virtual
+   ~Call ();
 
 
    //--------------------------------------------------------------------------
@@ -31,17 +37,32 @@ class Call : public Node
    SETTER(Caller, st::Symbol*) {_caller = val;}
 
    // CallerNode
-   GETTER(CallerNode, Node*) {return getChild(0);}
+   GETTER(CallerNode, Node*) {return _caller_node;}
+   SETTER(CallerNode, Node*)
+   {
+      _caller_node = val;
+      if (val != NULL) val->setParent(this);
+   }
+
+   // ChildCount
+   virtual
+   GETTER (ChildCount, size_t) {return 2;}
 
    // IsInstanceCall
    GETTER(IsInstanceCall, bool) {return _is_instance_call;}
    SETTER(IsInstanceCall, bool) {_is_instance_call = val;}
 
+   // MemorySize
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(MemorySize, int) {return sizeof(Call);}
 
    // ParamsNode
-   GETTER(ParamsNode, Node*) {return getChild(1);}
+   GETTER(ParamsNode, NodeList*) {return _params_node;}
+   SETTER(ParamsNode, NodeList*)
+   {
+      _params_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
 
    //--------------------------------------------------------------------------
@@ -52,11 +73,17 @@ class Call : public Node
    bool
    hasParamsNode() {return ChildCount()==2;}
 
+   virtual Node*
+   getChild (size_t i) const;
+
    void
    insertParam (Node* node);
 
    virtual void
    isValid(NodeValidator* vld);
+
+   virtual void
+   setChild (size_t i, Node* n);
 
 
    //--------------------------------------------------------------------------
@@ -65,7 +92,9 @@ class Call : public Node
    protected:
 
    st::Symbol* _caller;
+   Node* _caller_node;
    bool _is_instance_call;
+   NodeList* _params_node;
 };
 
 

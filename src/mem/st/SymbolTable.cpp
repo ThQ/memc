@@ -7,11 +7,11 @@ namespace mem { namespace st {
 SymbolTable::SymbolTable ()
 {
    _home = new Namespace();
-   _home->setName("#home");
+   _home->setName("$home");
    _home->setIsInvisible(true);
 
    _system = new Namespace();
-   _system->setName("#system");
+   _system->setName("$system");
    _system->setIsInvisible(true);
 
    _root = new Namespace();

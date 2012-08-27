@@ -1,5 +1,6 @@
 #include "mem/log/ConsoleFormatter.hpp"
 
+
 namespace mem { namespace log {
 
 

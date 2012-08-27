@@ -9,26 +9,30 @@
 namespace mem { namespace ast { namespace node {
 
 
-/**
- * An if node represents a condition and an associated block. It can have an
- * optional else condition block associated.
- *
- * > if <bool expression>
- * >    <block>
- * > else
- * >    <block>
- */
+// An if node represents a condition and an associated block. It can have an
+// optional else condition block associated.
+//
+// Syntax:
+//    if <Condition>
+//       <IfBlock>
+//    else
+//       [ElseBlock]
 class If: public Node
 {
+   public:
+   static const int kTYPE = Kind::IF;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
-   If();
+   // Default constructor.
+   If ();
+
+   // Destructor
+   virtual
+   ~If ();
 
 
    //--------------------------------------------------------------------------
@@ -36,23 +40,44 @@ class If: public Node
    //--------------------------------------------------------------------------
    public:
 
+   // ChildCount
+   GETTER(ChildCount, size_t) {return 3;}
+
    // ConditionNode
-   GETTER(ConditionNode, node::Node*) {return getChild(0);}
+   GETTER(ConditionNode, node::Node*) {return _condition_node;}
+   SETTER(ConditionNode, node::Node*)
+   {
+      _condition_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // IfBlockNode
-   GETTER(IfBlockNode, node::Node*) {return static_cast<Block*>(getChild(1));}
+   GETTER(IfBlockNode, node::Block*) {return _if_block_node;}
+   SETTER(IfBlockNode, node::Block*)
+   {
+      _if_block_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // ElseBlockNode
-   GETTER(ElseBlockNode, node::Node*) {return static_cast<Block*>(getChild(2));}
+   GETTER(ElseBlockNode, node::Block*) {return _else_block_node;}
+   SETTER(ElseBlockNode, node::Block*)
+   {
+      _else_block_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(MemorySize, int) {return sizeof(If);}
 
 
    //--------------------------------------------------------------------------
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
+
+   virtual Node*
+   getChild (size_t i) const;
 
    inline bool
    hasConditionNode () {return ConditionNode() != NULL;}
@@ -62,6 +87,19 @@ class If: public Node
 
    virtual void
    isValid (NodeValidator* v);
+
+   virtual void
+   setChild (size_t i, Node* n);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   node::Node* _condition_node;
+   node::Block* _if_block_node;
+   node::Block* _else_block_node;
 };
 
 } } }

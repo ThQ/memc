@@ -4,28 +4,24 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Dot::Dot ()
 {
-   _type = Kind::DOT;
+   _type = Dot::kTYPE;
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 void
 Dot::isValid (NodeValidator* v)
 {
-   Node::isValid(v);
-
-   v->ensure(ChildCount() == 2, "Dot must have exactly 2 children");
-   if (ChildCount() == 2)
-   {
-      v->ensure(LeftNode()->isDotNode() || LeftNode()->isFinalIdNode(),
-         "Left node must be either a DOT node or an ID node");
-   }
+   BinaryOp::isValid(v);
 }
 
-Dot*
-castToDot (Node* n)
-{
-   assert (n->isDotNode());
-   return static_cast<Dot*>(n);
-}
 } } }

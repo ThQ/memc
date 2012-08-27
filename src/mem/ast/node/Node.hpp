@@ -14,23 +14,23 @@
 
 namespace mem { namespace ast { namespace node {
 
-
 class Node
 {
+   public:
+   static const int kTYPE = Kind::UNKNOWN;
+
+
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTORS
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
    // Default constructor
    Node ();
 
-   // Initializes a node with a specifid type.
-   Node (unsigned int type);
-
    // Default destructor
    virtual
-   ~Node();
+   ~Node ();
 
 
    //--------------------------------------------------------------------------
@@ -43,7 +43,8 @@ class Node
    SETTER(BoundSymbol, st::Symbol*) {_bound_type = val;}
 
    // ChildCount
-   GETTER(ChildCount, size_t) {return _child_count;}
+   virtual
+   GETTER(ChildCount, size_t) {return 0;}
 
    // Depth
    void Depth (unsigned long depth);
@@ -54,18 +55,20 @@ class Node
    SETTER(ExprType, st::Symbol*) {assert(val->isAnyType());_exp_type = static_cast<st::Type*>(val);}
 
    // Kind
-   GETTER(Kind, unsigned int) {return _type;}
-   SETTER(Kind, unsigned int) {_type = val;}
+   GETTER(Kind, int) {return _type;}
+   SETTER(Kind, int) {_type = val;}
 
    // KindName
    GETTER(KindName, std::string) {return get_type_name(_type);}
    GETTER(KindNameCstr, const char*) {return get_type_name(_type);}
 
+   // MemorySize
    virtual
    GETTER(MemorySize, int) {return sizeof(Node);}
 
    // Parent
    GETTER(Parent, Node*) {return _parent;}
+   SETTER(Parent, Node*) {_parent = val;}
 
    // Position
    GETTER(Position, fs::position::Range*) {return _position;}
@@ -91,6 +94,23 @@ class Node
    inline bool
    hasExprType () const {return _exp_type != NULL;}
 
+#if 0
+   void
+   eat (Node* n);
+#endif
+
+   // Returns the type of the node as a string.
+   static const char*
+   get_type_name (int type);
+
+   // Returns the Nth child.
+   virtual Node*
+   getChild (size_t i) const;
+
+   // Returns true if the node has children.
+   inline bool
+   hasChildren () { return ChildCount() > 0; }
+
    void
    insertChild (Node* n);
 
@@ -105,93 +125,18 @@ class Node
    isAssignable ();
 
    inline bool
-   isArrayNode() {return isKind(Kind::ARRAY);}
+   isOrNode () const {return isKind(Kind::OP_OR);}
 
    inline bool
-   isBlockNode() {return isKind(Kind::BLOCK);}
-
-   inline bool
-   isClassNode() const {return isKind(Kind::CLASS);}
-
-   inline bool
-   isDecoratorNode() const {return isKind(Kind::DECORATOR);}
-
-   inline bool
-   isDotNode() const {return isKind(Kind::DOT);}
-
-   inline bool
-   isEnumNode() const {return isKind(Kind::ENUM);}
-
-   inline bool
-   isFieldNode() const {return isKind(Kind::FIELD);}
-
-   inline bool
-   isFileNode() const {return isKind(Kind::FILE);}
-
-   inline bool
-   isFinalIdNode() const {return isKind(Kind::FINAL_ID);}
-
-   inline bool
-   isFuncNode() const {return isKind(Kind::FUNCTION);}
-
-   inline bool
-   isFuncParamsNode() const {return isKind(Kind::FUNCTION_PARAMETERS);}
-
-   inline bool
-   isLastChild (Node* s) {return _last_child == s;}
-
-   inline bool
-   isIdNode() const {return isKind(Kind::ID);}
-
-   inline bool
-   isNewNode() const {return isKind(Kind::NEW);}
-
-   inline bool
-   isNumberNode() const {return isKind(Kind::NUMBER);}
-
-   inline bool
-   isOrNode() const {return isKind(Kind::OP_OR);}
-
-   inline bool
-   isPlaceHolderNode() const {return isKind(Kind::PLACE_HOLDER);}
+   isPlaceHolderNode () const {return isKind(Kind::PLACE_HOLDER);}
 
    bool
-   isReferenceNode() const;
-
-   inline bool
-   isReturnNode() const {return isKind(Kind::RETURN);}
-
-   inline bool
-   isRootNode() const {return isKind(Kind::ROOT);}
-
-   inline bool
-   isStringNode() const {return isKind(Kind::STRING);}
-
-   inline bool
-   isUseNode() const {return isKind(Kind::USE);}
+   isReferenceNode () const;
 
    // Returns true if the node is correctly formed after all the compiler
    // checks (but before any optimisation).
    virtual void
    isValid (NodeValidator* vld);
-
-   inline bool
-   isVarDeclNode() const {return isKind(Kind::VARIABLE_DECLARATION);}
-
-   void
-   eat (Node* n);
-
-   // Returns the type of the node as a string.
-   static const char*
-   get_type_name (int type);
-
-   // Returns the Nth child.
-   Node*
-   getChild (unsigned int i) const;
-
-   // Returns true if the node has children.
-   inline bool
-   hasChildren () { return _child_count > 0; }
 
    // Returns true if the node is of any text type.
    bool
@@ -205,70 +150,53 @@ class Node
    st::TypeVector
    packChildrenExprTypes ();
 
-   // Appends a child node.
-   void
-   pushChild (Node*);
-
-   // Appends 2 children nodes.
-   inline void
-   pushChildren (Node* n1, Node* n2)
-   {
-      pushChild(n1);
-      pushChild(n2);
-   }
-
-   // Appends 3 children nodes.
-   inline void
-   pushChildren (Node* n1, Node* n2, Node* n3)
-   {
-      pushChild(n1);
-      pushChild(n2);
-      pushChild(n3);
-   }
-
-   // Appends 4 children nodes.
-   inline void
-   pushChildren (Node* n1, Node* n2, Node* n3, Node* n4)
-   {
-      pushChild(n1);
-      pushChild(n2);
-      pushChild(n3);
-      pushChild(n4);
-   }
-
-   Node*
-   removeChild (Node* search);
-
    // Replaces a child node with another node.
    bool
    replaceChild (Node* search, Node* replace);
 
-   // Unlinks this node so that it is not pointed to by its parent, siblings,
-   // etc.
-   void
-   unlink ();
-
-   void
-   unlinkChildren ();
+   virtual void
+   setChild (size_t i, Node* n) {}
 
 
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
-   public:
+   protected:
 
    st::Symbol* _bound_type;
-   size_t _child_count;
-   unsigned long _depth;
    st::Type* _exp_type;
-   Node* _first_child;
-   Node* _last_child;
-   Node* _next;
    Node* _parent;
    fs::position::Range* _position;
-   Node* _prev;
    int _type;
 };
+
+template <class T> T*
+cast (Node* n)
+{
+   IF_DEBUG
+   {
+      if (n == NULL)
+      {
+         DEBUG_PRINTF("Invalid cast: node @%x is NULL\n", (int)n);
+         assert(false);
+      }
+      else if (!node::canCast(n->Kind(), T::kTYPE))
+      {
+         DEBUG_PRINTF("Invalid cast: cannot cast from %s to %s\n",
+            Node::get_type_name(n->Kind()),
+            Node::get_type_name(T::kTYPE));
+         assert(false);
+      }
+   }
+   return static_cast<T*>(n);
+}
+
+template <class T> bool
+isa (Node* n)
+{
+   if (n != NULL) return node::canCast(n->Kind(), T::kTYPE);
+   return false;
+}
 
 void
 assertKind (Node* n, int k);

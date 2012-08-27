@@ -3,15 +3,21 @@
 
 
 #include <string>
+#include "mem/ast/node/Class.hpp"
+#include "mem/ast/node/EnumType.hpp"
 #include "mem/ast/node/Func.hpp"
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/NodeList.hpp"
+#include "mem/ast/node/Use.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class File : public Node
+class File : public NodeList
 {
+   public:
+   static const int kTYPE = Kind::FILE;
+
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
@@ -28,9 +34,7 @@ class File : public Node
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    File ();
 
 
@@ -55,7 +59,7 @@ class File : public Node
    SETTER(IncludePath, std::string) {_include_path = val;}
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(MemorySize, int) {return sizeof(File);}
 
    // Path
    SETTER(Path, std::string) {_path = val;}
@@ -67,10 +71,10 @@ class File : public Node
    public:
 
    virtual void
-   isValid(NodeValidator* v);
+   isValid (NodeValidator* v);
 
    void
-   registerFunction(node::Func* func_n);
+   registerFunction (node::Func* func_n);
 };
 
 

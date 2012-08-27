@@ -4,16 +4,25 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 FinalId::FinalId ()
 {
-   _type = Kind::FINAL_ID;
+   _type = FinalId::kTYPE;
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 Node*
 FinalId::copy () const
 {
    FinalId* n = new FinalId ();
-   n->sValue(this->gValue());
+   n->setValue(Value());
    n->setBoundSymbol(BoundSymbol());
    n->setExprType(ExprType());
    if (Position() != NULL)
@@ -28,15 +37,8 @@ FinalId::isValid (NodeValidator* v)
 {
    Node::isValid(v);
    v->ensure(ChildCount() == 0, "FinalId cannot have children");
-   v->ensure(hasExprType(), "FinalId must have an expression type");
-   v->ensure(hasBoundSymbol(), "FinalId must have a bound symbol");
-}
-
-FinalId*
-castToFinalId (Node* n)
-{
-   ast::node::assertKind (n, Kind::FINAL_ID);
-   return static_cast<FinalId*>(n);
+   //v->ensure(hasExprType(), "FinalId must have an expression type");
+   //v->ensure(hasBoundSymbol(), "FinalId must have a bound symbol");
 }
 
 } } }

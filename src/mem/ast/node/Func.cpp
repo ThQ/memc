@@ -10,81 +10,57 @@ namespace mem { namespace ast { namespace node {
 
 Func::Func()
 {
-   _type = Kind::FUNCTION;
+   _body_node = NULL;
+   _decorator_node = NULL;
+   _name_node = NULL;
    _next_function = NULL;
+   _params_node = NULL;
+   _type = Func::kTYPE;
+   _return_type_node = NULL;
 }
 
-Block*
-Func::BodyNode ()
+Func::~Func ()
 {
-   for (size_t i = 0 ; i < ChildCount() ; ++i)
-   {
-      if (getChild(i)->isBlockNode())
-      {
-         return static_cast<Block*>(getChild(i));
-      }
-   }
-   return NULL;
+   delete _body_node;
+   delete _decorator_node;
+   delete _name_node;
+   delete _params_node;
+   delete _return_type_node;
 }
 
-Decorator*
-Func::DecoratorNode () const
-{
-   for (size_t i = 0; i < ChildCount(); ++i)
-   {
-      if (getChild(i)->isDecoratorNode())
-      {
-         return static_cast<Decorator*>(getChild(i));
-      }
-   }
-   return NULL;
-}
-
-Node*
-Func::ParamsNode ()
-{
-   for (size_t i = 0 ; i < ChildCount() ; ++i)
-   {
-      if (getChild(i)->isFuncParamsNode())
-      {
-         return getChild(i);
-      }
-   }
-   return NULL;
-}
-
-Node*
-Func::ReturnTypeNode ()
-{
-   for (size_t i = 0 ; i < ChildCount() ; ++i)
-   {
-      if (!getChild(i)->isFuncParamsNode() && !getChild(i)->isBlockNode() && !getChild(i)->isDecoratorNode())
-      {
-         return getChild(i);
-      }
-   }
-   return NULL;
-}
 
 //-----------------------------------------------------------------------------
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
-node::Node*
+node::VarDecl*
 Func::createParameter (std::string name, st::Type* ty)
 {
-   node::Text* name_n = new node::Text();
-   name_n->setKind(Kind::ID);
-   name_n->sValue(name);
+   node::FinalId* name_n = new node::FinalId();
+   name_n->setValue(name);
 
    node::FinalId* type_n = new node::FinalId();
-   type_n->sValue(ty->Name());
+   type_n->setValue(ty->Name());
 
-   node::Node* param = new node::Node();
-   param->setKind(Kind::FUNCTION_PARAMETER);
-   param->pushChildren(name_n, type_n);
+   node::VarDecl* param = new node::VarDecl();
+   param->setNameNode(name_n);
+   param->setTypeNode(type_n);
 
    return param;
+}
+
+Node*
+Func::getChild (size_t i) const
+{
+   switch (i)
+   {
+      case 0: return _decorator_node;
+      case 1: return _name_node;
+      case 2: return _params_node;
+      case 3: return _return_type_node;
+      case 4: return _body_node;
+   }
+   return NULL;
 }
 
 bool
@@ -93,11 +69,17 @@ Func::isVirtual ()
    return BodyNode() == NULL;
 }
 
-Func*
-castToFunc (Node* n)
+void
+Func::setChild (size_t i, Node* n)
 {
-   assertKind (n, Kind::FUNCTION);
-   return static_cast<Func*>(n);
+   switch (i)
+   {
+      case 0: setDecoratorNode(node::cast<Decorator>(n));break;
+      case 1: setNameNode(node::cast<Id>(n));break;
+      case 2: setParamsNode(n);break;
+      case 3: setReturnTypeNode(n);break;
+      case 4: setBodyNode(node::cast<Block>(n));break;
+   }
 }
 
 

@@ -11,7 +11,7 @@ TopTypesChecker::TopTypesChecker ()
 bool
 TopTypesChecker::visit (node::Node* node)
 {
-   DEBUG_REQUIRE (node != NULL);
+   if (node == NULL) return true;
 
    node::Node* parent = node->Parent();
 
@@ -20,34 +20,29 @@ TopTypesChecker::visit (node::Node* node)
       case node::Kind::CLASS:
       {
          assert (parent != NULL);
-         visitClass(node->BoundSymbol(), static_cast<node::Class*>(node));
+         visitClass(node->BoundSymbol(), node::cast<node::Class>(node));
          return true;
       }
       case node::Kind::ENUM:
       {
          assert (parent != NULL);
-         assert (parent->isFileNode());
-         visitEnum(parent->BoundSymbol(), static_cast<node::Enum*>(node));
+         assert (node::isa<node::File>(parent));
+         visitEnumType(parent->BoundSymbol(), node::cast<node::EnumType>(node));
          return false;
       }
       case node::Kind::FIELD:
       {
          assert (parent != NULL);
-         assert (parent->isClassNode() || parent->isEnumNode());
-         visitField(parent->BoundSymbol(), static_cast<node::Field*>(node));
+         visitField(parent->Parent()->BoundSymbol(), node::cast<node::Field>(node));
          return false;
       }
-      case node::Kind::FILE: break;
       case node::Kind::FUNCTION:
       {
          assert (parent != NULL);
-         assert(parent->BoundSymbol() != NULL);
-         visitFuncDecl(parent->BoundSymbol(), static_cast<node::Func*>(node));
+         assert(parent->hasBoundSymbol());
+         visitFuncDecl(parent->BoundSymbol(), node::cast<node::Func>(node));
          return false;
       }
-      case node::Kind::ROOT: break;
-      default:
-         return false;
    }
    return true;
 }
@@ -58,7 +53,7 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (clss != NULL);
 
-   node::Node* parent_ty_node = clss->gParentTypeNode();
+   node::Node* parent_ty_node = clss->ParentTypeNode();
    if (parent_ty_node != NULL)
    {
       visitExpr(scope, parent_ty_node);
@@ -71,12 +66,19 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
 }
 
 void
-TopTypesChecker::visitEnum (st::Symbol* scope, node::Enum* n)
+TopTypesChecker::visitEnumType (st::Symbol* scope, node::EnumType* n)
 {
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::EnumType>(n));
 
+   // Create the enumeration type
    st::EnumType* enum_ty = new st::EnumType();
-   enum_ty->setName(n->gValue());
+   enum_ty->setName(n->Value());
+
+   // Add the enum to the parent file node
    scope->addChild(enum_ty);
+
    n->setBoundSymbol(enum_ty);
 
    if (n->ChildCount() > 0)
@@ -84,16 +86,17 @@ TopTypesChecker::visitEnum (st::Symbol* scope, node::Enum* n)
       node::VarDecl* var_n = NULL;
       for (size_t i = 0; i < n->ChildCount(); ++i)
       {
-         var_n = static_cast<node::VarDecl*>(n->getChild(i));
+         var_n = node::cast<node::VarDecl>(n->getChild(i));
          visitVarDecl(enum_ty, var_n);
          ensureConstantExpr(var_n->ValueNode());
          var_n->setExprType(enum_ty);
          static_cast<st::Var*>(var_n->BoundSymbol())->setConstantValue(st::castToIntConstant(var_n->ValueNode()->BoundSymbol()));
       }
-      enum_ty->setType(static_cast<node::VarDecl*>(n->getChild(0))->ValueNode()->ExprType());
+      enum_ty->setType(node::cast<node::VarDecl>(n->getChild(0))->ValueNode()->ExprType());
 
       // We have to go over all the enum fields again to replace their original
       // type (ex: int) by the enum ty.
+      // FIXME : This should be done otherwise, how ?
       st::SymbolMapIterator i;
       st::Var* field = NULL;
       for (i = enum_ty->Children().begin(); i != enum_ty->Children().end(); ++i)
@@ -113,30 +116,31 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
    DEBUG_REQUIRE (scope->isClassType() || scope->isEnumType());
    DEBUG_REQUIRE (field != NULL);
 
-   node::Text* name_node = static_cast<node::Text*>(field->NameNode());
+   node::Text* name_node = node::cast<node::Text>(field->NameNode());
    node::Node* type_node = field->TypeNode();
    assert (name_node != NULL);
    assert (type_node != NULL);
 
    visitExpr(scope, type_node);
 
-   if (type_node->hasExprType())
+   if (type_node->hasExprType() && type_node->hasBoundSymbol())
    {
       if (ensureSizedExprType(type_node))
       {
          // TODO Ugly one here...
-         if (!type_node->ExprType()->isClassType() || !static_cast<st::Class*>(type_node->BoundSymbol())->isDependingOn(static_cast<st::Class*>(scope)))
-         {
+         st::Type* ty = st::castToType(type_node->BoundSymbol());
+         //if (ty->isClassType())// || !class_ty->isDependingOn(static_cast<st::Class*>(scope)))
+         //{
             st::Field* sym_field = new st::Field();
-            sym_field->setName(name_node->gValue());
-            sym_field->setType(type_node->ExprType());
+            sym_field->setName(name_node->Value());
+            sym_field->setType(ty);
             scope->addChild(sym_field);
 
             name_node->setBoundSymbol(sym_field);
             field->setBoundSymbol(sym_field);
             field->setExprType(sym_field->Type());
             assert(sym_field->Type() != NULL);
-
+#if 0
          }
          // Circular dependency
          else
@@ -148,6 +152,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
             err->format();
             log(err);
          }
+#endif
       }
       else
       {
@@ -175,23 +180,20 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    //  Declare the function
    // ----------------------
    st::Func* func_sym = new st::Func();
-   func_sym->setName(func_decl->gValue());
+   func_sym->setName(func_decl->Value());
    func_sym->setHasBody(func_decl->BodyNode() != NULL);
    scope->addChild(func_sym);
    _symbols->registerFunction(func_sym);
 
    func_decl->setBoundSymbol(func_sym);
+   func_decl->NameNode()->setBoundSymbol(func_sym);
+   func_decl->NameNode()->setExprType(func_sym);
 
-   if (func_decl->ReturnTypeNode() != NULL)
-   {
-      visitFuncReturnType (func_decl, func_sym);
-   }
-   else
-   {
-      // @TODO Set the return type to void
-   }
+   visitFuncReturnType (func_decl, func_sym);
 
-   // Visit function parameters
+   // ---------------------------
+   //  Visit function parameters
+   // ---------------------------
    node::Node* func_params = func_decl->ParamsNode();
    if (func_params != NULL)
    {
@@ -231,9 +233,10 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    //  Overriding check
    // ------------------
    // Try to find a function with the same name in ancestors
+   // FIXME This should be moved to another function
    if (scope->isClassType())
    {
-      st::Symbol* shadowed_sym = st::util::lookupSymbol(st::castToClassType(scope)->ParentClass(), func_decl->gValue());
+      st::Symbol* shadowed_sym = st::util::lookupSymbol(st::castToClassType(scope)->ParentClass(), func_decl->Value());
 
       if (shadowed_sym != NULL)
       {
@@ -269,22 +272,22 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
    st::Func* func_sym)
 {
    st::Arg* param_sym = NULL;
-   node::Node* param_node = NULL;
+   node::VarDecl* param_node = NULL;
    node::Text* name_node = NULL;
    node::Text* type_node = NULL;
 
    for (size_t i = 0; i < params_node->ChildCount(); ++i)
    {
-      param_node = params_node->getChild(i);
-      name_node = static_cast<node::Text*>(param_node->getChild(0));
-      type_node = static_cast<node::Text*>(param_node->getChild(1));
+      param_node = node::cast<node::VarDecl>(params_node->getChild(i));
+      name_node = node::cast<node::Text>(param_node->NameNode());
+      type_node = node::cast<node::Text>(param_node->TypeNode());
 
       visitExpr(scope, type_node);
 
       if (type_node->hasExprType())
       {
          // Add parameter to function symbol parameters
-         param_sym = func_sym->addParam(name_node->gValueCstr(),
+         param_sym = func_sym->addParam(name_node->Value(),
             st::castToType(type_node->ExprType()));
 
          // Add parameter to the symbol table of the block
@@ -296,6 +299,7 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
          func_sym->addChild(param_sym);
 
          name_node->setBoundSymbol(param_sym);
+         name_node->setExprType(param_sym->Type());
          param_node->setBoundSymbol(param_sym);
          param_node->setExprType(param_sym->Type());
       }
@@ -310,8 +314,7 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
    DEBUG_REQUIRE (func_sym != NULL);
    DEBUG_REQUIRE (func_node->ReturnTypeNode() != NULL);
 
-   node::Text* ret_ty_node = static_cast<node::Text*>(
-      func_node->ReturnTypeNode());
+   node::Text* ret_ty_node = node::cast<node::Text>(func_node->ReturnTypeNode());
 
    visitExpr(func_sym, ret_ty_node);
    assert (ret_ty_node != NULL);

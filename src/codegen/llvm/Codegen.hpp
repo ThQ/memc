@@ -10,7 +10,7 @@
 #include "codegen/llvm/TypeMaker.hpp"
 #include "codegen/ICodegen.hpp"
 #include "codegen/TStack.hpp"
-#include "mem/ast/node/Array.hpp"
+#include "mem/ast/node/ArrayType.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
@@ -21,6 +21,7 @@
 #include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
+#include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/String.hpp"
 #include "mem/ast/node/Tuple.hpp"
 #include "mem/ast/node/VarAssign.hpp"
@@ -146,8 +147,8 @@ class Codegen : public codegen::ICodegen
    inline void
    cgBlock (mem::ast::node::Node* block)
    {
-      assert(block->isBlockNode());
-      cgBlock(static_cast<mem::ast::node::Block*>(block));
+      assert(mem::ast::node::isa<mem::ast::node::Block>(block));
+      cgBlock(mem::ast::node::cast<mem::ast::node::Block>(block));
    }
 
    void
@@ -166,7 +167,7 @@ class Codegen : public codegen::ICodegen
    cgCompOp (mem::ast::node::BinaryOp* node);
 
    llvm::Value*
-   cgDotExpr (mem::ast::node::Dot* node);
+   cgDotExpr (mem::ast::node::BinaryOp* node);
 
    void
    cgFile (mem::ast::node::File* file_node);
@@ -222,7 +223,7 @@ class Codegen : public codegen::ICodegen
    cgDerefExpr (mem::ast::node::Node* node);
 
    void
-   cgReturnStatement (mem::ast::node::Node* node);
+   cgReturnStatement (mem::ast::node::Return* node);
 
    llvm::Value*
    cgString (mem::ast::node::String* n);

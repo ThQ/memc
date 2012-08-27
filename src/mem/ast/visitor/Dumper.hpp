@@ -13,9 +13,7 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-/**
- * A base class for AST dumpers.
- */
+// A base class for AST dumpers.
 class Dumper : public Visitor
 {
    //--------------------------------------------------------------------------

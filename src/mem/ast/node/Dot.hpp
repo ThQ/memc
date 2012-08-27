@@ -1,23 +1,30 @@
 #ifndef _MEM__AST__NODE__DOT__HPP_
 #define _MEM__AST__NODE__DOT__HPP_
 
-
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/BinaryOp.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
-
-class Dot: public Node
+// A class to represent the dot operator
+//
+// Syntax:
+//    [Left].[Right]
+//
+// Ex:
+//    my_namespace.my_class
+class Dot: public BinaryOp
 {
+   public:
+   static const int kTYPE = Kind::DOT;
+
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Dot();
 
 
@@ -26,14 +33,8 @@ class Dot: public Node
    //--------------------------------------------------------------------------
    public:
 
-   // LeftNode
-   GETTER(LeftNode, node::Node*) {return getChild(0);}
-
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
-
-   // RightNode
-   GETTER(RightNode, node::Node*) {return getChild(1);}
+   GETTER (MemorySize, int) {return sizeof(Dot);}
 
 
    //--------------------------------------------------------------------------
@@ -45,8 +46,6 @@ class Dot: public Node
    isValid (NodeValidator* v);
 };
 
-Dot*
-castToDot (Node* s);
 
 } } }
 

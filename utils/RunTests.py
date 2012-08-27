@@ -136,24 +136,25 @@ class TestRunner:
       items.sort()
       line = ""
       for item in items:
-         test = TestFile()
-         test.open(os.path.join(kTEST_DIR + "/" + item))
+         if item.endswith(".memt"):
+            test = TestFile()
+            test.open(os.path.join(kTEST_DIR + "/" + item))
 
-         line = ""
-         line += "[" + str(int(1.0*i/self._num_tests*100)).rjust(3) + "%]"
-         line += " " + test.name + " "
+            line = ""
+            line += "[" + str(int(1.0*i/self._num_tests*100)).rjust(3) + "%]"
+            line += " " + test.name + " "
 
-         ret_code = test.run()
-         if ret_code == 0:
-            line += "." * (79 - len(line) - 3) + " OK"
-         elif ret_code == 1:
-            self._failed_tests.append(item)
-            line += "." * (79 - len(line) - 7) + " FAILED"
-         else:
-            self._failed_tests.append(item)
-            line += "." * (79 - len(line) - 8) + " CRASHED"
-         i += 1
-         print line
+            ret_code = test.run()
+            if ret_code == 0:
+               line += "." * (79 - len(line) - 3) + " OK"
+            elif ret_code == 1:
+               self._failed_tests.append(item)
+               line += "." * (79 - len(line) - 7) + " FAILED"
+            else:
+               self._failed_tests.append(item)
+               line += "." * (79 - len(line) - 8) + " CRASHED"
+            i += 1
+            print line
 
 runner = TestRunner()
 runner.run_all()

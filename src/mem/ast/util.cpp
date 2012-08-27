@@ -7,15 +7,11 @@ namespace mem { namespace ast { namespace util {
 node::Call*
 createCall (std::string qualified_name, ast::node::Node* arg)
 {
-   ast::node::Call* call = new ast::node::Call();
-
    ast::node::FinalId* caller_id = new ast::node::FinalId();
-   caller_id->sValue(qualified_name);
+   caller_id->setValue(qualified_name);
 
-
-   ast::node::Node* arg_list = new ast::node::Node();
-   arg_list->setKind(ast::node::Kind::EXPRESSION_LIST);
-   arg_list->pushChild(arg);
+   ast::node::NodeList* arg_list = new ast::node::NodeList();
+   arg_list->addChild(arg);
 
    ast::node::Dot* dot = NULL;
    ast::node::Text* part_id = NULL;
@@ -26,21 +22,25 @@ createCall (std::string qualified_name, ast::node::Node* arg)
       if (i == 0)
       {
          part_id = new ast::node::FinalId();
-         part_id->sValue(id_parts[i]);
+         part_id->setValue(id_parts[i]);
          prev = part_id;
       }
       else
       {
          part_id = new ast::node::Text();
          part_id->setKind(ast::node::Kind::ID);
-         part_id->sValue(id_parts[i]);
+         part_id->setValue(id_parts[i]);
 
          dot = new ast::node::Dot();
-         dot->pushChildren(prev, part_id);
+         dot->setLeftNode(prev);
+         dot->setRightNode(part_id);
          prev = dot;
       }
    }
-   call->pushChildren(prev, arg_list);
+   ast::node::Call* call = new ast::node::Call();
+   call->setCallerNode(prev);
+   call->setParamsNode(arg_list);
+
    return call;
 }
 
@@ -49,11 +49,11 @@ getFileNode (node::Node* cur_node)
 {
    while (cur_node != NULL)
    {
-      if (cur_node->isFileNode())
+      if (node::isa<node::File>(cur_node))
       {
          return static_cast<node::File*>(cur_node);
       }
-      cur_node = cur_node->_parent;
+      cur_node = cur_node->Parent();
    }
    return NULL;
 }
@@ -63,7 +63,7 @@ getParentFunction (node::Node* cur_node)
 {
    while (cur_node != NULL)
    {
-      if (cur_node->isFuncNode())
+      if (node::isa<node::Func>(cur_node))
       {
          if (cur_node->hasBoundSymbol())
          {
@@ -71,7 +71,7 @@ getParentFunction (node::Node* cur_node)
          }
          return static_cast<st::Func*>(cur_node->BoundSymbol());
       }
-      cur_node = cur_node->_parent;
+      cur_node = cur_node->Parent();
    }
    return NULL;
 }

@@ -20,10 +20,6 @@
 
 namespace mem { namespace ast { namespace util {
 
-template<class T, unsigned int NodeKind>
-T
-castTo (node::Node* n){assert(n->isKind(NodeKind));return static_cast<T>(n);}
-
 node::Call*
 createCall (std::string qualified_name, ast::node::Node* arg);
 

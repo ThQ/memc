@@ -2,26 +2,34 @@
 #define _MEM__AST__NODE__ROOT__HPP_
 
 
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/NodeList.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class Root : public Node
+class Root : public NodeList
 {
+   public:
+   static const int kTYPE = Kind::ROOT;
+
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    Root ();
 
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER (MemorySize, int) {return sizeof(Root);}
 };
 
 

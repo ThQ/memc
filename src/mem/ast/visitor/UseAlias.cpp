@@ -15,7 +15,7 @@ UseAlias::visit (node::Node* node)
    switch (node->Kind())
    {
       case node::Kind::USE:
-         visitUse(static_cast<node::Use*>(node));
+         visitUse(node::cast<node::Use>(node));
          return false;
    }
    return true;
@@ -24,7 +24,10 @@ UseAlias::visit (node::Node* node)
 void
 UseAlias::visitUse (node::Use* node)
 {
-   std::string file_ns_name = static_cast<node::Use*>(node)->gValue();
+   DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node::isa<node::Use>(node));
+
+   std::string file_ns_name = node::cast<node::Use>(node)->Value();
    std::vector<std::string> file_ns_parts = st::util::splitQualifiedName(file_ns_name);
    st::Symbol* file_sym = st::util::lookupSymbol(_symbols->Home(), file_ns_parts);
    if (file_sym == NULL)

@@ -11,36 +11,48 @@ namespace mem { namespace ast { namespace node {
 
 class For: public Node
 {
+   public:
+   static const int kTYPE = Kind::FOR;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    For();
 
+   // Destructor
+   virtual
+   ~For ();
 
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
-   // InitializationNode
-   GETTER(InitializationNode, node::Node*) {return getChild(0);}
+   // BlockNode
+   GETTER(BlockNode, node::Block*) {return _block_node;}
+   SETTER(BlockNode, node::Block*) {_block_node = val;}
+
+   // ChildCount
+   GETTER(ChildCount, size_t) {return 4;}
 
    // ConditionNode
-   GETTER(ConditionNode, node::Node*) {return getChild(1);}
+   GETTER(ConditionNode, node::Node*) {return _condition_node;}
+   SETTER(ConditionNode, node::Node*) {_condition_node = val;}
+
+   // InitializationNode
+   GETTER(InitializationNode, node::Node*) {return _initialization_node;}
+   SETTER(InitializationNode, node::Node*) {_initialization_node = val;}
 
    // IterationNode
-   GETTER(IterationNode, node::Node*) {return getChild(2);}
+   GETTER(IterationNode, node::Node*) {return _iteration_node;}
+   SETTER(IterationNode, node::Node*) {_iteration_node = val;}
 
-   // BlockNode
-   GETTER(BlockNode, node::Node*) {return static_cast<Block*>(getChild(3));}
-
+   // MemorySize
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(MemorySize, int) {return sizeof(For);}
 
 
    //--------------------------------------------------------------------------
@@ -48,10 +60,25 @@ class For: public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual Node*
+   getChild (size_t i) const;
+
    virtual void
    isValid (NodeValidator* v);
-};
 
+   virtual void
+   setChild (size_t i, Node* n);
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   Block* _block_node;
+   Node* _condition_node;
+   Node* _initialization_node;
+   Node* _iteration_node;
+};
 
 } } }
 

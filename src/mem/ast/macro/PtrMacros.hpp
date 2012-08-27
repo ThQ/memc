@@ -2,9 +2,10 @@
 #define _MEM__AST__MACRO__PTR_MACROS__HPP_
 
 
-#include "mem/ast/node/Array.hpp"
+#include "mem/ast/node/ArrayType.hpp"
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/New.hpp"
+#include "mem/ast/node/NodeList.hpp"
 #include "mem/ast/node/String.hpp"
 #include "mem/ast/macro/Macro.hpp"
 

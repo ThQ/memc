@@ -1,37 +1,29 @@
 #include "mem/ast/node/Text.hpp"
 
+
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Text::Text ()
 {
-   _type = Kind::TEXT;
+   _type = Text::kTYPE;
    _value.assign("");
 }
 
-void
-Text::sValue (const char* value)
-{
-   _value.assign(value);
-}
 
-void
-Text::sValue (const char* value, size_t len)
-{
-   _value.assign(value, len);
-}
-
-void
-Text::sValue (std::string value)
-{
-   _value.assign(value);
-}
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 Node*
 Text::copy () const
 {
    Text* n = new Text();
-   n->sValue(n->gValue());
+   n->setValue(n->Value());
    return n;
 }
 

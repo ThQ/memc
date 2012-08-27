@@ -63,6 +63,6 @@ class Parse
 
 }
 
-extern int yyparse(mem::ast::node::Node* ast, mem::st::SymbolTable* symbols, mem::log::Logger* logger, mem::fs::File* file);
+extern int yyparse(mem::ast::node::File* ast, mem::st::SymbolTable* symbols, mem::log::Logger* logger, mem::fs::File* file);
 
 #endif

@@ -11,8 +11,8 @@ bool
 Overriding::decorate (ast::node::Node* n)
 {
    DEBUG_REQUIRE (n != NULL);
-   DEBUG_REQUIRE (n->isDecoratorNode());
-   DEBUG_REQUIRE (n->Parent()->isFuncNode());
+   DEBUG_REQUIRE (ast::node::isa<ast::node::Decorator>(n));
+   DEBUG_REQUIRE (ast::node::isa<ast::node::Func>(n->Parent()));
 
    //FIXME Do something here
    st::Func* func_sym = static_cast<st::Func*>(n->Parent()->BoundSymbol());

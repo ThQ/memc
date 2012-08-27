@@ -7,18 +7,29 @@
 
 namespace mem { namespace ast { namespace node {
 
-
+// A return statement
+//
+// Syntax:
+//    return <ValueNode>
+//
+// Ex:
+//    return 1
 class Return : public Node
 {
+   public:
+   static const int kTYPE = Kind::RETURN;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    Return ();
+
+   // Destructor
+   virtual
+   ~Return ();
 
 
    //--------------------------------------------------------------------------
@@ -27,10 +38,11 @@ class Return : public Node
    public:
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER (MemorySize, int) {return sizeof(Return);}
 
    // ValueNode
-   GETTER(ValueNode, Node*) {return getChild(0);}
+   GETTER (ValueNode, Node*) {return _value_node;}
+   SETTER (ValueNode, Node*) {_value_node = val;}
 
 
    //--------------------------------------------------------------------------
@@ -38,8 +50,22 @@ class Return : public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual Node*
+   getChild (size_t i) const;
+
    virtual void
    isValid (NodeValidator* v);
+
+   virtual void
+   setChild (size_t i, Node* n);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   Node* _value_node;
 };
 
 

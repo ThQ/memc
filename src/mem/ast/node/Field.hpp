@@ -2,6 +2,7 @@
 #define _MEM__AST__NODE__FIELD__HPP
 
 
+#include "mem/ast/node/Id.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/node/VarDecl.hpp"
@@ -12,18 +13,29 @@ namespace mem { namespace ast { namespace node {
 
 class Field : public VarDecl
 {
+   public:
+   static const int kTYPE = Kind::FIELD;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Field ();
 
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(ChildCount, size_t) {return 2;}
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Field);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

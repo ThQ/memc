@@ -2,29 +2,28 @@
 #define _MEM__AST__NODE__BLOCK__HPP_
 
 
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/NodeList.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class Block : public Node
+class Block : public NodeList
 {
+   public:
+   static const int kTYPE = Kind::BLOCK;
+
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    // -------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Block ();
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
-
+   GETTER(MemorySize, int) {return sizeof(Block);}
 };
-
 
 } } }
 

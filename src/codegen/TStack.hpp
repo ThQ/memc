@@ -30,8 +30,7 @@ class TStack
          if (i == 0) break;
          --i;
       }
-      V res;
-      return res;
+      return NULL;
    }
 
    public: void pop ()

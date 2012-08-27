@@ -4,9 +4,40 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 If::If ()
 {
-   _type = Kind::IF;
+   _condition_node = NULL;
+   _else_block_node = NULL;
+   _if_block_node = NULL;
+   _type = If::kTYPE;
+}
+
+If::~If ()
+{
+   delete _condition_node;
+   delete _if_block_node;
+   delete _else_block_node;
+}
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+Node*
+If::getChild (size_t i) const
+{
+   switch (i)
+   {
+      case 0: return _condition_node;
+      case 1: return _if_block_node;
+      case 2: return _else_block_node;
+   }
+   return NULL;
 }
 
 void
@@ -28,5 +59,17 @@ If::isValid (NodeValidator* v)
       }
    }
 }
+
+void
+If::setChild (size_t i, Node* n)
+{
+   switch (i)
+   {
+      case 0: setConditionNode(n); break;
+      case 1: setIfBlockNode(node::cast<Block>(n)); break;
+      case 2: setElseBlockNode(node::cast<Block>(n)); break;
+   }
+}
+
 
 } } }

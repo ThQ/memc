@@ -14,16 +14,29 @@ namespace mem { namespace ast { namespace node {
 // A class to represent literal numbers.
 class Number : public Node
 {
+   public:
+   static const int kTYPE = Kind::NUMBER;
+
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUTOR
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
    // Default constructor.
    Number ();
 
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(ChildCount, size_t) {return 0;}
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Number);}
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -33,9 +46,6 @@ class Number : public Node
    void
    isValid (NodeValidator* vld);
 };
-
-Number*
-castToNumber (Node* n);
 
 } } }
 

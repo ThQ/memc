@@ -31,7 +31,7 @@ Compiler::Compiler ()
    addAstVisitor(new mem::ast::visitor::Decorate(_decorators));
    addAstVisitor(new mem::ast::visitor::Ctor());
    addAstVisitor(new mem::ast::visitor::BlockTypesChecker());
-   //addAstVisitor(new mem::ast::visitor::TypeMatch());
+   addAstVisitor(new mem::ast::visitor::CoherenceChecker());
    addAstVisitor(new mem::ast::visitor::CheckValidity());
    addAstVisitor(new mem::ast::visitor::FindEntryPoint());
    addAstVisitor(new mem::ast::visitor::Stats());
@@ -203,7 +203,7 @@ Compiler::parse (std::string file_path)
       file_node->setId(ns_name);
       file_node->setIncludePath(file->_include_path);
       file_node->setPath(file_path);
-      ast.pushChild(file_node);
+      ast.addChild(file_node);
 
       mem::ast::visitor::FindUse find_use;
       _logger->debug("Searching for use statements", "");

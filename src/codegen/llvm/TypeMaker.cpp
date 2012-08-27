@@ -171,7 +171,7 @@ TypeMaker::makeDefaultConstant (mem::st::Type* t)
    llvm::Constant* cns = NULL;
    if (t->isIntType())
    {
-      mem::st::IntType* int_ty = mem::st::castToIntType(t);
+      //mem::st::IntType* int_ty = mem::st::castToIntType(t);
       cns = llvm::ConstantInt::get(get(t), 0, true /* is signed */);
    }
    else if (t->isPointerType())

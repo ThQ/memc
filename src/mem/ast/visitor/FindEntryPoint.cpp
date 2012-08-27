@@ -26,7 +26,7 @@ FindEntryPoint::tearDown ()
 bool
 FindEntryPoint::visit (node::Node* node)
 {
-   if (node->isFuncNode())
+   if (node::isa<node::Func>(node))
    {
       st::Func* func = st::castToFunc(node->BoundSymbol());
       if (func->Name() == "main")

@@ -3,10 +3,10 @@
 
 
 #include <vector>
-#include "mem/ast/node/Array.hpp"
+#include "mem/ast/node/ArrayType.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
-#include "mem/ast/node/Enum.hpp"
+#include "mem/ast/node/EnumType.hpp"
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
@@ -47,9 +47,7 @@ class TopTypesChecker : public BlockTypesChecker
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Visitor entry point.
-    */
+   // Visitor entry point.
    virtual bool
    visit (node::Node* node);
 
@@ -57,34 +55,26 @@ class TopTypesChecker : public BlockTypesChecker
    visitClass (st::Symbol* scope, node::Class* clss);
 
    void
-   visitEnum (st::Symbol* scope, node::Enum* node);
+   visitEnumType (st::Symbol* scope, node::EnumType* node);
 
-   /**
-    * Visit a class field declaration (MEM_NODE_FIELD).
-    *
-    * Checks whether the type symbol is really one and binds it to the AST.
-    *
-    * @param scope A class symbol, the field's parent.
-    * @param field The field node to check.
-    */
+   // Visit a class field declaration (MEM_NODE_FIELD).
+   //
+   // Checks whether the type symbol is really one and binds it to the AST.
+   //
+   // param(scope): A class symbol, the field's parent.
+   // param(field): The field node to check.
    void
    visitField (st::Symbol* scope, node::Field* field);
 
-   /**
-    * Visit a function declaration (MEM_NODE_FUNCTION_DECLARATION)
-    */
+   // Visit a function declaration (MEM_NODE_FUNCTION_DECLARATION)
    void
    visitFuncDecl (st::Symbol* scope, node::Func* func_decl);
 
-   /**
-    * Visit parameters in function declaration.
-    */
+   // Visit parameters in function declaration.
    void
    visitFuncParams (st::Symbol* scope, node::Node* params_node, st::Func* func);
 
-   /**
-    * Visit return type in function declaration.
-    */
+   // Visit return type in function declaration.
    void
    visitFuncReturnType (node::Func* func_node, st::Func* func_sym);
 };

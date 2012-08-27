@@ -11,18 +11,22 @@ namespace mem { namespace ast { namespace node {
 
 class Text: public Node
 {
-   public: std::string _value;
+   public:
+   static const int kTYPE = Kind::TEXT;
+
 
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
+   public:
 
-   // PROPERTY : Value
-   public: std::string gValue() const { return this->_value;}
-   public: const char* gValueCstr() {return this->_value.c_str();}
-   public: void sValue (const char* value);
-   public: void sValue (const char* value, size_t len);
-   public: void sValue (std::string value);
+   // Value
+   GETTER(Value, std::string) {return _value;}
+   SETTER(Value, std::string) {_value = val;}
+
+   // ValueCstr
+   GETTER(ValueCstr, const char*) {return _value.c_str();}
+
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
@@ -33,7 +37,8 @@ class Text: public Node
    Text ();
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER (MemorySize, int) {return sizeof(Text);}
+
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -42,6 +47,14 @@ class Text: public Node
 
    virtual Node*
    copy () const;
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   std::string _value;
 };
 
 

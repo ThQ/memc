@@ -3,7 +3,7 @@
 
 
 #include <string>
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/Block.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -11,15 +11,19 @@ namespace mem { namespace ast { namespace node {
 
 class While : public Node
 {
+   public:
+   static const int kTYPE = Kind::WHILE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    While ();
+
+   // Destructor
+   ~While ();
 
 
    //--------------------------------------------------------------------------
@@ -27,14 +31,28 @@ class While : public Node
    //--------------------------------------------------------------------------
    public:
 
+   // ChildCount
+   virtual
+   GETTER (ChildCount, size_t) {return 2;}
+
    // ConditionNode
-   GETTER(ConditionNode, Node*) {return this->getChild(0);}
+   GETTER (ConditionNode, Node*) {return _condition_node;}
+   SETTER (ConditionNode, Node*)
+   {
+      _condition_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // BodyNode
-   GETTER(BodyNode, Node*) {return this->getChild(1);}
+   GETTER (BlockNode, Block*) {return _block_node;}
+   SETTER (BlockNode, Block*)
+   {
+      _block_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER (MemorySize, int) {return sizeof(While);}
 
 
    //--------------------------------------------------------------------------
@@ -42,8 +60,23 @@ class While : public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual Node*
+   getChild (size_t i) const;
+
    virtual void
    isValid (NodeValidator* v);
+
+   virtual void
+   setChild (size_t i, Node* n);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   Node* _condition_node;
+   Block* _block_node;
 };
 
 

@@ -3,23 +3,35 @@
 
 
 #include "mem/ast/node/Node.hpp"
-#include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/FinalId.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
-
+// A node for variable declarations
+//
+// Syntax:
+//    <Name> :[Type] = [Value]
+//
+// Ex:
+//    my_int :int = 1
 class VarDecl : public Node
 {
+   public:
+   static const int kTYPE = Kind::VARIABLE_DECLARATION;
+
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    VarDecl ();
+
+   // Destructor
+   virtual
+   ~VarDecl ();
 
 
    //--------------------------------------------------------------------------
@@ -28,22 +40,40 @@ class VarDecl : public Node
    public:
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER (ChildCount, size_t) {return 3;}
+
+   virtual
+   GETTER (MemorySize, int) {return sizeof(VarDecl);}
 
    // Name
-   GETTER(Name, std::string) {return NameNode()->_value;}
+   GETTER (Name, std::string) {return NameNode()->_value;}
 
    // NameCstr
-   GETTER(NameCstr, const char*) {return Name().c_str();}
+   GETTER (NameCstr, const char*) {return Name().c_str();}
 
    // NameNode
-   GETTER(NameNode, Text*) { return static_cast<Text*>(getChild(0)); }
+   GETTER (NameNode, FinalId*) {return _name_node;}
+   SETTER (NameNode, FinalId*)
+   {
+      _name_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // TypeNode
-   GETTER(TypeNode, Node*) { return getChild(1); }
+   GETTER (TypeNode, Node*) {return _type_node;}
+   SETTER (TypeNode, Node*)
+   {
+      _type_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // ValueNode
-   GETTER(ValueNode, Node*) { return getChild(2); }
+   GETTER (ValueNode, Node*) {return _value_node;}
+   SETTER (ValueNode, Node*)
+   {
+      _value_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
 
    //--------------------------------------------------------------------------
@@ -51,8 +81,24 @@ class VarDecl : public Node
    //--------------------------------------------------------------------------
    public:
 
+   virtual Node*
+   getChild (size_t i) const;
+
    virtual void
    isValid (NodeValidator* v);
+
+   virtual void
+   setChild (size_t i, Node* n);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   FinalId* _name_node;
+   Node* _type_node;
+   Node* _value_node;
 };
 
 

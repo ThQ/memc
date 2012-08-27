@@ -17,14 +17,14 @@ PtrMacros::expand (node::Call* n)
    node::New* str = new node::New();
    if (n->ParamsNode()->ChildCount() == 2)
    {
-      node::Array* arr_node = new node::Array();
-      arr_node->pushChild(n->ParamsNode()->getChild(0));
-      arr_node->pushChild(n->ParamsNode()->getChild(1));
-      str->pushChild(arr_node);
+      node::ArrayType* arr_node = new node::ArrayType();
+      arr_node->setTypeNode(n->ParamsNode()->getChild(0));
+      arr_node->setLengthNode(n->ParamsNode()->getChild(1));
+      str->setTypeNode(arr_node);
    }
    else if (n->ParamsNode()->ChildCount() == 1)
    {
-      str->pushChild(n->ParamsNode()->getChild(0));
+      str->setTypeNode(n->ParamsNode()->getChild(0));
    }
    return str;
 }

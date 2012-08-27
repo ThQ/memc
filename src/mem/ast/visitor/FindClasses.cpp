@@ -14,9 +14,9 @@ FindClasses::visit (node::Node* node)
 {
    assert (node != NULL);
 
-   if (node->isClassNode())
+   if (node::isa<node::Class>(node))
    {
-      node::Class* cls_node = static_cast<node::Class*>(node);
+      node::Class* cls_node = node::cast<node::Class>(node);
       visitClassDecl(cls_node);
    }
 
@@ -34,7 +34,7 @@ FindClasses::visitClassDecl (node::Class* cls_node)
    assert(file_sym != NULL);
 
    st::Class* cls = new st::Class();
-   cls->setName(cls_node->gValue());
+   cls->setName(cls_node->Value());
    cls_node->setBoundSymbol(cls);
 
    st::util::registerType(_symbols, file_sym, cls);

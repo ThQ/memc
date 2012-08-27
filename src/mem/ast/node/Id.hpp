@@ -1,47 +1,50 @@
-#ifndef _MEM__AST__NODE__ARRAY__HPP_
-#define _MEM__AST__NODE__ARRAY__HPP_
+#ifndef _MEM__AST__NODE__ID__HPP_
+#define _MEM__AST__NODE__ID__HPP_
 
 
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/Text.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class Array: public Node
+class Id : public Text
 {
+   public:
+   static const int kTYPE = Kind::ID;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
-   Array();
+   // Default constructor
+   Id ();
 
 
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
-
-   GETTER(TypeNode, Node*) {return getChild(0);}
-   GETTER(LengthNode, Node*) {return getChild(1);}
+   public:
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(ChildCount, size_t) {return 0;}
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(Id);}
+
 
    //--------------------------------------------------------------------------
-   // FUNCTIONS
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
+
+   virtual Node*
+   copy () const;
 
    virtual void
    isValid (NodeValidator* v);
 };
-
-static Array*
-castToArray (Node* n);
 
 } } }
 

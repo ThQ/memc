@@ -10,15 +10,19 @@ namespace mem { namespace ast { namespace node {
 
 class BinaryOp: public Text // FIXME Inherit from Text so as to please bison
 {
+   public:
+   static const int kTYPE = Kind::BINARY_OPERATOR;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
-   BinaryOp();
+   // Default constructor
+   BinaryOp ();
+
+   // Destructor
+   ~BinaryOp ();
 
 
    //--------------------------------------------------------------------------
@@ -26,14 +30,25 @@ class BinaryOp: public Text // FIXME Inherit from Text so as to please bison
    //--------------------------------------------------------------------------
    public:
 
-   inline node::Node*
-   LeftNode() {return getChild(0);}
+   virtual
+   GETTER(ChildCount, size_t) {return 2;}
 
-   inline node::Node*
-   RightNode() {return getChild(1);}
+   GETTER (LeftNode, node::Node*) {return _left_node;}
+   SETTER (LeftNode, node::Node*)
+   {
+      _left_node = val;
+      if (val != NULL) val->setParent(this);
+   }
+
+   GETTER (RightNode, node::Node*) {return _right_node;}
+   SETTER (RightNode, node::Node*)
+   {
+      _right_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(MemorySize, int) {return sizeof(BinaryOp);}
 
 
    //--------------------------------------------------------------------------
@@ -41,8 +56,23 @@ class BinaryOp: public Text // FIXME Inherit from Text so as to please bison
    //--------------------------------------------------------------------------
    public:
 
+   virtual Node*
+   getChild (size_t i) const;
+
    virtual void
    isValid (NodeValidator* v);
+
+   virtual void
+   setChild (size_t i, Node* n);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   node::Node* _left_node;
+   node::Node* _right_node;
 };
 
 } } }

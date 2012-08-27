@@ -4,9 +4,37 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 CastOp::CastOp ()
 {
-   _type = Kind::OP_CAST;
+   _type = CastOp::kTYPE;
+   _type_node = NULL;
+   _value_node = NULL;
+}
+
+CastOp::~CastOp ()
+{
+   delete _type_node;
+   delete _value_node;
+}
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+Node*
+CastOp::getChild (size_t i) const
+{
+   switch (i)
+   {
+      case 0: return _value_node;
+      case 1: return _type_node;
+   }
+   return NULL;
 }
 
 void
@@ -14,7 +42,19 @@ CastOp::isValid (NodeValidator* v)
 {
    Node::isValid(v);
 
-   // FIXME Validate the number of children (2)
+   v->ensure(TypeNode() != NULL, "CastOp must have a type node");
+   v->ensure(ValueNode() != NULL, "CastOp must have a value node");
 }
+
+void
+CastOp::setChild (size_t i, Node* n)
+{
+   switch (i)
+   {
+      case 0: setValueNode(n); break;
+      case 1: setTypeNode(n); break;
+   }
+}
+
 
 } } }

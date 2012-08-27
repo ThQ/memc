@@ -12,11 +12,11 @@ Prechecker::Prechecker ()
 bool
 Prechecker::visit (node::Node* node)
 {
-   if (node->Position() == NULL && node->isRootNode() && node->isFileNode())
+   if (node->Position() == NULL && node::isa<node::Root>(node) && node::isa<node::File>(node))
    {
       log::Message* warn = new log::Warning();
       warn->formatMessage("Node (%s) has no position.",
-         node::Node::get_type_name(node->_type));
+         node::Node::get_type_name(node->Kind()));
       _logger->log(warn);
    }
 
@@ -27,7 +27,7 @@ Prechecker::visit (node::Node* node)
          node->KindName().c_str());
    }
 
-   if (!node->isRootNode() && node->Parent() == NULL)
+   if (!node::isa<node::Root>(node) && node->Parent() == NULL)
    {
       _logger->warning("Node(%s) has no parent",node->KindName().c_str());
    }

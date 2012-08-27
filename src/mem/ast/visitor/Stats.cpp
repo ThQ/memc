@@ -21,7 +21,7 @@ Stats::tearDown ()
    {
       stats << node::Node::get_type_name(it->first) << ": ";
       stats << it->second.usages;
-      stats << " * " << it->second.unit_memory_size << "B";
+      stats << " x " << it->second.unit_memory_size << "B";
       stats << " = " << it->second.total_memory_size << "B\n";
       total_node_count += it->second.usages;
       total_memory_size += it->second.total_memory_size;
@@ -35,6 +35,8 @@ Stats::tearDown ()
    msg->setPrimaryText("AST stats");
    msg->setSecondaryText(stats.str());
    log(msg);
+
+   return true;
 }
 
 bool
@@ -51,7 +53,11 @@ Stats::visit (node::Node* node)
       }
       else
       {
-         _kind_usages[node->Kind()] = {1,node->MemorySize(), node->MemorySize()};
+         KindStats s;
+         s.usages = 1;
+         s.unit_memory_size = node->MemorySize();
+         s.total_memory_size = node->MemorySize();
+         _kind_usages[node->Kind()] = s;
       }
    }
 

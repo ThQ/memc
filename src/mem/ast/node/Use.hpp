@@ -10,18 +10,20 @@ namespace mem { namespace ast { namespace node {
 
 class Use: public Text
 {
+   public:
+   static const int kTYPE = Kind::USE;
+
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    Use ();
 
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER (MemorySize, int) {return sizeof(Use);}
 
 
    //--------------------------------------------------------------------------

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "mem/ast/node/Func.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 

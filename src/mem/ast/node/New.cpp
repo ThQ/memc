@@ -4,23 +4,56 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 New::New ()
 {
-   _type = Kind::NEW;
+   _type = New::kTYPE;
+   _type_node = NULL;
 }
 
+New::~New ()
+{
+   delete _type_node;
+}
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+Node*
+New::getChild (size_t i) const
+{
+   switch (i)
+   {
+      case 0: return _type_node;
+   }
+   return NULL;
+}
 
 void
 New::isValid (NodeValidator* v)
 {
    Node::isValid(v);
-   v->ensure(ChildCount() == 1, "New must have exactly 1 child");
+   v->ensure(TypeNode() != NULL, "New must have a type node");
    v->ensure(hasExprType(), "New must have an expression type");
 
-   if (ChildCount() == 1)
+   if (TypeNode() != NULL)
    {
       v->ensure(TypeNode()->hasBoundSymbol(),
          "New : first child must have a bound symbol");
+   }
+}
+
+void
+New::setChild (size_t i, Node* n)
+{
+   switch (i)
+   {
+      case 0: setTypeNode(n);
    }
 }
 

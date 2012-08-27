@@ -152,7 +152,7 @@ TypeChecker::ensureSymbolIsType (node::Node* node, st::Symbol* sym)
    {
       log::TypeExpected* err = new log::TypeExpected();
       err->sSymbolName(sym->gQualifiedName());
-      //err->setPosition(node->copyPosition());
+      err->setPosition(node->copyPosition());
       err->format();
       log(err);
       return false;

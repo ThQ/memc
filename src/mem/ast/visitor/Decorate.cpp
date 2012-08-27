@@ -13,15 +13,15 @@ Decorate::Decorate (decorator::DecoratorMap decorators)
 bool
 Decorate::visit (node::Node* node)
 {
-   if (node->isFuncNode())
+   if (node::isa<node::Func>(node))
    {
-      node::Func* func = static_cast<node::Func*>(node);
+      node::Func* func = node::cast<node::Func>(node);
       if (func->DecoratorNode() != NULL)
       {
          node::Decorator* dec = func->DecoratorNode();
-         if (dec != NULL && _decorators.find(dec->gValue()) != _decorators.end())
+         if (dec != NULL && _decorators.find(dec->Value()) != _decorators.end())
          {
-            _decorators[dec->gValue()]->decorate(func->DecoratorNode());
+            _decorators[dec->Value()]->decorate(func->DecoratorNode());
          }
       }
       return false;

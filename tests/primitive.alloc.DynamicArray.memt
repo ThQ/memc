@@ -1,0 +1,4 @@
+### file
+main () -> int
+ i := new [int, 10]
+ return 0

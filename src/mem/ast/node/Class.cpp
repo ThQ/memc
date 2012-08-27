@@ -4,24 +4,51 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Class::Class ()
 {
-   _type = Kind::CLASS;
+   _members_node = NULL;
+   _name_node = NULL;
+   _parent_type_node = NULL;
+   _type = Class::kTYPE;
 }
 
-Node*
-Class::gParentTypeNode ()
+Class::~Class ()
 {
-   for (size_t i = 0 ; i < ChildCount() ; ++i)
-   {
-      assert (getChild(i) != NULL);
+   delete _members_node;
+   delete _name_node;
+   delete _parent_type_node;
+}
 
-      if (!getChild(i)->isFieldNode() && !getChild(i)->isFuncNode())
-      {
-         return getChild(i);
-      }
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+Node*
+Class::getChild (size_t i) const
+{
+   switch (i)
+   {
+      case 0: return _name_node;
+      case 1: return _parent_type_node;
+      case 2: return _members_node;
    }
    return NULL;
+}
+
+void
+Class::setChild (size_t i, Node* n)
+{
+   switch (i)
+   {
+      case 0: setMembersNode(node::castToNodeList(n)); break;
+      case 1: setNameNode(n); break;
+      case 2: setParentTypeNode(n); break;
+   }
 }
 
 } } }

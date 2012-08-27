@@ -71,54 +71,52 @@ BlockTypesChecker::chooseOverridenFunction (st::FunctionVector funcs, st::TypeVe
 bool
 BlockTypesChecker::visit (node::Node* node)
 {
-   if (node->isFuncNode())
+   if (node != NULL)
    {
-      node::Func* func = node::castToFunc(node);
-
-      if (func->BodyNode() != NULL)
+      if (node::isa<node::Func>(node))
       {
-         visitBlock(node->BoundSymbol(), func->BodyNode());
+         node::Func* func = node::cast<node::Func>(node);
+
+         if (func->BodyNode() != NULL)
+         {
+            visitBlock(node->BoundSymbol(), func->BodyNode());
+         }
+         return false;
       }
-      return false;
    }
    return true;
 }
 
 void
-BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::Node* node)
+BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::UnaryOp* node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (node != NULL);
 
-   visitExpr(scope, node->getChild(0));
+   node::Node* value_n = node->ValueNode();
 
-   if (node->getChild(0)->ExprType() != NULL)
+   visitExpr(scope, value_n);
+
+   if (value_n->hasExprType())
    {
-      st::Type* ptr_base_ty = st::castToType(node->getChild(0)->ExprType());
+      st::Type* ptr_base_ty = st::castToType(value_n->ExprType());
       std::string base_ty_name = ptr_base_ty->Name();
-      st::Type* amp_ty = st::util::lookupPointer(scope, ptr_base_ty);
+      st::Type* amp_ty = st::util::getPointerType(ptr_base_ty);
 
-      if (amp_ty != NULL)
-      {
-         node->setExprType(amp_ty);
-      }
-      else
-      {
-         logSymbolNotFound(scope, node->getChild(0), ptr_base_ty->gQualifiedName() + "*");
-         node->setExprType(BugType());
-      }
+      assert (amp_ty != NULL);
+      node->setExprType(amp_ty);
 
       // FIXME There should be more checks. For ex you should not be able to
       // do : &2
    }
    else
    {
-      node->getChild(0)->setExprType(BugType());
+      value_n->setExprType(BugType());
    }
 
    DEBUG_ENSURE (node->hasExprType());
-   DEBUG_ENSURE (node->getChild(0) != NULL);
-   DEBUG_ENSURE (node->getChild(0)->hasExprType());
+   DEBUG_ENSURE (value_n != NULL);
+   DEBUG_ENSURE (value_n->hasExprType());
 }
 
 void
@@ -189,7 +187,7 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
 }
 
 void
-BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
+BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
@@ -218,7 +216,7 @@ BlockTypesChecker::visitArray (st::Symbol* scope, node::Array* n)
    if (length_n != NULL)
    {
       visitExpr(scope, length_n);
-      if (length_n->isNumberNode()
+      if (node::isa<node::Number>(length_n)
          && length_n->hasBoundSymbol()
          && length_n->BoundSymbol()->isIntConstant()
          && length_n->ExprType()->canCastTo(_symbols->_core_types.IntTy()))
@@ -279,11 +277,11 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
       else if (value_ty->isTupleType())
       {
          // FIXME Nothing super safe here...
-         if (index_n->isNumberNode()
+         if (node::cast<node::Number>(index_n)
             && index_n->hasBoundSymbol()
             && index_n->BoundSymbol()->isIntConstant())
          {
-            node::Number* index_nb_n = node::castToNumber(index_n);
+            node::Number* index_nb_n = node::cast<node::Number>(index_n);
             st::IntConstant* i_const = st::castToIntConstant(index_nb_n->BoundSymbol());
 
             // FIXME This may break, it returns an int64_t
@@ -450,10 +448,10 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
       visitExprList(scope, call_node->ParamsNode());
    }
 
-   if (base_object->isDotNode())
+   if (node::isa<node::Dot>(base_object))
    {
       call_node->setIsInstanceCall(true);
-      node::Dot* dot_n = node::castToDot(base_object);
+      node::Dot* dot_n = node::cast<node::Dot>(base_object);
 
       node::Node* obj_n = dot_n->LeftNode()->copy();
       call_node->insertParam(obj_n);
@@ -513,14 +511,14 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
    // Left node is a variable container an object
    if (left_node->hasExprType())
    {
-      visitFinalId(left_node->ExprType(), static_cast<node::Text*>(right_node));
+      visitFinalId(left_node->ExprType(), node::cast<node::Text>(right_node));
    }
    else
    {
-      visitFinalId(left_node->BoundSymbol(), static_cast<node::Text*>(right_node));
+      visitFinalId(left_node->BoundSymbol(), node::cast<node::Text>(right_node));
    }
 
-   assert(right_node->isIdNode());
+   assert(node::isa<node::Id>(right_node));
 
    if (left_node->hasBoundSymbol())
    {
@@ -544,16 +542,15 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
             || left_node->BoundSymbol()->isNamespace())
          {
             ast::node::FinalId* fid = new ast::node::FinalId();
-            fid->sValue(right_node->BoundSymbol()->Name());
+            fid->setValue(right_node->BoundSymbol()->Name());
             fid->setBoundSymbol(right_node->BoundSymbol());
             if (expr_ty->isAnyType())
             {
                fid->setExprType(expr_ty);
             }
             dot_node->Parent()->replaceChild(dot_node, fid);
-            dot_node->unlink();
+            //dot_node->unlink();
             delete dot_node;
-            dot_node = NULL;
          }
          else
          {
@@ -565,7 +562,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
          dot_node->setExprType(BugType());
 
          log::SymbolNotFound* err = new log::SymbolNotFound();
-         err->sSymbolName(static_cast<node::Text*>(right_node)->gValue());
+         err->sSymbolName(node::cast<node::Text>(right_node)->Value());
          err->sScopeName(left_node->ExprType()->gQualifiedName());
          err->format();
          err->setPosition(right_node->copyPosition());
@@ -580,19 +577,25 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 void
 BlockTypesChecker::visitExprList (st::Symbol* scope, node::Node* node)
 {
+   if (scope != NULL) return;
+   if (node != NULL) return;
+
    node::Node* subnode = NULL;
    for (size_t i = 0; i < node->ChildCount(); ++i)
    {
       subnode = node->getChild(i);
-      visitExpr(scope, subnode);
+      if (subnode != NULL)
+      {
+         visitExpr(scope, subnode);
+      }
    }
 }
 
 void
 BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 {
-   DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (node != NULL);
+   if (node == NULL) return;
+   if (scope == NULL) return;
 
    switch (node->Kind())
    {
@@ -615,16 +618,15 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       case node::Kind::OP_LTE:
       case node::Kind::OP_GT:
       case node::Kind::OP_GTE:
-         visitCompOp(scope, static_cast<node::BinaryOp*>(node));
+         visitCompOp(scope, node::cast<node::BinaryOp>(node));
          break;
 
       case node::Kind::ARRAY:
-         visitArray (scope, util::castTo<node::Array*, node::Kind::ARRAY>(node));
+         visitArrayType (scope, node::cast<node::ArrayType>(node));
          break;
 
       case node::Kind::BRACKET_OP:
-         visitBracketOp(scope, util::castTo<node::BracketOp*,
-            node::Kind::BRACKET_OP>(node));
+         visitBracketOp(scope, node::cast<node::BracketOp>(node));
          break;
 
       case node::Kind::OP_AND:
@@ -633,16 +635,15 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::Kind::OP_CAST:
-         visitCastOperator (scope, util::castTo<node::CastOp*,
-            node::Kind::OP_CAST>(node));
+         visitCastOperator(scope, node::cast<node::CastOp>(node));
          break;
 
       case node::Kind::AMPERSAND:
-         visitAmpersand(scope, node);
+         visitAmpersand(scope, node::cast<node::UnaryOp>(node));
          break;
 
       case node::Kind::CALL:
-         visitCall(scope, util::castTo<node::Call*, node::Kind::CALL>(node));
+         visitCall(scope, node::cast<node::Call>(node));
          break;
 
       case node::Kind::DEREF:
@@ -658,15 +659,15 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::Kind::IF:
-         visitIf(scope, util::castTo<node::If*, node::Kind::IF>(node));
+         visitIf(scope, node::cast<node::If>(node));
          break;
 
       case node::Kind::FINAL_ID:
-         visitFinalId(scope, static_cast<node::Text*>(node));
+         visitFinalId(scope, node::cast<node::Text>(node));
          break;
 
       case node::Kind::FOR:
-         visitFor(scope, util::castTo<node::For*, node::Kind::FOR>(node));
+         visitFor(scope, node::cast<node::For>(node));
          break;
 
       case node::Kind::EXPRESSION_LIST:
@@ -674,47 +675,47 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::Kind::NEW:
-         visitNew(scope, util::castTo<node::New*, node::Kind::NEW>(node));
+         visitNew(scope, node::cast<node::New>(node));
          break;
 
       case node::Kind::RETURN:
-         visitReturn(scope, util::castTo<node::Return*, node::Kind::RETURN>(node));
+         visitReturn(scope, node::cast<node::Return>(node));
          break;
 
       case node::Kind::WHILE:
-         visitWhile(scope, util::castTo<node::While*, node::Kind::WHILE>(node));
+         visitWhile(scope, node::cast<node::While>(node));
          break;
 
       case node::Kind::POINTER:
-         visitPointer(scope, util::castTo<node::Ptr*, node::Kind::POINTER>(node));
+         visitPointer(scope, node::cast<node::Ptr>(node));
          break;
 
       case node::Kind::DOT:
-         visitDot(scope, util::castTo<node::Dot*, node::Kind::DOT>(node));
+         visitDot(scope, node::cast<node::Dot>(node));
          break;
 
       case node::Kind::NUMBER:
-         visitNumber(scope, util::castTo<node::Number*, node::Kind::NUMBER>(node));
+         visitNumber(scope, node::cast<node::Number>(node));
          break;
 
       case node::Kind::STRING:
-         visitString(scope, util::castTo<node::String*, node::Kind::STRING>(node));
+         visitString(scope, node::cast<node::String>(node));
          break;
 
       case node::Kind::TUPLE:
-         visitTuple(scope, static_cast<node::Tuple*>(node));
+         visitTuple(scope, node::cast<node::Tuple>(node));
          break;
 
       case node::Kind::TUPLE_TYPE:
-         visitTupleType(scope, static_cast<node::TupleType*>(node));
+         visitTupleType(scope, node::cast<node::TupleType>(node));
          break;
 
       case node::Kind::VARIABLE_DECLARATION:
-         visitVarDecl(scope, static_cast<node::VarDecl*>(node));
+         visitVarDecl(scope, node::cast<node::VarDecl>(node));
          break;
 
       case node::Kind::VARIABLE_ASSIGNMENT:
-         visitVarAssign(scope, static_cast<node::VarAssign*>(node));
+         visitVarAssign(scope, node::cast<node::VarAssign>(node));
          break;
 
       default:
@@ -731,7 +732,7 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::Text* id_node)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (id_node != NULL);
 
-   st::Symbol* sym = _symbols->lookupSymbol(scope, id_node->gValue());
+   st::Symbol* sym = _symbols->lookupSymbol(scope, id_node->Value());
 
    if (sym != NULL)
    {
@@ -756,7 +757,7 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::Text* id_node)
       id_node->setBoundSymbol(BugType());
       id_node->setExprType(BugType());
 
-      logSymbolNotFound(scope, id_node, id_node->gValue());
+      logSymbolNotFound(scope, id_node, id_node->Value());
    }
 
    DEBUG_ENSURE(id_node->hasBoundSymbol());
@@ -774,6 +775,7 @@ BlockTypesChecker::visitFor (st::Symbol* scope, node::For* n)
 
    visitBlock(scope, n->BlockNode());
 }
+
 void
 BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* call_n)
 {
@@ -872,15 +874,6 @@ BlockTypesChecker::visitMacroCall (st::Symbol* scope, node::Call* call_n)
    st::Macro* macro_sym = static_cast<st::Macro*>(base_object->BoundSymbol());
    macro::Macro* macro = static_cast<macro::Macro*>(macro_sym->MacroExpander());
    node::Node* macro_result = macro->expand(call_n);
-   if (call_n->_prev != NULL)
-   {
-      call_n->_prev->_next = macro_result;
-   }
-   if (call_n->_next != NULL)
-   {
-      call_n->_next->_prev = macro_result;
-   }
-   call_n->unlink();
    delete call_n;
    visitExpr(scope, macro_result);
 }
@@ -899,13 +892,14 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
 
    if (ty_node->BoundSymbol()->isArrayType())
    {
-      st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(st::castToArrayType(ty_node->BoundSymbol()));
+      st::ArrayType* arr_ty = st::castToArrayType(ty_node->BoundSymbol());
+      st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(arr_ty);
       st::Type* ptr_ty = st::util::getPointerType(unsized_arr_ty);
       new_node->setExprType(ptr_ty);
    }
    else
    {
-      st::Type* ptr_ty = st::util::lookupPointer(scope, st::castToType(ty_node->ExprType()));
+      st::Type* ptr_ty = st::util::getPointerType(ty_node->ExprType());
       new_node->setExprType(ptr_ty);
    }
 
@@ -1217,6 +1211,7 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
          scope->addChild(var);
 
          name_node->setBoundSymbol(var);
+         name_node->setExprType(var->Type());
          var_decl_node->setBoundSymbol(var);
       }
       else
@@ -1254,7 +1249,7 @@ BlockTypesChecker::visitWhile (st::Symbol* scope, node::While* while_node)
    ensureBoolExpr(while_node->ConditionNode());
 
    // Check block node
-   visitBlock(scope, while_node->BodyNode());
+   visitBlock(scope, while_node->BlockNode());
 
    DEBUG_ENSURE (while_node->ConditionNode()->hasExprType());
    DEBUG_ENSURE (while_node->ConditionNode()->ExprType()->Name() == "bool");

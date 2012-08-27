@@ -3,10 +3,20 @@
 
 namespace mem { namespace ast { namespace node {
 
+
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Field::Field ()
 {
-   _type = Kind::FIELD;
+   _type = Field::kTYPE;
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 std::string
 Field::get_type_name ()
@@ -28,7 +38,7 @@ Field::isValid (NodeValidator* v)
    v->ensure(NameNode() != NULL, "Field : Must have a name node");
    if (NameNode() != NULL)
    {
-      v->ensure(NameNode()->isIdNode(), "Field : Name node must be an ID");
+      v->ensure(node::isa<node::Id>(NameNode()), "Field : Name node must be an ID");
       v->ensure(NameNode()->hasBoundSymbol(), "Field : Name node must have a bound symbol");
    }
 

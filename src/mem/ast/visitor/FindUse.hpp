@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/Use.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
 
 

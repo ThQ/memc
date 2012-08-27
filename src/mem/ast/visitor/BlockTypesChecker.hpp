@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <vector>
 #include "mem/ast/macro/Macro.hpp"
-#include "mem/ast/node/Array.hpp"
+#include "mem/ast/node/ArrayType.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
 #include "mem/ast/node/BracketOp.hpp"
 #include "mem/ast/node/Call.hpp"
@@ -26,6 +26,7 @@
 #include "mem/ast/node/Tuple.hpp"
 #include "mem/ast/node/TupleType.hpp"
 #include "mem/ast/node/Type.hpp"
+#include "mem/ast/node/UnaryOp.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
 #include "mem/ast/node/While.hpp"
@@ -49,9 +50,7 @@ class BlockTypesChecker : public TypeChecker
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    BlockTypesChecker();
 
 
@@ -66,17 +65,15 @@ class BlockTypesChecker : public TypeChecker
    st::Func*
    chooseOverridenFunction (st::FunctionVector funcs, st::TypeVector param_tys);
 
-   /**
-    * Visitor entry point.
-    */
+   // Visitor entry point.
    virtual bool
    visit (node::Node* node);
 
    void
-   visitAmpersand (st::Symbol* scope, node::Node* node);
+   visitAmpersand (st::Symbol* scope, node::UnaryOp* node);
 
    void
-   visitArray (st::Symbol* scope, node::Array* node);
+   visitArrayType (st::Symbol* scope, node::ArrayType* node);
 
    void
    visitArithmeticOp (st::Symbol* scope, node::Node* node);
@@ -99,15 +96,11 @@ class BlockTypesChecker : public TypeChecker
    void
    visitLogicalExpr (st::Symbol* scope, node::Node* expr_node);
 
-   /**
-    * Visit a MEM_NODE_BLOCK node.
-    */
+   // Visit a MEM_NODE_BLOCK node.
    void
    visitBlock (st::Symbol* scope, node::Node* block);
 
-   /**
-    * Visits a MEM_NODE_CALL node.
-    */
+   // Visits a MEM_NODE_CALL node.
    void
    visitCall (st::Symbol* scope, node::Call* call_node);
 

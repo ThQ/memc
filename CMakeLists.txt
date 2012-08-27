@@ -47,7 +47,7 @@ CHECK_INCLUDE_FILE("stdint.h" HAVE_STDINT_H)
 add_custom_target(
 	test
 	COMMAND
-		${PYTHON_EXECUTABLE}
+		cd ${CMAKE_CURRENT_SOURCE_DIR}/tests && ${PYTHON_EXECUTABLE}
 		${memc_UTILS}/RunTests.py
 		--memc-exe=${CMAKE_CURRENT_BINARY_DIR}/memc
 		--test-dir=${CMAKE_CURRENT_SOURCE_DIR}/tests
@@ -59,10 +59,11 @@ add_custom_command(
 		${memc_BUILT}/mem/ast/node/Kind.hpp
 		${memc_BUILT}/mem/ast/node/Kind.cpp
 	COMMAND
-		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenNodeTypes.py
-		--template="${memc_SRC}/mem/ast/node/Kind.kind-in"
+		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenSimpleRtti.py
+		--template="${memc_SRC}/mem/ast/node/Kind.in"
 		--output-hpp-file="${memc_BUILT}/mem/ast/node/Kind.hpp"
 		--output-cpp-file="${memc_BUILT}/mem/ast/node/Kind.cpp"
+		--namespace="mem.ast.node"
 	DEPENDS ${memc_UTILS}/GenNodeTypes.py)
 add_custom_target(
 	gen-node-types ALL
@@ -121,8 +122,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/util.cpp
 	${memc_SRC}/mem/ast/macro/Macro.cpp
 	${memc_SRC}/mem/ast/macro/PtrMacros.cpp
-	${memc_SRC}/mem/ast/node/Array.cpp
-	${memc_SRC}/mem/ast/node/BinaryExpression.cpp
+	${memc_SRC}/mem/ast/node/ArrayType.cpp
 	${memc_SRC}/mem/ast/node/BinaryOp.cpp
 	${memc_SRC}/mem/ast/node/Block.cpp
 	${memc_SRC}/mem/ast/node/BracketOp.cpp
@@ -131,19 +131,20 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/node/Class.cpp
 	${memc_SRC}/mem/ast/node/Decorator.cpp
 	${memc_SRC}/mem/ast/node/Dot.cpp
-	${memc_SRC}/mem/ast/node/Enum.cpp
+	${memc_SRC}/mem/ast/node/EnumType.cpp
 	${memc_SRC}/mem/ast/node/Field.cpp
 	${memc_SRC}/mem/ast/node/File.cpp
 	${memc_SRC}/mem/ast/node/FinalId.cpp
 	${memc_SRC}/mem/ast/node/For.cpp
 	${memc_SRC}/mem/ast/node/Func.cpp
+	${memc_SRC}/mem/ast/node/Id.cpp
 	${memc_SRC}/mem/ast/node/If.cpp
 	${memc_BUILT}/mem/ast/node/Kind.cpp
 	${memc_SRC}/mem/ast/node/New.cpp
 	${memc_SRC}/mem/ast/node/Node.cpp
+	${memc_SRC}/mem/ast/node/NodeList.cpp
 	${memc_SRC}/mem/ast/node/NodeValidator.cpp
 	${memc_SRC}/mem/ast/node/Number.cpp
-	${memc_SRC}/mem/ast/node/Primitive.cpp
 	${memc_SRC}/mem/ast/node/Ptr.cpp
 	${memc_SRC}/mem/ast/node/Return.cpp
 	${memc_SRC}/mem/ast/node/Root.cpp
@@ -152,6 +153,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/node/Tuple.cpp
 	${memc_SRC}/mem/ast/node/TupleType.cpp
 	${memc_SRC}/mem/ast/node/Type.cpp
+	${memc_SRC}/mem/ast/node/UnaryOp.cpp
 	${memc_SRC}/mem/ast/node/Use.cpp
 	${memc_SRC}/mem/ast/node/VarAssign.cpp
 	${memc_SRC}/mem/ast/node/VarDecl.cpp

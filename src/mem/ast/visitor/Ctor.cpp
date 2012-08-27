@@ -13,27 +13,29 @@ void
 Ctor::initializeField (st::Field* field, node::Block* ctor)
 {
    node::FinalId* self_n = new node::FinalId();
-   self_n->sValue("self");
+   self_n->setValue("self");
 
    node::Text* field_name_n = new node::Text();
    field_name_n->setKind(node::Kind::ID);
-   field_name_n->sValue(field->Name());
+   field_name_n->setValue(field->Name());
 
    node::Dot* dot_name_n = new node::Dot();
-   dot_name_n->pushChildren(self_n, field_name_n);
+   dot_name_n->setLeftNode(self_n);
+   dot_name_n->setRightNode(field_name_n);
 
    if (field->VirtualFunction() != NULL)
    {
       node::Node* field_val = NULL;
       node::FinalId* vfn = new node::FinalId();
-      vfn->sValue(field->VirtualFunction()->Name());
+      vfn->setValue(field->VirtualFunction()->Name());
       field_val = vfn;
       assert (field_val != NULL);
 
       node::VarAssign* var_n = new node::VarAssign();
-      var_n->pushChildren(dot_name_n, field_val);
+      var_n->setNameNode(dot_name_n);
+      var_n->setValueNode(field_val);
 
-      ctor->pushChild(var_n);
+      ctor->addChild(var_n);
    }
 }
 
@@ -42,9 +44,9 @@ Ctor::visit (node::Node* node)
 {
    assert (node != NULL);
 
-   if (node->isClassNode())
+   if (node::isa<node::Class>(node))
    {
-      visitClass(static_cast<node::Class*>(node));
+      visitClass(node::cast<node::Class>(node));
       return false;
    }
    return true;
@@ -59,21 +61,26 @@ Ctor::visitClass (class node::Class* n)
 
    st::Class* cls_ty = static_cast<st::Class*>(n->BoundSymbol());
 
+   // -------
+   //  Name
+   // -------
+   node::Id* name_n = new node::Id();
+   name_n->setValue("$ctor");
+
    // ------------
    //  Parameters
    // ------------
    st::PointerType* self_ty = st::util::getPointerType(cls_ty);
    node::Node* param = node::Func::createParameter("self", self_ty);
 
-   node::Node* params_n = new node::Node();
-   params_n->setKind(node::Kind::FUNCTION_PARAMETERS);
-   params_n->pushChild(param);
+   node::NodeList* params_n = new node::NodeList();
+   params_n->addChild(param);
 
    // -------------
    //  Return type
    // -------------
    node::FinalId* return_n = new node::FinalId();
-   return_n->sValue("void");
+   return_n->setValue("void");
 
    // ------------
    //  Body block
@@ -96,10 +103,13 @@ Ctor::visitClass (class node::Class* n)
    //  Function
    // ----------
    node::Func* func_n = new node::Func();
-   func_n->sValue("$ctor");
-   func_n->pushChildren(params_n, return_n, body_n);
+   func_n->setValue("$ctor");
+   func_n->setNameNode(name_n);
+   func_n->setParamsNode(params_n);
+   func_n->setReturnTypeNode(return_n);
+   func_n->setBodyNode(body_n);
 
-   n->insertChild(func_n);
+   n->MembersNode()->addChild(func_n);
 
    visitFuncDecl(n->BoundSymbol(), func_n);
 }

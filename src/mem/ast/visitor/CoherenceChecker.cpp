@@ -16,32 +16,14 @@ CoherenceChecker::visit (node::Node* node)
 
    std::vector<std::string> errors;
 
-   node::Node* child_n = node->getChild(0);
-   for (; child_n != NULL; child_n = child_n->_next)
+   node::Node* child_n = NULL;
+   for (size_t i = 0; i < node->ChildCount(); ++i)
    {
-      if (child_n->Parent() != node)
+      child_n = node->getChild(i);
+
+      if (child_n != NULL && child_n->Parent() != node)
       {
          errors.push_back("Node parent declared differently between parent and child");
-      }
-
-      if (child_n->_prev != NULL && child_n->_prev->_next != child_n)
-      {
-         errors.push_back("Left sibling has not node as right sibling");
-
-         if (child_n->_prev->Parent() != child_n->Parent())
-         {
-            errors.push_back("Left sibling has not the same parent");
-         }
-      }
-
-      if (child_n->_next != NULL && child_n->_next->_prev != child_n)
-      {
-         errors.push_back("Right sibling has not node as left sibling");
-
-         if (child_n->_next->Parent() != child_n->Parent())
-         {
-            errors.push_back("Right sibling has not the same parent");
-         }
       }
    }
 

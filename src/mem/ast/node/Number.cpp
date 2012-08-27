@@ -3,13 +3,14 @@
 
 namespace mem { namespace ast { namespace node {
 
+
 //-----------------------------------------------------------------------------
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 Number::Number ()
 {
-   _type = Kind::NUMBER;
+   _type = Number::kTYPE;
 }
 
 
@@ -26,10 +27,5 @@ Number::isValid (NodeValidator* v)
    v->ensure(hasBoundSymbol(), "Number must be bounded (to constant symbol)");
 }
 
-Number*
-castToNumber (Node* n)
-{
-   node::assertKind (n, Kind::NUMBER);
-   return static_cast<Number*>(n);
-}
+
 } } }

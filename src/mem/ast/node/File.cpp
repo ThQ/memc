@@ -4,12 +4,21 @@
 namespace mem { namespace ast { namespace node {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 File::File ()
 {
-   _type = Kind::FILE;
+   _type = File::kTYPE;
    _function_ll_head = NULL;
    _function_ll_tail = NULL;
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 void
 File::isValid (NodeValidator* v)
@@ -21,11 +30,10 @@ File::isValid (NodeValidator* v)
    {
       child = getChild(i);
 
-      v->ensure(
-         child->isUseNode()
-         || child->isClassNode()
-         || child->isEnumNode()
-         || child->isFuncNode(),
+      v->ensure(node::isa<Use>(child)
+         || node::isa<Class>(child)
+         || node::isa<EnumType>(child)
+         || node::isa<Func>(child),
          "Children of a File node must be either Use, Class or Func");
    }
 }

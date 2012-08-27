@@ -1,12 +1,16 @@
 #include "mem/ast/node/TupleType.hpp"
 
-namespace mem { namespace ast { namespace node
-{
 
+namespace mem { namespace ast { namespace node {
+
+
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
 
 TupleType::TupleType ()
 {
-   _type = Kind::TUPLE_TYPE;
+   _type = TupleType::kTYPE;
 }
 
 

@@ -10,18 +10,29 @@ namespace mem { namespace ast { namespace node {
 
 class String : public Text
 {
+   public:
+   static const int kTYPE = Kind::STRING;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    String ();
 
+
+   //--------------------------------------------------------------------------
+   // FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
    virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   GETTER(ChildCount, size_t) {return 0;}
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(String);}
+
 
    //--------------------------------------------------------------------------
    // FUNCTIONS

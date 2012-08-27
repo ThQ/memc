@@ -544,7 +544,7 @@ void
 setupBugType (SymbolTable& st, CoreTypes& core_types)
 {
    core_types._bug_type = new st::PrimitiveType();
-   core_types._bug_type->setName("#BadType");
+   core_types._bug_type->setName("$BadType");
    util::registerType(&st, st.System(), core_types._bug_type);
 }
 

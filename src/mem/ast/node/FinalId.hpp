@@ -10,22 +10,32 @@ namespace mem { namespace ast { namespace node {
 
 class FinalId : public Text
 {
+   public:
+   static const int kTYPE = Kind::FINAL_ID;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    FinalId ();
-
-   virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
 
 
    //--------------------------------------------------------------------------
-   // FUNCTIONS
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual
+   GETTER(ChildCount, size_t) {return 0;}
+
+   virtual
+   GETTER(MemorySize, int) {return sizeof(FinalId);}
+
+
+   //--------------------------------------------------------------------------
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -35,9 +45,6 @@ class FinalId : public Text
    virtual void
    isValid (NodeValidator* v);
 };
-
-FinalId*
-castToFinalId (Node* n);
 
 } } }
 

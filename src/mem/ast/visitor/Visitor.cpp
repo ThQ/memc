@@ -16,15 +16,11 @@ Visitor::visit (node::Node* node)
 void
 Visitor::visit_preorder (node::Node* node)
 {
-   assert (node != NULL);
-
-   if (visit(node))
+   if (node != NULL && visit(node))
    {
-      node::Node* child_node = node->_first_child;
-      while (child_node != NULL)
+      for (size_t i = 0; i < node->ChildCount(); ++i)
       {
-         visit_preorder(child_node);
-         child_node = child_node->_next;
+         visit_preorder(node->getChild(i));
       }
    }
 }
