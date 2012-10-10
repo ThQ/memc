@@ -21,7 +21,7 @@ TopTypesChecker::visit (node::Node* node)
       {
          assert (parent != NULL);
          visitClass(node->BoundSymbol(), node::cast<node::Class>(node));
-         return true;
+         return false;
       }
       case node::Kind::ENUM:
       {
@@ -61,6 +61,16 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
       if (parent_cls != NULL && ensureClassType(parent_ty_node))
       {
          static_cast<st::Class*>(clss->BoundSymbol())->setParentClass(static_cast<st::Class*>(parent_cls));
+      }
+   }
+
+   node::NodeList* members_n = clss->MembersNode();
+
+   for (size_t i = 0; i < members_n->ChildCount(); ++i)
+   {
+      if (node::isa<node::Func>(members_n->getChild(i)))
+      {
+         visitFuncDecl(clss->BoundSymbol(), node::cast<node::Func>(members_n->getChild(i)));
       }
    }
 }
@@ -116,7 +126,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
    DEBUG_REQUIRE (scope->isClassType() || scope->isEnumType());
    DEBUG_REQUIRE (field != NULL);
 
-   node::Text* name_node = node::cast<node::Text>(field->NameNode());
+   node::Node* name_node = field->NameNode();
    node::Node* type_node = field->TypeNode();
    assert (name_node != NULL);
    assert (type_node != NULL);
@@ -273,14 +283,14 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
 {
    st::Arg* param_sym = NULL;
    node::VarDecl* param_node = NULL;
-   node::Text* name_node = NULL;
-   node::Text* type_node = NULL;
+   node::Node* name_node = NULL;
+   node::Node* type_node = NULL;
 
    for (size_t i = 0; i < params_node->ChildCount(); ++i)
    {
       param_node = node::cast<node::VarDecl>(params_node->getChild(i));
-      name_node = node::cast<node::Text>(param_node->NameNode());
-      type_node = node::cast<node::Text>(param_node->TypeNode());
+      name_node = param_node->NameNode();
+      type_node = param_node->TypeNode();
 
       visitExpr(scope, type_node);
 
@@ -314,7 +324,7 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
    DEBUG_REQUIRE (func_sym != NULL);
    DEBUG_REQUIRE (func_node->ReturnTypeNode() != NULL);
 
-   node::Text* ret_ty_node = node::cast<node::Text>(func_node->ReturnTypeNode());
+   node::Node* ret_ty_node = func_node->ReturnTypeNode();
 
    visitExpr(func_sym, ret_ty_node);
    assert (ret_ty_node != NULL);

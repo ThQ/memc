@@ -21,7 +21,7 @@ def make_out_header (kinds):
    out += "   T_YACC_ERROR=1,\n"
    out += "   T_YACC_UNDEFINED=2,\n"
 
-   for i in xrange(0, len(kinds)):
+   for i in range(0, len(kinds)):
       kind = kinds[i]
       out += "   " + kind[0] + "=" + kind[1] + ",\n"
 

@@ -74,6 +74,12 @@ class Node
    GETTER(Position, fs::position::Range*) {return _position;}
    SETTER(Position, fs::position::Range*) {_position = val;}
 
+   // Value
+   GETTER(Value, std::string) {return _value;}
+   SETTER(Value, std::string) {_value = val;}
+
+   // ValueCstr
+   GETTER(ValueCstr, const char*) {return _value.c_str();}
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -168,6 +174,7 @@ class Node
    Node* _parent;
    fs::position::Range* _position;
    int _type;
+   std::string _value;
 };
 
 template <class T> T*

@@ -2,7 +2,7 @@
 #define _MEM__AST__NODE__TUPLE_TYPE__HPP_
 
 
-#include "mem/ast/node/NodeList.hpp"
+#include "mem/ast/node/Type.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -13,7 +13,7 @@ namespace mem { namespace ast { namespace node {
 //    (type1, type2, ..., typeN)
 // Ex:
 //    (int, char, long)
-class TupleType : public NodeList
+class TupleType : public Type
 {
    public:
    static const int kTYPE = Kind::TUPLE_TYPE;

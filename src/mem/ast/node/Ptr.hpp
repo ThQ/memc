@@ -2,8 +2,7 @@
 #define _MEM__AST__NODE__PTR__HPP_
 
 
-#include "mem/ast/node/Block.hpp"
-#include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/Type.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -15,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 //
 // Ex:
 //    int*
-class Ptr: public Node
+class Ptr: public Type
 {
    public:
    static const int kTYPE = Kind::POINTER;

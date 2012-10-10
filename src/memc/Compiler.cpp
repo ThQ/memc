@@ -198,6 +198,8 @@ Compiler::parse (std::string file_path)
    if (file != NULL)
    {
       mem::ast::node::File* file_node = NULL;
+      gTOKENIZER.reset();
+      gTOKENIZER.setInputFile(file->gPath());
       file_node = _parser->parse (file);
       file_node->setBoundSymbol(file_sym);
       file_node->setId(ns_name);

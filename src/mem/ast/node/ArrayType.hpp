@@ -2,7 +2,7 @@
 #define _MEM__AST__NODE__ARRAY_TYPE__HPP_
 
 
-#include "mem/ast/node/Node.hpp"
+#include "mem/ast/node/Type.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 // Ex:
 //    [int]
 //    [int, 10]
-class ArrayType : public Node
+class ArrayType : public Type
 {
    public:
    static const int kTYPE = Kind::ARRAY;

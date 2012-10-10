@@ -441,7 +441,7 @@ function_declaration:
       $$->setParamsNode($3);
 
       // Return type
-      if ($5 != NULL) $$->setReturnTypeNode(mem::ast::node::cast<mem::ast::node::FinalId>($5));
+      if ($5 != NULL) $$->setReturnTypeNode(mem::ast::node::cast<mem::ast::node::Type>($5));
       else
       {
          mem::ast::node::FinalId* void_ty = new mem::ast::node::FinalId();

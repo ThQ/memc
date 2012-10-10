@@ -22,7 +22,7 @@ std::string
 Field::get_type_name ()
 {
    node::Type* type = static_cast<node::Type*>(ValueNode());
-   return type->_value;
+   return type->Value();
 }
 
 void
