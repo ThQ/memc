@@ -67,6 +67,9 @@ XmlDumper::visit (node::Node* node)
          case node::Kind::BLOCK:
             visitBlock(node::cast<node::Block>(node)); break;
 
+         case node::Kind::CALL:
+            visitCall (node::cast<node::Call>(node)); break;
+
          case node::Kind::CLASS:
             visitClass(node::cast<node::Class>(node)); break;
 
@@ -198,6 +201,20 @@ XmlDumper::visitBlock (node::Block* n)
    visitChildrenOf(n);
 
    *_out << "</block>\n";
+}
+
+void
+XmlDumper::visitCall (node::Call* call_n)
+{
+   DEBUG_REQUIRE (call_n != NULL);
+
+   *_out << "<call ";
+   dumpExprType(call_n);
+   dumpBoundSymbol(call_n);
+   dumpPosition(call_n);
+   *_out << ">";
+   visit(call_n->ParamsNode());
+   *_out << "</call>";
 }
 
 void

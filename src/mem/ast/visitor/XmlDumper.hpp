@@ -4,6 +4,7 @@
 
 #include "mem/ast/node/ArrayType.hpp"
 #include "mem/ast/node/BinaryOp.hpp"
+#include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
 #include "mem/ast/node/Field.hpp"
@@ -58,6 +59,9 @@ class XmlDumper : public Dumper
 
    void
    visitBlock (node::Block* n);
+
+   void
+   visitCall (node::Call* n);
 
    void
    visitClass (node::Class* n);
