@@ -1,0 +1,7 @@
+### file
+class TestClass
+ testFunction() -> void
+  1
+main () -> int
+ obj :TestClass
+ obj.testFunction()

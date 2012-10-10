@@ -66,7 +66,7 @@ class TestFile:
       if retcode:
          report = open(kREPORT_DIR + "/" + self.name, "w+")
          if report:
-            report.write(data)
+            report.write(str(data))
             report.close()
       return retcode
 
@@ -79,9 +79,9 @@ class TestFile:
 
 class TestLogger:
    def log (self, msg):
-      print msg,
+      print (msg,)
    def logln (self, msg):
-      print msg
+      print (msg)
 
 class TestRunner:
    def __init__ (self):
@@ -98,7 +98,7 @@ class TestRunner:
    def print_summary (self):
       percent_failed = int(round(1.0 * len(self._failed_tests)/self._num_tests*100, 0))
       percent_passed = int(round(100-(1.0 * len(self._failed_tests)/self._num_tests)*100, 0))
-      print ""
+      print ("")
       self.log_section("Summary")
       summary = str(self._num_tests) + " tests run\n"
       summary += " - Failed: " + str(len(self._failed_tests)) + " (" + str(percent_failed) + "%)\n"
@@ -154,7 +154,7 @@ class TestRunner:
                self._failed_tests.append(item)
                line += "." * (79 - len(line) - 8) + " CRASHED"
             i += 1
-            print line
+            print (line)
 
 runner = TestRunner()
 runner.run_all()

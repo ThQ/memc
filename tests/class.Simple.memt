@@ -1,5 +1,6 @@
 ### file
 class A
  field :int
+
 main () -> int
  return 0
