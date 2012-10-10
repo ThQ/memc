@@ -34,7 +34,7 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::FunctionType* fu
          err->sExpectedParamCount(func_sym->ArgumentCount());
          err->sParamCount(params->ChildCount());
          err->format();
-         //err->setPosition(params->copyPosition());
+         err->setPosition(params->copyPosition());
          log(err);
       }
    }
@@ -448,6 +448,7 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
       visitExprList(scope, call_node->ParamsNode());
    }
 
+   /*
    if (node::isa<node::Dot>(base_object))
    {
       call_node->setIsInstanceCall(true);
@@ -456,6 +457,7 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
       node::Node* obj_n = dot_n->LeftNode()->copy();
       call_node->insertParam(obj_n);
    }
+   */
 
    if (base_object->hasBoundSymbol())
    {

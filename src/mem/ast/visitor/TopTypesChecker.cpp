@@ -72,6 +72,10 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
       {
          visitFuncDecl(clss->BoundSymbol(), node::cast<node::Func>(members_n->getChild(i)));
       }
+      else
+      {
+         visitField(clss->BoundSymbol(), node::cast<node::Field>(members_n->getChild(i)));
+      }
    }
 }
 
