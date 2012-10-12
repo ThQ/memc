@@ -11,14 +11,14 @@ namespace mem { namespace ast { namespace node {
 Text::Text ()
 {
    _type = Text::kTYPE;
-   _value.assign("");
+   //_value.assign("");
 }
 
 
 //-----------------------------------------------------------------------------
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
-
+/*
 Node*
 Text::copy () const
 {
@@ -26,5 +26,6 @@ Text::copy () const
    n->setValue(n->Value());
    return n;
 }
+*/
 
 } } }

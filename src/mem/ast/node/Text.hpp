@@ -14,7 +14,8 @@ class Text: public Node
    public:
    static const int kTYPE = Kind::TEXT;
 
-
+   Text ();
+/*
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
@@ -34,7 +35,6 @@ class Text: public Node
    public:
 
    // Default constructor.
-   Text ();
 
    virtual
    GETTER (MemorySize, int) {return sizeof(Text);}
@@ -55,6 +55,7 @@ class Text: public Node
    public:
 
    std::string _value;
+   */
 };
 
 

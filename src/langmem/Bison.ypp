@@ -324,7 +324,7 @@ class_declaration:
    T_CLASS id class_members
    {
       mem::ast::node::Class* cls = new mem::ast::node::Class();
-      cls->setValue($2->_value);
+      cls->setValue($2->Value());
       cls->setNameNode($2);
       cls->setMembersNode($3);
       cls->setPosition(new fs::position::Range(@$));
@@ -334,7 +334,7 @@ class_declaration:
    | T_CLASS id T_LT type_name class_members
    {
       mem::ast::node::Class* cls = new mem::ast::node::Class();
-      cls->setValue($2->_value);
+      cls->setValue($2->Value());
       cls->setNameNode($2);
       cls->setParentTypeNode($4);
       cls->setMembersNode($5);
@@ -359,7 +359,7 @@ enum_declaration:
    {
       mem::ast::node::EnumType* e = new mem::ast::node::EnumType();
       e->setNameNode($2);
-      e->setValue($2->_value);
+      e->setValue($2->Value());
       e->setMembersNode($5);
 
       $$ = e;

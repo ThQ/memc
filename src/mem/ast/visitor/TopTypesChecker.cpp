@@ -145,6 +145,7 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
          st::Type* ty = st::castToType(type_node->BoundSymbol());
          //if (ty->isClassType())// || !class_ty->isDependingOn(static_cast<st::Class*>(scope)))
          //{
+            printf("Add field `%s'\n", name_node->ValueCstr());
             st::Field* sym_field = new st::Field();
             sym_field->setName(name_node->Value());
             sym_field->setType(ty);

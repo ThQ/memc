@@ -46,7 +46,7 @@ class VarDecl : public Node
    GETTER (MemorySize, int) {return sizeof(VarDecl);}
 
    // Name
-   GETTER (Name, std::string) {return NameNode()->_value;}
+   GETTER (Name, std::string) {return NameNode()->Value();}
 
    // NameCstr
    GETTER (NameCstr, const char*) {return Name().c_str();}
