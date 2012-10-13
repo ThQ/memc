@@ -139,6 +139,7 @@ void yyerror(ast::node::Node* ast,
    mem::ast::node::Decorator* decorator_node;
    mem::ast::node::Func* func_node;
    mem::ast::node::NodeList* node_list;
+   mem::ast::node::Type* type_node;
    mem::ast::node::VarDecl* var_decl_node;
    mem::ast::node::While* while_node;
 }
@@ -241,7 +242,7 @@ void yyerror(ast::node::Node* ast,
 %type <node> statement
 %type <block_node> statements
 %type <node> tuple_type
-%type <node> type_name
+%type <type_node> type_name
 %type <node_list> type_list
 %type <text_node> use
 %type <text_node> use_file
@@ -628,8 +629,10 @@ member_declaration:
 type_name:
    qualified_id
    {
-      $$ = static_cast<ast::node::Node*>($1);
+      $$ = new ast::node::Type();
+      $$->setValue($1->Value());
       $$->setPosition(@$.copy_range());
+      delete $1;
    }
    | type_name T_STAR
    {
@@ -642,7 +645,8 @@ type_name:
    {
       mem::ast::node::ArrayType* arr = new mem::ast::node::ArrayType();
       arr->setTypeNode($2);
-      $$ = static_cast<ast::node::Node*>(arr);
+
+      $$ = arr;
       $$->setPosition(@$.copy_range());
    }
    | T_LBRACKET type_name T_COMMA expr T_RBRACKET
@@ -650,7 +654,8 @@ type_name:
       mem::ast::node::ArrayType* arr = new mem::ast::node::ArrayType();
       arr->setTypeNode($2);
       arr->setLengthNode($4);
-      $$ = static_cast<ast::node::Node*>(arr);
+
+      $$ = arr;
       $$->setPosition(@$.copy_range());
    }
    | tuple_type

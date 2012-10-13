@@ -114,7 +114,7 @@ class BlockTypesChecker : public TypeChecker
    visitExprList (st::Symbol* scope, node::Node* node);
 
    void
-   visitFinalId (st::Symbol* scope, node::Text* node);
+   visitSymbolName (st::Symbol* scope, node::Node* node);
 
    void
    visitFor (st::Symbol* scope, node::For* n);
