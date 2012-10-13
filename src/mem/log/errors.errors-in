@@ -199,5 +199,15 @@
          "Function": "st::Symbol*",
          "OverridenFunction": "st::Symbol*"
       }
+   },
+   "DifferentOperandsType":
+   {
+      "type": "Error",
+      "message": "Operands don't have the same type",
+      "params":
+      {
+         "LeftType": "st::Symbol*",
+         "RightType": "st::Symbol*"
+      }
    }
 }

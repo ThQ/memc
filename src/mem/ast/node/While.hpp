@@ -12,7 +12,7 @@ namespace mem { namespace ast { namespace node {
 class While : public Node
 {
    public:
-   static const int kTYPE = Kind::WHILE;
+   static const int kTYPE = MetaKind::WHILE;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

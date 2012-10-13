@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class BinaryOp: public Text // FIXME Inherit from Text so as to please bison
 {
    public:
-   static const int kTYPE = Kind::BINARY_OPERATOR;
+   static const int kTYPE = MetaKind::BINARY_OPERATOR;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

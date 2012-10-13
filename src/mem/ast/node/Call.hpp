@@ -12,7 +12,7 @@ namespace mem { namespace ast { namespace node {
 class Call : public Node
 {
    public:
-   static const int kTYPE = Kind::CALL;
+   static const int kTYPE = MetaKind::CALL;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

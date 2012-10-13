@@ -12,7 +12,7 @@ namespace mem { namespace ast { namespace node {
 class EnumType : public Class
 {
    public:
-   static const int kTYPE = Kind::ENUM;
+   static const int kTYPE = MetaKind::ENUM;
 
 
    //--------------------------------------------------------------------------

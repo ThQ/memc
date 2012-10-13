@@ -16,7 +16,7 @@ namespace mem { namespace ast { namespace node {
 class TupleType : public Type
 {
    public:
-   static const int kTYPE = Kind::TUPLE_TYPE;
+   static const int kTYPE = MetaKind::TUPLE_TYPE;
 
 
    //--------------------------------------------------------------------------

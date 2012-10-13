@@ -11,6 +11,9 @@ namespace mem { namespace ast { namespace node {
 
 class NodeList : public Node
 {
+   public:
+   static const int kTYPE = MetaKind::NODE_LIST;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -58,9 +61,6 @@ class NodeList : public Node
 
    std::vector<Node*> _children;
 };
-
-NodeList*
-castToNodeList (Node* n);
 
 } } }
 

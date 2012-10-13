@@ -17,7 +17,7 @@ namespace mem { namespace ast { namespace node {
 class Return : public Node
 {
    public:
-   static const int kTYPE = Kind::RETURN;
+   static const int kTYPE = MetaKind::RETURN;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

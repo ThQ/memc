@@ -17,26 +17,26 @@ TopTypesChecker::visit (node::Node* node)
 
    switch (node->Kind())
    {
-      case node::Kind::CLASS:
+      case node::MetaKind::CLASS:
       {
          assert (parent != NULL);
          visitClass(node->BoundSymbol(), node::cast<node::Class>(node));
          return false;
       }
-      case node::Kind::ENUM:
+      case node::MetaKind::ENUM:
       {
          assert (parent != NULL);
          assert (node::isa<node::File>(parent));
          visitEnumType(parent->BoundSymbol(), node::cast<node::EnumType>(node));
          return false;
       }
-      case node::Kind::FIELD:
+      case node::MetaKind::FIELD:
       {
          assert (parent != NULL);
          visitField(parent->Parent()->BoundSymbol(), node::cast<node::Field>(node));
          return false;
       }
-      case node::Kind::FUNCTION:
+      case node::MetaKind::FUNCTION:
       {
          assert (parent != NULL);
          assert(parent->hasBoundSymbol());

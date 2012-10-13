@@ -8,7 +8,6 @@ namespace mem { namespace ast { namespace visitor {
 BlockTypesChecker::BlockTypesChecker ()
 {
    _name = "ast.BlockTypesChecker";
-   DEBUG_PRINT("p\n");
 }
 
 void
@@ -139,16 +138,16 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
    std::string op_name;
    switch (node->Kind())
    {
-      case node::Kind::OP_BIT_AND: op_name = "band"; break;
-      case node::Kind::OP_BIT_OR:  op_name = "bor"; break;
-      case node::Kind::OP_XOR:     op_name = "xor"; break;
-      case node::Kind::OP_LSHIFT:  op_name = "<<"; break;
-      case node::Kind::OP_RSHIFT:  op_name = ">>"; break;
-      case node::Kind::OP_PLUS:    op_name = "+"; break;
-      case node::Kind::OP_MINUS:   op_name = "-"; break;
-      case node::Kind::OP_MODULO:  op_name = "%"; break;
-      case node::Kind::OP_MUL:     op_name = "*"; break;
-      case node::Kind::OP_DIV:     op_name = "/"; break;
+      case node::MetaKind::OP_BIT_AND: op_name = "band"; break;
+      case node::MetaKind::OP_BIT_OR:  op_name = "bor"; break;
+      case node::MetaKind::OP_XOR:     op_name = "xor"; break;
+      case node::MetaKind::OP_LSHIFT:  op_name = "<<"; break;
+      case node::MetaKind::OP_RSHIFT:  op_name = ">>"; break;
+      case node::MetaKind::OP_PLUS:    op_name = "+"; break;
+      case node::MetaKind::OP_MINUS:   op_name = "-"; break;
+      case node::MetaKind::OP_MODULO:  op_name = "%"; break;
+      case node::MetaKind::OP_MUL:     op_name = "*"; break;
+      case node::MetaKind::OP_DIV:     op_name = "/"; break;
 
       default:
          DEBUG_PRINTF("Unsupported arithmetic operator (%s)",
@@ -370,19 +369,24 @@ BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
 
    // FIXME Must check that type is a primitive type
 
-   if (left_ty->isIntType() && right_ty->isIntType())
-   {
-      n->setExprType(_core_types->BoolTy());
-   }
-   else if (left_ty == right_ty)
+   if (left_ty == right_ty)
    {
       n->setExprType(_core_types->BoolTy());
    }
    else
    {
-      // FIXME Log an appropriate error
-      DEBUG_PRINT("Not same type in both expressions of binary operator.\n");
-      assert (false);
+      fs::position::Composite* pos = new fs::position::Composite();
+      pos->addChild(n->LeftNode()->Position()->copy_range());
+      //pos->addChild(n->RightNode()->Position()->copy_range());
+
+      n->setExprType(BugType());
+
+      log::DifferentOperandsType* err = new log::DifferentOperandsType();
+      err->sLeftType(left_ty);
+      err->sRightType(right_ty);
+      err->setPosition(pos);
+      err->format();
+      log(err);
    }
 
    DEBUG_REQUIRE (n->hasExprType());
@@ -425,7 +429,7 @@ BlockTypesChecker::visitLogicalExpr (st::Symbol* scope, node::Node* expr_node)
    DEBUG_REQUIRE (expr_node->getChild(0) != NULL);
    DEBUG_REQUIRE (expr_node->getChild(1) != NULL);
 
-   if (expr_node->isAndNode() || expr_node->isOrNode())
+   if (expr_node->Kind() == node::MetaKind::OP_AND || expr_node->Kind() == node::MetaKind::OP_OR)
    {
       visitExpr(scope, expr_node->getChild(0));
       visitExpr(scope, expr_node->getChild(1));
@@ -607,122 +611,122 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 
    switch (node->Kind())
    {
-      case node::Kind::OP_DIV:
-      case node::Kind::OP_MODULO:
-      case node::Kind::OP_MUL:
-      case node::Kind::OP_PLUS:
-      case node::Kind::OP_MINUS:
-      case node::Kind::OP_LSHIFT:
-      case node::Kind::OP_RSHIFT:
-      case node::Kind::OP_BIT_OR:
-      case node::Kind::OP_BIT_AND:
-      case node::Kind::OP_XOR:
+      case node::MetaKind::OP_DIV:
+      case node::MetaKind::OP_MODULO:
+      case node::MetaKind::OP_MUL:
+      case node::MetaKind::OP_PLUS:
+      case node::MetaKind::OP_MINUS:
+      case node::MetaKind::OP_LSHIFT:
+      case node::MetaKind::OP_RSHIFT:
+      case node::MetaKind::OP_BIT_OR:
+      case node::MetaKind::OP_BIT_AND:
+      case node::MetaKind::OP_XOR:
          visitArithmeticOp(scope, node);
          break;
 
-      case node::Kind::OP_NE:
-      case node::Kind::OP_EQ_EQ:
-      case node::Kind::OP_LT:
-      case node::Kind::OP_LTE:
-      case node::Kind::OP_GT:
-      case node::Kind::OP_GTE:
+      case node::MetaKind::OP_NE:
+      case node::MetaKind::OP_EQ_EQ:
+      case node::MetaKind::OP_LT:
+      case node::MetaKind::OP_LTE:
+      case node::MetaKind::OP_GT:
+      case node::MetaKind::OP_GTE:
          visitCompOp(scope, node::cast<node::BinaryOp>(node));
          break;
 
-      case node::Kind::ARRAY:
+      case node::MetaKind::ARRAY:
          visitArrayType (scope, node::cast<node::ArrayType>(node));
          break;
 
-      case node::Kind::BRACKET_OP:
+      case node::MetaKind::BRACKET_OP:
          visitBracketOp(scope, node::cast<node::BracketOp>(node));
          break;
 
-      case node::Kind::OP_AND:
-      case node::Kind::OP_OR:
+      case node::MetaKind::OP_AND:
+      case node::MetaKind::OP_OR:
          visitLogicalExpr(scope, node);
          break;
 
-      case node::Kind::OP_CAST:
+      case node::MetaKind::OP_CAST:
          visitCastOperator(scope, node::cast<node::CastOp>(node));
          break;
 
-      case node::Kind::AMPERSAND:
+      case node::MetaKind::AMPERSAND:
          visitAmpersand(scope, node::cast<node::UnaryOp>(node));
          break;
 
-      case node::Kind::CALL:
+      case node::MetaKind::CALL:
          visitCall(scope, node::cast<node::Call>(node));
          break;
 
-      case node::Kind::DEREF:
+      case node::MetaKind::DEREF:
          visitDeref(scope, node);
          break;
 
-      case node::Kind::ENUM:
+      case node::MetaKind::ENUM:
          // Don't do anything, it's taken care of by ::TopTypesChecker.
          break;
 
-      case node::Kind::GROUP:
+      case node::MetaKind::GROUP:
          visitGroup(scope, node);
          break;
 
-      case node::Kind::IF:
+      case node::MetaKind::IF:
          visitIf(scope, node::cast<node::If>(node));
          break;
 
-      case node::Kind::FINAL_ID:
+      case node::MetaKind::FINAL_ID:
          visitFinalId(scope, node::cast<node::Text>(node));
          break;
 
-      case node::Kind::FOR:
+      case node::MetaKind::FOR:
          visitFor(scope, node::cast<node::For>(node));
          break;
 
-      case node::Kind::EXPRESSION_LIST:
+      case node::MetaKind::EXPRESSION_LIST:
          visitExprList(scope, node);
          break;
 
-      case node::Kind::NEW:
+      case node::MetaKind::NEW:
          visitNew(scope, node::cast<node::New>(node));
          break;
 
-      case node::Kind::RETURN:
+      case node::MetaKind::RETURN:
          visitReturn(scope, node::cast<node::Return>(node));
          break;
 
-      case node::Kind::WHILE:
+      case node::MetaKind::WHILE:
          visitWhile(scope, node::cast<node::While>(node));
          break;
 
-      case node::Kind::POINTER:
+      case node::MetaKind::POINTER_TYPE:
          visitPointer(scope, node::cast<node::Ptr>(node));
          break;
 
-      case node::Kind::DOT:
+      case node::MetaKind::DOT:
          visitDot(scope, node::cast<node::Dot>(node));
          break;
 
-      case node::Kind::NUMBER:
+      case node::MetaKind::NUMBER:
          visitNumber(scope, node::cast<node::Number>(node));
          break;
 
-      case node::Kind::STRING:
+      case node::MetaKind::STRING:
          visitString(scope, node::cast<node::String>(node));
          break;
 
-      case node::Kind::TUPLE:
+      case node::MetaKind::TUPLE:
          visitTuple(scope, node::cast<node::Tuple>(node));
          break;
 
-      case node::Kind::TUPLE_TYPE:
+      case node::MetaKind::TUPLE_TYPE:
          visitTupleType(scope, node::cast<node::TupleType>(node));
          break;
 
-      case node::Kind::VARIABLE_DECLARATION:
+      case node::MetaKind::VARIABLE_DECLARATION:
          visitVarDecl(scope, node::cast<node::VarDecl>(node));
          break;
 
-      case node::Kind::VARIABLE_ASSIGNMENT:
+      case node::MetaKind::VARIABLE_ASSIGNMENT:
          visitVarAssign(scope, node::cast<node::VarAssign>(node));
          break;
 
@@ -1192,7 +1196,7 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
    // -----------------
    //  Check TYPE node
    // -----------------
-   if (type_node->isPlaceHolderNode())
+   if (type_node->Kind() == node::MetaKind::PLACE_HOLDER)
    {
       // Type is not explicitly declared (type inference)
 

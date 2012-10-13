@@ -410,7 +410,7 @@ return_type_or_null:
    {
       $$ = NULL;
    }
-   | T_RARR type_name { $$ = $2; }
+   | T_RARR type_name{ $$ = $2; }
 
 function_declaration:
    // Ex: my_function_name() -> my_return_type
@@ -697,7 +697,7 @@ variable_declaration :
    | final_id T_SEMICOLON T_EQ expr
    {
       mem::ast::node::Node* ty_place_holder = new mem::ast::node::Node();
-      ty_place_holder->setKind(ast::node::Kind::PLACE_HOLDER);
+      ty_place_holder->setKind(ast::node::MetaKind::PLACE_HOLDER);
       ty_place_holder->setPosition(@3.copy_range());
 
       mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
@@ -815,14 +815,14 @@ expr:
    | T_AMPERSAND expr
    {
       mem::ast::node::UnaryOp* n = new mem::ast::node::UnaryOp();
-      n->setKind(ast::node::Kind::AMPERSAND);
+      n->setKind(ast::node::MetaKind::AMPERSAND);
       n->setValueNode($2);
       $$ = n;
    }
    | T_AROBASE expr
    {
       mem::ast::node::UnaryOp* n = new mem::ast::node::UnaryOp();
-      n->setKind(ast::node::Kind::DEREF);
+      n->setKind(ast::node::MetaKind::DEREF);
       n->setValueNode($2);
       $$ = n;
    }
@@ -854,12 +854,12 @@ bool_operator:
    T_AND
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_AND);
+      $$->setKind(ast::node::MetaKind::OP_AND);
    }
    | T_OR
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_OR);
+      $$->setKind(ast::node::MetaKind::OP_OR);
    }
 
 comp_operator:
@@ -867,37 +867,37 @@ comp_operator:
    T_EQ_EQ
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_EQ_EQ);
+      $$->setKind(ast::node::MetaKind::OP_EQ_EQ);
    }
    // ex 1 < 2
    | T_LT
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_LT);
+      $$->setKind(ast::node::MetaKind::OP_LT);
    }
    // ex: 1 <= 2
    | T_LT_EQ
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_LTE);
+      $$->setKind(ast::node::MetaKind::OP_LTE);
    }
    // ex: 1 > 2
    | T_GT
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_GT);
+      $$->setKind(ast::node::MetaKind::OP_GT);
    }
    // ex: 1 >= 2
    | T_GT_EQ
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_GTE);
+      $$->setKind(ast::node::MetaKind::OP_GTE);
    }
    // ex: 1 != 2
    | T_BANG_EQ
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_NE);
+      $$->setKind(ast::node::MetaKind::OP_NE);
    }
 
 math_operator:
@@ -905,52 +905,52 @@ math_operator:
    T_PLUS
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_PLUS);
+      $$->setKind(ast::node::MetaKind::OP_PLUS);
    }
    | T_MINUS
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_MINUS);
+      $$->setKind(ast::node::MetaKind::OP_MINUS);
    }
    | T_STAR
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_MUL);
+      $$->setKind(ast::node::MetaKind::OP_MUL);
    }
    | T_DIV
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_DIV);
+      $$->setKind(ast::node::MetaKind::OP_DIV);
    }
    | T_GT_GT
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_RSHIFT);
+      $$->setKind(ast::node::MetaKind::OP_RSHIFT);
    }
    | T_LT_LT
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_LSHIFT);
+      $$->setKind(ast::node::MetaKind::OP_LSHIFT);
    }
    | T_BIT_OR
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_BIT_OR);
+      $$->setKind(ast::node::MetaKind::OP_BIT_OR);
    }
    | T_BIT_AND
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_BIT_AND);
+      $$->setKind(ast::node::MetaKind::OP_BIT_AND);
    }
    | T_XOR
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_XOR);
+      $$->setKind(ast::node::MetaKind::OP_XOR);
    }
    | T_MODULO
    {
       $$ = new mem::ast::node::BinaryOp();
-      $$->setKind(ast::node::Kind::OP_MODULO);
+      $$->setKind(ast::node::MetaKind::OP_MODULO);
    }
 
 binary_operator:

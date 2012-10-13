@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class String : public Text
 {
    public:
-   static const int kTYPE = Kind::STRING;
+   static const int kTYPE = MetaKind::STRING;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

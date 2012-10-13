@@ -14,7 +14,7 @@ UseAlias::visit (node::Node* node)
 {
    switch (node->Kind())
    {
-      case node::Kind::USE:
+      case node::MetaKind::USE:
          visitUse(node::cast<node::Use>(node));
          return false;
    }

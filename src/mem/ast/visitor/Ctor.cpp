@@ -16,7 +16,7 @@ Ctor::initializeField (st::Field* field, node::Block* ctor)
    self_n->setValue("self");
 
    node::Text* field_name_n = new node::Text();
-   field_name_n->setKind(node::Kind::ID);
+   field_name_n->setKind(node::MetaKind::ID);
    field_name_n->setValue(field->Name());
 
    node::Dot* dot_name_n = new node::Dot();

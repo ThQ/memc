@@ -16,7 +16,7 @@ namespace mem { namespace ast { namespace node {
 class File : public NodeList
 {
    public:
-   static const int kTYPE = Kind::FILE;
+   static const int kTYPE = MetaKind::FILE;
 
    //--------------------------------------------------------------------------
    // FIELDS

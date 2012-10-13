@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class FinalId : public Text
 {
    public:
-   static const int kTYPE = Kind::FINAL_ID;
+   static const int kTYPE = MetaKind::FINAL_ID;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

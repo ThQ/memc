@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class Block : public NodeList
 {
    public:
-   static const int kTYPE = Kind::BLOCK;
+   static const int kTYPE = MetaKind::BLOCK;
 
    // -------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

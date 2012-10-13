@@ -10,7 +10,7 @@ namespace mem { namespace ast { namespace node {
 
 Type::Type ()
 {
-   _type = Kind::UNKNOWN;
+   _type = Type::kTYPE;
 }
 
 

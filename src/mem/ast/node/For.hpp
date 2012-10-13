@@ -12,7 +12,7 @@ namespace mem { namespace ast { namespace node {
 class For: public Node
 {
    public:
-   static const int kTYPE = Kind::FOR;
+   static const int kTYPE = MetaKind::FOR;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

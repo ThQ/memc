@@ -12,7 +12,7 @@ namespace mem { namespace ast { namespace node {
 class Text: public Node
 {
    public:
-   static const int kTYPE = Kind::TEXT;
+   static const int kTYPE = MetaKind::TEXT;
 
    Text ();
 /*

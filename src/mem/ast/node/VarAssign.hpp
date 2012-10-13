@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class VarAssign : public Node
 {
    public:
-   static const int kTYPE = Kind::VARIABLE_ASSIGNMENT;
+   static const int kTYPE = MetaKind::VARIABLE_ASSIGNMENT;
 
 
    //--------------------------------------------------------------------------

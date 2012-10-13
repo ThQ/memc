@@ -20,7 +20,7 @@ Prechecker::visit (node::Node* node)
       _logger->log(warn);
    }
 
-   if (node->Kind() == node::Kind::UNKNOWN)
+   if (node->Kind() == node::MetaKind::UNKNOWN)
    {
       _logger->warning("Node has an unknown type {kind: %d, name: %s}",
          node->Kind(),

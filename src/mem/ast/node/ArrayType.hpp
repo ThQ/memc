@@ -17,7 +17,7 @@ namespace mem { namespace ast { namespace node {
 class ArrayType : public Type
 {
    public:
-   static const int kTYPE = Kind::ARRAY;
+   static const int kTYPE = MetaKind::ARRAY;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

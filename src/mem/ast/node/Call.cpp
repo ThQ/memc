@@ -72,7 +72,7 @@ Call::setChild (size_t i, Node* n)
    switch (i)
    {
       case 0: setCallerNode(n); break;
-      case 1: setParamsNode(node::castToNodeList(n)); break;
+      case 1: setParamsNode(node::cast<node::NodeList>(n)); break;
    }
 }
 

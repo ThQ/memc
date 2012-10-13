@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 class CastOp: public Node
 {
    public:
-   static const int kTYPE = Kind::OP_CAST;
+   static const int kTYPE = MetaKind::OP_CAST;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class BracketOp: public Node
 {
    public:
-   static const int kTYPE = Kind::BRACKET_OP;
+   static const int kTYPE = MetaKind::BRACKET_OP;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

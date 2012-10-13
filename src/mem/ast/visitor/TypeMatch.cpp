@@ -14,7 +14,7 @@ TypeMatch::visit (node::Node* node)
 {
    switch (node->Kind())
    {
-      case node::Kind::VARIABLE_DECLARATION:
+      case node::MetaKind::VARIABLE_DECLARATION:
          if (node->ChildCount() == 3)
          {
             visitVarDecl(static_cast<node::VarDecl*>(node));

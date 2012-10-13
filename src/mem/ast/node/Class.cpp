@@ -45,7 +45,7 @@ Class::setChild (size_t i, Node* n)
 {
    switch (i)
    {
-      case 0: setMembersNode(node::castToNodeList(n)); break;
+      case 0: setMembersNode(node::cast<node::NodeList>(n)); break;
       case 1: setNameNode(n); break;
       case 2: setParentTypeNode(n); break;
    }

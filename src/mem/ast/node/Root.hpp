@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class Root : public NodeList
 {
    public:
-   static const int kTYPE = Kind::ROOT;
+   static const int kTYPE = MetaKind::ROOT;
 
 
    //--------------------------------------------------------------------------

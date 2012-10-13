@@ -44,11 +44,11 @@ Node::isAssignable ()
 {
    switch (Kind())
    {
-      case Kind::FINAL_ID:
-      case Kind::DOT:
-      case Kind::AMPERSAND:
-      case Kind::BRACKET_OP:
-      case Kind::DEREF:
+      case MetaKind::FINAL_ID:
+      case MetaKind::DOT:
+      case MetaKind::AMPERSAND:
+      case MetaKind::BRACKET_OP:
+      case MetaKind::DEREF:
          return true;
    }
    return false;
@@ -59,29 +59,14 @@ Node::isReferenceNode () const
 {
    switch (Kind())
    {
-      case Kind::ARRAY:
-      case Kind::BRACKET_OP:
-      case Kind::DOT:
-      case Kind::FINAL_ID:
+      case MetaKind::ARRAY:
+      case MetaKind::BRACKET_OP:
+      case MetaKind::DOT:
+      case MetaKind::FINAL_ID:
          return true;
       default:
          return false;
    }
-}
-
-bool
-Node::isText ()
-{
-   switch (Kind())
-   {
-      case Kind::TEXT:
-      case Kind::FUNCTION:
-      case Kind::CLASS:
-      case Kind::ID:
-      case Kind::FINAL_ID:
-         return true;
-   }
-   return false;
 }
 
 void

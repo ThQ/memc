@@ -9,7 +9,7 @@ namespace mem { namespace ast { namespace node {
 
 NodeList::NodeList ()
 {
-   _type = Kind::NODE_LIST;
+   _type = NodeList::kTYPE;
 }
 
 NodeList::~NodeList ()
@@ -57,13 +57,6 @@ void
 NodeList::insertChild (Node* n)
 {
    _children.insert(_children.begin(), n);
-}
-
-NodeList*
-castToNodeList (Node* n)
-{
-   assert(n != NULL && n->isKind(Kind::NODE_LIST));
-   return static_cast<NodeList*>(n);
 }
 
 

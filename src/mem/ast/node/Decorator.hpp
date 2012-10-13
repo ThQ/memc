@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class Decorator : public Text
 {
    public:
-   static const int kTYPE = Kind::DECORATOR;
+   static const int kTYPE = MetaKind::DECORATOR;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

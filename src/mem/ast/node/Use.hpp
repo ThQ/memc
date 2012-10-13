@@ -11,7 +11,7 @@ namespace mem { namespace ast { namespace node {
 class Use: public Text
 {
    public:
-   static const int kTYPE = Kind::USE;
+   static const int kTYPE = MetaKind::USE;
 
 
    //--------------------------------------------------------------------------

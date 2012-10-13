@@ -20,7 +20,7 @@ namespace mem { namespace ast { namespace node {
 class If: public Node
 {
    public:
-   static const int kTYPE = Kind::IF;
+   static const int kTYPE = MetaKind::IF;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

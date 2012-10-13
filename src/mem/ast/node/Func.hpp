@@ -16,7 +16,7 @@ namespace mem { namespace ast { namespace node {
 class Func: public Text
 {
    public:
-   static const int kTYPE = Kind::FUNCTION;
+   static const int kTYPE = MetaKind::FUNCTION;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

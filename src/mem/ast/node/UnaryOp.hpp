@@ -12,7 +12,7 @@ namespace mem { namespace ast { namespace node {
 class UnaryOp : public Node
 {
    public:
-   static const int kTYPE = Kind::UNARY_OPERATOR;
+   static const int kTYPE = MetaKind::UNARY_OPERATOR;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

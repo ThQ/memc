@@ -13,7 +13,7 @@ namespace mem { namespace ast { namespace node {
 class Class : public Type
 {
    public:
-   static const int kTYPE = Kind::CLASS;
+   static const int kTYPE = MetaKind::CLASS;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

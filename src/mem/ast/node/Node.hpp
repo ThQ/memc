@@ -17,7 +17,7 @@ namespace mem { namespace ast { namespace node {
 class Node
 {
    public:
-   static const int kTYPE = Kind::UNKNOWN;
+   static const int kTYPE = MetaKind::UNKNOWN;
 
 
    //--------------------------------------------------------------------------
@@ -120,21 +120,8 @@ class Node
    void
    insertChild (Node* n);
 
-   inline bool
-   isAmpersandNode() const {return isKind(Kind::AMPERSAND);}
-
-   // true if the node is of type MEM_NODE_AND.
-   inline bool
-   isAndNode() const {return isKind(Kind::OP_AND);}
-
    bool
    isAssignable ();
-
-   inline bool
-   isOrNode () const {return isKind(Kind::OP_OR);}
-
-   inline bool
-   isPlaceHolderNode () const {return isKind(Kind::PLACE_HOLDER);}
 
    bool
    isReferenceNode () const;
@@ -143,10 +130,6 @@ class Node
    // checks (but before any optimisation).
    virtual void
    isValid (NodeValidator* vld);
-
-   // Returns true if the node is of any text type.
-   bool
-   isText ();
 
    // Returns true if the node is of a given type.
    inline bool

@@ -28,7 +28,7 @@ createCall (std::string qualified_name, ast::node::Node* arg)
       else
       {
          part_id = new ast::node::Text();
-         part_id->setKind(ast::node::Kind::ID);
+         part_id->setKind(ast::node::MetaKind::ID);
          part_id->setValue(id_parts[i]);
 
          dot = new ast::node::Dot();

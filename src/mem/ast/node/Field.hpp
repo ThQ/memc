@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 class Field : public VarDecl
 {
    public:
-   static const int kTYPE = Kind::FIELD;
+   static const int kTYPE = MetaKind::FIELD;
 
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR

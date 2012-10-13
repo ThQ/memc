@@ -61,87 +61,87 @@ XmlDumper::visit (node::Node* node)
    {
       switch (node->Kind())
       {
-         case node::Kind::ARRAY:
+         case node::MetaKind::ARRAY:
             visitArrayType(node::cast<node::ArrayType>(node)); break;
 
-         case node::Kind::BLOCK:
+         case node::MetaKind::BLOCK:
             visitBlock(node::cast<node::Block>(node)); break;
 
-         case node::Kind::CALL:
+         case node::MetaKind::CALL:
             visitCall (node::cast<node::Call>(node)); break;
 
-         case node::Kind::CLASS:
+         case node::MetaKind::CLASS:
             visitClass(node::cast<node::Class>(node)); break;
 
-         case node::Kind::DOT:
+         case node::MetaKind::DOT:
             visitDot(node::cast<node::Dot>(node)); break;
 
-         case node::Kind::FILE:
+         case node::MetaKind::FILE:
             visitFile (node::cast<node::File>(node)); break;
 
-         case node::Kind::FINAL_ID:
+         case node::MetaKind::FINAL_ID:
             visitFinalId(node::cast<node::FinalId>(node)); break;
 
-         case node::Kind::FUNCTION:
+         case node::MetaKind::FUNCTION:
             visitFunction(node::cast<node::Func>(node)); break;
 
-         case node::Kind::FOR:
+         case node::MetaKind::FOR:
             visitFor(node::cast<node::For>(node)); break;
 
-         case node::Kind::ID:
+         case node::MetaKind::ID:
              visitId(node::cast<node::Text>(node)); break;
 
-         case node::Kind::FIELD:
+         case node::MetaKind::FIELD:
              visitField(node::cast<node::Field>(node)); break;
 
-         case node::Kind::IF:
+         case node::MetaKind::IF:
              visitIf(node::cast<node::If>(node)); break;
 
-         case node::Kind::OP_NE:
-         case node::Kind::OP_EQ_EQ:
-         case node::Kind::OP_LT:
-         case node::Kind::OP_LTE:
-         case node::Kind::OP_GT:
-         case node::Kind::OP_GTE:
+         case node::MetaKind::OP_NE:
+         case node::MetaKind::OP_EQ_EQ:
+         case node::MetaKind::OP_LT:
+         case node::MetaKind::OP_LTE:
+         case node::MetaKind::OP_GT:
+         case node::MetaKind::OP_GTE:
             visitCompOp(node::cast<node::BinaryOp>(node)); break;
 
-         case node::Kind::OP_DIV:
-         case node::Kind::OP_MODULO:
-         case node::Kind::OP_MUL:
-         case node::Kind::OP_PLUS:
-         case node::Kind::OP_MINUS:
-         case node::Kind::OP_LSHIFT:
-         case node::Kind::OP_RSHIFT:
-         case node::Kind::OP_BIT_OR:
-         case node::Kind::OP_BIT_AND:
-         case node::Kind::OP_XOR:
+         case node::MetaKind::OP_DIV:
+         case node::MetaKind::OP_MODULO:
+         case node::MetaKind::OP_MUL:
+         case node::MetaKind::OP_PLUS:
+         case node::MetaKind::OP_MINUS:
+         case node::MetaKind::OP_LSHIFT:
+         case node::MetaKind::OP_RSHIFT:
+         case node::MetaKind::OP_BIT_OR:
+         case node::MetaKind::OP_BIT_AND:
+         case node::MetaKind::OP_XOR:
             visitArithmeticOp(node); break;
 
-         case node::Kind::PLACE_HOLDER:
+         case node::MetaKind::PLACE_HOLDER:
             visitPlaceHolder(node); break;
 
-         case node::Kind::NEW:
+         case node::MetaKind::NEW:
             visitNew(node::cast<node::New>(node)); break;
 
-         case node::Kind::NODE_LIST:
+         case node::MetaKind::NODE_LIST:
             visitNodeList(node::cast<node::NodeList>(node)); break;
 
-         case node::Kind::NUMBER:
+         case node::MetaKind::NUMBER:
             visitNumber(node::cast<node::Number>(node)); break;
 
-         case node::Kind::RETURN:
+         case node::MetaKind::RETURN:
             visitReturn(node::cast<node::Return>(node)); break;
 
-         case node::Kind::ROOT:
+         case node::MetaKind::ROOT:
             visitRoot(static_cast<node::Root*>(node)); break;
 
-         case node::Kind::VARIABLE_ASSIGNMENT:
+         case node::MetaKind::VARIABLE_ASSIGNMENT:
             visitVarAssign(node::cast<node::VarAssign>(node)); break;
 
-         case node::Kind::VARIABLE_DECLARATION:
+         case node::MetaKind::VARIABLE_DECLARATION:
             visitVarDecl(node::cast<node::VarDecl>(node)); break;
 
-         case node::Kind::WHILE:
+         case node::MetaKind::WHILE:
             visitWhile(node::cast<node::While>(node)); break;
 
          default:
@@ -161,16 +161,16 @@ XmlDumper::visitArithmeticOp (node::Node* n)
    *_out << "<op-";
    switch (n->Kind())
    {
-      case node::Kind::OP_BIT_AND: *_out << "band"; break;
-      case node::Kind::OP_BIT_OR:  *_out << "bor"; break;
-      case node::Kind::OP_XOR:     *_out << "xor"; break;
-      case node::Kind::OP_LSHIFT:  *_out << "lshift"; break;
-      case node::Kind::OP_RSHIFT:  *_out << "rshift"; break;
-      case node::Kind::OP_PLUS:    *_out << "plus"; break;
-      case node::Kind::OP_MINUS:   *_out << "minus"; break;
-      case node::Kind::OP_MODULO:  *_out << "modulo"; break;
-      case node::Kind::OP_MUL:     *_out << "mul"; break;
-      case node::Kind::OP_DIV:     *_out << "div"; break;
+      case node::MetaKind::OP_BIT_AND: *_out << "band"; break;
+      case node::MetaKind::OP_BIT_OR:  *_out << "bor"; break;
+      case node::MetaKind::OP_XOR:     *_out << "xor"; break;
+      case node::MetaKind::OP_LSHIFT:  *_out << "lshift"; break;
+      case node::MetaKind::OP_RSHIFT:  *_out << "rshift"; break;
+      case node::MetaKind::OP_PLUS:    *_out << "plus"; break;
+      case node::MetaKind::OP_MINUS:   *_out << "minus"; break;
+      case node::MetaKind::OP_MODULO:  *_out << "modulo"; break;
+      case node::MetaKind::OP_MUL:     *_out << "mul"; break;
+      case node::MetaKind::OP_DIV:     *_out << "div"; break;
       default:
          assert(false);
    }

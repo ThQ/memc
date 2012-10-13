@@ -18,7 +18,7 @@ namespace mem { namespace ast { namespace node {
 class VarDecl : public Node
 {
    public:
-   static const int kTYPE = Kind::VARIABLE_DECLARATION;
+   static const int kTYPE = MetaKind::VARIABLE_DECLARATION;
 
 
    //--------------------------------------------------------------------------

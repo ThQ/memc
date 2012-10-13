@@ -10,6 +10,9 @@ namespace mem { namespace ast { namespace node {
 
 class Type : public NodeList
 {
+   public:
+   static const int kTYPE = MetaKind::TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------

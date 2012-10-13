@@ -16,7 +16,7 @@ namespace mem { namespace ast { namespace node {
 class Dot: public BinaryOp
 {
    public:
-   static const int kTYPE = Kind::DOT;
+   static const int kTYPE = MetaKind::DOT;
 
 
    //--------------------------------------------------------------------------

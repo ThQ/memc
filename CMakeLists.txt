@@ -64,6 +64,7 @@ add_custom_command(
 		--output-hpp-file="${memc_BUILT}/mem/ast/node/Kind.hpp"
 		--output-cpp-file="${memc_BUILT}/mem/ast/node/Kind.cpp"
 		--namespace="mem.ast.node"
+      --klass="MetaKind"
 	DEPENDS ${memc_UTILS}/GenNodeTypes.py)
 add_custom_target(
 	gen-node-types ALL

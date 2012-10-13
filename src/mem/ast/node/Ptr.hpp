@@ -17,7 +17,7 @@ namespace mem { namespace ast { namespace node {
 class Ptr: public Type
 {
    public:
-   static const int kTYPE = Kind::POINTER;
+   static const int kTYPE = MetaKind::POINTER_TYPE;
 
 
    //--------------------------------------------------------------------------
