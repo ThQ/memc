@@ -1,4 +1,4 @@
 ### file
 main ()
  arr :[int]*
- i :int = @arr[0]
+ i :int = arr[0]

@@ -269,6 +269,11 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 
    if (value_ty != NULL)
    {
+      if (value_ty->isPointerType())
+      {
+         value_ty = static_cast<st::PointerType*>(value_ty)->PointedType();
+      }
+
       if (value_ty->isArrayType())
       {
          st::ArrayType* arr = st::castToArrayType(value_ty);
