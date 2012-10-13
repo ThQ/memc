@@ -8,6 +8,7 @@ namespace mem { namespace ast { namespace visitor {
 BlockTypesChecker::BlockTypesChecker ()
 {
    _name = "ast.BlockTypesChecker";
+   DEBUG_PRINT("p\n");
 }
 
 void
@@ -773,6 +774,10 @@ BlockTypesChecker::visitFinalId (st::Symbol* scope, node::Text* id_node)
 void
 BlockTypesChecker::visitFor (st::Symbol* scope, node::For* n)
 {
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::For>(n));
+
    visitExpr(scope, n->InitializationNode());
 
    visitExpr(scope, n->ConditionNode());
@@ -781,6 +786,8 @@ BlockTypesChecker::visitFor (st::Symbol* scope, node::For* n)
    visitExpr(scope, n->IterationNode());
 
    visitBlock(scope, n->BlockNode());
+
+   DEBUG_ENSURE(n->ConditionNode()->hasExprType());
 }
 
 void

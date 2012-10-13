@@ -10,6 +10,7 @@
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
+#include "mem/ast/node/For.hpp"
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/NodeList.hpp"
 #include "mem/ast/node/New.hpp"
@@ -86,6 +87,9 @@ class XmlDumper : public Dumper
 
    void
    visitFunction (node::Func* n);
+
+   void
+   visitFor (node::For* n);
 
    void
    visitId (node::Text* n);

@@ -85,6 +85,9 @@ XmlDumper::visit (node::Node* node)
          case node::Kind::FUNCTION:
             visitFunction(node::cast<node::Func>(node)); break;
 
+         case node::Kind::FOR:
+            visitFor(node::cast<node::For>(node)); break;
+
          case node::Kind::ID:
              visitId(node::cast<node::Text>(node)); break;
 
@@ -161,13 +164,13 @@ XmlDumper::visitArithmeticOp (node::Node* n)
       case node::Kind::OP_BIT_AND: *_out << "band"; break;
       case node::Kind::OP_BIT_OR:  *_out << "bor"; break;
       case node::Kind::OP_XOR:     *_out << "xor"; break;
-      case node::Kind::OP_LSHIFT:  *_out << "<<"; break;
-      case node::Kind::OP_RSHIFT:  *_out << ">>"; break;
-      case node::Kind::OP_PLUS:    *_out << "+"; break;
-      case node::Kind::OP_MINUS:   *_out << "-"; break;
-      case node::Kind::OP_MODULO:  *_out << "%"; break;
-      case node::Kind::OP_MUL:     *_out << "*"; break;
-      case node::Kind::OP_DIV:     *_out << "/"; break;
+      case node::Kind::OP_LSHIFT:  *_out << "lshift"; break;
+      case node::Kind::OP_RSHIFT:  *_out << "rshift"; break;
+      case node::Kind::OP_PLUS:    *_out << "plus"; break;
+      case node::Kind::OP_MINUS:   *_out << "minus"; break;
+      case node::Kind::OP_MODULO:  *_out << "modulo"; break;
+      case node::Kind::OP_MUL:     *_out << "mul"; break;
+      case node::Kind::OP_DIV:     *_out << "div"; break;
       default:
          assert(false);
    }
@@ -245,7 +248,7 @@ XmlDumper::visitClass (node::Class* n)
 void
 XmlDumper::visitCompOp (node::BinaryOp* n)
 {
-   std::string op_name = "?";
+   std::string op_name = "unknown-comp";
 
    *_out << "<op-" << op_name;
    dumpExprType(n);
@@ -326,6 +329,17 @@ XmlDumper::visitFunction (node::Func* n)
    visitChildrenOf(n);
 
    *_out << "</function>\n";
+}
+
+void
+XmlDumper::visitFor (node::For* n)
+{
+   *_out << "<for>\n";
+   visit(n->InitializationNode());
+   visit(n->ConditionNode());
+   visit(n->IterationNode());
+   visit(n->BlockNode());
+   *_out << "</for>\n";
 }
 
 void

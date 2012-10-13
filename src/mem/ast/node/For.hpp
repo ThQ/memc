@@ -40,15 +40,27 @@ class For: public Node
 
    // ConditionNode
    GETTER(ConditionNode, node::Node*) {return _condition_node;}
-   SETTER(ConditionNode, node::Node*) {_condition_node = val;}
+   SETTER(ConditionNode, node::Node*)
+   {
+      _condition_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // InitializationNode
    GETTER(InitializationNode, node::Node*) {return _initialization_node;}
-   SETTER(InitializationNode, node::Node*) {_initialization_node = val;}
+   SETTER(InitializationNode, node::Node*)
+   {
+      _initialization_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // IterationNode
    GETTER(IterationNode, node::Node*) {return _iteration_node;}
-   SETTER(IterationNode, node::Node*) {_iteration_node = val;}
+   SETTER(IterationNode, node::Node*)
+   {
+      _iteration_node = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // MemorySize
    virtual
