@@ -8,6 +8,7 @@ args_parser.add_argument("--template", required=True)
 args_parser.add_argument("--namespace", required=True)
 args_parser.add_argument("--output-hpp-file", required=True)
 args_parser.add_argument("--output-cpp-file", required=True)
+args_parser.add_argument("--klass", required=True)
 args = args_parser.parse_args()
 
 
@@ -43,6 +44,7 @@ class RttiParser:
         self.namespace = ""
         self.root_ty = None
         self.hpp_file_path = ""
+        self.klass = ""
 
     def generate_cpp (self):
         namespaces = self.namespace.upper().split(".")
@@ -62,7 +64,7 @@ class RttiParser:
         cpp += kTAB + "switch (dest_kind)\n"
         cpp += 2*kTAB + "{\n"
         for ty in self.types:
-            cpp += "case Kind::" + ty.name + ": return canCastTo" + ty.get_cpp_name() + "(source_kind);\n"
+            cpp += "case " + self.klass + "::" + ty.name + ": return canCastTo" + ty.get_cpp_name() + "(source_kind);\n"
         cpp += 2*kTAB + "}\n"
         cpp += kTAB + "return false;\n"
         cpp += "}\n\n"
@@ -74,14 +76,14 @@ class RttiParser:
             if len(children) > 0:
                 cpp += kTAB + "switch (k)\n"
                 cpp += kTAB + "{\n"
-                cpp += 2 * kTAB + "case Kind::" + ty.name + ":\n"
+                cpp += 2 * kTAB + "case " + self.klass + "::" + ty.name + ":\n"
                 for child in children:
-                    cpp += 2 * kTAB + "case Kind::" + child.name + ":\n"
+                    cpp += 2 * kTAB + "case " + self.klass + "::" + child.name + ":\n"
                 cpp += 3*kTAB + "return true;\n"
                 cpp += kTAB + "}\n"
                 cpp += kTAB + "return false;\n"
             else:
-                cpp += kTAB + "return k == Kind::" + ty.name + ";\n"
+                cpp += kTAB + "return k == " + self.klass + "::" + ty.name + ";\n"
             cpp += "}\n\n"
 
         cpp += len(namespaces) * "}" + "\n"
@@ -103,7 +105,7 @@ class RttiParser:
 
         hpp += "\n\n"
 
-        hpp += "class Kind { public: enum _KindEnum {\n" + kTAB
+        hpp += "class " + self.klass + " { public: enum _KindEnum {\n" + kTAB
         hpp += (",\n" + kTAB).join([ty.name for ty in self.types])
         hpp += "\n};};\n\n"
 
@@ -151,6 +153,7 @@ parser = RttiParser()
 parser.namespace = args.namespace
 parser.parse_file(args.template)
 parser.hpp_file_path = args.output_hpp_file
+parser.klass = args.klass
 
 kOUT_HPP_DIR = os.path.dirname(args.output_hpp_file)
 kOUT_CPP_DIR = os.path.dirname(args.output_cpp_file)
