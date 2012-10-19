@@ -36,6 +36,7 @@ class Logger
 
    // Formatter
    SETTER(Formatter, Formatter*) {delete _formatter; _formatter = val;}
+   GETTER(Formatter, Formatter*) {return _formatter;}
 
    // Level
    SETTER(Level, int) {_level = val;}

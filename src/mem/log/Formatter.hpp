@@ -23,12 +23,12 @@ class Formatter
    //--------------------------------------------------------------------------
    public:
 
-   Formatter();
+   // Default constructor
+   Formatter ();
 
-   /**
-    * Destructor.
-    */
-   virtual ~Formatter();
+   // Destructor.
+   virtual
+   ~Formatter ();
 
 
    //--------------------------------------------------------------------------

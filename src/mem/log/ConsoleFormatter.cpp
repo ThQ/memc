@@ -4,48 +4,50 @@
 namespace mem { namespace log {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 ConsoleFormatter::ConsoleFormatter ()
 {
    setId("console");
-
-   this->add_tag("type", format_type_start, format_type_end);
-   this->add_tag("symbol", format_type_start, format_type_end);
+   _colors_enabled = false;
 }
 
 ConsoleFormatter::~ConsoleFormatter ()
 {
-   this->_tags.clear();
 }
 
-void
-ConsoleFormatter::add_tag (std::string name, log::TagFunctor fptr_start,
-   log::TagFunctor fptr_end)
-{
-   this->_tags[name] = fptr_start;
-   this->_tags["/" + name] = fptr_end;
-}
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 std::string
 ConsoleFormatter::format (Message* msg)
 {
    std::ostringstream res;
 
-   this->format_message(res, msg);
+   this->_formatMessage(res, msg);
 
    if (msg->SecondaryText() != "")
    {
-      this->format_description(res, msg);
+      this->_formatDescription(res, msg);
    }
 
    if (msg->Position() != NULL)
    {
-      this->format_position(res, msg->Position());
+      this->_formatPosition(res, msg->Position());
    }
    return res.str();
 }
 
+//-----------------------------------------------------------------------------
+// PROTECTED FUNCTIONS
+//-----------------------------------------------------------------------------
+
 void
-ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
+ConsoleFormatter::_formatDescription (std::ostream& str, Message* msg)
 {
    std::string sec_text = msg->SecondaryText();
 
@@ -73,31 +75,45 @@ ConsoleFormatter::format_description (std::ostringstream& str, Message* msg)
 }
 
 void
-ConsoleFormatter::format_level_name (std::ostringstream& str, MessageLevel lvl)
+ConsoleFormatter::_formatLevelId (std::ostream& str, MessageLevel lvl)
 {
    switch (lvl)
    {
-      case UNKNOWN:     str << " (?)"; break;
-      case INFO:        str << " (I)"; break;
-      case DEBUG:       str << " \033[1;30m(D)"; break;
-      case WARNING:     str << " \033[1;34m(W)"; break;
-      case ERROR:       str << " \033[1;31m(E)"; break;
-      case FATAL_ERROR: str << " \033[1;31m(F)"; break;
+      case UNKNOWN:
+         str << " (?)";
+         break;
+
+      case INFO:
+         str << " (I)";
+         break;
+
+      case DEBUG:
+         str << " " << _getLinuxColor("1;30") << "(D)";
+         break;
+
+      case WARNING:
+         str << " " << _getLinuxColor("1;34") << "(W)";
+         break;
+
+      case ERROR:
+         str << " " << _getLinuxColor("1;31") << "(E)";
+         break;
+
+      case FATAL_ERROR:
+         str << " " << _getLinuxColor("1;31") << "(F)";
+         break;
    }
-
 }
 
 void
-ConsoleFormatter::format_message (std::ostringstream& str, Message* msg)
+ConsoleFormatter::_formatMessage (std::ostream& str, Message* msg)
 {
-   this->format_level_name(str, msg->Level());
-   str << " "; //\033[1m";
-   str << msg->PrimaryText();
-   str << "\033[0m\n";
+   _formatLevelId(str, msg->Level());
+   str << " " << msg->PrimaryText() << "\033[0m\n";
 }
 
 void
-ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Position* pos_a)
+ConsoleFormatter::_formatPosition (std::ostream& str, fs::position::Position* pos_a)
 {
    fs::position::Range* pos = static_cast<fs::position::Range*>(pos_a);
    if (pos->_file != NULL)
@@ -109,6 +125,7 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
       str << "\n";
 
       str << "     > ";
+
       if (pos->LineStart() > 0 && pos->gFile()->isLineInFile(pos->LineStart()-1))
       {
          std::string context_line = pos->gFile()->getLineCstr(pos->LineStart()-1);
@@ -139,109 +156,14 @@ ConsoleFormatter::format_position (std::ostringstream& str, fs::position::Positi
    }
 }
 
-const char*
-ConsoleFormatter::format_string (const char* message)
+std::string
+ConsoleFormatter::_getLinuxColor (std::string color)
 {
-   std::string sresult;
-   char buffer[32] = "";
-   size_t buffer_cursor = 0;
-   //size_t buffer_len = 0;
-   bool buffering = false;
-   std::vector<StackElement*> stack;
-   StackElement* cur_stack_el = NULL;
-   size_t i = 0;
-   bool keep_looping = true;
-   TagFunctor tag_functor = NULL;
-
-   while (keep_looping)
+   if (_colors_enabled)
    {
-      char c = message[i];
-
-      switch (c)
-      {
-         case '\0':
-            keep_looping = false;
-            break;
-
-
-         case '{':
-            buffering = true;
-            cur_stack_el = new StackElement();
-            cur_stack_el->start = i;
-            stack.push_back(cur_stack_el);
-            break;
-
-         case '}':
-            buffering = false;
-            cur_stack_el = stack.back();
-            cur_stack_el->end = i;
-            tag_functor = this->get_tag_functor(cur_stack_el->name + "/");
-            if (tag_functor != NULL)
-            {
-               sresult.append(tag_functor());
-            }
-            delete stack.back();
-            stack.pop_back();
-            break;
-
-         case ':':
-            if (buffering)
-            {
-               buffer[buffer_cursor] = '\0';
-               cur_stack_el->name.assign(buffer);
-               tag_functor = this->get_tag_functor(cur_stack_el->name);
-               if (tag_functor != NULL)
-               {
-                  sresult.append(tag_functor());
-               }
-               buffering = false;
-               break;
-            }
-
-         default:
-            if (buffering)
-            {
-               buffer[buffer_cursor] = c;
-               ++ buffer_cursor;
-            }
-            else
-            {
-               sresult += c;
-            }
-      }
-      ++ i;
+      return "\033[" + color + "m";
    }
-
-   for (size_t i = 0 ; stack.size() ; ++i)
-   {
-      delete stack[i];
-   }
-
-   char* result = new char[sresult.size() + 1];
-   result = strcpy(result, sresult.c_str());
-   return result;
-}
-
-const char*
-ConsoleFormatter::format_type_end ()
-{
-   return "\033[0m\0";
-}
-
-const char*
-ConsoleFormatter::format_type_start ()
-{
-   return "\033[0;34m\0";
-}
-
-log::TagFunctor
-ConsoleFormatter::get_tag_functor (std::string name)
-{
-   if (this->_tags.find(name) != this->_tags.end())
-   {
-      return this->_tags[name];
-   }
-   return NULL;
+   return "";
 }
 
 } }

@@ -6,8 +6,11 @@ namespace memc {
 
 Compiler::Compiler ()
 {
+   mem::log::ConsoleFormatter* formatter = new mem::log::ConsoleFormatter();
+   formatter->setColorsEnabled(true);
+
    _logger = new mem::log::ConsoleLogger();
-   _logger->setFormatter(new mem::log::ConsoleFormatter());
+   _logger->setFormatter(formatter);
 
    _parser = new langmem::Parse();
    _parser->setLogger(_logger);
