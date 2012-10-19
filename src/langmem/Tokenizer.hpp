@@ -150,7 +150,7 @@ class Tokenizer
    _readSome (int n);
 
    inline char
-   _get1Char () {return *(_getNChars(1));}
+   _getChar () {return *(_getNChars(1));}
 
    char*
    _getNChars (int n);

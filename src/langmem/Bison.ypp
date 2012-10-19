@@ -1,9 +1,12 @@
+%error-verbose
+
 %parse-param{mem::ast::node::File* ast}
 %parse-param{mem::st::SymbolTable* symbols}
 %parse-param{mem::log::Logger* logger}
 %parse-param{mem::fs::File* file}
 
 %code requires{
+
 #define PASS (0);
 #include <stdio.h>
 #include <string.h>
@@ -52,9 +55,6 @@
 
 using namespace mem;
 
-#ifndef YYERROR_VERBOSE
-#define YYERROR_VERBOSE 1
-#endif
 
 #define YYLTYPE fs::position::Range
 #define YYLTYPE_IS_DECLARED 1
@@ -176,6 +176,7 @@ void yyerror(ast::node::Node* ast,
 %token T_LITERAL_HEX
 %token <text> T_LITERAL_INT
 %token <text> T_LITERAL_NUMBER
+%token T_MINUS_EQ
 %token T_NEW
 %token T_NEWLINE
 %token T_OP
@@ -189,8 +190,10 @@ void yyerror(ast::node::Node* ast,
 %token T_RETURN
 %token T_SEMICOLON
 %token T_SINGLE_LINE_COMMENT
+%token T_SLASH_EQ
 %token T_SPACE
 %token T_STAR
+%token T_STAR_EQ
 %token <text> T_STRING
 %token T_USE
 %token T_WHILE
@@ -679,8 +682,11 @@ tuple_type:
       $$ = $2;
    }
 
+assignment_operator:
+   T_EQ | T_PLUS_EQ | T_MINUS_EQ | T_SLASH_EQ | T_STAR_EQ
+
 variable_assignment :
-   expr T_EQ expr
+   expr assignment_operator expr
    {
       mem::ast::node::VarAssign* n = new mem::ast::node::VarAssign();
       n->setPosition(@$.copy_range());

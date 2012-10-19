@@ -1,0 +1,5 @@
+### file
+main () -> int
+   i :int
+   i += 1
+   return 0

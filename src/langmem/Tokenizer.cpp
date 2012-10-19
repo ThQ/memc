@@ -163,14 +163,39 @@ Tokenizer::_processTokenStart (char c)
       case '.': _pushToken(T_DOT, "."); break;
       case '@': _pushToken(T_AROBASE, "@"); break;
       case '&': _pushToken(T_AMPERSAND, "&"); break;
-      case '*': _pushToken(T_STAR, "*"); break;
-      case '%': _pushToken(T_MODULO, "*"); break;
-      case '+': _pushToken(T_PLUS, "*"); break;
+      case '%': _pushToken(T_MODULO, "%"); break;
       case ':': _pushToken(T_SEMICOLON, ":"); break;
 
+      case '+':
+      {
+         c2 = _getChar();
+         switch (c2)
+         {
+            case '=':
+               _pushToken(T_PLUS_EQ, "*");
+               break;
+            default:
+               _backtrack();
+               _pushToken(T_EQ, "=");
+         }
+         break;
+      }
+      case '*':
+      {
+         c2 = _getChar();
+         switch (c2)
+         {
+            case '=':
+               _pushToken(T_STAR_EQ, "*="); break;
+               break;
+            default:
+               _pushToken(T_STAR, "*"); break;
+         }
+         break;
+      }
       case '!':
       {
-         c2 = _get1Char();
+         c2 = _getChar();
          if (c2 == '=')
          {
             _pushToken(T_BANG_EQ, "!=");
@@ -184,35 +209,41 @@ Tokenizer::_processTokenStart (char c)
       }
       case '/':
       {
-         c2 = _get1Char();
-         if (c2 == '/')
+         c2 = _getChar();
+         switch (c2)
          {
-            _state = T_SINGLE_LINE_COMMENT;
-         }
-         else
-         {
-            _backtrack();
-            _pushToken(T_DIV, "/");
+            case '/':
+               _state = T_SINGLE_LINE_COMMENT;
+               break;
+            case '=':
+               _pushToken(T_SLASH_EQ, "/=");
+               break;
+            default:
+               _backtrack();
+               _pushToken(T_DIV, "/");
          }
          break;
       }
       case '-':
       {
-         c2 = _get1Char();
-         if (c2 == '>')
+         c2 = _getChar();
+         switch (c2)
          {
-            _pushToken(T_RARR, "->");
-         }
-         else
-         {
-            _backtrack();
-            _pushToken(T_MINUS, "-");
+            case '>':
+               _pushToken(T_RARR, "->");
+               break;
+            case '=':
+               _pushToken(T_MINUS_EQ, "-=");
+               break;
+            default:
+               _backtrack();
+               _pushToken(T_MINUS, "-");
          }
          break;
       }
       case '>':
       {
-         c2 = _get1Char();
+         c2 = _getChar();
          if (c2 == '=')
          {
             _pushToken(T_GT_EQ, ">=");
@@ -230,7 +261,7 @@ Tokenizer::_processTokenStart (char c)
       }
       case '<':
       {
-         c2 = _get1Char();
+         c2 = _getChar();
          if (c2 == '=')
          {
             _pushToken(T_LT_EQ, "<=");
@@ -248,15 +279,15 @@ Tokenizer::_processTokenStart (char c)
       }
       case '=':
       {
-         c2 = _get1Char();
-         if (c2 == '=')
+         c2 = _getChar();
+         switch (c2)
          {
-            _pushToken(T_EQ_EQ, "==");
-         }
-         else
-         {
-            _backtrack();
-            _pushToken(T_EQ, "=");
+            case '=':
+               _pushToken(T_EQ_EQ, "==");
+               break;
+            default:
+               _backtrack();
+               _pushToken(T_EQ, "=");
          }
          break;
       }
@@ -498,7 +529,7 @@ Tokenizer::_readNextToken ()
 
    while (!_isFileConsumed())
    {
-      c = _get1Char();
+      c = _getChar();
       //DEBUG_PRINTF("State[%d] CHAR <%c>(%d)\n", _state, c, c);
       if (c == 0)
       {
@@ -579,7 +610,7 @@ Tokenizer::_readNextToken ()
          {
             if (c == '\\')
             {
-               _tokenBuffer += _escapeChar(_get1Char());
+               _tokenBuffer += _escapeChar(_getChar());
             }
             else if (c != '"')
             {
