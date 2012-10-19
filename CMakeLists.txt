@@ -146,7 +146,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/node/NodeList.cpp
 	${memc_SRC}/mem/ast/node/NodeValidator.cpp
 	${memc_SRC}/mem/ast/node/Number.cpp
-	${memc_SRC}/mem/ast/node/Ptr.cpp
+	${memc_SRC}/mem/ast/node/PointerType.cpp
 	${memc_SRC}/mem/ast/node/Return.cpp
 	${memc_SRC}/mem/ast/node/Root.cpp
 	${memc_SRC}/mem/ast/node/String.cpp
