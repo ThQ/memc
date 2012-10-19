@@ -64,14 +64,14 @@ class File
    /**
     * Return the Nth line of the file.
     */
-   std::string*
+   std::string
    getLine (size_t n) const;
 
    /**
     * Return the Nth line of the file as a C string.
     */
    inline const char*
-   getLineCstr(size_t i) const {return this->getLine(i)->c_str();}
+   getLineCstr(size_t i) const {return this->getLine(i).c_str();}
 
    /**
     * Return true if the i is a valid line.

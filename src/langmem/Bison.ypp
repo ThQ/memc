@@ -30,7 +30,7 @@
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
-#include "mem/ast/node/Ptr.hpp"
+#include "mem/ast/node/PointerType.hpp"
 #include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/Root.hpp"
 #include "mem/ast/node/String.hpp"
@@ -183,6 +183,7 @@ void yyerror(ast::node::Node* ast,
 %token T_PASS
 %token T_OBJECT
 %token T_QUOTE
+%token T_PLUS_EQ
 %token T_RBRACKET
 %token T_RARR
 %token T_RETURN
@@ -636,7 +637,7 @@ type_name:
    }
    | type_name T_STAR
    {
-      mem::ast::node::Ptr* ptr = new mem::ast::node::Ptr();
+      mem::ast::node::PointerType* ptr = new mem::ast::node::PointerType();
       ptr->setTypeNode($1);
       $$ = ptr;
       $$->setPosition(@$.copy_range());

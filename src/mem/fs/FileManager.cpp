@@ -9,6 +9,7 @@ FileManager::~FileManager ()
    std::map<std::string,File*>::iterator it = _files.begin();
    for (; it != _files.end(); ++it )
    {
+      DEBUG_PRINTF("Delete FILE %s\n", it->second->gPath().c_str());
       delete it->second;
    }
 }

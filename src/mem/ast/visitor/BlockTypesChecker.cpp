@@ -700,7 +700,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          break;
 
       case node::MetaKind::POINTER_TYPE:
-         visitPointer(scope, node::cast<node::Ptr>(node));
+         visitPointer(scope, node::cast<node::PointerType>(node));
          break;
 
       case node::MetaKind::DOT:
@@ -983,7 +983,7 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
 }
 
 void
-BlockTypesChecker::visitPointer (st::Symbol* scope, node::Ptr* n)
+BlockTypesChecker::visitPointer (st::Symbol* scope, node::PointerType* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);

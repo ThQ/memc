@@ -20,7 +20,7 @@
 #include "mem/ast/node/If.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
-#include "mem/ast/node/Ptr.hpp"
+#include "mem/ast/node/PointerType.hpp"
 #include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/String.hpp"
 #include "mem/ast/node/Tuple.hpp"
@@ -141,7 +141,7 @@ class BlockTypesChecker : public TypeChecker
    visitNumber (st::Symbol* scope, node::Number* node);
 
    void
-   visitPointer (st::Symbol* scope, node::Ptr* n);
+   visitPointer (st::Symbol* scope, node::PointerType* n);
 
    void
    visitReturn (st::Symbol* scope, node::Return* ret);

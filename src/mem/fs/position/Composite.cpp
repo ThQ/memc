@@ -7,10 +7,7 @@ Composite::~Composite ()
 {
    for (size_t i = 0; i < _children.size() ; ++i)
    {
-      if (_children[i] != NULL)
-      {
-         delete _children[i];
-      }
+      delete _children[i];
    }
 }
 

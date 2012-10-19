@@ -1,4 +1,4 @@
-#include "mem/ast/node/Ptr.hpp"
+#include "mem/ast/node/PointerType.hpp"
 
 
 namespace mem { namespace ast { namespace node {
@@ -8,13 +8,13 @@ namespace mem { namespace ast { namespace node {
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
-Ptr::Ptr ()
+PointerType::PointerType ()
 {
-   _type = Ptr::kTYPE;
+   _type = PointerType::kTYPE;
    _type_node = NULL;
 }
 
-Ptr::~Ptr ()
+PointerType::~PointerType ()
 {
    delete _type_node;
 }
@@ -25,7 +25,7 @@ Ptr::~Ptr ()
 //-----------------------------------------------------------------------------
 
 Node*
-Ptr::getChild (size_t i) const
+PointerType::getChild (size_t i) const
 {
    switch (i)
    {
@@ -35,7 +35,7 @@ Ptr::getChild (size_t i) const
 }
 
 void
-Ptr::isValid (NodeValidator* v)
+PointerType::isValid (NodeValidator* v)
 {
    Node::isValid(v);
 
@@ -43,7 +43,7 @@ Ptr::isValid (NodeValidator* v)
 }
 
 void
-Ptr::setChild (size_t i, Node* n)
+PointerType::setChild (size_t i, Node* n)
 {
    switch (i)
    {

@@ -1,5 +1,5 @@
-#ifndef _MEM__AST__NODE__PTR__HPP_
-#define _MEM__AST__NODE__PTR__HPP_
+#ifndef _MEM__AST__NODE__POINTER_TYPE__HPP_
+#define _MEM__AST__NODE__POINTER_TYPE__HPP_
 
 
 #include "mem/ast/node/Type.hpp"
@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 //
 // Ex:
 //    int*
-class Ptr: public Type
+class PointerType: public Type
 {
    public:
    static const int kTYPE = MetaKind::POINTER_TYPE;
@@ -26,11 +26,11 @@ class Ptr: public Type
    public:
 
    // Default constructor
-   Ptr ();
+   PointerType ();
 
    // Destructor
    virtual
-   ~Ptr ();
+   ~PointerType ();
 
 
    //--------------------------------------------------------------------------
@@ -40,7 +40,7 @@ class Ptr: public Type
 
    // MemorySize
    virtual
-   GETTER(MemorySize, int) {return sizeof(Ptr);}
+   GETTER(MemorySize, int) {return sizeof(PointerType);}
 
    // TypeNode
    GETTER(TypeNode, node::Node*) {return _type_node;}

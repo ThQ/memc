@@ -6,7 +6,7 @@
 copySubstring (s :[char]*, start :int, length :int) -> [char]*
    new_s := new [char, length + 1]
    i :int = 0
-   c :char = @s[start]
+   c :char = s[start]
    while i < length
       @new_s[i] = c
       i = i + 1

@@ -10,7 +10,7 @@
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
-#include "mem/ast/node/Ptr.hpp"
+#include "mem/ast/node/PointerType.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Type.hpp"
 #include "mem/ast/visitor/BlockTypesChecker.hpp"

@@ -25,11 +25,12 @@ File::dump ()
    }
 }
 
-std::string*
+std::string
 File::getLine (size_t i) const
 {
    assert(i < _lines.size() && "Line out of file");
-   return _lines[i];
+   std::string line = *_lines[i];
+   return line;
 }
 
 bool
