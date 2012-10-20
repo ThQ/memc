@@ -154,8 +154,8 @@ Tokenizer::_processTokenStart (char c)
 
    switch (c)
    {
-      case '{': _state = T_OPEN_BRACE; break;
-      case '}': _state = T_CLOSE_BRACE; break;
+      case '{': _state = T_OPEN_BRACE; _backtrack(); break;
+      case '}': _state = T_CLOSE_BRACE; _backtrack(); break;
       case '(': _pushToken(T_OP, "("); break;
       case ')': _pushToken(T_CP, ")"); break;
       case '[': _pushToken(T_LBRACKET, "["); break;
