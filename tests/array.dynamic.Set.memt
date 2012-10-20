@@ -1,4 +1,6 @@
 ### file
 main ()
- arr :[int]*
- arr[0] = 1
+{
+   arr :[int]*
+   arr[0] = 1
+}

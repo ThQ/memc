@@ -1,6 +1,10 @@
 ### file
 class A
- field :int
-main () -> int
- field := new A
- return 0
+{
+   field :int
+}
+
+main ()
+{
+    my_a := new A
+}

@@ -1,3 +1,4 @@
 ### file
-main (argc :int) -> int
-   return 0
+main (argc :int)
+{
+}

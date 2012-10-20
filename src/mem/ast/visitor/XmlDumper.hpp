@@ -15,6 +15,7 @@
 #include "mem/ast/node/NodeList.hpp"
 #include "mem/ast/node/New.hpp"
 #include "mem/ast/node/Number.hpp"
+#include "mem/ast/node/PointerType.hpp"
 #include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/Root.hpp"
 #include "mem/ast/node/VarAssign.hpp"
@@ -108,6 +109,9 @@ class XmlDumper : public Dumper
 
    void
    visitPlaceHolder (node::Node* n);
+
+   void
+   visitPointerType (node::PointerType* n);
 
    void
    visitReturn (node::Return* n);

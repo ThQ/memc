@@ -1,0 +1,10 @@
+### file
+my_func() -> int*
+{
+   my_var :int*
+   return my_var
+}
+
+main()
+{
+}

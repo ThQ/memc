@@ -48,7 +48,7 @@ NodeList::eat (NodeList* n)
 }
 
 Node*
-NodeList::getChild(size_t i) const
+NodeList::getChild (size_t i) const
 {
    return _children[i];
 }

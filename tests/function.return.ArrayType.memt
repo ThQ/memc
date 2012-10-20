@@ -1,0 +1,10 @@
+### file
+my_func() -> [int, 5]
+{
+   my_var :[int, 5]
+   return my_var
+}
+
+main()
+{
+}

@@ -1,4 +1,5 @@
 ### file
-main () -> int
- i := new int
- return 0
+main ()
+{
+   i := new int
+}

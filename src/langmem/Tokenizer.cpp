@@ -11,7 +11,7 @@ Tokenizer::Tokenizer ()
    _cur_column = 0;
    _cur_line = 1;
    _fs_file = NULL;
-   _indent_level = 0;
+   //_indent_level = 0;
    _eat_space = true;
    _logger = NULL;
 }
@@ -154,17 +154,19 @@ Tokenizer::_processTokenStart (char c)
 
    switch (c)
    {
+      case '{': _state = T_OPEN_BRACE; break;
+      case '}': _state = T_CLOSE_BRACE; break;
       case '(': _pushToken(T_OP, "("); break;
       case ')': _pushToken(T_CP, ")"); break;
       case '[': _pushToken(T_LBRACKET, "["); break;
       case ']': _pushToken(T_RBRACKET, "]"); break;
       case ',': _pushToken(T_COMMA, ","); break;
-      case ';': _pushToken(T_COLON, ";"); break;
+      case ';': _pushToken(T_SEMICOLON, ";"); break;
       case '.': _pushToken(T_DOT, "."); break;
       case '@': _pushToken(T_AROBASE, "@"); break;
       case '&': _pushToken(T_AMPERSAND, "&"); break;
       case '%': _pushToken(T_MODULO, "%"); break;
-      case ':': _pushToken(T_SEMICOLON, ":"); break;
+      case ':': _pushToken(T_COLON, ":"); break;
 
       case '+':
       {
@@ -176,7 +178,7 @@ Tokenizer::_processTokenStart (char c)
                break;
             default:
                _backtrack();
-               _pushToken(T_EQ, "=");
+               _pushToken(T_PLUS, "+");
          }
          break;
       }
@@ -189,6 +191,7 @@ Tokenizer::_processTokenStart (char c)
                _pushToken(T_STAR_EQ, "*="); break;
                break;
             default:
+               _backtrack();
                _pushToken(T_STAR, "*"); break;
          }
          break;
@@ -293,11 +296,12 @@ Tokenizer::_processTokenStart (char c)
       }
       case 10: // NEWLINE
       {
-         _pushToken(T_NEWLINE);
+         //_pushToken(T_NEWLINE);
+         DEBUG_PRINT("newline start\n");
          _cur_line ++;
          _cur_column = 1;
          _state = T_NEWLINE;
-         _cur_tok = T_NEWLINE;
+         //_cur_tok = T_NEWLINE;
          break;
       }
       case '"':
@@ -359,7 +363,7 @@ Tokenizer::getNextToken ()
    t = _token_queue.front();
    _token_queue.pop();
 
-#if 0
+#if 1
    DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"} @ %d:%d..%d:%d\n",
      t.Kind(), t.Value().c_str(),
      t.Location().LineStart(), t.Location().ColumnStart(),
@@ -370,6 +374,7 @@ Tokenizer::getNextToken ()
    return t;
 }
 
+/*
 void
 Tokenizer::_getIndentTokenKind (std::string indent)
 {
@@ -438,6 +443,7 @@ Tokenizer::_getIndentTokenKind (std::string indent)
       _pushToken(T_YACC_ERROR, indent);
    }
 }
+*/
 
 int
 Tokenizer::_getTokenKindFromId (std::string id)
@@ -524,7 +530,7 @@ void
 Tokenizer::_readNextToken ()
 {
    _tokenBuffer = "";
-   char c;
+   char c = 0;
    _cur_tok = T_YACC_END;
 
    while (!_isFileConsumed())
@@ -561,6 +567,7 @@ Tokenizer::_readNextToken ()
             }
             break;
          }
+         /*
          case T_INDENT:
          {
             if (Tokenizer::_isSpace(c))
@@ -578,6 +585,7 @@ Tokenizer::_readNextToken ()
             }
             break;
          }
+         */
          case T_LITERAL_NUMBER:
          {
             if (Tokenizer::_isAlphaNumeric(c))
@@ -589,6 +597,49 @@ Tokenizer::_readNextToken ()
                _backtrack();
                _pushToken(T_LITERAL_NUMBER);
                return;
+            }
+            break;
+         }
+         case T_CLOSE_BRACE:
+         {
+            if (c == '}')
+            {
+               DEBUG_PRINT("close brace\n");
+               _pushToken(T_CLOSE_BRACE, "}");
+               _state = T_CLOSE_BRACE;
+               return;
+            }
+            else if (c == '{')
+            {
+               _state = T_OPEN_BRACE;
+            }
+            else if (c != '\n' && c != '\r' && c != ' ')
+            {
+               _state = T_YACC_UNDEFINED;
+               _backtrack();
+            }
+            else
+            {
+            }
+            break;
+         }
+         case T_OPEN_BRACE:
+         {
+            if (c == '{')
+            {
+               _pushToken(T_OPEN_BRACE, "{");
+               _state = T_OPEN_BRACE;
+               return;
+            }
+            else if (c == '}')
+            {
+               _state = T_CLOSE_BRACE;
+               _backtrack();
+            }
+            else if (c != '\n' && c != '\r' && c != ' ')
+            {
+               _state = T_YACC_UNDEFINED;
+               _backtrack();
             }
             break;
          }
@@ -625,14 +676,26 @@ Tokenizer::_readNextToken ()
          }
          case T_NEWLINE:
          {
-            if (c != '\n')
+            if (c == '\n' || c == '\r' || c == ' ')
             {
-               _state = T_INDENT;
+            }
+            else if (c == '{')
+            {
+               _state = T_OPEN_BRACE;
+               _backtrack();
+            }
+            else if (c == '}')
+            {
+               _pushToken(T_SEMICOLON, ";");
+               _state = T_CLOSE_BRACE;
                _backtrack();
             }
             else
             {
-               _cur_line ++;
+               _pushToken(T_SEMICOLON, ";");
+               _state = T_YACC_UNDEFINED;
+               _backtrack();
+               return ;
             }
             break;
          }
@@ -663,6 +726,7 @@ Tokenizer::_readNextToken ()
    }
 }
 
+/*
 std::string
 Tokenizer::_makeIndentationVisible (std::string indent)
 {
@@ -685,6 +749,7 @@ Tokenizer::_makeIndentationVisible (std::string indent)
    }
    return r.str();
 }
+*/
 
 bool
 Tokenizer::isFinished ()
@@ -696,11 +761,13 @@ void
 Tokenizer::_pushEndTokens ()
 {
    _state = T_YACC_END;
+   /*
    for (int i = 0; i < _indent_level; ++i)
    {
       _pushToken(T_DEDENT, "");
    }
    _pushToken(T_NEWLINE, "");
+   */
    _pushToken(T_YACC_END, "");
 }
 

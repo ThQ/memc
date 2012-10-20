@@ -9,7 +9,7 @@
 namespace mem { namespace ast { namespace node {
 
 
-class NodeList : public Node
+class NodeList: public Node
 {
    public:
    static const int kTYPE = MetaKind::NODE_LIST;

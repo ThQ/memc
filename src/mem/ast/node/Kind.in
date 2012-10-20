@@ -47,19 +47,22 @@ UNKNOWN
 		ID
 		{
 			FINAL_ID
+			TYPE
+			{
+				ARRAY_TYPE
+				POINTER_TYPE
+				TUPLE_TYPE
+			}
 		}
 		DECORATOR
 		FUNCTION
 		NAMESPACE
 		STRING
-		TYPE
-		{
-			ARRAY_TYPE
-			CLASS
-			ENUM
-			POINTER_TYPE
-			TUPLE_TYPE
-		}
+	}
+	TYPE
+	{
+				CLASS
+				ENUM
 	}
 	UNARY_OPERATOR
 	{

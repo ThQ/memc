@@ -35,7 +35,7 @@ class Tokenizer
    int _cur_column;
    mem::fs::File* _fs_file;
    std::string _indent_unit;
-   int _indent_level;
+   //int _indent_level;
    bool _eat_space;
    std::istream* _in;
    mem::fs::position::Range _location;
@@ -107,8 +107,8 @@ class Tokenizer
    char
    _escapeChar(char c) const ;
 
-   inline void
-   _getIndentTokenKind (std::string indent);
+   //inline void
+   //_getIndentTokenKind (std::string indent);
 
    inline int
    _getTokenKindFromId (std::string id);
@@ -137,8 +137,8 @@ class Tokenizer
    static inline bool
    _isValidIdChar (char c) {return _isAlphaNumeric(c) || c == '_';}
 
-   std::string
-   _makeIndentationVisible (std::string indent);
+   //std::string
+   //_makeIndentationVisible (std::string indent);
 
    inline bool
    _processTokenStart (char c);

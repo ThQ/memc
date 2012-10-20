@@ -1,7 +1,11 @@
 ### file
 class A
- field :int
-main () -> int
- my_a :A
- some_var :int = my_a.field
- return 0
+{
+   field :int
+}
+
+main ()
+{
+   my_a :A
+   some_var :int = my_a.field
+}

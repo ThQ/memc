@@ -1,6 +1,10 @@
 ### file
 class A
- field :int
+{
+   my_field :int
+}
 
 main () -> int
- return 0
+{
+   return 0
+}

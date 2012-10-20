@@ -1,7 +1,10 @@
 ### file
 class BadClass < int
- some_field :int
+{
+   some_field :int
+}
 
-main () -> int
- a :BadClass
- return 0
+main ()
+{
+   a :BadClass
+}

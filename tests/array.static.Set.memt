@@ -1,4 +1,6 @@
 ### file
 main ()
- arr :[int, 10]
- arr[1] = 2
+{
+   arr :[int, 10]
+   arr[1] = 2
+}

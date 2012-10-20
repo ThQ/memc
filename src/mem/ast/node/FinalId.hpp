@@ -2,13 +2,13 @@
 #define _MEM__AST__NODE__FINAL_ID__HPP_
 
 
-#include "mem/ast/node/Text.hpp"
+#include "mem/ast/node/Id.hpp"
 
 
 namespace mem { namespace ast { namespace node {
 
 
-class FinalId : public Text
+class FinalId : public Id
 {
    public:
    static const int kTYPE = MetaKind::FINAL_ID;

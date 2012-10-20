@@ -129,6 +129,9 @@ XmlDumper::visit (node::Node* node)
          case node::MetaKind::NUMBER:
             visitNumber(node::cast<node::Number>(node)); break;
 
+         case node::MetaKind::POINTER_TYPE:
+            visitPointerType(node::cast<node::PointerType>(node)); break;
+
          case node::MetaKind::RETURN:
             visitReturn(node::cast<node::Return>(node)); break;
 
@@ -409,6 +412,16 @@ void
 XmlDumper::visitPlaceHolder (node::Node* n)
 {
    *_out << "<place-holder";
+   dumpExprType(n);
+   dumpBoundSymbol(n);
+   dumpPosition(n);
+   *_out << " />\n";
+}
+
+void
+XmlDumper::visitPointerType (node::PointerType* n)
+{
+   *_out << "<pointer-type";
    dumpExprType(n);
    dumpBoundSymbol(n);
    dumpPosition(n);
