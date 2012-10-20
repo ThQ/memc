@@ -65,27 +65,16 @@ Tokenizer::_escapeChar (char c_in) const
 
    switch (c_in)
    {
-      case 'a':
-         return '\a';
-      case 'b':
-         return '\b';
-      case 'f':
-         return '\f';
-      case 'n':
-         return '\n';
-      case 'r':
-         return '\r';
-      case 't':
-         return '\t';
-      case 'v':
-         return '\v';
-      case '\'':
-         return 39;
-      case '\\':
-         return 92;
-
-      default:
-         c = c_in;
+      case 'a': return '\a';
+      case 'b': return '\b';
+      case 'f': return '\f';
+      case 'n': return '\n';
+      case 'r': return '\r';
+      case 't': return '\t';
+      case 'v': return '\v';
+      case '\'': return 39;
+      case '\\': return 92;
+      default: c = c_in;
    }
 
    return c;

@@ -50,9 +50,9 @@ class Tokenizer
    //--------------------------------------------------------------------------
    public:
 
-   SETTER(Logger, mem::log::Logger*) { _logger = val;}
    SETTER(EatSpace, bool) {_eat_space = val;}
 
+   SETTER(Logger, mem::log::Logger*) { _logger = val;}
 
    SETTER(FsFile, mem::fs::File*) {_fs_file = val;}
 
@@ -84,7 +84,11 @@ class Tokenizer
    reset ();
 
    inline void
-   setInputFile (std::string fpath) { _in = new std::ifstream(fpath.c_str(), std::ifstream::in); };
+   setInputFile (std::string fpath)
+   {
+      delete _in;
+      _in = new std::ifstream(fpath.c_str(), std::ifstream::in);
+   }
 
 
    //--------------------------------------------------------------------------

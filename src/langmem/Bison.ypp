@@ -393,7 +393,7 @@ function_name:
    {
       mem::ast::node::Func* func = new mem::ast::node::Func();
       func->setNameNode($1);
-      func->setPosition(@$.copy_range());
+      //func->setPosition(@1.copy_range());
       func->setValue($1->Value());
       $$ = func;
    }
@@ -403,7 +403,7 @@ function_name:
       func->setDecoratorNode($1);
       func->setNameNode($2);
       func->setValue($2->Value());
-      func->setPosition(@2.copy_range());
+      //func->setPosition(@2.copy_range());
       $$ = func;
    }
 

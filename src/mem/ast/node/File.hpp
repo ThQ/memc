@@ -19,17 +19,6 @@ class File : public NodeList
    static const int kTYPE = MetaKind::FILE;
 
    //--------------------------------------------------------------------------
-   // FIELDS
-   //--------------------------------------------------------------------------
-   protected:
-
-   std::string _id;
-   std::string _include_path;
-   std::string _path;
-   Func* _function_ll_head;
-   Func* _function_ll_tail;
-
-   //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -75,6 +64,18 @@ class File : public NodeList
 
    void
    registerFunction (node::Func* func_n);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   std::string _id;
+   std::string _include_path;
+   std::string _path;
+   Func* _function_ll_head;
+   Func* _function_ll_tail;
 };
 
 

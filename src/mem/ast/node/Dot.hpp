@@ -24,7 +24,7 @@ class Dot: public BinaryOp
    //--------------------------------------------------------------------------
    public:
 
-   // Default constructor.
+   // Default constructor
    Dot();
 
 

@@ -22,6 +22,7 @@ class BinaryOp: public Text // FIXME Inherit from Text so as to please bison
    BinaryOp ();
 
    // Destructor
+   virtual
    ~BinaryOp ();
 
 

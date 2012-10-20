@@ -23,6 +23,7 @@ class While : public Node
    While ();
 
    // Destructor
+   virtual
    ~While ();
 
 

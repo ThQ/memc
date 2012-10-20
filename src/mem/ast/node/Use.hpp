@@ -22,6 +22,12 @@ class Use: public Text
    // Default constructor.
    Use ();
 
+
+   //--------------------------------------------------------------------------
+   // PROPERTIES
+   //--------------------------------------------------------------------------
+   public:
+
    virtual
    GETTER (MemorySize, int) {return sizeof(Use);}
 
