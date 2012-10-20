@@ -297,7 +297,6 @@ Tokenizer::_processTokenStart (char c)
       case 10: // NEWLINE
       {
          //_pushToken(T_NEWLINE);
-         DEBUG_PRINT("newline start\n");
          _cur_line ++;
          _cur_column = 1;
          _state = T_NEWLINE;
@@ -363,7 +362,7 @@ Tokenizer::getNextToken ()
    t = _token_queue.front();
    _token_queue.pop();
 
-#if 1
+#if 0
    DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"} @ %d:%d..%d:%d\n",
      t.Kind(), t.Value().c_str(),
      t.Location().LineStart(), t.Location().ColumnStart(),
@@ -604,7 +603,6 @@ Tokenizer::_readNextToken ()
          {
             if (c == '}')
             {
-               DEBUG_PRINT("close brace\n");
                _pushToken(T_CLOSE_BRACE, "}");
                _state = T_CLOSE_BRACE;
                return;
