@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 //    (type1, type2, ..., typeN)
 // Ex:
 //    (int, char, long)
-class TupleType : public Type
+class TupleType : public Id
 {
    public:
    static const int kTYPE = MetaKind::TUPLE_TYPE;

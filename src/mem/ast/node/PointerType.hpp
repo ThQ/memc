@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 //
 // Ex:
 //    int*
-class PointerType: public Type
+class PointerType: public Id
 {
    public:
    static const int kTYPE = MetaKind::POINTER_TYPE;

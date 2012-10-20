@@ -248,7 +248,7 @@ void yyerror(ast::node::Node* ast,
 %type <node>           statement
 %type <block_node>     statements
 %type <node>           tuple_type
-%type <type_node>      type_list
+%type <id_node>      type_list
 %type <text_node>      use
 %type <text_node>      use_file
 %type <node>           variable_assignment

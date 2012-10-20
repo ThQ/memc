@@ -14,7 +14,7 @@ namespace mem { namespace ast { namespace node {
 // Ex:
 //    [int]
 //    [int, 10]
-class ArrayType : public Type
+class ArrayType : public Id
 {
    public:
    static const int kTYPE = MetaKind::ARRAY;

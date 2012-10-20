@@ -36,7 +36,6 @@ void
 Id::isValid (NodeValidator* v)
 {
    Node::isValid(v);
-   v->ensure(ChildCount() == 0, "Id cannot have children");
 }
 
 
