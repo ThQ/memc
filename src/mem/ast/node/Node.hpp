@@ -167,13 +167,14 @@ cast (Node* n)
    {
       if (n == NULL)
       {
-         DEBUG_PRINTF("Invalid cast: node @%x is NULL\n", (int)n);
+         DEBUG_PRINTF("Invalid cast: node @%p is NULL\n", n);
          assert(false);
       }
       else if (!node::canCast(n->Kind(), T::kTYPE))
       {
-         DEBUG_PRINTF("Invalid cast: cannot cast from %s to %s\n",
+         DEBUG_PRINTF("Invalid cast: cannot cast from %s (@%p) to %s\n",
             Node::get_type_name(n->Kind()),
+            n,
             Node::get_type_name(T::kTYPE));
          assert(false);
       }
