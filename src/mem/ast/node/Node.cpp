@@ -106,8 +106,8 @@ assertKind (Node* n, int k)
 #ifndef NDEBUG
    if (!n->isKind(k))
    {
-      DEBUG_PRINTF("Node (@%x) is not a `%s' but a `%s'\n",
-         (int)n,
+      DEBUG_PRINTF("Node (@%p) is not a `%s' but a `%s'\n",
+         n,
          Node::get_type_name(k),
          Node::get_type_name(n->Kind()));
       assert (n->isKind(k));
