@@ -320,6 +320,7 @@ class TestRunner:
       if f:
          f.write(html)
          f.close()
+         self._logger.logln("HTML report written to " + report_file)
 
    def get_memc_version_string (self):
       args = [kMEMC, "--version"]
@@ -340,6 +341,7 @@ class TestRunner:
       summary = str(self._num_tests) + " tests run\n"
       summary += " - Failed: " + str(len(self._failed_tests)) + " (" + str(percent_failed) + "%)\n"
       summary += " - Passed: " + str(self._num_tests - len(self._failed_tests)) + " (" +  str(percent_passed) + "%)"
+      summary += "\n"
       self._logger.logln(summary)
 
    def read_file (self, path):
