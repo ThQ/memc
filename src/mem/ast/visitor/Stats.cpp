@@ -16,20 +16,46 @@ Stats::tearDown ()
    std::map<int, KindStats>::iterator it;
    int total_node_count = 0;
    int total_memory_size = 0;
-   stats << "---------------\n";
+
+   int colsw[4] = {25, 10, 13 ,14};
+   int totalw = 1 + 3 * 3 + 1;
+   for (int i = 0; i < 4; ++i) totalw += colsw[i];
+
+   stats << " " << std::setw(totalw) << std::setfill('=') << "" << "\n";
+   stats << std::setfill(' ');
+
+   stats << "| " << std::setw(colsw[0]) << "Node";
+   stats << " | " << std::setw(colsw[1]) << "Node count";
+   stats << " | " << std::setw(colsw[2]) << "Node size (B)";
+   stats << " | " << std::setw(colsw[3]) << "Total size (B)";
+   stats << " |\n";
+
+   stats << " " << std::setw(totalw) << std::setfill('=') << "" << "\n";
+   stats << std::setfill(' ');
+
    for (it = _kind_usages.begin(); it != _kind_usages.end(); ++it)
    {
-      stats << node::Node::get_type_name(it->first) << ": ";
-      stats << it->second.usages;
-      stats << " x " << it->second.unit_memory_size << "B";
-      stats << " = " << it->second.total_memory_size << "B\n";
+      stats << "| " << std::setw(colsw[0]) << node::Node::get_type_name(it->first);
+      stats << " | " << std::setw(colsw[1]) << it->second.usages;
+      stats << " | " << std::setw(colsw[2]) << it->second.unit_memory_size;
+      stats << " | " << std::setw(colsw[3]) << it->second.total_memory_size;
+      stats << " |\n";
+
       total_node_count += it->second.usages;
       total_memory_size += it->second.total_memory_size;
    }
 
-   stats << "---------------\n";
-   stats << "Total: " << total_node_count;
-   stats << " | " << total_memory_size << "B\n";
+   stats << " " << std::setw(totalw) << std::setfill('-') << "" << "\n";
+   stats << std::setfill(' ');
+
+   stats << "| " << std::setw(colsw[0]) << "Total";
+   stats << " | " << std::setw(colsw[1]) << total_node_count;
+   stats << " | " << std::setw(colsw[2]) << "";
+   stats << " | " << std::setw(colsw[3]) << total_memory_size;
+   stats << " |\n";
+
+   stats << " " << std::setw(totalw) << std::setfill('-') << "" << "\n";
+   stats << std::setfill(' ');
 
    log::Message* msg = new log::Info();
    msg->setPrimaryText("AST stats");

@@ -2,6 +2,7 @@
 #define _MEM__AST__VISITOR__STATS__HPP_
 
 
+#include <iomanip>
 #include <map>
 #include <sstream>
 #include "mem/ast/node/Node.hpp"
