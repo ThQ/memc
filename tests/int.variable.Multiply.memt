@@ -1,0 +1,7 @@
+### file
+main ()
+{
+   var i1 :int
+   var i2 :int
+   var i = i1 * i2
+}
