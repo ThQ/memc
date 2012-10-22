@@ -1,0 +1,9 @@
+### options
+must-fail
+
+### file
+main ()
+{
+   var i = 2
+   @i
+}

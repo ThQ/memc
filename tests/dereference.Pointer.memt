@@ -1,0 +1,6 @@
+### file
+main ()
+{
+   var i_ptr :int* = new int
+   var i :int = @i_ptr
+}
