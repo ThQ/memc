@@ -1298,7 +1298,12 @@ BlockTypesChecker::visitWhile (st::Symbol* scope, node::While* while_node)
    ensureBoolExpr(while_node->ConditionNode());
 
    // Check block node
-   visitBlock(scope, while_node->BlockNode());
+   st::Symbol* while_block = new st::Symbol();
+   while_block->hintName(scope, "~if");
+   scope->addChild(while_block);
+   while_node->BlockNode()->setBoundSymbol(while_block);
+
+   visitBlock(while_block, while_node->BlockNode());
 
    DEBUG_ENSURE (while_node->ConditionNode()->hasExprType());
    DEBUG_ENSURE (while_node->ConditionNode()->ExprType()->Name() == "bool");
