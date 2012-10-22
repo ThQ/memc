@@ -198,7 +198,7 @@ class TestFile:
       report.name = self.name
       report.source = self.content
 
-      if "must-fail" in self.options:
+      if "must-not-compile" in self.options:
          if report.return_code == 1:
             report.status = "passed"
          elif report.return_code == 0:
