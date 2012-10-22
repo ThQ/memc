@@ -1,0 +1,12 @@
+### options
+must-fail
+
+### file
+main ()
+{
+   while 1 == 1
+   {
+      var a :int
+   }
+   a += 1
+}
