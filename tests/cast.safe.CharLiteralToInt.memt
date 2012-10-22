@@ -1,5 +1,5 @@
 ### file
-main () -> int
+main ()
 {
-   return 99 :int
+   var i :int = 99 :int;
 }

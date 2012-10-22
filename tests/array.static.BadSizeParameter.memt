@@ -4,6 +4,6 @@ must-not-compile
 ### file
 main ()
 {
-   var a :int
-   var arr :[int, a]
+   var a :int;
+   var arr :[int, a];
 }

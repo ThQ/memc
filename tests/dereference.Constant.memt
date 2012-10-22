@@ -4,5 +4,5 @@ must-not-compile
 ### file
 main ()
 {
-   @2
+   @2;
 }

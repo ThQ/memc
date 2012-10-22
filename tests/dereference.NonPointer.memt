@@ -4,6 +4,6 @@ must-not-compile
 ### file
 main ()
 {
-   var i = 2
-   @i
+   var i = 2;
+   @i;
 }

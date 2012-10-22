@@ -1,6 +1,6 @@
 ### file
 main ()
 {
-   var i :int = 0
-   i += 1
+   var i :int = 0;
+   i += 1;
 }

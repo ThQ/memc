@@ -3,6 +3,6 @@ main ()
 {
    for var i = 0; i < 10; i+=1
    {
-      var a = i
+      var a = i;
    }
 }

@@ -6,7 +6,7 @@ enum MyEnum
 {
    my_function() -> int
    {
-      return 1
+      return 1;
    }
 }
 

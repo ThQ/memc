@@ -1,6 +1,6 @@
 ### file
 main ()
 {
-   var arr :[int]*
-   var i :int = arr[0]
+   var arr :[int]*;
+   var i :int = arr[0];
 }

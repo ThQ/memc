@@ -143,8 +143,8 @@ Tokenizer::_processTokenStart (char c)
 
    switch (c)
    {
-      case '{': _state = T_OPEN_BRACE; _backtrack(); break;
-      case '}': _state = T_CLOSE_BRACE; _backtrack(); break;
+      case '{': _pushToken(T_OPEN_BRACE, "{"); break;
+      case '}': _pushToken(T_CLOSE_BRACE, "}"); break;
       case '(': _pushToken(T_OP, "("); break;
       case ')': _pushToken(T_CP, ")"); break;
       case '[': _pushToken(T_LBRACKET, "["); break;
@@ -283,13 +283,11 @@ Tokenizer::_processTokenStart (char c)
          }
          break;
       }
-      case 10: // NEWLINE
+      case '\n': // NEWLINE
       {
-         //_pushToken(T_NEWLINE);
          _cur_line ++;
          _cur_column = 1;
-         _state = T_NEWLINE;
-         //_cur_tok = T_NEWLINE;
+         _state = T_YACC_UNDEFINED;
          break;
       }
       case '"':
@@ -361,77 +359,6 @@ Tokenizer::getNextToken ()
    t.Location().sFile(_fs_file);
    return t;
 }
-
-/*
-void
-Tokenizer::_getIndentTokenKind (std::string indent)
-{
-   // First time we see indentation
-   if (_indent_unit.size() == 0 && indent.size() != 0)
-   {
-      _indent_unit = indent;
-      _indent_level = 1;
-      _pushToken(T_INDENT, indent);
-      return;
-   }
-
-   // True if indentation is a multiple of the unit
-   // For example :
-   // * _indent_unit = <tab>
-   // * indent = <tab><tab>
-   // Then this is OK (true)
-   int is_mul_of_unit = (indent.size() %
-      (_indent_unit.size() == 0 ? 1 : _indent_unit.size())) == 0;
-
-   if (is_mul_of_unit)
-   {
-      int indent_level = indent.size() /
-         (_indent_unit.size() == 0 ? 1 : _indent_unit.size());
-
-      // Identation
-      if (indent_level > _indent_level)
-      {
-         _indent_level = indent_level;
-         _pushToken(T_INDENT, indent);
-         return;
-      }
-      // Dedentation
-      else if (indent_level < _indent_level)
-      {
-         // We may be dedenting more than once at a time :
-         // If _indent_unit = <   > (3 spaces -> 1 level)
-         // and last identation was <         > (9 spaces -> 3 levels)
-         // and now its <   > (3 spaces -> 1 level)
-         // -> we are decrementing by 2 levels (3 - 1)
-         for (int i = 0; i < _indent_level - indent_level; ++i)
-         {
-            _pushToken(T_DEDENT, _indent_unit);
-         }
-         _indent_level = indent_level;
-         return;
-      }
-      else
-      {
-         // We are simply indenting in the same block (not an indentation, nor
-         // a dedentation, we then just skip the token since a T_NEWLINE has
-         // been just emited the token before.
-         //_pushToken(T_NEWLINE, "");
-         _state = T_YACC_UNDEFINED;
-         return;
-      }
-   }
-   else
-   {
-      mem::log::BadIndentation* err = new mem::log::BadIndentation();
-      err->sDefaultIndentation(_indent_unit);
-      err->sIndentation(indent);
-      err->format();
-      _logger->log(err);
-
-      _pushToken(T_YACC_ERROR, indent);
-   }
-}
-*/
 
 int
 Tokenizer::_getTokenKindFromId (std::string id)
@@ -589,48 +516,6 @@ Tokenizer::_readNextToken ()
                _backtrack();
                _pushToken(T_LITERAL_NUMBER);
                return;
-            }
-            break;
-         }
-         case T_CLOSE_BRACE:
-         {
-            if (c == '}')
-            {
-               _pushToken(T_CLOSE_BRACE, "}");
-               _state = T_CLOSE_BRACE;
-               return;
-            }
-            else if (c == '{')
-            {
-               _state = T_OPEN_BRACE;
-            }
-            else if (c != '\n' && c != '\r' && c != ' ')
-            {
-               _state = T_YACC_UNDEFINED;
-               _backtrack();
-            }
-            else
-            {
-            }
-            break;
-         }
-         case T_OPEN_BRACE:
-         {
-            if (c == '{')
-            {
-               _pushToken(T_OPEN_BRACE, "{");
-               _state = T_OPEN_BRACE;
-               return;
-            }
-            else if (c == '}')
-            {
-               _state = T_CLOSE_BRACE;
-               _backtrack();
-            }
-            else if (c != '\n' && c != '\r' && c != ' ')
-            {
-               _state = T_YACC_UNDEFINED;
-               _backtrack();
             }
             break;
          }

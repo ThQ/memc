@@ -1,15 +1,15 @@
 ### file
 main ()
 {
-   var a :int
+   var a :int;
 
    if 1 == 2
    {
-      a = 1
+      a = 1;
    }
 
    if 2 == 1
    {
-      a = 2
+      a = 2;
    }
 }

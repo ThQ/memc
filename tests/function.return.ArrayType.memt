@@ -1,8 +1,8 @@
 ### file
 my_func() -> [int, 5]
 {
-   var my_var :[int, 5]
-   return my_var
+   var my_var :[int, 5];
+   return my_var;
 }
 
 main()

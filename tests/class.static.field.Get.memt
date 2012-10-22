@@ -1,11 +1,11 @@
 ### file
 class A
 {
-   field :int
+   field :int;
 }
 
 main ()
 {
-   var my_a :A
-   var some_var :int = my_a.field
+   var my_a :A;
+   var some_var :int = my_a.field;
 }
