@@ -206,10 +206,14 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    if (type_n != NULL)
    {
       visitExpr(scope, type_n);
-      ensureSymbolIsType(type_n, type_n->BoundSymbol());
-      item_ty = st::cast<st::Type>(type_n->BoundSymbol());
-
-      assert(st::isa<st::Type>(item_ty));
+      if (ensureSymbolIsType(type_n, type_n->BoundSymbol()))
+      {
+         item_ty = st::cast<st::Type>(type_n->BoundSymbol());
+      }
+      else
+      {
+         item_ty = BugType();
+      }
    }
 
    // ------
