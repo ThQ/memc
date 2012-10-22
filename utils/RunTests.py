@@ -398,4 +398,13 @@ runner.run_all()
 runner.print_summary()
 runner.dump_html_report(os.path.join(kREPORT_DIR, "memc-test-report.html"))
 
-
+if runner._num_tests != runner._num_passed_tests:
+    print("\n" + "=" * 80)
+    print("")
+    print("   Please submit this test report to")
+    print("")
+    print("      >>> https://github.com/ThQ/memc/issues/new")
+    print("")
+    print("   You have stumbled upon some bugs we'd like to know.\n")
+    print("=" * 80 + "\n")
+    sys.exit(1)
