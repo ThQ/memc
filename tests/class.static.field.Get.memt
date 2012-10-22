@@ -6,6 +6,6 @@ class A
 
 main ()
 {
-   my_a :A
-   some_var :int = my_a.field
+   var my_a :A
+   var some_var :int = my_a.field
 }

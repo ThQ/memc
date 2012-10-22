@@ -5,7 +5,7 @@ main ()
    {
       while 2 == 1
       {
-         a := 1
+         var a = 1
       }
    }
 }

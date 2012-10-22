@@ -6,5 +6,5 @@ class A
 
 main ()
 {
-    my_a := new A
+    var my_a = new A
 }

@@ -1,6 +1,6 @@
 ### file
 main () -> int
 {
-   c := 99 :char
+   var c = 99 :char
    return c :int
 }

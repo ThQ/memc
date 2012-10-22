@@ -198,6 +198,7 @@ void yyerror(ast::node::Node* ast,
 %token T_STAR_EQ
 %token <text> T_STRING
 %token T_USE
+%token T_VAR
 %token T_WHILE
 %token T_WHITESPACE
 
@@ -721,51 +722,38 @@ variable_assignment :
 
 variable_declaration :
    // Ex: my_variable :my_type
-   simple_id T_COLON id
+   T_VAR simple_id T_COLON id
    {
       mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
-      n->setNameNode($1);
-      n->setTypeNode($3);
+      n->setNameNode($2);
+      n->setTypeNode($4);
       n->setPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
    }
-   // Ex: my_variable := my_function()
-   | simple_id T_COLON T_EQ expr
+   // Ex: my_variable = my_function()
+   | T_VAR simple_id T_EQ expr
    {
       mem::ast::node::Node* ty_place_holder = new mem::ast::node::Node();
       ty_place_holder->setKind(ast::node::MetaKind::PLACE_HOLDER);
-      ty_place_holder->setPosition(@3.copy_range());
+      ty_place_holder->setPosition(@4.copy_range());
 
       mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
-      n->setNameNode($1);
+      n->setNameNode($2);
       n->setTypeNode(ty_place_holder);
       n->setValueNode($4);
       n->setPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
    }
    // Ex: my_variable :my_type = my_function()
-   | simple_id T_COLON id T_EQ expr
+   | T_VAR simple_id T_COLON id T_EQ expr
    {
       mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
-      n->setNameNode($1);
-      n->setTypeNode($3);
-      n->setValueNode($5);
+      n->setNameNode($2);
+      n->setTypeNode($4);
+      n->setValueNode($6);
       n->setPosition(@$.copy_range());
       $$ = (ast::node::Node*)n;
    }
-/*
-final_id:
-   T_ID
-   {
-      $$ = new mem::ast::node::FinalId();
-      $$->setPosition(new fs::position::Range(@$));
-      $$->setValue($1->c_str());
-
-      delete $1;
-   }
-
-id:
-*/
 
 /* RECURSIVE */
 qualified_id:

@@ -493,6 +493,10 @@ Tokenizer::_getTokenKindFromId (std::string id)
          if (id == "use") kind = T_USE;
          break;
 
+      case 'v':
+         if (id == "var") kind = T_VAR;
+         break;
+
       case 'w':
          if (id == "while") kind = T_WHILE;
          break;

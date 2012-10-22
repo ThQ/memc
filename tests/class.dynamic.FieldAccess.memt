@@ -6,6 +6,6 @@ class A
 
 main ()
 {
-   my_a :A*
+   var my_a :A*
    my_a.field = 1
 }

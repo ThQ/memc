@@ -9,5 +9,5 @@ class BadClass < int
 
 main ()
 {
-   a :BadClass
+   var a :BadClass
 }

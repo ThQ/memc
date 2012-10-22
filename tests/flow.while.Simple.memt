@@ -3,6 +3,6 @@ main ()
 {
    while 1 == 2
    {
-      a := 1
+      var a = 1
    }
 }

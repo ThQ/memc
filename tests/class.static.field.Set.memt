@@ -6,6 +6,6 @@ class SomeClass
 
 main ()
 {
-   my_a :SomeClass
+   var my_a :SomeClass
    my_a.field = 1
 }

@@ -1,6 +1,6 @@
 ### file
 main ()
 {
-   arr :[int, 10]
-   i :int = arr[0]
+   var arr :[int, 10]
+   var i :int = arr[0]
 }

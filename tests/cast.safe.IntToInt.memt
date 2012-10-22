@@ -1,7 +1,6 @@
 ### file
-main () -> int
+main ()
 {
-   i_src := 12 :int
-   i_dest := i_src :int
-   return 0
+   var i_src = 12 :int
+   var i_dest = i_src :int
 }
