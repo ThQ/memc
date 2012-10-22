@@ -15,6 +15,7 @@ find_program(LLVM_CONFIG_EXE NAMES "llvm-config" "llvm-config-3.0")
 set(memc_BUILT ${CMAKE_CURRENT_BINARY_DIR}/src.built)
 set(memc_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set(memc_UTILS ${CMAKE_CURRENT_SOURCE_DIR}/utils)
+set(gtest_SRC ${memc_UTILS}/gtest)
 
 file(MAKE_DIRECTORY ${memc_BUILT})
 file(MAKE_DIRECTORY ${memc_BUILT}/langmem)
@@ -251,6 +252,10 @@ set(memc_SOURCES
 	${memc_SRC}/langmem/Parser.cpp
 	${memc_SRC}/langmem/Tokenizer.cpp)
 
+set(memc_test_SOURCES
+   ${gtest_SRC}/gtest-all.cc
+   ${gtest_SRC}/gtest_main.cc)
+
 # Build configurations
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -UNDEBUG")
 
@@ -264,6 +269,12 @@ configure_file(${memc_SRC}/config.h.in ${memc_BUILT}/config.h)
 
 add_executable(memc ${memc_SOURCES})
 include_directories(${memc_SRC} ${memc_BUILT})
-# The order is important : dl must come at the end
-#target_link_libraries(memc ${CMAKE_DL_LIBS} pthread ffi m ${LLVM_LIBS} dl)
 
+
+#------------------------------------------------------------------------------
+# memc-test
+#------------------------------------------------------------------------------
+
+add_executable(memc-test ${memc_test_SOURCES})
+include_directories(${memc_SRC} ${memc_BUILT} ${gtest_SRC})
+target_link_libraries(memc-test pthread)
