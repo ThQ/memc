@@ -1,6 +1,5 @@
 UNKNOWN
 {
-	ARRAY
 	BINARY_OPERATOR
 	{
 		DOT
@@ -46,6 +45,7 @@ UNKNOWN
 	{
 		ID
 		{
+			ARRAY
 			FINAL_ID
 			ARRAY_TYPE
 			POINTER_TYPE
