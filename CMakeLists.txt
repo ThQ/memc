@@ -72,6 +72,25 @@ add_custom_target(
 		${memc_BUILT}/mem/ast/node/Kind.hpp
 		${memc_BUILT}/mem/ast/node/Kind.cpp)
 
+# Symbol kinds
+add_custom_command(
+	OUTPUT
+		${memc_BUILT}/mem/st/Kind.hpp
+		${memc_BUILT}/mem/st/Kind.cpp
+	COMMAND
+		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenSimpleRtti.py
+		--template="${memc_SRC}/mem/st/Kind.in"
+		--output-hpp-file="${memc_BUILT}/mem/st/Kind.hpp"
+		--output-cpp-file="${memc_BUILT}/mem/st/Kind.cpp"
+		--namespace="mem.st"
+      --klass="MetaKind"
+	DEPENDS ${memc_UTILS}/GenNodeTypes.py)
+add_custom_target(
+	gen-symbol-types ALL
+	DEPENDS
+		${memc_BUILT}/mem/st/Kind.hpp
+		${memc_BUILT}/mem/st/Kind.cpp)
+
 # Error classes
 add_custom_command(
 	OUTPUT ${memc_BUILT}/mem/log/errors.hpp
@@ -205,6 +224,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/st/FunctionType.cpp
 	${memc_SRC}/mem/st/IntConstant.cpp
 	${memc_SRC}/mem/st/IntType.cpp
+	${memc_BUILT}/mem/st/Kind.cpp
 	${memc_SRC}/mem/st/Macro.cpp
 	${memc_SRC}/mem/st/Namespace.cpp
 	${memc_SRC}/mem/st/Null.cpp

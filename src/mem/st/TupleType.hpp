@@ -13,6 +13,9 @@ namespace mem { namespace st {
 // Tuple types must always be created in the `system' namespace.
 class TupleType : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::TUPLE_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -67,9 +70,6 @@ class TupleType : public Type
    // The types of the components of the tuple.
    TypeVector _subtypes;
 };
-
-TupleType*
-castToTupleType (Symbol* s);
 
 } }
 

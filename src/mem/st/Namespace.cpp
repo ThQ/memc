@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 Namespace::Namespace ()
 {
-   _kind = NAMESPACE;
+   _kind = Namespace::kTYPE;
 }
 
 } }

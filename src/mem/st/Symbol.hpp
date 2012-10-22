@@ -9,7 +9,7 @@
 #include <string>
 #include "mem/ss.hpp"
 #include "mem/fs/position/Range.hpp"
-#include "mem/st/SymbolKind.hpp"
+#include "mem/st/Kind.hpp"
 
 
 namespace mem { namespace st {
@@ -19,6 +19,9 @@ namespace mem { namespace st {
 // A base class for all symbols stored in the symbol table.
 class Symbol
 {
+   public:
+   static const int kTYPE = MetaKind::UNKNOWN;
+
    public:
    typedef std::map<std::string, Symbol*> SymbolCollection;
    typedef SymbolCollection::iterator SymbolCollectionIterator;
@@ -64,7 +67,7 @@ class Symbol
    SETTER(IsInvisible, bool) {_is_invisible = val;}
 
    // Kind
-   GETTER(Kind, SymbolKind) {return _kind;}
+   GETTER(Kind, int) {return _kind;}
 
    // Name
    GETTER(Name, std::string) {return _name;}
@@ -118,11 +121,11 @@ class Symbol
 
    // Returns true if the symbol is of a given kind.
    inline bool
-   is (SymbolKind kind) const {return _kind == kind;};
+   is (int kind) const {return _kind == kind;};
 
-   inline bool
-   isAliasSymbol() const {return is(st::ALIAS);}
-
+   //inline bool
+   //isAliasSymbol() const {return is(st::ALIAS);}
+#if 0
    bool
    isAnyConstant () const;
 
@@ -132,11 +135,11 @@ class Symbol
    bool
    isAnyType () const;
 
-   inline bool
-   isArgSymbol() const {return is(st::ARG);}
+   //inline bool
+   //isArgSymbol() const {return is(st::ARG);}
 
-   inline bool
-   isArrayType() const {return is(st::ARRAY);}
+   //inline bool
+   //isArrayType() const {return is(st::ARRAY);}
 
    inline bool
    isClassType() const {return is(st::CLASS);}
@@ -176,10 +179,12 @@ class Symbol
 
    inline bool
    isPrimitiveType() const {return is(st::PRIMITIVE_TYPE);}
+#endif
 
    bool
    isReferenceSymbol() const;
 
+#if 0
    bool
    isTupleType() const {return is(st::TUPLE_TYPE);}
 
@@ -188,6 +193,7 @@ class Symbol
 
    inline bool
    isVoidType () const {return is(st::VOID_TYPE);}
+#endif
 
    // Returns the qualified name of the symbol.
    //
@@ -230,7 +236,7 @@ class Symbol
    bool _is_invisible;
 
    // The kind of the symbol.
-   SymbolKind _kind;
+   int _kind;
 
    // The name (id) of the symbol.
    //
@@ -248,6 +254,34 @@ typedef std::map<std::string, Symbol*> SymbolMap;
 typedef SymbolMap::iterator SymbolMapIterator;
 typedef std::vector<Symbol*> SymbolVector;
 
+template <class T> T*
+cast (Symbol* n)
+{
+   IF_DEBUG
+   {
+      if (n == NULL)
+      {
+         DEBUG_PRINTF("Invalid cast: symbol @%p is NULL\n", n);
+         assert(false);
+      }
+      else if (!st::canCast(n->Kind(), T::kTYPE))
+      {
+         DEBUG_PRINTF("Invalid cast: cannot cast from %s (@%p) to %s\n",
+            st::kKIND_NAMES[n->Kind()],
+            n,
+            st::kKIND_NAMES[T::kTYPE]);
+         assert(false);
+      }
+   }
+   return static_cast<T*>(n);
+}
+
+template <class T> bool
+isa (Symbol* n)
+{
+   if (n != NULL) return st::canCast(n->Kind(), T::kTYPE);
+   return false;
+}
 } }
 
 #endif

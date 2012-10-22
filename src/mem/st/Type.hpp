@@ -12,6 +12,9 @@ namespace mem { namespace st {
 // A base class for all mem types.
 class Type: public Symbol
 {
+   public:
+   static const int kTYPE = MetaKind::TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -58,9 +61,6 @@ class Type: public Symbol
 };
 
 typedef std::vector<st::Type*> TypeVector;
-
-st::Type*
-castToType (Symbol* s);
 
 } }
 

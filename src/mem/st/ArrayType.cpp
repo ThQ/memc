@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 ArrayType::ArrayType ()
 {
-   _kind = ARRAY;
+   _kind = ArrayType::kTYPE;
    _array_length = -1;
    _item_type = NULL;
 }
@@ -22,9 +22,9 @@ ArrayType::ArrayType ()
 bool
 ArrayType::canCastTo (Type* dest_ty) const
 {
-  if (dest_ty->isArrayType())
+  if (st::isa<st::ArrayType>(dest_ty))
   {
-      ArrayType* arr_ty = static_cast<ArrayType*>(dest_ty);
+      ArrayType* arr_ty = st::cast<ArrayType>(dest_ty);
       return arr_ty->ItemType() == _item_type && arr_ty->ArrayLength() == _array_length;
   }
   return false;
@@ -49,10 +49,5 @@ ArrayType::_computeByteSize ()
    }
 }
 
-ArrayType*
-castToArrayType (Symbol* s)
-{
-   assert (s->isArrayType());
-   return static_cast<ArrayType*>(s);
-}
+
 } }

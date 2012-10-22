@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 Null::Null ()
 {
-   _kind = NULL_VALUE;
+   _kind = Null::kTYPE;
    _name = "NULL";
 }
 

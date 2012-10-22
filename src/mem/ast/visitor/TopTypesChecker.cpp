@@ -52,6 +52,7 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (clss != NULL);
+   DEBUG_REQUIRE (node::isa<node::Class>(clss));
 
    node::Node* parent_ty_node = clss->ParentTypeNode();
    if (parent_ty_node != NULL)
@@ -104,7 +105,7 @@ TopTypesChecker::visitEnumType (st::Symbol* scope, node::EnumType* n)
          visitVarDecl(enum_ty, var_n);
          ensureConstantExpr(var_n->ValueNode());
          var_n->setExprType(enum_ty);
-         static_cast<st::Var*>(var_n->BoundSymbol())->setConstantValue(st::castToIntConstant(var_n->ValueNode()->BoundSymbol()));
+         static_cast<st::Var*>(var_n->BoundSymbol())->setConstantValue(st::cast<st::IntConstant>(var_n->ValueNode()->BoundSymbol()));
       }
       enum_ty->setType(node::cast<node::VarDecl>(n->getChild(0))->ValueNode()->ExprType());
 
@@ -115,7 +116,7 @@ TopTypesChecker::visitEnumType (st::Symbol* scope, node::EnumType* n)
       st::Var* field = NULL;
       for (i = enum_ty->Children().begin(); i != enum_ty->Children().end(); ++i)
       {
-         field = st::castToVar(i->second);
+         field = st::cast<st::Var>(i->second);
          field->setType(enum_ty);
          field->setIsGlobal(true);
          field->setIsConstant(true);
@@ -127,8 +128,9 @@ void
 TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (scope->isClassType() || scope->isEnumType());
+   DEBUG_REQUIRE (st::isa<st::Class>(scope) || st::isa<st::EnumType>(scope));
    DEBUG_REQUIRE (field != NULL);
+   DEBUG_REQUIRE (node::isa<node::Field>(field));
 
    node::Node* name_node = field->NameNode();
    node::Node* type_node = field->TypeNode();
@@ -142,10 +144,9 @@ TopTypesChecker::visitField (st::Symbol* scope, node::Field* field)
       if (ensureSizedExprType(type_node))
       {
          // TODO Ugly one here...
-         st::Type* ty = st::castToType(type_node->BoundSymbol());
+         st::Type* ty = st::cast<st::Type>(type_node->BoundSymbol());
          //if (ty->isClassType())// || !class_ty->isDependingOn(static_cast<st::Class*>(scope)))
          //{
-            printf("Add field `%s'\n", name_node->ValueCstr());
             st::Field* sym_field = new st::Field();
             sym_field->setName(name_node->Value());
             sym_field->setType(ty);
@@ -190,6 +191,7 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (func_decl != NULL);
+   DEBUG_REQUIRE (node::isa<node::Func>(func_decl));
 
    // ----------------------
    //  Declare the function
@@ -238,9 +240,9 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    // ----------------
    //  Ctor specifics
    // ----------------
-   if (scope->isClassType() && func_sym->Name() == "$ctor")
+   if (st::isa<st::Class>(scope) && func_sym->Name() == "$ctor")
    {
-      st::Class* cls_ty = st::castToClassType(scope);
+      st::Class* cls_ty = st::cast<st::Class>(scope);
       cls_ty->setDefaultCtor(func_sym);
    }
 
@@ -249,15 +251,15 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    // ------------------
    // Try to find a function with the same name in ancestors
    // FIXME This should be moved to another function
-   if (scope->isClassType())
+   if (st::isa<st::Class>(scope))
    {
-      st::Symbol* shadowed_sym = st::util::lookupSymbol(st::castToClassType(scope)->ParentClass(), func_decl->Value());
+      st::Symbol* shadowed_sym = st::util::lookupSymbol(st::cast<st::Class>(scope)->ParentClass(), func_decl->Value());
 
       if (shadowed_sym != NULL)
       {
-         func_sym->setOverridenFunction(st::castToFunc(shadowed_sym));
+         func_sym->setOverridenFunction(st::cast<st::Func>(shadowed_sym));
 
-         if (shadowed_sym->isFuncSymbol())
+         if (st::isa<st::Func>(shadowed_sym))
          {
             log::OverridingFunction* err = new log::OverridingFunction();
             err->sFunction(func_sym);
@@ -265,15 +267,15 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
             err->format();
             log(err);
 
-            if (func_sym->ReturnType() != st::castToFunc(shadowed_sym)->ReturnType())
+            if (func_sym->ReturnType() != st::cast<st::Func>(shadowed_sym)->ReturnType())
             {
                log::Message* err = new log::Error();
                err->formatMessage("Return type was defined as %s (not %s)",
-                  st::castToFunc(shadowed_sym)->ReturnType()->gQualifiedNameCstr(),
+                  st::cast<st::Func>(shadowed_sym)->ReturnType()->gQualifiedNameCstr(),
                   func_sym->ReturnType()->gQualifiedNameCstr());
                err->formatDescription("Overriding function `%s' is redefining the return type of function `%s'",
                   func_sym->gQualifiedNameCstr(),
-                  st::castToFunc(shadowed_sym)->gQualifiedNameCstr());
+                  st::cast<st::Func>(shadowed_sym)->gQualifiedNameCstr());
                log(err);
             }
          }
@@ -303,7 +305,7 @@ TopTypesChecker::visitFuncParams (st::Symbol* scope, node::Node* params_node,
       {
          // Add parameter to function symbol parameters
          param_sym = func_sym->addParam(name_node->Value(),
-            st::castToType(type_node->ExprType()));
+            st::cast<st::Type>(type_node->ExprType()));
 
          // Add parameter to the symbol table of the block
          if (type_node->hasExprType()
@@ -326,7 +328,9 @@ TopTypesChecker::visitFuncReturnType (node::Func* func_node,
    st::Func* func_sym)
 {
    DEBUG_REQUIRE (func_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::Func>(func_node));
    DEBUG_REQUIRE (func_sym != NULL);
+   DEBUG_REQUIRE (st::isa<st::Func>(func_sym));
    DEBUG_REQUIRE (func_node->ReturnTypeNode() != NULL);
 
    node::Node* ret_ty_node = func_node->ReturnTypeNode();

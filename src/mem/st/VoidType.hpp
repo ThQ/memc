@@ -10,6 +10,9 @@ namespace mem { namespace st {
 // A base class for the type of the NULL constant.
 class VoidType : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::VOID_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------

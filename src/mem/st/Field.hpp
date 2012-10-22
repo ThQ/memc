@@ -11,6 +11,9 @@ namespace mem { namespace st {
 
 class Field : public Var
 {
+   public:
+   static const int kTYPE = MetaKind::FIELD;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    // -------------------------------------------------------------------------

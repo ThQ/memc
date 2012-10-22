@@ -11,6 +11,9 @@ namespace mem { namespace st {
 
 class Constant : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::CONSTANT;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------

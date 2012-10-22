@@ -8,7 +8,7 @@ namespace mem { namespace st {
 //-----------------------------------------------------------------------------
 Macro::Macro ()
 {
-   _kind = MACRO;
+   _kind = Macro::kTYPE;
    _macro_expander = NULL;
 }
 

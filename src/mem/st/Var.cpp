@@ -10,7 +10,7 @@ namespace mem { namespace st {
 Var::Var ()
 {
    _constant_value = NULL;
-   _kind = VAR;
+   _kind = Var::kTYPE;
    _is_global = false;
    _is_constant = false;
    _type = NULL;
@@ -19,7 +19,7 @@ Var::Var ()
 Var::Var (std::string name, class Type* type)
 {
    _constant_value = NULL;
-   _kind = VAR;
+   _kind = Var::kTYPE;
    _is_global = false;
    _is_constant = false;
    _name.assign(name);
@@ -50,17 +50,6 @@ Symbol*
 Var::gExprType ()
 {
    return _type;
-}
-
-//-----------------------------------------------------------------------------
-// STATIC FUNCTIONS
-//-----------------------------------------------------------------------------
-Var*
-castToVar (Symbol* s)
-{
-   assert (s != NULL);
-   assert (s->isVarSymbol());
-   return static_cast<Var*>(s);
 }
 
 

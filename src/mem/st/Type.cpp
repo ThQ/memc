@@ -9,8 +9,9 @@ namespace mem { namespace st {
 
 Type::Type ()
 {
-   _parent_type = NULL;
    _byte_size = -1;
+   _kind = Type::kTYPE;
+   _parent_type = NULL;
 }
 
 
@@ -34,16 +35,5 @@ Type::isSubclass (Type* possible_parent)
    return false;
 }
 
-//-----------------------------------------------------------------------------
-// STATIC FUNCTIONS
-//-----------------------------------------------------------------------------
-
-st::Type*
-castToType (Symbol* s)
-{
-   assert (s != NULL);
-   assert (s->isAnyType());
-   return static_cast<Type*>(s);
-}
 
 } }

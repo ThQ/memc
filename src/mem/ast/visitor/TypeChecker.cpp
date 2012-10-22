@@ -59,7 +59,7 @@ TypeChecker::ensureClassType (node::Node* expr)
 {
    bool is_class_ty = false;
 
-   if (expr->hasBoundSymbol() && expr->BoundSymbol()->isClassType())
+   if (expr->hasBoundSymbol() && st::isa<st::Class>(expr->BoundSymbol()))
    {
       is_class_ty = true;
    }
@@ -78,7 +78,7 @@ TypeChecker::ensureClassType (node::Node* expr)
 bool
 TypeChecker::ensureConstantExpr (node::Node* expr)
 {
-   if (expr == NULL || !expr->hasBoundSymbol() || !expr->BoundSymbol()->isAnyConstant())
+   if (expr == NULL || !expr->hasBoundSymbol() || !st::isa<st::Constant>(expr->BoundSymbol()))
    {
       log::ExpectedConstant* err = new log::ExpectedConstant();
       err->format();
@@ -118,10 +118,10 @@ TypeChecker::ensureSizedExprType (node::Node* expr)
    {
       std::string fix_str;
 
-      if (ty->isArrayType() && !static_cast<st::ArrayType*>(ty)->hasLength())
+      if (st::isa<st::ArrayType>(ty) && !st::cast<st::ArrayType>(ty)->hasLength())
       {
-         fix_str += "> [" + static_cast<st::ArrayType*>(ty)->ItemType()->Name() + ",1i]\n";
-         fix_str += "> [" + static_cast<st::ArrayType*>(ty)->ItemType()->Name() + "]*\n";
+         fix_str += "> [" + st::cast<st::ArrayType>(ty)->ItemType()->Name() + ",1i]\n";
+         fix_str += "> [" + st::cast<st::ArrayType>(ty)->ItemType()->Name() + "]*\n";
       }
       std::string desc;
       if (fix_str.size() != 0)
@@ -148,7 +148,7 @@ TypeChecker::ensureSymbolIsType (node::Node* node, st::Symbol* sym)
    assert (node != NULL);
    assert (sym != NULL);
 
-   if (!sym->isAnyType())
+   if (!st::isa<st::Type>(sym))
    {
       log::TypeExpected* err = new log::TypeExpected();
       err->sSymbolName(sym->gQualifiedName());

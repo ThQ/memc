@@ -8,22 +8,10 @@ namespace mem { namespace st {
 //-----------------------------------------------------------------------------
 IntConstant::IntConstant ()
 {
-   _kind = INT_CONSTANT;
+   _kind = IntConstant::kTYPE;
    _is_signed = false;
    _type = NULL;
 }
 
-
-//-----------------------------------------------------------------------------
-// STATIC FUNCTIONS
-//-----------------------------------------------------------------------------
-
-IntConstant*
-castToIntConstant (Symbol* s)
-{
-   assert (s != NULL);
-   assert (s->isIntConstant());
-   return static_cast<IntConstant*>(s);
-}
 
 } }

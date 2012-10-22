@@ -9,12 +9,12 @@ namespace mem { namespace st {
 
 IntType::IntType ()
 {
-   _kind = INT_TYPE;
+   _kind = IntType::kTYPE;
 }
 
 IntType::IntType (std::string name, int byte_size)
 {
-   _kind = INT_TYPE;
+   _kind = IntType::kTYPE;
    setName(name);
    setByteSize(byte_size);
 }
@@ -29,22 +29,12 @@ IntType::canCastTo (Type* dest_ty) const
 {
    DEBUG_REQUIRE (dest_ty);
 
-   if (dest_ty->isIntType() && dest_ty->hasByteSize())
+   if (st::isa<st::IntType>(dest_ty) && dest_ty->hasByteSize())
    {
       return ByteSize() <= dest_ty->ByteSize();
    }
    return false;
 }
 
-//-----------------------------------------------------------------------------
-// STATIC FUNCTIONS
-//-----------------------------------------------------------------------------
-IntType*
-castToIntType (Symbol* s)
-{
-   assert (s != NULL);
-   assert (s->isIntType());
-   return static_cast<IntType*>(s);
-}
 
 } }

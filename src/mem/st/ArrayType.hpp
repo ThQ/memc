@@ -13,6 +13,9 @@ namespace mem { namespace st {
 // is dynamicaly allocated.
 class ArrayType : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::ARRAY_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
@@ -50,7 +53,7 @@ class ArrayType : public Type
    hasLength() const {return _array_length != -1;}
 
    bool
-   isArrayOfClassInstances () const { return _item_type->isClassType(); }
+   isArrayOfClassInstances () const { return _item_type->Kind() == st::MetaKind::CLASS_TYPE; }
 
 
    //--------------------------------------------------------------------------
@@ -70,9 +73,6 @@ class ArrayType : public Type
    st::Type* _item_type;
    int _array_length;
 };
-
-ArrayType*
-castToArrayType (Symbol* s);
 
 } }
 

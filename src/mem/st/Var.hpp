@@ -12,6 +12,9 @@ namespace mem { namespace st {
 
 class Var : public Symbol
 {
+   public:
+   static const int kTYPE = MetaKind::VAR;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
@@ -71,8 +74,6 @@ class Var : public Symbol
    st::Constant* _constant_value;
 };
 
-Var*
-castToVar (Symbol* s);
 
 } }
 

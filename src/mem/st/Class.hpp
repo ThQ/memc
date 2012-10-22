@@ -16,6 +16,9 @@ namespace mem { namespace st {
 // FIXME : Byte size does take into account ancestor's fields.
 class Class : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::CLASS_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
@@ -37,7 +40,10 @@ class Class : public Type
    // PROPERTIES
    //--------------------------------------------------------------------------
 
-   virtual GETTER(ByteSize, int) { return ParentClass() != NULL && ParentClass()->isClassType() ? ParentClass()->ByteSize() + _byte_size : _byte_size;}
+   virtual GETTER(ByteSize, int)
+   {
+      return ParentClass() != NULL && st::isa<Class>(ParentClass()) ? ParentClass()->ByteSize() + _byte_size : _byte_size;
+   }
 
    GETTER(DefaultCtor, Func*) { return _default_ctor;}
    SETTER(DefaultCtor, Func*) { _default_ctor = val;}
@@ -101,9 +107,6 @@ class Class : public Type
    int _cur_field_index;
    Func* _default_ctor;
 };
-
-Class*
-castToClassType (Symbol* s);
 
 } }
 

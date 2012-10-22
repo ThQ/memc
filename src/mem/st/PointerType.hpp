@@ -14,6 +14,9 @@ namespace mem { namespace st {
 // if they don't exist yet, they are created. This is done in `st::util'.
 class PointerType : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::POINTER_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -37,9 +40,9 @@ class PointerType : public Type
    SETTER(PointedType, Type*)
    {
       _pointed_type = val;
-      if(val->isPointerType())
+      if(st::isa<st::PointerType>(val))
       {
-         _ptr_level = static_cast<PointerType*>(val)->IndirectionLevel() + 1;
+         _ptr_level = st::cast<PointerType>(val)->IndirectionLevel() + 1;
       }
    }
 
@@ -73,10 +76,11 @@ class PointerType : public Type
 
    // True if this pointer type points to an array type.
    bool
-   isPointerToArray () { return _pointed_type->isArrayType(); }
+   isPointerToArray () { return _pointed_type->Kind() == st::MetaKind::ARRAY_TYPE; }
 
    bool
-   isPointerToClass () { return _pointed_type->isClassType(); }
+   isPointerToClass () { return _pointed_type->Kind() == st::MetaKind::CLASS_TYPE; }
+
 
    //--------------------------------------------------------------------------
    // FIELDS
@@ -98,9 +102,6 @@ class PointerType : public Type
    // Pointer types cannot have a `_ptr_level' lower than 1.
    int _ptr_level;
 };
-
-PointerType*
-castToPointerType (Symbol* s);
 
 } }
 

@@ -14,6 +14,9 @@ namespace mem { namespace st {
 // (in codegen::Llvm for example).
 class Arg : public Var
 {
+   public:
+   static const int kTYPE = MetaKind::ARG;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------

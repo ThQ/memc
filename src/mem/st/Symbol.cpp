@@ -12,7 +12,7 @@ Symbol::Symbol ()
    _child_count = 0;
    _depth = 0;
    _is_invisible = false;
-   _kind = UNKNOWN;
+   _kind = Symbol::kTYPE;
    _parent = NULL;
 }
 
@@ -126,62 +126,14 @@ Symbol::hintName (Symbol* parent, std::string hint)
 }
 
 bool
-Symbol::isAnyConstant () const
-{
-   switch (_kind)
-   {
-      case st::INT_CONSTANT:
-      case st::NULL_VALUE:
-         return true;
-      default:
-         return false;
-   }
-   DEBUG_UNREACHABLE();
-}
-bool
-Symbol::isAnyType () const
-{
-   switch (_kind)
-   {
-      case st::ARRAY:
-      case st::CLASS:
-      case st::ENUM_TYPE:
-      case st::FUNCTION_TYPE:
-      case st::INT_TYPE:
-      case st::POINTER:
-      case st::PRIMITIVE_TYPE:
-      case st::TUPLE_TYPE:
-      case st::VOID_TYPE:
-         return true;
-      default:
-         return false;
-   }
-   DEBUG_UNREACHABLE();
-}
-
-bool
-Symbol::isAnyPrimitiveType () const
-{
-   switch (_kind)
-   {
-      case st::INT_TYPE:
-      case st::PRIMITIVE_TYPE:
-         return true;
-      default:
-         return false;
-   }
-   DEBUG_UNREACHABLE();
-}
-
-bool
 Symbol::isReferenceSymbol() const
 {
    switch (_kind)
    {
-      case VAR:
-      case ARG:
-      case ARRAY:
-      case POINTER:
+      case st::MetaKind::VAR:
+      case st::MetaKind::ARG:
+      case st::MetaKind::ARRAY_TYPE:
+      case st::MetaKind::POINTER_TYPE:
          return true;
       default:
          return false;

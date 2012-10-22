@@ -28,7 +28,7 @@ FindEntryPoint::visit (node::Node* node)
 {
    if (node::isa<node::Func>(node))
    {
-      st::Func* func = st::castToFunc(node->BoundSymbol());
+      st::Func* func = st::cast<st::Func>(node->BoundSymbol());
       if (func->Name() == "main")
       {
          _entry_point = func;

@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 Func::Func ()
 {
-   _kind = FUNCTION;
+   _kind = Func::kTYPE;
    _has_body = false;
    _is_entry_point = false;
    _is_external = false;
@@ -54,18 +54,6 @@ st::Var*
 Func::getParam (int i)
 {
    return _params[i];
-}
-
-//-----------------------------------------------------------------------------
-// STATIC FUNCTIONS
-//-----------------------------------------------------------------------------
-
-st::Func*
-castToFunc (Symbol* s)
-{
-   assert (s != NULL);
-   assert (s->isFuncSymbol());
-   return static_cast<Func*>(s);
 }
 
 } }

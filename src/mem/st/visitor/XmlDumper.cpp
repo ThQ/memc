@@ -15,56 +15,56 @@ XmlDumper::visit (st::Symbol* sym)
 {
    switch (sym->Kind())
    {
-      case ARG:
-         visitArgument(static_cast<st::Arg*>(sym));
+      case st::MetaKind::ARG:
+         visitArgument(st::cast<st::Arg>(sym));
          break;
 
-      case ARRAY:
-         visitArrayType(static_cast<st::ArrayType*>(sym));
+      case st::MetaKind::ARRAY_TYPE:
+         visitArrayType(st::cast<st::ArrayType>(sym));
          break;
 
-      case CLASS:
-         visitClass(static_cast<st::Class*>(sym));
+      case st::MetaKind::CLASS_TYPE:
+         visitClass(st::cast<st::Class>(sym));
          break;
 
-      case ENUM_TYPE:
-         visitEnumType(static_cast<st::EnumType*>(sym));
+      case st::MetaKind::ENUM_TYPE:
+         visitEnumType(st::cast<st::EnumType>(sym));
          break;
 
-      case INT_CONSTANT:
-         visitIntConstant(static_cast<st::IntConstant*>(sym));
+      case st::MetaKind::INT_CONSTANT:
+         visitIntConstant(st::cast<st::IntConstant>(sym));
          break;
 
-      case FIELD:
-         visitField(static_cast<st::Field*>(sym));
+      case st::MetaKind::FIELD:
+         visitField(st::cast<st::Field>(sym));
          break;
 
-      case FUNCTION:
-         visitFunction(static_cast<st::Func*>(sym));
+      case st::MetaKind::FUNCTION:
+         visitFunction(st::cast<st::Func>(sym));
          break;
 
-      case INT_TYPE:
-         visitIntType(static_cast<st::IntType*>(sym));
+      case st::MetaKind::INT_TYPE:
+         visitIntType(st::cast<st::IntType>(sym));
          break;
 
-      case NAMESPACE:
-         visitNamespace(static_cast<st::Namespace*>(sym));
+      case st::MetaKind::NAMESPACE:
+         visitNamespace(st::cast<st::Namespace>(sym));
          break;
 
-      case POINTER:
-         visitPointerType(static_cast<st::PointerType*>(sym));
+      case st::MetaKind::POINTER_TYPE:
+         visitPointerType(st::cast<st::PointerType>(sym));
          break;
 
-      case PRIMITIVE_TYPE:
-         visitPrimitiveType(static_cast<st::PrimitiveType*>(sym));
+      case st::MetaKind::PRIMITIVE_TYPE:
+         visitPrimitiveType(st::cast<st::PrimitiveType>(sym));
          break;
 
-      case TUPLE_TYPE:
-         visitTupleType(static_cast<st::TupleType*>(sym));
+      case st::MetaKind::TUPLE_TYPE:
+         visitTupleType(st::cast<st::TupleType>(sym));
          break;
 
-      case VAR:
-         visitVar(static_cast<st::Var*>(sym));
+      case st::MetaKind::VAR:
+         visitVar(st::cast<st::Var>(sym));
          break;
 
       default:

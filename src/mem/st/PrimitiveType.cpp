@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 PrimitiveType::PrimitiveType ()
 {
-   _kind = PRIMITIVE_TYPE;
+   _kind = PrimitiveType::kTYPE;
 }
 
 } }

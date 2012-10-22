@@ -92,6 +92,7 @@ BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::UnaryOp* node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node::isa<node::UnaryOp>(node));
 
    node::Node* value_n = node->ValueNode();
 
@@ -99,7 +100,7 @@ BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::UnaryOp* node)
 
    if (value_n->hasExprType())
    {
-      st::Type* ptr_base_ty = st::castToType(value_n->ExprType());
+      st::Type* ptr_base_ty = st::cast<st::Type>(value_n->ExprType());
       std::string base_ty_name = ptr_base_ty->Name();
       st::Type* amp_ty = st::util::getPointerType(ptr_base_ty);
 
@@ -160,8 +161,8 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
       st::Type* left_ty = left_node->ExprType();
       st::Type* right_ty = right_node->ExprType();
       st::Type* common_ty = st::util::getBiggestIntType(
-         st::castToIntType(left_ty),
-         st::castToIntType(right_ty));
+         st::cast<st::IntType>(left_ty),
+         st::cast<st::IntType>(right_ty));
       // FIXME Must check operand types
       node->setExprType(common_ty);
    }
@@ -191,6 +192,7 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::ArrayType>(n));
 
    st::Symbol* arr_sym = BugType();
    int arr_size = -1;
@@ -205,9 +207,9 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    {
       visitExpr(scope, type_n);
       ensureSymbolIsType(type_n, type_n->BoundSymbol());
-      item_ty = st::castToType(type_n->BoundSymbol());
+      item_ty = st::cast<st::Type>(type_n->BoundSymbol());
 
-      assert(item_ty->isAnyType());
+      assert(st::isa<st::Type>(item_ty));
    }
 
    // ------
@@ -218,10 +220,10 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
       visitExpr(scope, length_n);
       if (node::isa<node::Number>(length_n)
          && length_n->hasBoundSymbol()
-         && length_n->BoundSymbol()->isIntConstant()
-         && length_n->ExprType()->canCastTo(_symbols->_core_types.IntTy()))
+         && st::isa<st::IntConstant>(length_n->BoundSymbol())
+         && st::isa<st::IntType>(length_n->ExprType()))
       {
-         st::IntConstant* i_const = st::castToIntConstant(length_n->BoundSymbol());
+         st::IntConstant* i_const = st::cast<st::IntConstant>(length_n->BoundSymbol());
          // FIXME This may break since it returns an int64_t
          arr_size = (int)i_const->getSignedValue();
       }
@@ -245,7 +247,7 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    }
 
    n->setBoundSymbol(arr_sym);
-   n->setExprType(st::castToType(arr_sym));
+   n->setExprType(st::cast<st::Type>(arr_sym));
 
    DEBUG_ENSURE (n->hasBoundSymbol());
    DEBUG_ENSURE (n->hasExprType());
@@ -259,6 +261,7 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::BracketOp>(n));
 
    visitExpr (scope, n->ValueNode());
    visitExpr (scope, n->IndexNode());
@@ -269,30 +272,30 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
 
    if (value_ty != NULL)
    {
-      if (value_ty->isPointerType())
+      if (st::isa<st::PointerType>(value_ty))
       {
-         value_ty = static_cast<st::PointerType*>(value_ty)->PointedType();
+         value_ty = st::cast<st::PointerType>(value_ty)->PointedType();
       }
 
-      if (value_ty->isArrayType())
+      if (st::isa<st::ArrayType>(value_ty))
       {
-         st::ArrayType* arr = st::castToArrayType(value_ty);
+         st::ArrayType* arr = st::cast<st::ArrayType>(value_ty);
          n->setExprType(arr->ItemType());
       }
-      else if (value_ty->isTupleType())
+      else if (st::isa<st::TupleType>(value_ty))
       {
          // FIXME Nothing super safe here...
          if (node::cast<node::Number>(index_n)
             && index_n->hasBoundSymbol()
-            && index_n->BoundSymbol()->isIntConstant())
+            && st::isa<st::IntConstant>(index_n->BoundSymbol()))
          {
             node::Number* index_nb_n = node::cast<node::Number>(index_n);
-            st::IntConstant* i_const = st::castToIntConstant(index_nb_n->BoundSymbol());
+            st::IntConstant* i_const = st::cast<st::IntConstant>(index_nb_n->BoundSymbol());
 
             // FIXME This may break, it returns an int64_t
             int item_index = (int)i_const->getSignedValue();
             // FIXME No bound checking...
-            n->setExprType(st::castToTupleType(value_ty)->Subtypes()[item_index]);
+            n->setExprType(st::cast<st::TupleType>(value_ty)->Subtypes()[item_index]);
          }
       }
       else
@@ -316,6 +319,7 @@ BlockTypesChecker::visitCastOperator (st::Symbol* scope, node::CastOp* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::CastOp>(n));
 
    visitExpr(scope, n->ValueNode());
    visitExpr(scope, n->TypeNode());
@@ -358,6 +362,7 @@ BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::BinaryOp>(n));
    DEBUG_REQUIRE (n->LeftNode() != NULL);
    DEBUG_REQUIRE (n->RightNode() != NULL);
 
@@ -405,9 +410,9 @@ BlockTypesChecker::visitDeref (st::Symbol* scope, node::Node* n)
 
    if (value_ty != NULL)
    {
-      if (value_ty->isPointerType())
+      if (st::isa<st::PointerType>(value_ty))
       {
-         n->setExprType(st::castToPointerType(value_ty)->PointedType());
+         n->setExprType(st::cast<st::PointerType>(value_ty)->PointedType());
       }
       else
       {
@@ -448,6 +453,7 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (call_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(call_node));
    DEBUG_REQUIRE (call_node->CallerNode() != NULL);
 
    node::Node* base_object = call_node->CallerNode();
@@ -472,12 +478,12 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
    if (base_object->hasBoundSymbol())
    {
       // Macro call
-      if (base_object->BoundSymbol()->isMacro())
+      if (st::isa<st::Macro>(base_object->BoundSymbol()))
       {
          visitMacroCall(scope, call_node);
       }
       // Function call
-      else if (base_object->BoundSymbol()->isFuncSymbol())
+      else if (st::isa<st::Func>(base_object->BoundSymbol()))
       {
          visitFunctionCall(scope, call_node);
       }
@@ -513,6 +519,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (dot_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::Dot>(dot_node));
    DEBUG_REQUIRE (dot_node->LeftNode() != NULL);
    DEBUG_REQUIRE (dot_node->RightNode() != NULL);
 
@@ -549,14 +556,14 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 
          // If we are not accessing a class member, we can just flatten the dot
          // node by replacing it by final id.
-         if (left_node->BoundSymbol()->isClassType()
-            || left_node->BoundSymbol()->isEnumType()
-            || left_node->BoundSymbol()->isNamespace())
+         if (st::isa<st::Class>(left_node->BoundSymbol())
+            || st::isa<st::EnumType>(left_node->BoundSymbol())
+            || st::isa<st::Namespace>(left_node->BoundSymbol()))
          {
             ast::node::FinalId* fid = new ast::node::FinalId();
             fid->setValue(right_node->BoundSymbol()->Name());
             fid->setBoundSymbol(right_node->BoundSymbol());
-            if (expr_ty->isAnyType())
+            if (st::isa<st::Type>(expr_ty))
             {
                fid->setExprType(expr_ty);
             }
@@ -566,7 +573,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
          }
          else
          {
-            dot_node->setExprType(st::castToType(expr_ty));
+            dot_node->setExprType(st::cast<st::Type>(expr_ty));
          }
       }
       else
@@ -749,9 +756,9 @@ BlockTypesChecker::visitSymbolName (st::Symbol* scope, node::Node* id_node)
 
    if (sym != NULL)
    {
-      if (sym->isAliasSymbol())
+      if (st::isa<st::Alias>(sym))
       {
-         id_node->setBoundSymbol(static_cast<st::Alias*>(sym)->Aliased());
+         id_node->setBoundSymbol(st::cast<st::Alias>(sym)->Aliased());
       }
       else
       {
@@ -800,20 +807,21 @@ BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* call_n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (call_n != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(call_n));
    DEBUG_REQUIRE (call_n->CallerNode() != NULL);
    DEBUG_REQUIRE (call_n->CallerNode()->BoundSymbol() != NULL);
-   DEBUG_REQUIRE (call_n->CallerNode()->BoundSymbol()->isFuncSymbol());
+   DEBUG_REQUIRE (st::isa<st::Func>(call_n->CallerNode()->BoundSymbol()));
 
    node::Node* base_object = call_n->CallerNode();
 
-   st::Func* base_func = st::castToFunc(base_object->BoundSymbol());
+   st::Func* base_func = st::cast<st::Func>(base_object->BoundSymbol());
    call_n->setExprType(base_func->ReturnType());
 
    // Search for an overriding function that may fit the same signature
    // FIXME Spaghetti
    if (call_n->IsInstanceCall())
    {
-      st::Class* cls = st::castToClassType(base_func->Parent());
+      st::Class* cls = st::cast<st::Class>(base_func->Parent());
       st::FunctionVector funcs = cls->getFunctionsLike(base_func->Name(), base_func->Type());
       st::Func* new_func = chooseOverridenFunction (funcs, call_n->ParamsNode()->packChildrenExprTypes());
       call_n->CallerNode()->setBoundSymbol(new_func);
@@ -830,9 +838,13 @@ BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* call_n)
 void
 BlockTypesChecker::visitFunctorCall (st::Symbol* scope, node::Call* call_n)
 {
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (call_n != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(call_n));
+
    node::Node* base_object = call_n->CallerNode();
-   st::PointerType* ptr_ty = st::castToPointerType(base_object->ExprType());
-   st::FunctionType* func_ty = st::castToFunctionType(ptr_ty->getNonPointerParent());
+   st::PointerType* ptr_ty = st::cast<st::PointerType>(base_object->ExprType());
+   st::FunctionType* func_ty = st::cast<st::FunctionType>(ptr_ty->getNonPointerParent());
    call_n->setExprType(func_ty->ReturnType());
 
    if (call_n->hasParamsNode())
@@ -859,6 +871,7 @@ BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (if_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::If>(if_node));
 
    // Check condition expression
    visitExpr(scope, if_node->ConditionNode());
@@ -889,8 +902,12 @@ BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
 void
 BlockTypesChecker::visitMacroCall (st::Symbol* scope, node::Call* call_n)
 {
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (call_n != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(call_n));
+
    node::Node* base_object = call_n->CallerNode();
-   st::Macro* macro_sym = static_cast<st::Macro*>(base_object->BoundSymbol());
+   st::Macro* macro_sym = st::cast<st::Macro>(base_object->BoundSymbol());
    macro::Macro* macro = static_cast<macro::Macro*>(macro_sym->MacroExpander());
    node::Node* macro_result = macro->expand(call_n);
    delete call_n;
@@ -902,6 +919,7 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (new_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::New>(new_node));
 
    node::Node* ty_node = new_node->TypeNode();
    assert (ty_node != NULL);
@@ -909,9 +927,9 @@ BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
    visitExpr(scope, ty_node);
    ensureSymbolIsType(ty_node, ty_node->BoundSymbol());
 
-   if (ty_node->BoundSymbol()->isArrayType())
+   if (st::isa<st::ArrayType>(ty_node->BoundSymbol()))
    {
-      st::ArrayType* arr_ty = st::castToArrayType(ty_node->BoundSymbol());
+      st::ArrayType* arr_ty = st::cast<st::ArrayType>(ty_node->BoundSymbol());
       st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(arr_ty);
       st::Type* ptr_ty = st::util::getPointerType(unsized_arr_ty);
       new_node->setExprType(ptr_ty);
@@ -931,7 +949,7 @@ BlockTypesChecker::visitNumber (st::Symbol* scope, node::Number* n)
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
    DEBUG_REQUIRE (n->hasBoundSymbol());
-   DEBUG_REQUIRE (n->BoundSymbol()->isIntConstant());
+   DEBUG_REQUIRE (st::isa<st::IntConstant>(n->BoundSymbol()));
 }
 
 #if 0
@@ -987,6 +1005,7 @@ BlockTypesChecker::visitPointer (st::Symbol* scope, node::PointerType* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::PointerType>(n));
 
    if (n->TypeNode() != NULL)
    {
@@ -1000,13 +1019,13 @@ BlockTypesChecker::visitPointer (st::Symbol* scope, node::PointerType* n)
       }
 
       if (n->TypeNode()->hasBoundSymbol()
-         && n->TypeNode()->BoundSymbol()->isAnyType())
+         && st::isa<st::Type>(n->TypeNode()->BoundSymbol()))
       {
          st::Symbol* ptr_ty = st::util::lookupPointer(scope,
-            st::castToType(n->TypeNode()->BoundSymbol()));
+            st::cast<st::Type>(n->TypeNode()->BoundSymbol()));
          assert (ptr_ty != NULL);
          n->setBoundSymbol(ptr_ty);
-         n->setExprType(st::castToType(ptr_ty));
+         n->setExprType(st::cast<st::Type>(ptr_ty));
       }
       else
       {
@@ -1024,10 +1043,11 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::Return>(n));
 
    st::Func* parent_func = util::getParentFunction(n);
    assert (parent_func);
-   assert (parent_func->isFuncSymbol());
+   assert (st::isa<st::Func>(parent_func));
 
    node::Node* value_node = n->ValueNode();
    assert (value_node != NULL);
@@ -1059,7 +1079,8 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
 void
 BlockTypesChecker::visitString (st::Symbol* scope, node::String* n)
 {
-   DEBUG_REQUIRE(n != NULL);
+   DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::String>(n));
 
    st::IntType* char_ty = _symbols->_core_types.CharTy();
    st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(char_ty);
@@ -1073,6 +1094,7 @@ BlockTypesChecker::visitTuple (st::Symbol* scope, node::Tuple* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::Tuple>(n));
 
    st::TypeVector tys;
    bool an_expr_failed = false;
@@ -1109,6 +1131,7 @@ BlockTypesChecker::visitTupleType (st::Symbol* scope, node::TupleType* n)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (n != NULL);
+   DEBUG_REQUIRE (node::isa<node::TupleType>(n));
 
    st::TypeVector tys;
    for (size_t i = 0; i < n->ChildCount(); ++i)
@@ -1137,6 +1160,7 @@ void
 BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
 {
    DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node::isa<node::VarAssign>(node));
    DEBUG_REQUIRE (node->NameNode() != NULL);
    DEBUG_REQUIRE (node->ValueNode() != NULL);
 
@@ -1176,6 +1200,7 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (var_decl_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::VarDecl>(var_decl_node));
    DEBUG_REQUIRE (var_decl_node->NameNode() != NULL);
    DEBUG_REQUIRE (var_decl_node->TypeNode() != NULL);
 
@@ -1262,6 +1287,7 @@ BlockTypesChecker::visitWhile (st::Symbol* scope, node::While* while_node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (while_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::While>(while_node));
 
    // Check condition node
    visitExpr(scope, while_node->ConditionNode());

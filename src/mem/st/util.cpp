@@ -26,7 +26,7 @@ createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
       cur_scope = cur_ns;
    }
    assert(cur_scope->Parent() != NULL);
-   assert(cur_ns->is(NAMESPACE));
+   assert(cur_ns->Kind() == st::MetaKind::NAMESPACE);
    return static_cast<st::Namespace*>(cur_ns);
 }
 
@@ -37,26 +37,27 @@ getExprType (Symbol* s)
 
    st::Type* ret = NULL;
 
-   if (s->isAnyType())
+   if (st::isa<st::Type>(s))
    {
-      ret = static_cast<st::Type*>(s);
+      ret = st::cast<st::Type>(s);
    }
-   else if (s->isArgSymbol())
+   else if (st::isa<st::Arg>(s))
    {
-      ret = static_cast<st::Arg*>(s)->Type();
+      ret = st::cast<st::Arg>(s)->Type();
    }
-   else if (s->isFieldSymbol())
+   else if (st::isa<st::Field>(s))
    {
-      ret = static_cast<st::Field*>(s)->Type();
+      ret = st::cast<st::Field>(s)->Type();
    }
-   else if (s->isVarSymbol() || s->isNullSymbol())
+   else if (st::isa<st::Var>(s) || st::isa<st::Null>(s))
    {
-      ret = static_cast<st::Var*>(s)->Type();
+      ret = st::cast<st::Var>(s)->Type();
    }
-   else if (s->isFuncSymbol())
+   else if (st::isa<st::Func>(s))
    {
-      ret = static_cast<st::Func*>(s)->Type();
-      ret = static_cast<st::FunctionType*>(ret)->FunctorType();
+      // FIXME : Which one ?
+      ret = st::cast<st::Func>(s)->Type();
+      ret = st::cast<st::FunctionType>(ret)->FunctorType();
    }
 
    return ret;
@@ -71,9 +72,9 @@ getFunctionType (Symbol* scope, TypeVector arguments, Type* return_type)
    for (i = scope->Children().begin(); i != scope->Children().end(); ++i)
    {
       child = i->second;
-      if (child->isFunctionType() && static_cast<st::FunctionType*>(child)->isLike(arguments, return_type))
+      if (st::isa<st::FunctionType>(child) && st::cast<st::FunctionType>(child)->isLike(arguments, return_type))
       {
-         return static_cast<st::FunctionType*>(child);
+         return st::cast<st::FunctionType>(child);
       }
    }
 
@@ -117,11 +118,11 @@ Type*
 getPointerBaseType (PointerType* ptr)
 {
    Type* base_ty = NULL;
-   while (ptr->isPointerType())
+   while (st::isa<st::PointerType>(ptr))
    {
-      ptr = static_cast<st::PointerType*>(ptr->PointedType());
+      ptr = st::cast<st::PointerType>(ptr->PointedType());
    }
-   if (!ptr->isPointerType())
+   if (!st::isa<st::PointerType>(ptr))
    {
       base_ty = ptr;
    }
@@ -142,9 +143,9 @@ getPointerType (Type* base_ty)
          base_ty->Parent()->addChild(ptr_ty);
          return ptr_ty;
       }
-      else if (ty->isPointerType())
+      else if (st::isa<st::PointerType>(ty))
       {
-         return static_cast<st::PointerType*>(ty);
+         return st::cast<st::PointerType>(ty);
       }
    }
 
@@ -186,9 +187,9 @@ getSymbol (Symbol* scope, std::string sym_name)
          if (res != NULL) break;
          scope = scope->Parent();
       }
-      if (res != NULL && res->isAliasSymbol())
+      if (res != NULL && st::isa<st::Alias>(res))
       {
-         res = static_cast<st::Alias*>(res)->Aliased();
+         res = st::cast<st::Alias>(res)->Aliased();
       }
    }
 
@@ -204,11 +205,11 @@ getTupleType (Symbol* scope, TypeVector tys)
    for (i = scope->Children().begin(); i != scope->Children().end(); ++i)
    {
       child = i->second;
-      if (child->isTupleType())
+      if (st::isa<st::TupleType>(child))
       {
-         if (static_cast<st::TupleType*>(child)->hasTypes(tys))
+         if (st::cast<st::TupleType>(child)->hasTypes(tys))
          {
-            return static_cast<st::TupleType*>(child);
+            return st::cast<st::TupleType>(child);
          }
       }
    }
@@ -242,7 +243,7 @@ getSizedArrayType (Type* item_ty, int size)
       }
       else
       {
-         return static_cast<st::ArrayType*>(sym);
+         return st::cast<st::ArrayType>(sym);
       }
       DEBUG_UNREACHABLE();
    }
@@ -277,7 +278,7 @@ getUnsizedArrayType (Type* base_ty)
       }
       else
       {
-         return static_cast<st::ArrayType*>(sym);
+         return st::cast<st::ArrayType>(sym);
       }
       DEBUG_UNREACHABLE();
    }
@@ -287,10 +288,10 @@ getUnsizedArrayType (Type* base_ty)
 bool
 isFunctorType (Symbol* s)
 {
-   if (s != NULL && s->isPointerType())
+   if (s != NULL && st::isa<st::PointerType>(s))
    {
-      Type* pointed_ty = static_cast<st::PointerType*>(s)->getNonPointerParent();
-      if (pointed_ty->isFunctionType()) return true;
+      Type* pointed_ty = st::cast<st::PointerType>(s)->getNonPointerParent();
+      if (st::isa<st::FunctionType>(pointed_ty)) return true;
    }
    return false;
 }
@@ -301,7 +302,7 @@ lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
    ArrayType* arr_ty = NULL;
    Symbol* base_ty = util::lookupSymbol(scope, base_ty_name);
 
-   if (base_ty != NULL && base_ty->isAnyType())
+   if (base_ty != NULL && st::isa<st::Type>(base_ty))
    {
       std::stringstream str;
       str << "[";
@@ -311,7 +312,7 @@ lookupArrayType (Symbol* scope, std::string base_ty_name, int size)
       str << "]";
 
       arr_ty = new ArrayType();
-      arr_ty->setItemType(static_cast<Type*>(base_ty));
+      arr_ty->setItemType(st::cast<st::Type>(base_ty));
       arr_ty->setName(str.str());
       arr_ty->setArrayLength(size);
 
@@ -325,9 +326,9 @@ Class*
 lookupClass (Symbol* scope, std::string cls_name)
 {
    Symbol* cls = util::lookupSymbol(scope, cls_name);
-   if (cls != NULL && cls->is(CLASS))
+   if (cls != NULL && st::isa<st::Class>(cls))
    {
-      return static_cast<Class*>(cls);
+      return st::cast<st::Class>(cls);
    }
    return NULL;
 }
@@ -336,9 +337,9 @@ Func*
 lookupFunction (Symbol* scope, std::string func_name)
 {
    Symbol* func = util::lookupSymbol(scope, func_name);
-   if (func != NULL && func->is(FUNCTION))
+   if (func != NULL && st::isa<st::Func>(func))
    {
-      return static_cast<Func*>(func);
+      return st::cast<Func>(func);
    }
    return NULL;
 }
@@ -352,7 +353,7 @@ lookupMember (Symbol* scope, std::string symbol_name)
    {
       res = scope->getChild(symbol_name);
       if (res != NULL) return res;
-      scope = static_cast<Class*>(scope)->ParentType();
+      scope = st::cast<st::Class>(scope)->ParentType();
    }
 
    return NULL;
@@ -380,9 +381,9 @@ lookupSymbol (Symbol* scope, std::string symbol_name)
          }
       }
 
-      if (res != NULL && res->isAliasSymbol())
+      if (res != NULL && st::isa<st::Alias>(res))
       {
-         res = static_cast<st::Alias*>(res)->Aliased();
+         res = st::cast<st::Alias>(res)->Aliased();
       }
    }
 
@@ -421,9 +422,9 @@ st::PointerType*
 lookupPointer(Symbol* scope, Type* base_ty)
 {
    st::Symbol* parent = base_ty->Parent();
-   if (parent != NULL && parent->isAliasSymbol())
+   if (parent != NULL && st::isa<st::Alias>(parent))
    {
-      parent = static_cast<st::Alias*>(parent)->Aliased();
+      parent = st::cast<st::Alias>(parent)->Aliased();
    }
    st::Symbol* ptr = parent->getChild(base_ty->Name() + "*");
 
@@ -436,9 +437,9 @@ lookupPointer(Symbol* scope, Type* base_ty)
 
       return ptr_ty;
    }
-   else if (ptr->isPointerType())
+   else if (st::isa<st::PointerType>(ptr))
    {
-      return static_cast<st::PointerType*>(ptr);
+      return st::cast<st::PointerType>(ptr);
    }
 
    return NULL;
@@ -458,12 +459,12 @@ lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
    {
       if (i == 0)
       {
-         cur_sym = static_cast<st::Type*>(lookupSymbol(scope, base_ty_name));
+         cur_sym = st::cast<st::Type>(lookupSymbol(scope, base_ty_name));
          if (cur_sym == NULL) break;
       }
       else
       {
-         tmp_ptr = static_cast<st::PointerType*>(getSymbol(scope, cur_ptr_name));
+         tmp_ptr = st::cast<st::PointerType>(getSymbol(scope, cur_ptr_name));
 
          if (tmp_ptr != NULL)
          {
@@ -494,9 +495,9 @@ lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
       cur_ptr_name += "*";
    }
 
-   DEBUG_ENSURE(cur_sym == NULL || cur_sym->isPointerType());
+   DEBUG_ENSURE(cur_sym == NULL || st::isa<st::PointerType>(cur_sym));
 
-   return static_cast<PointerType*>(cur_sym);
+   return st::cast<st::PointerType>(cur_sym);
 }
 
 bool

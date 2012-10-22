@@ -57,9 +57,9 @@ Ctor::visitClass (class node::Class* n)
 {
    DEBUG_REQUIRE (n != NULL);
    DEBUG_REQUIRE (n->BoundSymbol());
-   DEBUG_REQUIRE (n->BoundSymbol()->isClassType());
+   DEBUG_REQUIRE (st::isa<st::Class>(n->BoundSymbol()));
 
-   st::Class* cls_ty = static_cast<st::Class*>(n->BoundSymbol());
+   st::Class* cls_ty = st::cast<st::Class>(n->BoundSymbol());
 
    // -------
    //  Name
@@ -87,12 +87,12 @@ Ctor::visitClass (class node::Class* n)
    // ------------
    node::Block* body_n = new node::Block();
 
-   st::Class* cls = static_cast<st::Class*>(n->BoundSymbol());
+   st::Class* cls = st::cast<st::Class>(n->BoundSymbol());
    st::FieldVector fields = cls->getAllFields();
    st::Field* field = NULL;
    for (size_t i = 0; i < fields.size(); ++i)
    {
-      if (fields[i]->isFieldSymbol())
+      if (st::isa<st::Field>(fields[i]))
       {
          field = fields[i];
          initializeField (field, body_n);

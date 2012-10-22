@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 Constant::Constant ()
 {
-   _kind = UNKNOWN;
+   _kind = Constant::kTYPE;
    _type = NULL;
 }
 

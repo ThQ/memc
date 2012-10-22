@@ -11,6 +11,9 @@ namespace mem { namespace st {
 
 class IntConstant : public Constant
 {
+   public:
+   static const int kTYPE = MetaKind::INT_CONSTANT;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
@@ -39,9 +42,6 @@ class IntConstant : public Constant
    ui64 _signed_value;
    st::Type* _type;
 };
-
-IntConstant*
-castToIntConstant (Symbol* s);
 
 } }
 

@@ -10,6 +10,9 @@ namespace mem { namespace st {
 
 class Namespace : public Symbol
 {
+   public:
+   static const int kTYPE = MetaKind::NAMESPACE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------

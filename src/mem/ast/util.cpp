@@ -67,9 +67,9 @@ getParentFunction (node::Node* cur_node)
       {
          if (cur_node->hasBoundSymbol())
          {
-            assert(cur_node->BoundSymbol()->isFuncSymbol());
+            assert(st::isa<st::Func>(cur_node->BoundSymbol()));
          }
-         return static_cast<st::Func*>(cur_node->BoundSymbol());
+         return st::cast<st::Func>(cur_node->BoundSymbol());
       }
       cur_node = cur_node->Parent();
    }

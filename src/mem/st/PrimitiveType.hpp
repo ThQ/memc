@@ -10,6 +10,9 @@ namespace mem { namespace st {
 // A base class for all primitive types : int, float, void, etc.
 class PrimitiveType : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::PRIMITIVE_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------

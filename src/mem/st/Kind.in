@@ -1,0 +1,33 @@
+UNKNOWN
+{
+   ALIAS
+   CONSTANT
+   {
+      INT_CONSTANT
+      NULL_CONSTANT
+   }
+   NAMESPACE
+   TYPE
+   {
+      ARRAY_TYPE
+      CLASS_TYPE
+      ENUM_TYPE
+      FUNCTION
+      {
+         MACRO
+      }
+      FUNCTION_TYPE
+      POINTER_TYPE
+      PRIMITIVE_TYPE
+      {
+         INT_TYPE
+      }
+      TUPLE_TYPE
+      VOID_TYPE
+   }
+   VAR
+   {
+      ARG
+      FIELD
+   }
+}

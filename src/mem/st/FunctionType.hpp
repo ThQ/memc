@@ -12,6 +12,9 @@ namespace mem { namespace st {
 
 class FunctionType: public Type
 {
+   public:
+   static const int kTYPE = MetaKind::FUNCTION_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -89,9 +92,6 @@ class FunctionType: public Type
    Type* _return_type;
    PointerType* _functor_type;
 };
-
-FunctionType*
-castToFunctionType (Symbol* s);
 
 } }
 

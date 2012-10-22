@@ -10,7 +10,7 @@ namespace mem { namespace st {
 
 Arg::Arg ()
 {
-   _kind = ARG;
+   _kind = Arg::kTYPE;
 }
 
 

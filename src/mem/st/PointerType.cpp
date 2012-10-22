@@ -9,7 +9,7 @@ namespace mem { namespace st {
 PointerType::PointerType ()
 {
    _pointed_type = NULL;
-   _kind = POINTER;
+   _kind = PointerType::kTYPE;
    _ptr_level = 1;
    _byte_size = sizeof(void*);
 }
@@ -26,9 +26,9 @@ PointerType::~PointerType ()
 bool
 PointerType::canCastTo (Type* dest_ty) const
 {
-   if (dest_ty->isPointerType())
+   if (st::isa<st::PointerType>(dest_ty))
    {
-      PointerType* dest_ptr_ty = static_cast<PointerType*>(dest_ty);
+      PointerType* dest_ptr_ty = st::cast<st::PointerType>(dest_ty);
       if (IndirectionLevel() == dest_ptr_ty->IndirectionLevel())
       {
          return _pointed_type->canCastTo(dest_ptr_ty->PointedType());
@@ -41,28 +41,16 @@ Type*
 PointerType::getNonPointerParent ()
 {
    st::Type* parent = _pointed_type;
-   while (parent != NULL && parent->isPointerType())
+   while (parent != NULL && st::isa<st::PointerType>(parent))
    {
-      parent = static_cast<st::PointerType*>(parent)->PointedType();
+      parent = st::cast<st::PointerType>(parent)->PointedType();
    }
 
-   if (!parent->isPointerType())
+   if (!st::isa<st::PointerType>(parent))
    {
       return parent;
    }
    return NULL;
-}
-
-//-----------------------------------------------------------------------------
-// STATIC FUNCTIONS
-//-----------------------------------------------------------------------------
-
-PointerType*
-castToPointerType (Symbol* s)
-{
-   assert (s != NULL);
-   assert (s->isPointerType());
-   return static_cast<PointerType*>(s);
 }
 
 } }

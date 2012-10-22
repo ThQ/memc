@@ -23,6 +23,9 @@ namespace mem { namespace st {
 // useful when code generating.
 class Func: public Type
 {
+   public:
+   static const int kTYPE = MetaKind::FUNCTION;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -110,9 +113,6 @@ class Func: public Type
    Func* _next_function;
    FunctionType* _type;
 };
-
-st::Func*
-castToFunc (st::Symbol* s);
 
 typedef std::vector<Func*> FunctionVector;
 

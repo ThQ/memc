@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 EnumType::EnumType ()
 {
-   _kind = ENUM_TYPE;
+   _kind = EnumType::kTYPE;
    _type = NULL;
 }
 

@@ -34,6 +34,7 @@
 #include "mem/ast/util.hpp"
 #include "mem/fs/position/Composite.hpp"
 #include "mem/fs/position/Range.hpp"
+#include "mem/st/EnumType.hpp"
 #include "mem/st/Func.hpp"
 #include "mem/st/Var.hpp"
 #include "mem/st/util.hpp"

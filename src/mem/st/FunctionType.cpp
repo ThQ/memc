@@ -11,7 +11,7 @@ FunctionType::FunctionType ()
 {
    _byte_size = sizeof(void*);
    _functor_type = NULL;
-   _kind = FUNCTION_TYPE;
+   _kind = FunctionType::kTYPE;
    _return_type = NULL;
 }
 
@@ -43,9 +43,9 @@ FunctionType::addArguments (TypeVector tys)
 bool
 FunctionType::canCastTo (Type* dest_ty) const
 {
-   if (!dest_ty->isFunctionType()) return false;
+   if (!st::isa<st::FunctionType>(dest_ty)) return false;
 
-   st::FunctionType* dest = static_cast<st::FunctionType*>(dest_ty);
+   st::FunctionType* dest = st::cast<st::FunctionType>(dest_ty);
    if (dest->ArgumentCount() != ArgumentCount()) return false;
    if (dest->ReturnType() != ReturnType()) return false;
 
@@ -109,10 +109,4 @@ FunctionType::_computeName ()
    _name += _return_type->gQualifiedName();
 }
 
-FunctionType*
-castToFunctionType (Symbol* s)
-{
-   assert (s->isFunctionType());
-   return static_cast<FunctionType*>(s);
-}
 } }

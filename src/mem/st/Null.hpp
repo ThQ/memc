@@ -13,6 +13,9 @@ namespace mem { namespace st {
 // have the symbol table to compare.
 class Null : public Constant
 {
+   public:
+   static const int kTYPE = MetaKind::NULL_CONSTANT;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------

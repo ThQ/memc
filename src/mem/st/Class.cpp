@@ -12,7 +12,7 @@ Class::Class ()
    _byte_size = 0;
    _cur_field_index = 0;
    _default_ctor = NULL;
-   _kind = CLASS;
+   _kind = Class::kTYPE;
 }
 
 Class::~Class ()
@@ -27,9 +27,9 @@ Class::~Class ()
 bool
 Class::addChild (Symbol* s)
 {
-   if (s->Kind() == FIELD)
+   if (s->Kind() == st::MetaKind::FIELD)
    {
-      st::Field* field = static_cast<Field*>(s);
+      st::Field* field = st::cast<st::Field>(s);
       assert(field->Type() != NULL);
       field->setFieldIndex(_cur_field_index);
       _cur_field_index++;
@@ -44,9 +44,9 @@ Class::addChild (Symbol* s)
 bool
 Class::canCastTo (Type* dest_ty) const
 {
-   if (dest_ty->isClassType())
+   if (st::isa<st::Class>(dest_ty))
    {
-      return this == dest_ty || isSubclassOf(static_cast<Class*>(dest_ty));
+      return this == dest_ty || isSubclassOf(st::cast<st::Class>(dest_ty));
    }
    return false;
 }
@@ -55,9 +55,9 @@ int
 Class::getAbsoluteFieldCount ()
 {
    int count = 0;
-   if (_parent != NULL && _parent->isClassType())
+   if (_parent != NULL && st::isa<st::Class>(_parent))
    {
-      count += static_cast<st::Class*>(_parent)->getAbsoluteFieldCount();
+      count += st::cast<st::Class>(_parent)->getAbsoluteFieldCount();
    }
    count += _cur_field_index;
    return count;
@@ -75,9 +75,9 @@ Class::getAllFields ()
    SymbolMapIterator i;
    for (i = _children.begin(); i != _children.end(); ++i)
    {
-      if (i->second->isFieldSymbol())
+      if (st::isa<st::Field>(i->second))
       {
-         fv.push_back(static_cast<Field*>(i->second));
+         fv.push_back(st::cast<st::Field>(i->second));
       }
    }
    return fv;
@@ -98,14 +98,14 @@ Class::getFunctionsLike (std::string name, FunctionType* func_ty)
 
    while (cls != NULL)
    {
-      if (cls->isClassType())
+      if (st::isa<st::Class>(cls))
       {
          func = cls->getChild(name);
          if (func != NULL && func->Name() == name)
          {
-            if (st::castToFunc(func)->Type()->isOverridenCandidate(func_ty))
+            if (st::cast<st::Func>(func)->Type()->isOverridenCandidate(func_ty))
             {
-               funcs.push_back(static_cast<st::Func*>(func));
+               funcs.push_back(st::cast<st::Func>(func));
             }
          }
       }
@@ -123,9 +123,9 @@ Class::getOrderedFields ()
 {
    std::vector<st::Field*> v;
    size_t parent_field_count = 0;
-   if (_parent!= NULL && _parent->isClassType())
+   if (_parent!= NULL && st::isa<st::Class>(_parent))
    {
-      v = static_cast<st::Class*>(_parent)->getOrderedFields();
+      v = st::cast<st::Class>(_parent)->getOrderedFields();
       parent_field_count = v.size();
    }
    if (hasFields())
@@ -136,9 +136,9 @@ Class::getOrderedFields ()
       SymbolCollectionIterator i;
       for (i = _children.begin(); i != _children.end(); i++)
       {
-         if (i->second->Kind() == FIELD)
+         if (st::isa<st::Field>(i->second))
          {
-            field = static_cast<Field*>(i->second);
+            field = st::cast<st::Field>(i->second);
             v[parent_field_count + field->_field_index] = field;
          }
       }
@@ -156,8 +156,8 @@ Class::getOrderedFields ()
 bool
 Class::isDependingOn (Class* other_cls)
 {
-   assert (other_cls != NULL);
-   assert (other_cls->isClassType());
+   DEBUG_REQUIRE (other_cls != NULL);
+   DEBUG_REQUIRE (st::isa<st::Class>(other_cls));
 
    st::Var* cls_field = NULL;
 
@@ -171,16 +171,16 @@ Class::isDependingOn (Class* other_cls)
       SymbolCollectionIterator i;
       for (i = _children.begin(); i != _children.end(); i++)
       {
-         if ((*i).second->isVarSymbol())
+         if (st::isa<st::Var>((*i).second))
          {
-            cls_field = static_cast<st::Var*>(i->second);
-            if (cls_field->Type()->isClassType())
+            cls_field = st::cast<st::Var>(i->second);
+            if (st::isa<st::Class>(cls_field->Type()))
             {
                if (cls_field->Type() == other_cls)
                {
                   return true;
                }
-               else if (static_cast<st::Class*>(
+               else if (st::cast<st::Class>(
                   cls_field->Type())->isDependingOn(other_cls))
                {
                   return true;
@@ -206,22 +206,5 @@ Class::isSubclassOf (Class* cls) const
    return false;
 }
 
-
-//-----------------------------------------------------------------------------
-// PROTECTED FUNCTIONS
-//-----------------------------------------------------------------------------
-
-
-//-----------------------------------------------------------------------------
-// STATIC FUNCTIONS
-//-----------------------------------------------------------------------------
-
-Class*
-castToClassType (Symbol* s)
-{
-   assert (s != NULL);
-   assert (s->isClassType());
-   return static_cast<Class*>(s);
-}
 
 } }

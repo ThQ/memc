@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 VoidType::VoidType ()
 {
-   _kind = VOID_TYPE;
+   _kind = VoidType::kTYPE;
    _name = "void";
 }
 

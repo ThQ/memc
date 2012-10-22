@@ -17,6 +17,9 @@ namespace mem { namespace st {
 // FIXME: Should be extended to alias any symbol.
 class Alias : public Symbol
 {
+   public:
+   static const int kTYPE = MetaKind::ALIAS;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------

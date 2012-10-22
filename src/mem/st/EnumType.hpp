@@ -14,6 +14,9 @@ namespace mem { namespace st {
 // is dynamicaly allocated.
 class EnumType : public Type
 {
+   public:
+   static const int kTYPE = MetaKind::ENUM_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------

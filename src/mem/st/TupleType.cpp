@@ -9,7 +9,7 @@ namespace mem { namespace st {
 
 TupleType::TupleType ()
 {
-   _kind = TUPLE_TYPE;
+   _kind = TupleType::kTYPE;
 }
 
 
@@ -21,11 +21,11 @@ bool
 TupleType::addChild (Symbol* s)
 {
    DEBUG_REQUIRE (s != NULL);
-   if (s->isAnyType())
+   if (st::isa<st::Type>(s))
    {
       if (_byte_size == -1) _byte_size = 0;
-      _byte_size += static_cast<st::Type*>(s)->ByteSize();
-      _subtypes.push_back(static_cast<st::Type*>(s));
+      _byte_size += st::cast<st::Type>(s)->ByteSize();
+      _subtypes.push_back(st::cast<st::Type>(s));
    }
    return false;
 }
@@ -59,11 +59,6 @@ TupleType::hasTypes (TypeVector tys)
    return false;
 }
 
-
-//-----------------------------------------------------------------------------
-// PROTECTED FUNCTIONS
-//-----------------------------------------------------------------------------
-
 void
 TupleType::_recomputeName ()
 {
@@ -75,13 +70,6 @@ TupleType::_recomputeName ()
    }
    name += ")";
    _name = name;
-}
-
-TupleType*
-castToTupleType (Symbol* s)
-{
-   assert (s->is(st::TUPLE_TYPE));
-   return static_cast<TupleType*>(s);
 }
 
 } }

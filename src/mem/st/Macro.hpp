@@ -9,6 +9,9 @@ namespace mem { namespace st {
 
 class Macro : public Func
 {
+   public:
+   static const int kTYPE = MetaKind::MACRO;
+
    protected:
    void* _macro_expander;
 

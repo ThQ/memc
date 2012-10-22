@@ -11,6 +11,9 @@ namespace mem { namespace st {
 // A base class for signed integer types.
 class IntType : public PrimitiveType
 {
+   public:
+   static const int kTYPE = MetaKind::INT_TYPE;
+
    //--------------------------------------------------------------------------
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
@@ -31,9 +34,6 @@ class IntType : public PrimitiveType
    virtual bool
    canCastTo (Type* dest_ty) const;
 };
-
-IntType*
-castToIntType (Symbol* s);
 
 } }
 
