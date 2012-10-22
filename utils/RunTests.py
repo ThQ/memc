@@ -296,7 +296,7 @@ class TestRunner:
       html += "<div class=\"tests\">"
       html += "<ul>"
       for report in self._reports:
-         if report.return_code != 0:
+         if report.status != "passed":
             html += "<li class=\""
             html += "\">"
             html += "<h4>"
