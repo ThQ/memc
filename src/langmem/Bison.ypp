@@ -1,11 +1,13 @@
 %error-verbose
+%locations
 
 %parse-param{mem::ast::node::File* ast}
 %parse-param{mem::st::SymbolTable* symbols}
 %parse-param{mem::log::Logger* logger}
 %parse-param{mem::fs::File* file}
 
-%code requires{
+%code requires
+{
 
 #define PASS (0);
 #include <stdio.h>
@@ -85,46 +87,42 @@ extern langmem::Tokenizer gTOKENIZER;
 }
 
 %code {
+   langmem::Tokenizer gTOKENIZER;
 
-langmem::Tokenizer gTOKENIZER;
-
-int yylex()
-{
-   langmem::Token t = gTOKENIZER.getNextToken();
-
-   switch (t.Kind())
+   int yylex()
    {
-      case T_ID:
-      case T_OP:
-      case T_STRING:
-      case T_LITERAL_NUMBER:
-         std::string* str = new std::string();
-         str->assign(t.Value());
-         yylval.text = str;
-         break;
+      langmem::Token t = gTOKENIZER.getNextToken();
+
+      switch (t.Kind())
+      {
+         case T_ID:
+         case T_OP:
+         case T_STRING:
+         case T_LITERAL_NUMBER:
+            std::string* str = new std::string();
+            str->assign(t.Value());
+            yylval.text = str;
+            break;
+      }
+      yylloc = t.Location();
+      return t.Kind();
    }
-   yylloc = t.Location();
-   return t.Kind();
-}
 
-void yyerror(ast::node::Node* ast,
-   mem::st::SymbolTable* symbols,
-   ::mem::log::Logger* logger, // Type ambiguity for gcc-c++ 4.2.1 on FreeBSD
-   fs::File* file,
-   const char *s)
-{
-   fs::position::Position* pos = new fs::position::Position();
-   pos->sFile(file);
+   void yyerror(ast::node::Node* ast,
+      mem::st::SymbolTable* symbols,
+      ::mem::log::Logger* logger, // Type ambiguity for gcc-c++ 4.2.1 on FreeBSD
+      fs::File* file,
+      const char *s)
+   {
+      fs::position::Position* pos = new fs::position::Position();
+      pos->sFile(file);
 
-   log::Message* msg = new log::Error();
-   msg->setPrimaryText("Syntax error");
-   msg->setSecondaryText(s);
-   msg->setPosition(pos);
-   logger->log(msg);
-}
-}
-
-%code requires {
+      log::Message* msg = new log::Error();
+      msg->setPrimaryText("Syntax error");
+      msg->setSecondaryText(s);
+      msg->setPosition(pos);
+      logger->log(msg);
+   }
 }
 
 %union
@@ -144,11 +142,7 @@ void yyerror(ast::node::Node* ast,
    mem::ast::node::While* while_node;
 }
 
-%code {
-}
 
-
-%locations
 %token T_AMPERSAND
 %token T_AROBASE
 %token T_AND
@@ -277,7 +271,6 @@ input :
    {
       ast->addChild($2);
    }
-
 
 use:
    T_USE use_file
@@ -805,7 +798,7 @@ expr:
    {
       $$ = (ast::node::Node*)$1;
    }
-   /* ex: (1 + 2 + 3) */
+   // ex: (1 + 2 + 3)
    | T_OP expr T_CP
    {
       mem::ast::node::NodeList* n = new mem::ast::node::NodeList();
@@ -813,6 +806,7 @@ expr:
 
       $$ = n;
    }
+   // ex: (1 + 2, true)
    | T_OP expr_list T_CP
    {
       mem::ast::node::Tuple* n = new mem::ast::node::Tuple();
