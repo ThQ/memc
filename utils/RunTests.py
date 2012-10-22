@@ -53,6 +53,13 @@ body {
    color:#1C44B3;
 }
 
+#submit-box {
+   border:1px solid #D5B160;
+   background:#F0DFB4;
+   padding:10px;
+   border-radius:2px;
+}
+
 h1 {
    font-family:Roboto,arial,sans-serif;
    font-weight:normal;
@@ -138,6 +145,7 @@ class TestFile:
       self.name = ""
       self.path = ""
       self.out_path = ""
+      self.options = {}
 
    def parse (self):
       self.sections = {}
@@ -151,6 +159,19 @@ class TestFile:
             if section_name == "":
                raise TextOutsideOfSectionError()
             self.sections[section_name] += line + "\n"
+
+      if "options" in self.sections:
+         self.parse_options(self.sections["options"])
+
+   def parse_options (self, options_str):
+      lines = [line.strip() for line in options_str.splitlines()]
+      for line in lines:
+         if line != "":
+            colon_pos = line.find(":")
+            if colon_pos != -1:
+               self.options[line[0:colon_pos]] = line[colon_pos:]
+            else:
+               self.options[line] = ""
 
    def open (self, path):
       self.content = ""
@@ -176,7 +197,21 @@ class TestFile:
       report.path = self.path
       report.name = self.name
 
-      return retcode, report
+      if "must-fail" in self.options:
+         if report.return_code == 1:
+            report.status = "passed"
+         elif report.return_code == 0:
+            report.status = "failed"
+      else:
+         if report.return_code == 0:
+            report.status = "passed"
+         elif report.return_code == 1:
+            report.status = "failed"
+
+      if report.return_code != 0 and report.return_code != 1:
+         report.status = "crashed"
+
+      return report
 
    def write_test_source (self):
       if "file" in self.sections:
@@ -201,6 +236,7 @@ class TestReport:
       self.log = ""
       self.path = ""
       self.name = ""
+      self.status = ""
 
 
 class TestRunner:
@@ -232,10 +268,23 @@ class TestRunner:
       html += "<li><a href=\"#tests\">Tests</a></li>"
       html += "</ul>"
 
+      if self._num_failed_tests > 0:
+         html += "<p id=\"submit-box\">"
+         html += "Please <strong>submit this report</strong> to our <a href=\"https://github.com/ThQ/memc/issues/new?title=Failing+tests\">issue tracker</a>."
+         html += " You have stumbled upon some bugs that we'd like to know about."
+         html += "</p>"
+
       html += "<h2><a name=\"summary\">#</a> Summary</h2>"
-      html += "<table>"
-      html += "<tr><td>" + str(self._num_failed_tests) + " failed</td>"
-      html += "<td>" + str(self._num_passed_tests) + " passed </td></tr>"
+      html += "<table id=\"summary\">"
+      html += "<tr><th>Failed</th><th>Passed</th></tr>"
+      html += "<tr>"
+      html += "<td>" + str(round(self._percent_failed_tests,1)) + "%</td>"
+      html += "<td>" + str(round(self._percent_passed_tests,1)) + "%</td>"
+      html += "<tr>"
+      html += "<tr>"
+      html += "<td>" + str(self._num_failed_tests) + "</td>"
+      html += "<td>" + str(self._num_passed_tests) + "</td>"
+      html += "<tr>"
       html += "</table>"
 
       html += "<h2><a name=\"memc\">#</a> memc</h2>"
@@ -252,7 +301,7 @@ class TestRunner:
             html += "\">"
             html += "<h4>"
             html += "<a name=\"" + cgi.escape(report.name) + "\" />" + cgi.escape(report.name)
-            if report.return_code == 0:
+            if report.status == "passed":
                html += "<a class=\"passed\">Passed</a>"
             else:
                html += "<a class=\"failed\">Failed</a>"
@@ -321,13 +370,14 @@ class TestRunner:
             line += "[" + str(int(1.0*i/self._num_tests*100)).rjust(3) + "%]"
             line += " " + test.name + " "
 
-            ret_code, report = test.run()
+            report = test.run()
+            status = report.status
             self._reports.append(report)
 
-            if ret_code == 0:
+            if status == "passed":
                self._num_passed_tests += 1
                line += "." * (79 - len(line) - 3) + " OK"
-            elif ret_code == 1:
+            elif status == "failed":
                self._num_failed_tests += 1
                self._failed_tests.append(item)
                line += "." * (79 - len(line) - 7) + " FAILED"
@@ -344,6 +394,6 @@ class TestRunner:
 runner = TestRunner()
 runner.run_all()
 runner.print_summary()
-runner.dump_html_report(os.path.join(kREPORT_DIR, "memc-compilation-report.html"))
+runner.dump_html_report(os.path.join(kREPORT_DIR, "memc-test-report.html"))
 
 
