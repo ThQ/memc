@@ -51,7 +51,7 @@ add_custom_target(
 		${memc_UTILS}/RunTests.py
 		--memc-exe=${CMAKE_CURRENT_BINARY_DIR}/memc
 		--test-dir=${CMAKE_CURRENT_SOURCE_DIR}/tests
-		--report-dir=${CMAKE_CURRENT_BINARY_DIR}/test-reports)
+		--report-dir=${CMAKE_CURRENT_BINARY_DIR})
 
 # Node kinds
 add_custom_command(
