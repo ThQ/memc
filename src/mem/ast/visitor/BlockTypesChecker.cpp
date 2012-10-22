@@ -788,22 +788,32 @@ BlockTypesChecker::visitSymbolName (st::Symbol* scope, node::Node* id_node)
 }
 
 void
-BlockTypesChecker::visitFor (st::Symbol* scope, node::For* n)
+BlockTypesChecker::visitFor (st::Symbol* scope, node::For* for_node)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (n != NULL);
-   DEBUG_REQUIRE (node::isa<node::For>(n));
+   DEBUG_REQUIRE (for_node != NULL);
+   DEBUG_REQUIRE (node::isa<node::For>(for_node));
 
-   visitExpr(scope, n->InitializationNode());
+   // Block scope
+   st::Symbol* for_block = new st::Symbol();
+   for_block->hintName(scope, "~for");
+   scope->addChild(for_block);
+   for_node->BlockNode()->setBoundSymbol(for_block);
 
-   visitExpr(scope, n->ConditionNode());
-   ensureBoolExpr(n->ConditionNode());
+   // Initialization
+   visitExpr(for_block, for_node->InitializationNode());
 
-   visitExpr(scope, n->IterationNode());
+   // Condition
+   visitExpr(for_block, for_node->ConditionNode());
+   ensureBoolExpr(for_node->ConditionNode());
 
-   visitBlock(scope, n->BlockNode());
+   // Iteration
+   visitExpr(for_block, for_node->IterationNode());
 
-   DEBUG_ENSURE(n->ConditionNode()->hasExprType());
+   // Block
+   visitBlock(for_block, for_node->BlockNode());
+
+   DEBUG_ENSURE(for_node->ConditionNode()->hasExprType());
 }
 
 void
@@ -1299,7 +1309,7 @@ BlockTypesChecker::visitWhile (st::Symbol* scope, node::While* while_node)
 
    // Check block node
    st::Symbol* while_block = new st::Symbol();
-   while_block->hintName(scope, "~if");
+   while_block->hintName(scope, "~while");
    scope->addChild(while_block);
    while_node->BlockNode()->setBoundSymbol(while_block);
 
