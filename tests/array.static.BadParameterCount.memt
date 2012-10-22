@@ -1,0 +1,8 @@
+### options
+must-fail
+
+### file
+main ()
+{
+   var arr :[int, 10, 10]
+}
