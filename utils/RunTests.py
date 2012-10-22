@@ -151,7 +151,7 @@ class TestFile:
       self.sections = {}
       section_name = ""
 
-      for line in self.content.split("\n"):
+      for line in self.content.splitlines():
          if len(line) >= 4 and line[0:3] == "###":
             section_name = line[4:].strip()
             self.sections[section_name] = ""
@@ -196,6 +196,7 @@ class TestFile:
       report.log = data.decode()
       report.path = self.path
       report.name = self.name
+      report.source = self.content
 
       if "must-fail" in self.options:
          if report.return_code == 1:
@@ -232,6 +233,7 @@ class TestLogger:
 
 class TestReport:
    def __init__ (self):
+      self.source = ""
       self.return_code = 0
       self.log = ""
       self.path = ""
@@ -307,6 +309,10 @@ class TestRunner:
                html += "<a class=\"failed\">Failed</a>"
 
             html += "</h4>"
+            html += "<p>Source:<p>"
+            html += "<pre class=\"code\">" + cgi.escape(report.source) + "</pre>"
+
+            html += "<p>Output:</p>"
             html += "<pre class=\"code\">" + cgi.escape(report.log) + "</pre>"
             html += "</li>"
 
