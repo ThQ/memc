@@ -83,7 +83,7 @@ h4 {
    border-top-left-radius:5px;
    border-top-right-radius:5px;
 }
-code {
+.code {
    display:block;
    border:1px solid #D0D0D0;
    border-radius:5px;
@@ -288,7 +288,7 @@ class TestRunner:
       html += "</table>"
 
       html += "<h2><a name=\"memc\">#</a> memc</h2>"
-      html += "<code>" + cgi.escape(self.get_memc_version_string()).replace("\n", "<br/>") + "</code>"
+      html += "<pre class=\"code\">" + cgi.escape(self.get_memc_version_string()) + "</pre>"
 
       html += "<h2><a name=\"tests\">#</a> Tests (" + str(self._num_tests) + ")</h2>"
 
@@ -307,7 +307,7 @@ class TestRunner:
                html += "<a class=\"failed\">Failed</a>"
 
             html += "</h4>"
-            html += "<code>" + cgi.escape(report.log).replace("\n", "<br />").replace("\t", "&nbsp;"*3) + "</code>"
+            html += "<pre class=\"code\">" + cgi.escape(report.log) + "</pre>"
             html += "</li>"
 
       html += "</ul>"
