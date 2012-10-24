@@ -3,6 +3,7 @@
 
 
 #include <fstream>
+#include <sstream>
 #include <queue>
 #include <stdio.h>
 #include <string>
@@ -88,6 +89,20 @@ class Tokenizer
    {
       delete _in;
       _in = new std::ifstream(fpath.c_str(), std::ifstream::in);
+   }
+
+   inline void
+   setInputString (std::string str)
+   {
+      delete _in;
+      _in = new std::istringstream (str, std::istringstream::in);
+   }
+
+   inline void
+   setInputStringStream (std::istringstream* istr)
+   {
+      delete _in;
+      _in = istr;
    }
 
 

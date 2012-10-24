@@ -4,6 +4,10 @@
 namespace langmem {
 
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Tokenizer::Tokenizer ()
 {
    _bufferCursor = 0;
@@ -13,6 +17,7 @@ Tokenizer::Tokenizer ()
    _fs_file = NULL;
    //_indent_level = 0;
    _eat_space = true;
+   _in = NULL;
    _logger = NULL;
 }
 
@@ -20,6 +25,48 @@ Tokenizer::~Tokenizer ()
 {
    delete _in;
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
+Token
+Tokenizer::getNextToken ()
+{
+   Token t;
+
+   while (_token_queue.size() == 0)
+   {
+      _readNextToken();
+   }
+
+   // There cannot be 2 consecutive T_SPACE, no need to loop here
+   if (_eat_space && _token_queue.front().Kind() == T_SPACE)
+   {
+      _token_queue.pop();
+      _readNextToken();
+   }
+   assert (_token_queue.size() != 0);
+
+   t = _token_queue.front();
+   _token_queue.pop();
+
+#if 0
+   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"} @ %d:%d..%d:%d\n",
+     t.Kind(), t.Value().c_str(),
+     t.Location().LineStart(), t.Location().ColumnStart(),
+     t.Location().LineEnd(), t.Location().ColumnEnd());
+#endif
+
+   t.Location().sFile(_fs_file);
+   return t;
+}
+
+
+//-----------------------------------------------------------------------------
+// PROTECTED FUNCTIONS
+//-----------------------------------------------------------------------------
 
 void
 Tokenizer::_backtrack ()
@@ -318,46 +365,15 @@ Tokenizer::_processTokenStart (char c)
          }
          else
          {
-            _cur_tok = T_YACC_ERROR;
+            _pushToken(T_YACC_ERROR);
+            _pushToken(T_YACC_END);
             emit_token = true;
-            DEBUG_PRINTF("Lexer error on <%c>\n", c);
+            DEBUG_PRINTF("(%d:%d) Lexer error : bad token start <%c> (%d)\n", _cur_line, _cur_column, c, c);
          }
       }
    }
 
    return emit_token;
-}
-
-Token
-Tokenizer::getNextToken ()
-{
-   Token t;
-
-   while (_token_queue.size() == 0)
-   {
-      _readNextToken();
-   }
-
-   // There cannot be 2 consecutive T_SPACE, no need to loop here
-   if (_eat_space && _token_queue.front().Kind() == T_SPACE)
-   {
-      _token_queue.pop();
-      _readNextToken();
-   }
-   assert (_token_queue.size() != 0);
-
-   t = _token_queue.front();
-   _token_queue.pop();
-
-#if 0
-   DEBUG_PRINTF("Emit TOKEN {kind:%d, value:\"%s\"} @ %d:%d..%d:%d\n",
-     t.Kind(), t.Value().c_str(),
-     t.Location().LineStart(), t.Location().ColumnStart(),
-     t.Location().LineEnd(), t.Location().ColumnEnd());
-#endif
-
-   t.Location().sFile(_fs_file);
-   return t;
 }
 
 int
@@ -589,7 +605,7 @@ Tokenizer::_readNextToken ()
          }
          default:
          {
-            DEBUG_PRINTF("Lexer error on <%c>\n", c);
+            DEBUG_PRINTF("Lexer error on <%c> (%d)\n", c, c);
             _pushToken(T_YACC_ERROR);
             return ;
          }

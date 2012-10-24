@@ -247,14 +247,9 @@ set(memc_SOURCES
 	${memc_SRC}/memc/tool/CommandChain.cpp
 	${memc_SRC}/memc/tool/Toolbox.cpp
 	${memc_SRC}/memc/Compiler.cpp
-	${memc_SRC}/memc/main.cpp
 	${memc_BUILT}/langmem/Bison.cpp
 	${memc_SRC}/langmem/Parser.cpp
 	${memc_SRC}/langmem/Tokenizer.cpp)
-
-set(memc_test_SOURCES
-   ${gtest_SRC}/gtest-all.cc
-   ${gtest_SRC}/gtest_main.cc)
 
 # Build configurations
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -UNDEBUG")
@@ -267,7 +262,7 @@ set(memc_VERSION_PATCH 1)
 set(memc_VERSION "${memc_VERSION_MAJOR}.${memc_VERSION_MINOR}.${memc_VERSION_PATCH}")
 configure_file(${memc_SRC}/config.h.in ${memc_BUILT}/config.h)
 
-add_executable(memc ${memc_SOURCES})
+add_executable(memc ${memc_SOURCES} ${memc_SRC}/memc/main.cpp)
 include_directories(${memc_SRC} ${memc_BUILT})
 
 
@@ -275,6 +270,11 @@ include_directories(${memc_SRC} ${memc_BUILT})
 # memc-test
 #------------------------------------------------------------------------------
 
-add_executable(memc-test ${memc_test_SOURCES})
+set(memc_test_SOURCES
+   ${memc_SRC}/langmem/Tokenizer_test.cpp
+   ${gtest_SRC}/gtest-all.cc
+   ${gtest_SRC}/gtest_main.cc)
+
+add_executable(memc-test ${memc_SOURCES} ${memc_test_SOURCES})
 include_directories(${memc_SRC} ${memc_BUILT} ${gtest_SRC})
 target_link_libraries(memc-test pthread)

@@ -77,7 +77,7 @@ class BlockTypesChecker : public TypeChecker
    visitArrayType (st::Symbol* scope, node::ArrayType* node);
 
    void
-   visitArithmeticOp (st::Symbol* scope, node::Node* node);
+   visitArithmeticOp (st::Symbol* scope, node::BinaryOp* node);
 
    void
    visitBinaryExpr (st::Symbol* scope, node::Node* expr_node);

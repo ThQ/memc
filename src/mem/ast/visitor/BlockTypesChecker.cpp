@@ -121,19 +121,20 @@ BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::UnaryOp* node)
 }
 
 void
-BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::Node* node)
+BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::BinaryOp* node)
 {
    DEBUG_REQUIRE (scope != NULL);
    DEBUG_REQUIRE (node != NULL);
-   DEBUG_REQUIRE (node->getChild(0) != NULL);
-   DEBUG_REQUIRE (node->getChild(1) != NULL);
+   DEBUG_REQUIRE (node::isa<node::BinaryOp>(node));
+   DEBUG_REQUIRE (node->LeftNode() != NULL);
+   DEBUG_REQUIRE (node->RightNode() != NULL);
 
    // Check left node
-   node::Node* left_node = node->getChild(0);
+   node::Node* left_node = node->LeftNode();
    visitExpr(scope, left_node);
 
    // Check right node
-   node::Node* right_node = node->getChild(1);
+   node::Node* right_node = node->RightNode();
    visitExpr(scope, right_node);
 
    std::string op_name;
@@ -632,7 +633,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       case node::MetaKind::OP_BIT_OR:
       case node::MetaKind::OP_BIT_AND:
       case node::MetaKind::OP_XOR:
-         visitArithmeticOp(scope, node);
+         visitArithmeticOp(scope, node::cast<node::BinaryOp>(node));
          break;
 
       case node::MetaKind::OP_NE:
