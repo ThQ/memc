@@ -13,7 +13,7 @@ namespace memc { namespace opt {
 
 class _Option
 {
-   public: typedef enum {NONE, STRING, BOOL, INT, INT_ENUM} OptionType;
+   public: typedef enum {NONE, STRING, STRING_ENUM, BOOL, INT, INT_ENUM} OptionType;
    public: std::string _long_name;
    public: std::string _short_name;
    public: std::string _desc;
@@ -89,6 +89,10 @@ class EnumOption : public _Option
          _val = _enum[str_val];
          _is_set = true;
          return true;
+      }
+      else
+      {
+         DEBUG_PRINTF("Enum option <%s> cannot have value <%s>\n", LongName().c_str(), str_val.c_str());
       }
       return false;
    }

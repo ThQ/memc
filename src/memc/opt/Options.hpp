@@ -35,9 +35,6 @@ class Options
 
    ~Options ();
 
-   _Option*
-   _getOptObject (std::string opt_name);
-
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -67,6 +64,20 @@ class Options
    void
    addStrOpt (std::string long_name, std::string short_name, std::string desc);
 
+   EnumOption<std::string>*
+   addStrEnumOpt (std::string long_name, std::string short_name, std::string desc)
+   {
+      EnumOption<std::string>* opt = new opt::EnumOption<std::string>();
+      opt->setType(_Option::STRING_ENUM);
+      opt->setLongName(long_name);
+      opt->setShortName(short_name);
+      opt->setDescription(desc);
+
+      addOpt(opt);
+
+      return opt;
+   }
+
    void
    dump (std::ostream& out);
 
@@ -92,6 +103,12 @@ class Options
    }
 
    inline std::string
+   getStrEnum (std::string name)
+   {
+      return getValue<std::string, _Option::STRING_ENUM>(name, "");
+   }
+
+   inline std::string
    getStr (std::string name)
    {
       return getValue<std::string, _Option::STRING>(name, "");
@@ -104,6 +121,10 @@ class Options
       if (opt != NULL && opt->_type == opt_ty)
       {
          return static_cast< Option<T>* >(opt)->_val;
+      }
+      else
+      {
+         DEBUG_PRINTF("Unknown option (at=%p, name=<%s>, type=<%d>)\n", opt, opt_name.c_str(), opt_ty);
       }
       return default_val;
    }
@@ -122,6 +143,15 @@ class Options
 
    bool
    set (std::string opt_name, std::string opt_value);
+
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   _Option*
+   _getOptObject (std::string opt_name);
 };
 
 } }

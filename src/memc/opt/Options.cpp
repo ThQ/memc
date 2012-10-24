@@ -266,10 +266,16 @@ Options::set (std::string opt_name, std::string opt_value)
    _Option* opt = _getOptObject(opt_name);
    if (opt != NULL)
    {
+      DEBUG_PRINTF("Set option <%s>=<%s> (type=%d)\n", opt_name.c_str(), opt_value.c_str(), opt->_type);
+
       switch (opt->_type)
       {
          case _Option::STRING:
             is_set = static_cast<StringOption*>(opt)->setVal(opt_value);
+            break;
+
+         case _Option::STRING_ENUM:
+            is_set = static_cast<EnumOption<std::string>*>(opt)->setVal(opt_value);
             break;
 
          case _Option::INT_ENUM:
@@ -282,6 +288,8 @@ Options::set (std::string opt_name, std::string opt_value)
             break;
 
          default:
+            DEBUG_PRINTF("Option <%s>=<%s> has unknown type <%d>\n",
+               opt_name.c_str(), opt_value.c_str(), opt->_type);
             assert(false);
       }
    }

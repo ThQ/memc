@@ -4,10 +4,18 @@
 namespace memc {
 
 
-Compiler::Compiler ()
+Compiler::Compiler (opt::Options* opts)
 {
    mem::log::ConsoleFormatter* formatter = new mem::log::ConsoleFormatter();
-   formatter->setColorsEnabled(true);
+
+   if (opts->getStrEnum("--color") == "yes")
+   {
+      formatter->setColorsEnabled(true);
+   }
+   else
+   {
+      formatter->setColorsEnabled(false);
+   }
 
    _logger = new mem::log::ConsoleLogger();
    _logger->setFormatter(formatter);
@@ -16,7 +24,7 @@ Compiler::Compiler ()
    _parser->setLogger(_logger);
    _parser->setSymbolTable(&symbols);
 
-   _opts = NULL;
+   _opts = opts;
 
    addDecorator(new mem::decorator::External());
    addDecorator(new mem::decorator::Overriding());

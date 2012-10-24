@@ -6,6 +6,11 @@ int main (int argc, char** argv)
    DEBUG_PRINT("[Running in DEBUG mode]\n");
 
    memc::opt::Options opts;
+   opts.addStrEnumOpt("--color", "",
+      "Enable/disable color output")
+      ->bind("yes", "yes")
+      ->bind("no", "no")
+      ->bind("auto", "auto");
    opts.addStrOpt("--dump-ast-xml", "",
       "Dump the Abstract Syntax Tree as XML");
    opts.addStrOpt("--emit-llvm-bc", "",
@@ -30,8 +35,7 @@ int main (int argc, char** argv)
       "Dump the Symbol Table as XML");
    opts.parse(argc, argv);
 
-   memc::Compiler compiler;
-   compiler.setOptions(&opts);
+   memc::Compiler compiler(&opts);
    compiler.run();
 
    return compiler.isBuildSuccessful() ? 0 : 1;

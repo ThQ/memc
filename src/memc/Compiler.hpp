@@ -88,7 +88,7 @@ class Compiler
    /**
     * Default constructor.
     */
-   Compiler();
+   Compiler(opt::Options* opts);
 
    /**
     * Destructor.
