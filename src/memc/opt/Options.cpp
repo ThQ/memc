@@ -39,6 +39,38 @@ Options::dump (std::ostream& out)
          case _Option::STRING:
             out << "=<string>\n";
             break;
+
+         case _Option::INT_ENUM:
+         {
+            EnumOption<int>* opt = static_cast<EnumOption<int>*>(i->second);
+            std::map<std::string, int>::iterator i;
+
+            out << "=<";
+            for (i = opt->_enum.begin(); i != opt->_enum.end(); ++i)
+            {
+               if (i != opt->_enum.begin()) out << "|";
+               out << i->first.c_str();
+            }
+            out << ">\n";
+
+            break;
+         }
+         case _Option::STRING_ENUM:
+         {
+            EnumOption<std::string>* opt = static_cast<EnumOption<std::string>*>(i->second);
+            std::map<std::string, std::string>::iterator i;
+
+            out << "=<";
+            for (i = opt->_enum.begin(); i != opt->_enum.end(); ++i)
+            {
+               if (i != opt->_enum.begin()) out << "|";
+               out << i->first.c_str();
+            }
+            out << ">\n";
+
+            break;
+         }
+
          default:
             out << "\n";
       }
@@ -46,6 +78,7 @@ Options::dump (std::ostream& out)
       {
          out << "   " << i->second->Description() << "\n";
       }
+      out << "\n";
    }
 }
 
