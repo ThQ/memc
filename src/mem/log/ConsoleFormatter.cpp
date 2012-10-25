@@ -109,7 +109,7 @@ void
 ConsoleFormatter::_formatMessage (std::ostream& str, Message* msg)
 {
    _formatLevelId(str, msg->Level());
-   str << " " << msg->PrimaryText() << "\033[0m\n";
+   str << " " << msg->PrimaryText() << _getLinuxColor("0") << "\n";
 }
 
 void
