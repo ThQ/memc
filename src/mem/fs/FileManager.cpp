@@ -20,9 +20,9 @@ FileManager::getLineOf (std::string file_path, unsigned int lineno)
    std::map<std::string, File*>::iterator file_it;
    if ((file_it = _files.find(file_path)) != _files.end())
    {
-      if (file_it->second->_lines.size() > lineno)
+      if (file_it->second->Lines().size() > lineno)
       {
-         line.assign(file_it->second->_lines[lineno - 1]->c_str());
+         line.assign(file_it->second->getLine(lineno - 1));
       }
    }
    return line;
@@ -63,7 +63,7 @@ FileManager::tryOpenFile (std::string file_path,
 
          if (res != NULL)
          {
-            res->_include_path = _path[i];
+            res->setIncludePath(_path[i]);
             break;
          }
       }

@@ -15,7 +15,7 @@ Parse::parse (mem::fs::File* file)
 {
    mem::ast::node::File* file_n = new mem::ast::node::File();
 
-   gTOKENIZER.setInputFile(file->gPath());
+   gTOKENIZER.setInputFile(file->Path());
    gTOKENIZER.setFsFile(file);
    gTOKENIZER.reset();
    yyparse(file_n, _st, _logger, file);

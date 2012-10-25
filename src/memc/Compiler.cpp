@@ -210,11 +210,11 @@ Compiler::parse (std::string file_path)
    {
       mem::ast::node::File* file_node = NULL;
       gTOKENIZER.reset();
-      gTOKENIZER.setInputFile(file->gPath());
+      gTOKENIZER.setInputFile(file->Path());
       file_node = _parser->parse (file);
       file_node->setBoundSymbol(file_sym);
       file_node->setId(ns_name);
-      file_node->setIncludePath(file->_include_path);
+      file_node->setIncludePath(file->IncludePath());
       file_node->setPath(file_path);
       ast.addChild(file_node);
 

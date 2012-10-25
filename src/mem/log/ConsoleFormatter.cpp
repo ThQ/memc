@@ -120,7 +120,7 @@ ConsoleFormatter::_formatPosition (std::ostream& str, fs::position::Position* po
    if (pos->_file != NULL)
    {
       str << "     @ ";
-      str << pos->gFile()->gPath();
+      str << pos->gFile()->Path();
       str << ":";
       str << pos->LineStart();
       str << "\n";
