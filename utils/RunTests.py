@@ -140,6 +140,7 @@ class TextOutsideOfSectionError (Exception):
 
 class TestFile:
    def __init__ (self):
+      self.command = ""
       self.sections = {}
       self.content = ""
       self.name = ""
@@ -175,7 +176,7 @@ class TestFile:
 
    def open (self, path):
       self.content = ""
-      self.name = os.path.splitext(os.path.basename(path))[0]
+      self.name = path[len(kTEST_DIR) + 1:-5]
       self.out_path = kMEM_SRC
       self.path = path
       fin = open(path, "r")
@@ -183,9 +184,10 @@ class TestFile:
          self.content = fin.read()
          fin.close()
          self.parse ()
-         self.write_test_source()
 
    def run (self):
+      self.write_test_source()
+
       args = [kMEMC, "--log-level=debug", "--color=no", "--output=" + kBIN, str(self.out_path)]
       memc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
       data = memc.communicate()[0]
@@ -193,6 +195,7 @@ class TestFile:
 
       report = TestReport()
       report.return_code = retcode
+      report.command = " ".join(args)
       report.log = data.decode()
       report.path = self.path
       report.name = self.name
@@ -225,7 +228,7 @@ class TestFile:
 class TestLogger:
 
    def log (self, msg):
-      print (msg,)
+      print (msg, end="")
 
    def logln (self, msg):
       print (msg)
@@ -252,6 +255,22 @@ class TestRunner:
       self._percent_passed_tests = 0
       self._logger = TestLogger()
       self._reports = []
+      self._tests = []
+
+   def discover_tests (self, dir_path):
+      i = 1
+      items = os.listdir(dir_path)
+      items.sort()
+      line = ""
+      for item in items:
+         full_path = os.path.join(dir_path, item)
+         if item.endswith(".memt"):
+            self._num_tests += 1
+            test = TestFile()
+            test.open(full_path)
+            self._tests.append(test)
+         elif os.path.isdir(full_path):
+            self.discover_tests(full_path)
 
    def dump_html_report (self, report_file):
       html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
@@ -309,6 +328,10 @@ class TestRunner:
                html += "<a class=\"failed\">Failed</a>"
 
             html += "</h4>"
+
+            html += "<p>Command:</p>"
+            html += "<pre class=\"code\">" + cgi.escape(report.command) + "</pre>"
+
             html += "<p>Source:<p>"
             html += "<pre class=\"code\">" + cgi.escape(report.source) + "</pre>"
 
@@ -345,8 +368,8 @@ class TestRunner:
       print ("")
       self.log_section("Summary")
       summary = str(self._num_tests) + " tests run\n"
-      summary += " - Failed: " + str(len(self._failed_tests)) + " (" + str(percent_failed) + "%)\n"
-      summary += " - Passed: " + str(self._num_tests - len(self._failed_tests)) + " (" +  str(percent_passed) + "%)"
+      summary += " - Failed: " + str(self._num_failed_tests) + " (" + str(self._percent_failed_tests) + "%)\n"
+      summary += " - Passed: " + str(self._num_tests - self._num_failed_tests) + " (" +  str(self._percent_passed_tests) + "%)"
       summary += "\n"
       self._logger.logln(summary)
 
@@ -358,49 +381,50 @@ class TestRunner:
          fin.close()
       return contents
 
-   def run_all (self):
+   def run (self):
       self.log_section("Running tests for `" + kMEMC + "'...")
       self._logger.logln("Test directory: " + kTEST_DIR)
       self._logger.logln("Reports directory: " + kREPORT_DIR)
       self._logger.logln("")
-      self._num_tests = len(os.listdir(kTEST_DIR))
 
+      self.discover_tests(kTEST_DIR)
+
+      self._logger.logln(str(self._num_tests) + " tests discovered:")
+
+      self.run_tests()
+
+      if self._num_tests != 0:
+         self._percent_failed_tests = round(self._num_failed_tests * 100 / self._num_tests, 1)
+         self._percent_passed_tests = round(self._num_passed_tests * 100 / self._num_tests, 1)
+      else:
+         self._percent_failed_tests = 0
+         self._percent_passed_tests = 0
+
+   def run_tests (self):
       i = 1
-      items = os.listdir(kTEST_DIR)
-      items.sort()
-      line = ""
-      for item in items:
-         if item.endswith(".memt"):
-            test = TestFile()
-            test.open(os.path.join(kTEST_DIR + "/" + item))
+      for test in self._tests:
+         progress = str(i).rjust(len(str(self._num_tests))) + "/" + str(self._num_tests)
 
-            line = ""
-            line += "[" + str(int(1.0*i/self._num_tests*100)).rjust(3) + "%]"
-            line += " " + test.name + " "
+         log_ln = ("(" + progress + ") Running <" + test.name + ">").ljust(71, ".") + " "
+         self._logger.log(log_ln)
+         report = test.run()
+         self._reports.append(report)
 
-            report = test.run()
-            status = report.status
-            self._reports.append(report)
+         if report.status == "passed":
+            self._logger.logln("OK")
+            self._num_passed_tests += 1
+         elif report.status == "failed":
+            self._logger.logln("FAILED")
+            self._num_failed_tests += 1
+         else:
+            self._logger.logln("CRASHED")
+            self._num_failed_tests += 1
 
-            if status == "passed":
-               self._num_passed_tests += 1
-               line += "." * (79 - len(line) - 3) + " OK"
-            elif status == "failed":
-               self._num_failed_tests += 1
-               self._failed_tests.append(item)
-               line += "." * (79 - len(line) - 7) + " FAILED"
-            else:
-               self._num_failed_tests += 1
-               self._failed_tests.append(item)
-               line += "." * (79 - len(line) - 8) + " CRASHED"
-            i += 1
-            print (line)
+         i += 1
 
-      self._percent_failed_tests = self._num_failed_tests * 100 / self._num_tests
-      self._percent_passed_tests = self._num_passed_tests * 100 / self._num_tests
 
 runner = TestRunner()
-runner.run_all()
+runner.run()
 runner.print_summary()
 runner.dump_html_report(os.path.join(kREPORT_DIR, "memc-test-report.html"))
 
