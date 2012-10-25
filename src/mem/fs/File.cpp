@@ -33,6 +33,21 @@ File::getLine (size_t i) const
    return line;
 }
 
+std::vector<std::string>
+File::getLineWithContext(size_t line, int context_line_count)
+{
+   std::vector<std::string> lines;
+   int first_line = line - context_line_count;
+   int last_line = line + context_line_count + 1;
+
+   for (int i = first_line ; i < last_line ; ++i)
+   {
+      lines.push_back(getLine(i));
+   }
+
+   return lines;
+}
+
 bool
 File::open (std::string name)
 {

@@ -73,6 +73,9 @@ class File
    inline const char*
    getLineCstr(size_t i) const {return this->getLine(i).c_str();}
 
+   std::vector<std::string>
+   getLineWithContext(size_t line, int context_line_count);
+
    /**
     * Return true if the i is a valid line.
     */

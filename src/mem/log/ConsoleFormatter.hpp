@@ -64,6 +64,9 @@ class ConsoleFormatter : public Formatter
    void
    _formatPosition (std::ostream& str, fs::position::Position* pos);
 
+   void
+   _formatSourceLines (std::ostream& str, fs::position::Range* pos);
+
    std::string
    _getLinuxColor (std::string color);
 
@@ -74,6 +77,7 @@ class ConsoleFormatter : public Formatter
    public:
 
    bool _colors_enabled;
+   int _num_context_lines;
 };
 
 

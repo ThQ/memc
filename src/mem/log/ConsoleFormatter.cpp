@@ -12,6 +12,7 @@ ConsoleFormatter::ConsoleFormatter ()
 {
    setId("console");
    _colors_enabled = false;
+   _num_context_lines = 2;
 }
 
 ConsoleFormatter::~ConsoleFormatter ()
@@ -124,35 +125,70 @@ ConsoleFormatter::_formatPosition (std::ostream& str, fs::position::Position* po
       str << pos->LineStart();
       str << "\n";
 
-      str << "     > ";
-
-      if (pos->LineStart() > 0 && pos->gFile()->isLineInFile(pos->LineStart()-1))
-      {
-         std::string context_line = pos->gFile()->getLineCstr(pos->LineStart()-1);
-         str << context_line;
-         str << "\n       ";
-
-         for (size_t i = 1 ; i < context_line.length() ; ++i)
-         {
-            switch (pos->getTypeAt(i))
-            {
-               case fs::position::NOTHING: str << " "; break;
-               case fs::position::RANGE:   str << "-"; break;
-               case fs::position::CURSOR:  str << "^"; break;
-            }
-         }
-         str << "\n";
-      }
-      else
-      {
-         str << "<bad line:";
-         str << pos->LineStart();
-         str << ">\n";
-      }
+      _formatSourceLines(str, pos);
    }
    else
    {
       str << "       @  <invalid file>\n";
+   }
+}
+
+void
+ConsoleFormatter::_formatSourceLines (std::ostream& str, fs::position::Range* pos)
+{
+
+   if (pos->LineStart() > 0 && pos->gFile()->isLineInFile(pos->LineStart()-1))
+   {
+      std::vector<std::string> lines = pos->gFile()->getLineWithContext(pos->LineStart()-1, _num_context_lines);
+
+      for (size_t i = 0; i < lines.size(); ++i)
+      {
+         if (i == _num_context_lines)
+         {
+            str << "       ";
+         }
+         else
+         {
+            str << "     | ";
+         }
+         str << lines[i];
+         str << "\n";
+
+         if (i == _num_context_lines)
+         {
+            str << "       ";
+            for (size_t j = 1 ; j < lines[i].length() ; ++j)
+            {
+               switch (pos->getTypeAt(j))
+               {
+                  case fs::position::NOTHING: str << " "; break;
+                  case fs::position::RANGE:   str << "-"; break;
+                  case fs::position::CURSOR:  str << "^"; break;
+               }
+            }
+            str << "\n";
+         }
+      }
+
+      /*
+      std::string context_line = pos->gFile()->getLineCstr(pos->LineStart()-1);
+      for (size_t i = 1 ; i < context_line.length() ; ++i)
+      {
+         switch (pos->getTypeAt(i))
+         {
+            case fs::position::NOTHING: str << " "; break;
+            case fs::position::RANGE:   str << "-"; break;
+            case fs::position::CURSOR:  str << "^"; break;
+         }
+      }
+      str << "\n";
+      */
+   }
+   else
+   {
+      str << "<bad line:";
+      str << pos->LineStart();
+      str << ">\n";
    }
 }
 
