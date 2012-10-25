@@ -114,7 +114,7 @@ TypeChecker::ensureSizedExprType (node::Node* expr)
    st::Type* ty = expr->ExprType();
    ensureSymbolIsType(expr, ty);
 
-   if (ty != NULL && !ty->hasByteSize())
+   if (ty != NULL && ty != BugType() && !ty->hasByteSize())
    {
       std::string fix_str;
 
