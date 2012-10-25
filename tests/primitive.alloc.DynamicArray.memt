@@ -1,5 +1,0 @@
-### file
-main ()
-{
-   var i = new [int, 10];
-}

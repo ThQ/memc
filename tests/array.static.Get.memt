@@ -1,6 +1,0 @@
-### file
-main ()
-{
-   var arr :[int, 10];
-   var i :int = arr[0];
-}

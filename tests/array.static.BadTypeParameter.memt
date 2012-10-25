@@ -1,9 +1,0 @@
-### options
-must-not-compile
-
-### file
-main ()
-{
-   var a :int;
-   var arr :[a, 10];
-}
