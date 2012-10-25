@@ -1,0 +1,12 @@
+### options
+must-not-compile
+
+### file
+main ()
+{
+   for var i = 1; i < 10; i += 1
+   {
+      var a :int;
+   }
+   a += 1;
+}

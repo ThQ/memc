@@ -1,0 +1,13 @@
+### options
+must-not-compile
+
+### file
+class BadClass < int
+{
+   some_field :int;
+}
+
+main ()
+{
+   var a :BadClass;
+}

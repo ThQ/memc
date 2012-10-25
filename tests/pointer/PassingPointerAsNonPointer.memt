@@ -1,0 +1,13 @@
+### options
+must-not-compile
+
+### file
+testFunc(int i)
+{
+}
+
+main ()
+{
+   i :int* = new int;
+   testFunc(i);
+}

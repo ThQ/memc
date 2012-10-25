@@ -1,0 +1,13 @@
+### file
+class TestClass
+{
+   testFunction()
+   {
+   }
+}
+
+main ()
+{
+   var obj :TestClass;
+   obj.testFunction();
+}

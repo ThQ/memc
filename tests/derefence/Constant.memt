@@ -1,0 +1,8 @@
+### options
+must-not-compile
+
+### file
+main ()
+{
+   @2;
+}

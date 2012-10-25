@@ -1,0 +1,6 @@
+### file
+main () -> int
+{
+   var c = 99 :char;
+   return c :int;
+}

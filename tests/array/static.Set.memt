@@ -1,0 +1,6 @@
+### file
+main ()
+{
+   var arr :[int, 10];
+   arr[1] = 2;
+}

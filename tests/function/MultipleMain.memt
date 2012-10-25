@@ -1,0 +1,7 @@
+### options
+must-not-compile
+
+### file
+main (argc :int) -> int {}
+
+main () {}

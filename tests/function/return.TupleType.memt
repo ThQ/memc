@@ -1,0 +1,10 @@
+### file
+my_func() -> (int, char)
+{
+   var my_var :(int, char);
+   return my_var;
+}
+
+main()
+{
+}

@@ -1,0 +1,6 @@
+### file
+main ()
+{
+   var i_src = 12 :int;
+   var i_dest = i_src :int;
+}

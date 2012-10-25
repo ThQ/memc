@@ -1,0 +1,9 @@
+### file
+class A
+{
+   my_field :int;
+}
+
+main ()
+{
+}

@@ -1,0 +1,11 @@
+### file
+main ()
+{
+   while 1 < 2
+   {
+      while 2 > 1
+      {
+         var a = 1;
+      }
+   }
+}

@@ -1,0 +1,10 @@
+### file
+class A
+{
+   field :int;
+}
+
+main ()
+{
+    var my_a = new A;
+}

@@ -1,0 +1,14 @@
+### file
+class TestClass
+{
+   testFunction(i :int) -> int
+   {
+      return i;
+   }
+}
+
+main ()
+{
+   var obj :TestClass;
+   obj.testFunction(10);
+}
