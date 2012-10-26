@@ -45,11 +45,16 @@ class Err:
                 out += kINDENT + "public: " + self.params[param_id] + " _" + param_id + ";\n"
             out += "\n"
 
+        # Constructor
+        out += kINDENT + "public: " + self.name + "()\n"
+        out += kINDENT + "{\n"
+        out += kINDENT*2 + "this->setId(\"" + self.format_name_as_id(self.name) + "\");\n"
+        out += kINDENT + "}\n"
+
         for param_id in self.params:
             out += kINDENT + "public: inline void s" + param_id + "(" + self.params[param_id] + " " + param_id + ")"
             out += " {_" + param_id + "=" + param_id + ";}\n"
 
-        #out += kINDENT + "public: " + self.name + "();\n"
         out += kINDENT + "public: inline void format() {"
         out += "formatMessage" + self.format_str(self.message) + ";"
 
@@ -71,6 +76,17 @@ class Err:
         else:
             raise ErrorTypeNotFoundError()
 
+
+    def format_name_as_id (self, name):
+        id = ""
+        for c in name:
+           if c.isupper():
+              id += "-" + c.lower()
+           else:
+              id += c
+        if id[0] == "-":
+           id = id[1:]
+        return id
 
     def format_str (self, s):
         is_param = False
