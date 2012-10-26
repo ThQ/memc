@@ -102,7 +102,8 @@ add_custom_target(
 
 # Error classes
 add_custom_command(
-	OUTPUT ${memc_BUILT}/mem/log/errors.hpp
+	OUTPUT
+		${memc_BUILT}/mem/log/errors.hpp
 	COMMAND
 		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenErrorClasses.py
 		--template="${memc_SRC}/mem/log/errors.errors-in"
