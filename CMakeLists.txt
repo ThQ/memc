@@ -52,6 +52,7 @@ add_custom_target(
 		${memc_UTILS}/RunTests.py
 		--memc-exe=${CMAKE_CURRENT_BINARY_DIR}/memc
 		--test-dir=${CMAKE_CURRENT_SOURCE_DIR}/tests
+		--data-dir=${CMAKE_CURRENT_SOURCE_DIR}/data
 		--report-dir=${CMAKE_CURRENT_BINARY_DIR})
 add_custom_target(
 	run-blackbox-test

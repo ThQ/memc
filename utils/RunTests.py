@@ -9,9 +9,11 @@ args_parser = argparse.ArgumentParser(description='Test a memc executable')
 args_parser.add_argument("--memc-exe", required=True)
 args_parser.add_argument("--test-dir", required=True)
 args_parser.add_argument("--report-dir", required=True)
+args_parser.add_argument("--data-dir", required=True)
 args = args_parser.parse_args()
 
 kCWD=os.getcwd()
+kDATA_DIR = args.data_dir
 kTEST_DIR = args.test_dir
 kMEMC = args.memc_exe
 kREPORT_DIR = args.report_dir
@@ -21,118 +23,6 @@ if not os.path.isdir(kREPORT_DIR):
 
 kBIN = os.path.join(kREPORT_DIR, "memt")
 kMEM_SRC = os.path.join(kREPORT_DIR, "test.mem")
-
-REPORT_CSS = """
-html {
-   padding:0;
-   margin:0;
-}
-body {
-   font-size:0.9em;
-   padding:0;
-   margin:0 10px 0 250px;
-}
-#toc {
-   border-right:5px solid #DADADA;
-   position:fixed;
-   left:0;
-   top:0;
-   width:200px;
-   background:#E6E6E6;
-   margin:0;
-   padding:10px 10px 10px 20px;
-   list-style-type:square;
-   font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-   height:100%;
-   font-size:0.8em;
-}
-#toc li {
-   margin:2px 0 2px 0;
-}
-#toc a:link, #toc a:visited, #toc a:hover {
-   color:#1C44B3;
-}
-
-#submit-box {
-   border:1px solid #D5B160;
-   background:#F0DFB4;
-   padding:10px;
-   border-radius:2px;
-}
-
-h1 {
-   font-family:Roboto,arial,sans-serif;
-   font-weight:normal;
-}
-h2 {
-   font-family:Georgia,arial,sans-serif;
-   font-weight:normal;
-}
-h3 {
-   font-family:Georgia,arial,sans-serif;
-   font-weight:normal;
-}
-h4 {
-   font-family:arial,sans-serif;
-   font-size:1em;
-   font-weight:none;
-   border-bottom:1px solid #D0D0D0;
-   padding:10px;
-   background:#FFFFFF;
-   margin:0 0 10px 0;
-   border-top-left-radius:5px;
-   border-top-right-radius:5px;
-}
-.code {
-   display:block;
-   border:1px solid #D0D0D0;
-   border-radius:5px;
-   background:#FFFFFF;
-   color:#333333;
-   font-family:'Droid Sans Mono', sans-mono;
-   font-size:0.9em;
-   padding:5px;
-   margin:20px;
-}
-.tests ul {
-   list-style-type:none;
-   padding:0;
-   margin:5px 0 5px 0;
-}
-.summary {
-   font-size:0.8em;
-}
-.tests li {
-   padding: 0;
-   border:1px solid #D0D0D0;
-   border-radius:5px;
-   background:#F0F0F0;
-   margin:0 0 20px 0;
-}
-a.passed {
-   color:#FFFFFF;
-   padding:3px;
-   font-size:0.8em;
-   font-weight:none;
-   background:#7C8A31;
-   border-radius:3px;
-   margin:0 0 0 10px;
-}
-a.failed {
-   color:#FFFFFF;
-   padding:3px;
-   font-size:0.8em;
-   font-weight:none;
-   background:#B62B15;
-   border-radius:3px;
-   margin:0 0 0 10px;
-}
-
-li.passed {
-}
-li.failed {
-}
-"""
 
 
 class TextOutsideOfSectionError (Exception):
@@ -273,11 +163,16 @@ class TestRunner:
             self.discover_tests(full_path)
 
    def dump_html_report (self, report_file):
+      css_file = open(os.path.join(kDATA_DIR, "test", "report.css"))
+      css = ""
+      if css_file:
+         css = css_file.read()
+
       html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
       html += "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
       html += "<head>"
       html += "<title>memc test report</title>"
-      html += "<style type=\"text/css\">" + REPORT_CSS + "</style>"
+      html += "<style type=\"text/css\">" + css + "</style>"
       html += "</head>"
       html += "<body>"
 
@@ -306,6 +201,16 @@ class TestRunner:
       html += "<td>" + str(self._num_failed_tests) + "</td>"
       html += "<td>" + str(self._num_passed_tests) + "</td>"
       html += "<tr>"
+      html += "</table>"
+
+      html += "<table>"
+      html += "<tr><th>Test</th><th>Status</th></tr>"
+
+      for report in self._reports:
+         html += "<tr>"
+         html += "<td><a href=\"#" + cgi.escape(report.name) + "\">" + cgi.escape(report.name) + "</a></td>"
+         html += "<td>" + report.status + "</td>"
+         html += "</tr>"
       html += "</table>"
 
       html += "<h2><a name=\"memc\">#</a> memc</h2>"
