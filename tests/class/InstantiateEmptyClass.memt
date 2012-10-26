@@ -1,0 +1,13 @@
+### options
+must-not-compile
+
+### file
+
+class EmptyClass
+{
+}
+
+main ()
+{
+   var some_var :EmptyClass;
+}
