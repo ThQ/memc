@@ -30,7 +30,7 @@ FindClasses::visitClassDecl (node::Class* cls_node)
 
    node::File* file_node = util::getFileNode(cls_node);
    assert(file_node != NULL);
-   st::Namespace* file_sym = static_cast<st::Namespace*>(file_node->BoundSymbol());
+   st::Namespace* file_sym = st::cast<st::Namespace>(file_node->BoundSymbol());
    assert(file_sym != NULL);
 
    st::Class* cls = new st::Class();

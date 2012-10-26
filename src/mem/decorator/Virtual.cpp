@@ -15,7 +15,7 @@ Virtual::decorate (ast::node::Node* n)
    DEBUG_REQUIRE (ast::node::isa<ast::node::Decorator>(n));
    DEBUG_REQUIRE (ast::node::isa<ast::node::Func>(n->Parent()));
 
-   st::Func* func_sym = static_cast<st::Func*>(n->Parent()->BoundSymbol());
+   st::Func* func_sym = st::cast<st::Func>(n->Parent()->BoundSymbol());
    // FIXME
    if (!func_sym->IsOverriding())
    {

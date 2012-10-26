@@ -61,7 +61,7 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* clss)
       st::Symbol* parent_cls = parent_ty_node->BoundSymbol();
       if (parent_cls != NULL && ensureClassType(parent_ty_node))
       {
-         static_cast<st::Class*>(clss->BoundSymbol())->setParentClass(static_cast<st::Class*>(parent_cls));
+         st::cast<st::Class>(clss->BoundSymbol())->setParentClass(st::cast<st::Class>(parent_cls));
       }
    }
 
@@ -105,7 +105,7 @@ TopTypesChecker::visitEnumType (st::Symbol* scope, node::EnumType* n)
          visitVarDecl(enum_ty, var_n);
          ensureConstantExpr(var_n->ValueNode());
          var_n->setExprType(enum_ty);
-         static_cast<st::Var*>(var_n->BoundSymbol())->setConstantValue(st::cast<st::IntConstant>(var_n->ValueNode()->BoundSymbol()));
+         st::cast<st::Var>(var_n->BoundSymbol())->setConstantValue(st::cast<st::IntConstant>(var_n->ValueNode()->BoundSymbol()));
       }
       enum_ty->setType(node::cast<node::VarDecl>(n->getChild(0))->ValueNode()->ExprType());
 

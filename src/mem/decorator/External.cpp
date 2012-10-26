@@ -15,7 +15,7 @@ External::decorate (ast::node::Node* n)
    DEBUG_REQUIRE (ast::node::isa<ast::node::Decorator>(n));
    DEBUG_REQUIRE (ast::node::isa<ast::node::Func>(n));
 
-   st::Func* func_sym = static_cast<st::Func*>(n->Parent()->BoundSymbol());
+   st::Func* func_sym = st::cast<st::Func>(n->Parent()->BoundSymbol());
    func_sym->setIsExternal(true);
 
    return true;

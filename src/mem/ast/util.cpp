@@ -51,7 +51,7 @@ getFileNode (node::Node* cur_node)
    {
       if (node::isa<node::File>(cur_node))
       {
-         return static_cast<node::File*>(cur_node);
+         return node::cast<node::File>(cur_node);
       }
       cur_node = cur_node->Parent();
    }

@@ -49,7 +49,7 @@ class Class : public Type
    SETTER(DefaultCtor, Func*) { _default_ctor = val;}
 
    // The parent class in the type hierarchy.
-   GETTER(ParentClass, st::Class*) { return static_cast<st::Class*>(_parent);}
+   GETTER(ParentClass, st::Class*) { return st::cast<st::Class>(_parent);}
    SETTER(ParentClass, st::Class*) { _parent = val;  }
 
    //--------------------------------------------------------------------------

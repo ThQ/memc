@@ -39,7 +39,7 @@ UseAlias::visitUse (node::Use* node)
    {
       st::Alias* alias = new st::Alias();
       alias->setName(file_sym->Name());
-      alias->setAliased(static_cast<st::Namespace*>(file_sym));
+      alias->setAliased(st::cast<st::Namespace>(file_sym));
       node->setBoundSymbol(file_sym);
       node->Parent()->BoundSymbol()->addChild(alias);
    }

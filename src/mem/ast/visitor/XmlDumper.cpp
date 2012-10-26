@@ -136,7 +136,7 @@ XmlDumper::visit (node::Node* node)
             visitReturn(node::cast<node::Return>(node)); break;
 
          case node::MetaKind::ROOT:
-            visitRoot(static_cast<node::Root*>(node)); break;
+            visitRoot(node::cast<node::Root>(node)); break;
 
          case node::MetaKind::VARIABLE_ASSIGNMENT:
             visitVarAssign(node::cast<node::VarAssign>(node)); break;

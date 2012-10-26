@@ -756,7 +756,7 @@ qualified_id:
       n->setValue($1->Value());
       n->setPosition(@$.copy_range());
       delete $1;
-      $$ = static_cast<ast::node::Text*>(n);
+      $$ = ast::node::cast<ast::node::Text>(n);
       assert($$->Position() != NULL);
    }
    | qualified_id T_DOT simple_id
@@ -817,7 +817,7 @@ expr:
    }
    | qualified_id
    {
-      $$ = static_cast<ast::node::Node*>($1);
+      $$ = ast::node::cast<ast::node::Node>($1);
    }
    | call
    {

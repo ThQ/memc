@@ -16,7 +16,7 @@ FindUse::visit (node::Node* node)
 
    if (node::isa<node::Use>(node))
    {
-      node::Text* text_node = static_cast<node::Text*>(node);
+      node::Text* text_node = node::cast<node::Text>(node);
       _uses.push_back(text_node->Value());
    }
    return true;
