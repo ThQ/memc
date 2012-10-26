@@ -49,9 +49,9 @@ TypeMatch::visitVarDecl (node::VarDecl* var_decl_node)
       //pos->addChild(value_node->copyPosition());
 
       log::InvalidTypeInVarAssignment* err = new log::InvalidTypeInVarAssignment();
-      err->sVariableName(var_decl_node->Name());
-      err->sExpectedTypeName(var_ty->gQualifiedName());
-      err->sTypeName(value_ty->gQualifiedName());
+      err->setVariableName(var_decl_node->Name());
+      err->setExpectedTypeName(var_ty->gQualifiedName());
+      err->setTypeName(value_ty->gQualifiedName());
       err->format();
       err->setPosition(pos);
 

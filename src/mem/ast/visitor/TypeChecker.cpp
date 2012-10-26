@@ -33,8 +33,8 @@ TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
       if (!is_safe_cast)
       {
          log::CannotAssign* err = new log::CannotAssign();
-         err->sTypeName(src_ty->Name());
-         err->sExpectedTypeName(dest_ty->Name());
+         err->setTypeName(src_ty->Name());
+         err->setExpectedTypeName(dest_ty->Name());
          if (source->Position() != NULL)
          {
             err->setPosition(source->Position()->copy());
@@ -66,7 +66,7 @@ TypeChecker::ensureClassType (node::Node* expr)
    else
    {
       log::ExpectedClassType* err = new log::ExpectedClassType();
-      err->sType(expr->BoundSymbol());
+      err->setType(expr->BoundSymbol());
       err->format();
       log(err);
    }
@@ -95,12 +95,9 @@ TypeChecker::ensureExprType (node::Node* expr, st::Symbol* expr_type)
    {
       // @FIXME Prints the same types, why ?
       log::SpecificTypeExpected* err = new log::SpecificTypeExpected();
-      err->sTypeName(expr->ExprType()->gQualifiedName());
-      err->sExpectedTypeName(expr_type->gQualifiedName());
-      if (expr->Position() != NULL)
-      {
-         err->setPosition(expr->copyPosition());
-      }
+      err->setTypeName(expr->ExprType()->gQualifiedName());
+      err->setExpectedTypeName(expr_type->gQualifiedName());
+      err->setPosition(expr->copyPosition());
       err->format();
       log(err);
       return false;
@@ -130,7 +127,7 @@ TypeChecker::ensureSizedExprType (node::Node* expr)
       }
 
       log::UnsizedType* err = new log::UnsizedType();
-      err->sTypeName(ty->Name());
+      err->setTypeName(ty->Name());
       if (desc.size() != 0)
       {
          err->setSecondaryText(desc);
@@ -151,7 +148,7 @@ TypeChecker::ensureSymbolIsType (node::Node* node, st::Symbol* sym)
    if (!st::isa<st::Type>(sym))
    {
       log::TypeExpected* err = new log::TypeExpected();
-      err->sSymbolName(sym->gQualifiedName());
+      err->setSymbolName(sym->gQualifiedName());
       err->setPosition(node->copyPosition());
       err->format();
       log(err);
@@ -164,13 +161,10 @@ void
 TypeChecker::logSymbolNotFound (st::Symbol* scope, node::Node* node, std::string symbol_name)
 {
    log::SymbolNotFound* err = new log::SymbolNotFound();
-   err->sSymbolName(symbol_name);
-   err->sScopeName(scope->gQualifiedName());
+   err->setSymbolName(symbol_name);
+   err->setScopeName(scope->gQualifiedName());
    err->format();
-   if (node != NULL)
-   {
-      err->setPosition(node->copyPosition());
-   }
+   err->setPosition(node->copyPosition());
    log(err);
 }
 

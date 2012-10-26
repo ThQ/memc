@@ -41,19 +41,23 @@ class Err:
         out += "{\n"
 
         if len(self.params) > 0:
+            out += kINDENT + "protected:\n"
             for param_id in self.params:
-                out += kINDENT + "public: " + self.params[param_id] + " _" + param_id + ";\n"
+                out += kINDENT + self.params[param_id] + " _" + param_id + ";\n"
             out += "\n"
 
+        out += kINDENT + "public:\n"
         # Constructor
-        out += kINDENT + "public: " + self.name + "()\n"
+        out += kINDENT + self.name + "()\n"
         out += kINDENT + "{\n"
         out += kINDENT*2 + "this->setId(\"" + self.format_name_as_id(self.name) + "\");\n"
         out += kINDENT + "}\n"
 
-        for param_id in self.params:
-            out += kINDENT + "public: inline void s" + param_id + "(" + self.params[param_id] + " " + param_id + ")"
-            out += " {_" + param_id + "=" + param_id + ";}\n"
+        if len(self.params) > 0:
+            out += "\n"
+            for param_id in self.params:
+                out += kINDENT + "SETTER(" + param_id + ", " + self.params[param_id] + ")"
+                out += " {_" + param_id + "=val;}\n"
 
         out += kINDENT + "public: inline void format() {"
         out += "formatMessage" + self.format_str(self.message) + ";"

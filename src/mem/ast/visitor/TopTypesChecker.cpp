@@ -262,8 +262,8 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
          if (st::isa<st::Func>(shadowed_sym))
          {
             log::OverridingFunction* err = new log::OverridingFunction();
-            err->sFunction(func_sym);
-            err->sOverridenFunction(shadowed_sym->Parent());
+            err->setFunction(func_sym);
+            err->setOverridenFunction(shadowed_sym->Parent());
             err->format();
             log(err);
 

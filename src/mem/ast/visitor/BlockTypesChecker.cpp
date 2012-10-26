@@ -31,8 +31,8 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::FunctionType* fu
       else
       {
          log::BadParameterCount* err = new log::BadParameterCount();
-         err->sExpectedParamCount(func_sym->ArgumentCount());
-         err->sParamCount(params->ChildCount());
+         err->setExpectedParamCount(func_sym->ArgumentCount());
+         err->setParamCount(params->ChildCount());
          err->format();
          err->setPosition(params->copyPosition());
          log(err);
@@ -175,9 +175,9 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::BinaryOp* node)
 
       log::UnsupportedArithmeticOperation* err =
          new log::UnsupportedArithmeticOperation();
-      err->sLeftTypeName(left_node->ExprType()->NameCstr());
-      err->sOpName(op_name.c_str());
-      err->sRightTypeName(right_node->ExprType()->NameCstr());
+      err->setLeftTypeName(left_node->ExprType()->NameCstr());
+      err->setOpName(op_name.c_str());
+      err->setRightTypeName(right_node->ExprType()->NameCstr());
       err->format();
       err->setPosition(pos);
       log(err);
@@ -392,8 +392,8 @@ BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
       n->setExprType(BugType());
 
       log::DifferentOperandsType* err = new log::DifferentOperandsType();
-      err->sLeftType(left_ty);
-      err->sRightType(right_ty);
+      err->setLeftType(left_ty);
+      err->setRightType(right_ty);
       err->setPosition(pos);
       err->format();
       log(err);
@@ -424,7 +424,7 @@ BlockTypesChecker::visitDeref (st::Symbol* scope, node::Node* n)
          n->setExprType(BugType());
 
          log::DerefNonPointer* err = new log::DerefNonPointer();
-         err->sTypeName(value_ty->Name());
+         err->setTypeName(value_ty->Name());
          err->format();
          log(err);
       }
@@ -502,8 +502,8 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
          call_node->setExprType(BugType());
 
          log::CallNonFunction* err = new log::CallNonFunction();
-         err->sObjectName(base_object->BoundSymbol()->Name());
-         err->sObjectTypeName(base_object->ExprType()->gQualifiedName());
+         err->setObjectName(base_object->BoundSymbol()->Name());
+         err->setObjectTypeName(base_object->ExprType()->gQualifiedName());
          err->setPosition(base_object->Position()->copy());
          err->format();
          log(err);
@@ -586,8 +586,8 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
          dot_node->setExprType(BugType());
 
          log::SymbolNotFound* err = new log::SymbolNotFound();
-         err->sSymbolName(node::cast<node::Text>(right_node)->Value());
-         err->sScopeName(left_node->ExprType()->gQualifiedName());
+         err->setSymbolName(node::cast<node::Text>(right_node)->Value());
+         err->setScopeName(left_node->ExprType()->gQualifiedName());
          err->format();
          err->setPosition(right_node->copyPosition());
          log(err);
@@ -1077,9 +1077,9 @@ BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
    {
       log::ReturnTypeDiffersFromPrototype* err = new
          log::ReturnTypeDiffersFromPrototype();
-      err->sFuncName(parent_func->gQualifiedName());
-      err->sRetTy(n->ValueNode()->ExprType());
-      err->sExpectedRetTy(parent_func->ReturnType());
+      err->setFuncName(parent_func->gQualifiedName());
+      err->setRetTy(n->ValueNode()->ExprType());
+      err->setExpectedRetTy(parent_func->ReturnType());
       //err->setPosition(value_node->copyPosition());
       err->format();
       log(err);
@@ -1201,7 +1201,7 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
       node->NameNode()->setBoundSymbol(BugType());
 
       log::NotAssignable* e = new log::NotAssignable();
-      //e->setPosition(node->NameNode()->copyPosition());
+      e->setPosition(node->NameNode()->copyPosition());
       e->format();
       log(e);
    }
@@ -1278,7 +1278,7 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope,
          var_decl_node->setBoundSymbol(BugType());
 
          log::VariableAlreadyDefined* err = new log::VariableAlreadyDefined();
-         err->sVarName(var_decl_node->Name());
+         err->setVarName(var_decl_node->Name());
          err->setPosition(var_decl_node->copyPosition());
          err->format();
          log(err);
