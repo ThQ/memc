@@ -304,6 +304,7 @@ Compiler::printBuildSummary ()
    {
       mem::log::Message* err = new mem::log::FatalError();
       err->setPrimaryText("Build FAILED");
+      err->setId("build-failed");
       err->setSecondaryText(sec_text.str());
       _logger->log(err);
    }
