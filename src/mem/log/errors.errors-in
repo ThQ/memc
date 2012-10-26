@@ -1,4 +1,3 @@
-
 {
 	"BadParameterCount":
 	{
@@ -22,7 +21,7 @@
 	},
 	"SymbolNotFound":
 	{
-		"message": "Symbol `$SymbolName' not found in `$ScopeName'",
+		"message": "Unknown symbol `$SymbolName' in `$ScopeName'",
 		"type": "Error",
 		"params":
 		{
