@@ -37,71 +37,76 @@ namespace mem { namespace log {
  */
 class Message
 {
-   protected:
+   //--------------------------------------------------------------------------
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
-   std::string _description;
-   std::string _file_path;
-   MessageLevel _level;
-   std::string _message;
-   fs::position::Position* _position;
-   std::string _source_line;
+   // Default constructor
+   Message ();
+
+   // Initializes a Message at a given level.
+   Message (MessageLevel level);
+
+   // Destructor
+   virtual
+   ~Message();
+
 
    //--------------------------------------------------------------------------
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
-   // PROPERTY : Description
+   // Id
+   GETTER(Id, std::string) {return _id;}
+   SETTER(Id, std::string) {_id = val;}
+
+   // Description
    GETTER(SecondaryText, std::string) {return _description;}
    SETTER(SecondaryText, std::string) { _description.assign(val); }
 
-   // PROPERTY : Level
+   // Level
    GETTER(Level, MessageLevel) {return _level;}
    SETTER(Level, MessageLevel) {_level = val;}
 
-   // PROPERTY : Message
+   // Message
    GETTER(PrimaryText, std::string) {return _message;}
    SETTER(PrimaryText, std::string) {_message = val;}
 
-   // PROPERTY : Position
+   // Position
    GETTER(Position, fs::position::Position*) {return _position;}
    SETTER(Position, fs::position::Position*) {_position = val;}
 
 
    //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTOR
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
-   Message ();
-
-   /**
-    * Initializes a Message at a given level.
-    */
-   Message (MessageLevel level);
-
-   /**
-    * Destructor.
-    */
-   virtual
-   ~Message();
-
-   /**
-    * Formats the description text.
-    */
+   // Formats the description text.
    void
    formatDescription(const char* format, ...);
 
-   /**
-    * Formats the message text.
-    *
-    * Messages should be as short as possible.
-    */
+   // Formats the message text.
+   //
+   // Messages should be as short as possible.
    void
    formatMessage (const char* format, ...);
+
+
+   //--------------------------------------------------------------------------
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   std::string _description;
+   std::string _id;
+   std::string _file_path;
+   MessageLevel _level;
+   std::string _message;
+   fs::position::Position* _position;
+   std::string _source_line;
 };
 
 
