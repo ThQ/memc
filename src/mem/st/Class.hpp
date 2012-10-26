@@ -24,14 +24,10 @@ class Class : public Type
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor
    Class ();
 
-   /**
-    * Destructor.
-    */
+   // Destructor
    virtual
    ~Class();
 
@@ -49,8 +45,8 @@ class Class : public Type
    SETTER(DefaultCtor, Func*) { _default_ctor = val;}
 
    // The parent class in the type hierarchy.
-   GETTER(ParentClass, st::Class*) { return st::cast<st::Class>(_parent);}
-   SETTER(ParentClass, st::Class*) { _parent = val;  }
+   GETTER(ParentClass, st::Class*) { return _parent_class;}
+   SETTER(ParentClass, st::Class*) { _parent_class = st::cast<st::Class>(val);  }
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -106,6 +102,7 @@ class Class : public Type
 
    int _cur_field_index;
    Func* _default_ctor;
+   st::Class* _parent_class;
 };
 
 } }
