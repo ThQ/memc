@@ -36,6 +36,7 @@
 #include "mem/fs/FileManager.hpp"
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
+#include "mem/log/TestFriendlyFormatter.hpp"
 #include "mem/log/XmlFormatter.hpp"
 #include "mem/st/Alias.hpp"
 #include "mem/st/SymbolTable.hpp"

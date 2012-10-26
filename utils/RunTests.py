@@ -188,7 +188,7 @@ class TestFile:
    def run (self):
       self.write_test_source()
 
-      args = [kMEMC, "--log-level=debug", "--color=no", "--output=" + kBIN, str(self.out_path)]
+      args = [kMEMC, "--log-level=debug", "--color=no", "--log-formatter=\"test-friendly\"", "--output=" + kBIN, str(self.out_path)]
       memc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
       data = memc.communicate()[0]
       retcode = int(memc.returncode)

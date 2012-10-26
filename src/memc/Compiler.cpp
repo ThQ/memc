@@ -6,15 +6,27 @@ namespace memc {
 
 Compiler::Compiler (opt::Options* opts)
 {
-   mem::log::ConsoleFormatter* formatter = new mem::log::ConsoleFormatter();
+   mem::log::Formatter* formatter = NULL;
 
-   if (opts->getStrEnum("--color") == "yes")
+   // TODO: Should use a factory or something here
+   if (opts->getStr("--log-formatter") == "test-friendly")
    {
-      formatter->setColorsEnabled(true);
+      formatter = new mem::log::TestFriendlyFormatter();
    }
    else
    {
-      formatter->setColorsEnabled(false);
+      mem::log::ConsoleFormatter* cons_formatter = new mem::log::ConsoleFormatter();
+
+      if (opts->getStrEnum("--color") == "yes")
+      {
+         cons_formatter->setColorsEnabled(true);
+      }
+      else
+      {
+         cons_formatter->setColorsEnabled(false);
+      }
+
+      formatter = cons_formatter;
    }
 
    _logger = new mem::log::ConsoleLogger();

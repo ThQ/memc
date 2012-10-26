@@ -221,6 +221,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/log/Formatter.cpp
 	${memc_SRC}/mem/log/Logger.cpp
 	${memc_SRC}/mem/log/Message.cpp
+	${memc_SRC}/mem/log/TestFriendlyFormatter.cpp
 	${memc_SRC}/mem/log/XmlFormatter.cpp
 	${memc_SRC}/mem/st/Alias.cpp
 	${memc_SRC}/mem/st/Arg.cpp
