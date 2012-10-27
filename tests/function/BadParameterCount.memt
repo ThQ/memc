@@ -13,5 +13,5 @@ someFunc (i :int, j :int) -> int
 
 main ()
 {
-   var i :int = someFunc(1, 2);
+   var i :int = someFunc(1, 2, 3);
 }
