@@ -76,6 +76,9 @@ XmlDumper::visit (node::Node* node)
          case node::MetaKind::DOT:
             visitDot(node::cast<node::Dot>(node)); break;
 
+         case node::MetaKind::ENUM:
+            visitEnumType (node::cast<node::EnumType>(node)); break;
+
          case node::MetaKind::FILE:
             visitFile (node::cast<node::File>(node)); break;
 
@@ -278,6 +281,20 @@ XmlDumper::visitDot (node::Dot* n)
    visit(n->RightNode());
 
    *_out << "</op-dot>\n";
+}
+
+void
+XmlDumper::visitEnumType (node::EnumType* n)
+{
+   *_out << "<enum";
+   dumpExprType(n);
+   dumpBoundSymbol(n);
+   dumpPosition(n);
+   *_out << ">\n";
+
+   visitChildrenOf(n);
+
+   *_out << "</enum>\n";
 }
 
 void

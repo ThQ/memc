@@ -7,6 +7,7 @@
 #include "mem/ast/node/Call.hpp"
 #include "mem/ast/node/Class.hpp"
 #include "mem/ast/node/Dot.hpp"
+#include "mem/ast/node/EnumType.hpp"
 #include "mem/ast/node/Field.hpp"
 #include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Func.hpp"
@@ -76,6 +77,9 @@ class XmlDumper : public Dumper
 
    void
    visitDot (node::Dot* n);
+
+   void
+   visitEnumType (node::EnumType* n);
 
    void
    visitField (node::Field* n);

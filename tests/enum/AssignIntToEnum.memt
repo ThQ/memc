@@ -1,0 +1,19 @@
+### options
+must-not-compile
+
+### log
+E:cannot-assign
+F:build-failed
+
+### file
+enum FileError
+{
+   OK;
+   FileNotFound;
+   CannotOpenFile;
+}
+
+main ()
+{
+   var err :FileError = 1;
+}

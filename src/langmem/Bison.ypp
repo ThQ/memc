@@ -224,7 +224,8 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <node>           compound_statement
 %type <node>           dot_expr
 %type <node>           enum_declaration
-%type <node_list>      enum_fields
+%type <var_decl_node>  EnumField
+%type <node_list>      EnumFields
 %type <node>           expr
 %type <node_list>      expr_list
 %type <node>           for_statement
@@ -244,7 +245,7 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <node>           statement
 %type <block_node>     statements
 %type <node>           tuple_type
-%type <id_node>      type_list
+%type <id_node>        type_list
 %type <text_node>      use
 %type <text_node>      use_file
 %type <node>           variable_assignment
@@ -343,26 +344,38 @@ ClassMembers_:
 //=============================================================================
 
 enum_declaration:
-   T_ENUM id T_NEWLINE T_INDENT enum_fields
+   T_ENUM simple_id T_OPEN_BRACE EnumFields T_CLOSE_BRACE
    {
+      mem::ast::node::FinalId* enum_ty = new mem::ast::node::FinalId();
+      enum_ty->setValue("int");
+
       mem::ast::node::EnumType* e = new mem::ast::node::EnumType();
       e->setNameNode($2);
       e->setValue($2->Value());
-      e->setMembersNode($5);
+      e->setParentTypeNode(enum_ty);
+      e->setMembersNode($4);
 
       $$ = e;
    }
 
-enum_fields:
-   variable_declaration eos
+EnumFields:
+   EnumField
    {
       $$ = new mem::ast::node::NodeList();
       $$->addChild($1);
    }
-   | enum_fields variable_declaration eos
+   | EnumFields EnumField
    {
       assert($2 != NULL);
+      $$ = $1;
       $$->addChild($2);
+   }
+
+EnumField:
+   simple_id eos
+   {
+      $$ = new mem::ast::node::VarDecl();
+      $$->setNameNode($1);
    }
 
 

@@ -87,6 +87,8 @@ TopTypesChecker::visitEnumType (st::Symbol* scope, node::EnumType* n)
    DEBUG_REQUIRE (n != NULL);
    DEBUG_REQUIRE (node::isa<node::EnumType>(n));
 
+   visitExpr(scope, n->ParentTypeNode());
+
    // Create the enumeration type
    st::EnumType* enum_ty = new st::EnumType();
    enum_ty->setName(n->Value());
@@ -99,15 +101,24 @@ TopTypesChecker::visitEnumType (st::Symbol* scope, node::EnumType* n)
    if (n->ChildCount() > 0)
    {
       node::VarDecl* var_n = NULL;
-      for (size_t i = 0; i < n->ChildCount(); ++i)
+      node::NodeList* members_n = n->MembersNode();
+      for (size_t i = 0; i < members_n->ChildCount(); ++i)
       {
-         var_n = node::cast<node::VarDecl>(n->getChild(i));
+         node::FinalId* field_type_n = new node::FinalId();
+         field_type_n->setValue(n->ParentTypeNode()->Value());
+
+         var_n = node::cast<node::VarDecl>(members_n->getChild(i));
+         var_n->setTypeNode(field_type_n);
+
          visitVarDecl(enum_ty, var_n);
-         ensureConstantExpr(var_n->ValueNode());
+         if (var_n->ValueNode() != NULL)
+         {
+            ensureConstantExpr(var_n->ValueNode());
+         }
          var_n->setExprType(enum_ty);
-         st::cast<st::Var>(var_n->BoundSymbol())->setConstantValue(st::cast<st::IntConstant>(var_n->ValueNode()->BoundSymbol()));
+         //st::cast<st::Var>(var_n->BoundSymbol())->setConstantValue(st::cast<st::IntConstant>(var_n->ValueNode()->BoundSymbol()));
       }
-      enum_ty->setType(node::cast<node::VarDecl>(n->getChild(0))->ValueNode()->ExprType());
+      enum_ty->setType(st::cast<st::Type>(n->ParentTypeNode()->BoundSymbol()));
 
       // We have to go over all the enum fields again to replace their original
       // type (ex: int) by the enum ty.

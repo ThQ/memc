@@ -1,0 +1,13 @@
+### file
+
+enum FileError
+{
+   OK;
+   FileNotFound;
+   CannotOpenFile;
+}
+
+main ()
+{
+
+}
