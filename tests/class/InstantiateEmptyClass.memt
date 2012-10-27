@@ -1,9 +1,9 @@
 ### options
-must-not-compil
+must-not-compile
 
 ### log
-E:empty-class-instantiation
-E:build-failed
+F:unsized-type
+F:build-failed
 
 ### file
 
