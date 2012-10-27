@@ -51,6 +51,7 @@ class File : public NodeList
    GETTER(MemorySize, int) {return sizeof(File);}
 
    // Path
+   GETTER(Path, std::string) {return _path;}
    SETTER(Path, std::string) {_path = val;}
 
 

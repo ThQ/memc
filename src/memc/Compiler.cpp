@@ -3,6 +3,9 @@
 
 namespace memc {
 
+//-----------------------------------------------------------------------------
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
 
 Compiler::Compiler (opt::Options* opts)
 {
@@ -12,6 +15,10 @@ Compiler::Compiler (opt::Options* opts)
    if (opts->getStr("--log-formatter") == "test-friendly")
    {
       formatter = new mem::log::TestFriendlyFormatter();
+   }
+   else if (opts->getStr("--log-formatter") == "xml")
+   {
+      formatter = new mem::log::XmlFormatter();
    }
    else
    {
@@ -89,6 +96,11 @@ Compiler::~Compiler ()
       delete st_visitors[i];
    }
 }
+
+
+//-----------------------------------------------------------------------------
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 void
 Compiler::addDecorator (mem::decorator::Decorator* dec)
@@ -230,29 +242,7 @@ Compiler::parse (std::string file_path)
       file_node->setPath(file_path);
       ast.addChild(file_node);
 
-      mem::ast::visitor::FindUse find_use;
-      _logger->debug("Searching for use statements", "");
-      find_use.visit_preorder(file_node);
-      for (size_t i = 0; i < find_use._uses.size(); ++i)
-      {
-         if (ns_name == find_use._uses[i])
-         {
-            // FIXME This thing is probably failing, should use a pointer.
-            mem::log::Message warn(mem::log::WARNING);
-            warn.formatMessage(
-               "File {path:%s} is trying to include itself: include ignored.",
-               file_path.c_str()
-            );
-            _logger->log(&warn);
-         }
-         else
-         {
-            std::string rel_file_path (find_use._uses[i]);
-            mem::Util::namespace_to_path(rel_file_path);
-            rel_file_path += ".mem";
-            this->_parse_queue.push(rel_file_path);
-         }
-      }
+      _findUses(file_node);
    }
    else
    {
@@ -271,46 +261,6 @@ Compiler::parse (std::string file_path)
 }
 
 void
-Compiler::printBuildSummary ()
-{
-   std::ostringstream sec_text;
-
-   if (_logger->FatalErrorCount() > 0)
-   {
-      sec_text << "Fatal errors: ";
-      sec_text << _logger->FatalErrorCount();
-      sec_text << "\n";
-   }
-
-   if (_logger->ErrorCount() > 0)
-   {
-      sec_text << "Errors: ";
-      sec_text << _logger->ErrorCount();
-      sec_text << "\n";
-   }
-
-   if (_logger->WarningCount() > 0)
-   {
-      sec_text << "Warnings: ";
-      sec_text << _logger->WarningCount();
-      sec_text << "\n";
-   }
-
-   if (isBuildSuccessful())
-   {
-      _logger->info("Build SUCCESSFUL", "");
-   }
-   else
-   {
-      mem::log::Message* err = new mem::log::FatalError();
-      err->setPrimaryText("Build FAILED");
-      err->setId("build-failed");
-      err->setSecondaryText(sec_text.str());
-      _logger->log(err);
-   }
-}
-
-void
 Compiler::printUsage (std::ostream& out)
 {
    out << "USAGE: ";
@@ -323,21 +273,6 @@ Compiler::printUsage (std::ostream& out)
    out << "OPTIONS:\n";
 
    _opts->dump(out);
-
-   /*
-   std::map<std::string, opt::CliOption*>::iterator i;
-   for (i = _opts->_cli_options.begin(); i != _opts->_cli_options.end(); ++i)
-   {
-      if (i->second != NULL)
-      {
-         out << " --";
-         out << i->second->_cli_name;
-         out << " : \n    ";
-         out << i->second->_description;
-         out << "\n";
-      }
-   }
-   */
 }
 
 void
@@ -353,12 +288,6 @@ Compiler::processParseQueue ()
 void
 Compiler::run ()
 {
-   std::string formatter_id = _opts->getStr("--log-formatter");
-
-   if (formatter_id == "xml")
-   {
-      _logger->setFormatter(new mem::log::XmlFormatter());
-   }
    _logger->begin();
 
    fm.appendPath(".");
@@ -410,7 +339,7 @@ Compiler::run ()
 
       if (isBuildSuccessful()) emitCode();
 
-      printBuildSummary();
+      _logBuildSummary();
    }
 
    _logger->finish();
@@ -444,5 +373,76 @@ Compiler::runStVisitors ()
    }
 }
 
+
+//-----------------------------------------------------------------------------
+// PROTECTED FUNCTIONS
+//-----------------------------------------------------------------------------
+
+void
+Compiler::_findUses (mem::ast::node::File* file_n)
+{
+   _logger->debug("Searching for use statements", "");
+
+   mem::ast::visitor::FindUse use_finder;
+   use_finder.visit_preorder(file_n);
+
+   std::vector<std::string> uses = use_finder._uses;
+
+   for (size_t i = 0; i < uses.size(); ++i)
+   {
+      if (file_n->Id() == uses[i])
+      {
+         mem::log::AutoInclude* err = new mem::log::AutoInclude();
+         err->setFilePath(file_n->Path());
+         err->format();
+         _logger->log(err);
+      }
+      else
+      {
+         std::string rel_file_path = uses[i];
+         mem::Util::namespace_to_path(rel_file_path);
+         rel_file_path += ".mem";
+         _parse_queue.push(rel_file_path);
+      }
+   }
+}
+
+void
+Compiler::_logBuildSummary ()
+{
+   std::ostringstream sec_text;
+
+   if (_logger->FatalErrorCount() > 0)
+   {
+      sec_text << "Fatal errors: ";
+      sec_text << _logger->FatalErrorCount();
+      sec_text << "\n";
+   }
+
+   if (_logger->ErrorCount() > 0)
+   {
+      sec_text << "Errors: ";
+      sec_text << _logger->ErrorCount();
+      sec_text << "\n";
+   }
+
+   if (_logger->WarningCount() > 0)
+   {
+      sec_text << "Warnings: ";
+      sec_text << _logger->WarningCount();
+      sec_text << "\n";
+   }
+
+   if (isBuildSuccessful())
+   {
+      _logger->info("Build SUCCESSFUL", "");
+   }
+   else
+   {
+      mem::log::BuildFailed* err = new mem::log::BuildFailed();
+      err->setSecondaryText(sec_text.str());
+      _logger->log(err);
+   }
+}
 
 }

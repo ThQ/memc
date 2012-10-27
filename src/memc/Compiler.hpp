@@ -148,12 +148,6 @@ class Compiler
    void
    parse (std::string file_path);
 
-   /**
-    * Print a compilation summary to stdout.
-    */
-   void
-   printBuildSummary ();
-
    void
    printUsage (std::ostream& out);
 
@@ -174,6 +168,19 @@ class Compiler
 
    void
    runStVisitors ();
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   // Find `use` node in a file node
+   void
+   _findUses (mem::ast::node::File* file_n);
+
+   // Log a compilation summary
+   void
+   _logBuildSummary ();
 };
 
 

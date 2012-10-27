@@ -208,5 +208,20 @@
          "LeftType": "st::Symbol*",
          "RightType": "st::Symbol*"
       }
+   },
+   "AutoInclude":
+   {
+      "type": "Warning",
+      "message": "File `$FilePath' is trying to include itself",
+      "description": "Include has been ignored.",
+      "params":
+      {
+         "FilePath": "std::string"
+      }
+   },
+   "BuildFailed":
+   {
+      "type": "FatalError",
+      "message": "Build FAILED"
    }
 }
