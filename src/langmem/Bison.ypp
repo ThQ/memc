@@ -345,7 +345,11 @@ class_declaration:
    }
 
 class_members:
-   T_OPEN_BRACE members_declarations T_CLOSE_BRACE
+   T_OPEN_BRACE T_CLOSE_BRACE
+   {
+      $$ = new mem::ast::node::NodeList();
+   }
+   | T_OPEN_BRACE members_declarations T_CLOSE_BRACE
    {
       $$ = $2;
    }
