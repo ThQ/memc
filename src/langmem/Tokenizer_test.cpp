@@ -52,3 +52,56 @@ TEST(TokenizerTest, MainFunctionWithParameterAndReturnType)
 
    assertTokenStream(src, tokens);
 }
+
+TEST(TokenizerTest, CallWithParameters)
+{
+   std::string src = "fn (i :int, j :int) -> int {return i;}";
+   src += " main(){ var i :int = fn(1, 2); }";
+
+   langmem::_TokenKind tokens[] = {
+      // fn (
+      langmem::T_ID,
+      langmem::T_OP,
+      //i :int,
+      langmem::T_ID,
+      langmem::T_COLON,
+      langmem::T_ID,
+      langmem::T_COMMA,
+      //j :int
+      langmem::T_ID,
+      langmem::T_COLON,
+      langmem::T_ID,
+      // ) -> int
+      langmem::T_CP,
+      langmem::T_RARR,
+      langmem::T_ID,
+      // { return i; }
+      langmem::T_OPEN_BRACE,
+      langmem::T_RETURN,
+      langmem::T_ID,
+      langmem::T_SEMICOLON,
+      langmem::T_CLOSE_BRACE,
+      // main ()
+      langmem::T_ID,
+      langmem::T_OP,
+      langmem::T_CP,
+      // { var i :int =
+      langmem::T_OPEN_BRACE,
+      langmem::T_VAR,
+      langmem::T_ID,
+      langmem::T_COLON,
+      langmem::T_ID,
+      langmem::T_EQ,
+      // fn(1, 2); }
+      langmem::T_ID,
+      langmem::T_OP,
+      langmem::T_LITERAL_NUMBER,
+      langmem::T_COMMA,
+      langmem::T_LITERAL_NUMBER,
+      langmem::T_CP,
+      langmem::T_SEMICOLON,
+      langmem::T_CLOSE_BRACE,
+      langmem::T_YACC_END};
+
+   assertTokenStream(src, tokens);
+}
