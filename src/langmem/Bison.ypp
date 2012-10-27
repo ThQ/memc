@@ -991,6 +991,8 @@ expr_list :
    {
       $$ = new mem::ast::node::NodeList();
       $$->addChild($1);
+      $$->setPosition(@$.copy_range());
+
    }
    | expr_list T_COMMA expr
    {
@@ -999,6 +1001,7 @@ expr_list :
          $$ = new mem::ast::node::NodeList();
       }
       $$->addChild($3);
+      $$->Position()->append(@3);
    }
 
 call :
