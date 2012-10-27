@@ -1003,7 +1003,7 @@ expr_list :
 
 call :
    /* ex: my_func() */
-   qualified_id T_OP T_CP
+   simple_id T_OP T_CP
    {
       mem::ast::node::Call* n = new mem::ast::node::Call();
       n->setCallerNode($1);
@@ -1011,11 +1011,13 @@ call :
       $$->setPosition(new fs::position::Range(@1, @3));
    }
    /* ex: my_func(1, 2, 3) */
-   | qualified_id T_OP expr_list T_CP
+   | simple_id T_OP expr_list T_CP
    {
       mem::ast::node::Call* n = new mem::ast::node::Call();
       n->setCallerNode($1);
       n->setParamsNode($3);
+
+      $$ = n;
       $$->setPosition(new fs::position::Range(@1, @4));
    }
 
