@@ -1,6 +1,8 @@
 ### file
 class TestClass
 {
+   some_field :int;
+
    testFunction(i :int) -> int
    {
       return i;

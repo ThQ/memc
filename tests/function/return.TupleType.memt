@@ -1,5 +1,5 @@
 ### file
-my_func() -> (int, char)
+myFunc () -> (int, char)
 {
    var my_var :(int, char);
    return my_var;
@@ -7,4 +7,5 @@ my_func() -> (int, char)
 
 main()
 {
+   var tuple_i_c :(int, char) = myFunc();
 }

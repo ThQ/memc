@@ -14,33 +14,19 @@ TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
    {
       st::Type* src_ty = source->ExprType();
 
-      is_safe_cast = src_ty->canCastTo(dest_ty);
-      /*
-      if (src_ty == dest_ty)
+      if (src_ty != BugType() && dest_ty != BugType())
       {
-         is_valid = true;
-      }
-      else if (src_ty->isIntType() && dest_ty->isIntType())
-      {
-         // Safe integer cast
-         if (src_ty->ByteSize() < dest_ty->ByteSize())
-         {
-            is_valid = true;
-         }
-      }
-      */
+         is_safe_cast = src_ty->canCastTo(dest_ty);
 
-      if (!is_safe_cast)
-      {
-         log::CannotAssign* err = new log::CannotAssign();
-         err->setTypeName(src_ty->Name());
-         err->setExpectedTypeName(dest_ty->Name());
-         if (source->Position() != NULL)
+         if (!is_safe_cast)
          {
+            log::CannotAssign* err = new log::CannotAssign();
+            err->setTypeName(src_ty->Name());
+            err->setExpectedTypeName(dest_ty->Name());
             err->setPosition(source->Position()->copy());
+            err->format();
+            log(err);
          }
-         err->format();
-         log(err);
       }
    }
 

@@ -1,4 +1,11 @@
 ### file
-main() -> int
+
+myFunc () -> int
 {
+   return 1;
+}
+
+main ()
+{
+   var i :int = myFunc();
 }

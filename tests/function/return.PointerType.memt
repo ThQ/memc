@@ -7,4 +7,5 @@ my_func() -> int*
 
 main()
 {
+   var int_p :int* = my_func();
 }

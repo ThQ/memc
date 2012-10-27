@@ -6,7 +6,7 @@ E:expected-type
 F:build-failed
 
 ### file
-testFunc(int i)
+testFunc(i :int)
 {
 }
 

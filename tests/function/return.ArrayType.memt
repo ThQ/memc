@@ -7,4 +7,5 @@ my_func() -> [int, 5]
 
 main()
 {
+   var int_arr :[int, 5] = my_func();
 }
