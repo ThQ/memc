@@ -1,6 +1,10 @@
 ### options
 must-not-compile
 
+### log
+E:expected-type
+F:build-failed
+
 ### file
 testFunc(int i)
 {
@@ -8,6 +12,6 @@ testFunc(int i)
 
 main ()
 {
-   i :int* = new int;
+   var i :int* = new int;
    testFunc(i);
 }

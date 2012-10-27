@@ -2,6 +2,7 @@ import argparse
 import cgi
 import os
 import os.path
+import re
 import subprocess
 import sys
 
@@ -24,6 +25,7 @@ if not os.path.isdir(kREPORT_DIR):
 kBIN = os.path.join(kREPORT_DIR, "memt")
 kMEM_SRC = os.path.join(kREPORT_DIR, "test.mem")
 
+gLOG_LINE_RE = re.compile("\(([DIWEF])\) ([a-z-]+)", re.MULTILINE)
 
 class TextOutsideOfSectionError (Exception):
    pass
@@ -37,6 +39,8 @@ class TestFile:
       self.path = ""
       self.out_path = ""
       self.options = {}
+      self.output_log = []
+      self.expected_output_log = []
 
    def parse (self):
       self.sections = {}
@@ -54,6 +58,9 @@ class TestFile:
       if "options" in self.sections:
          self.parse_options(self.sections["options"])
 
+      if "log" in self.sections:
+         self.parse_log_section(self.sections["log"])
+
    def parse_options (self, options_str):
       lines = [line.strip() for line in options_str.splitlines()]
       for line in lines:
@@ -63,6 +70,16 @@ class TestFile:
                self.options[line[0:colon_pos]] = line[colon_pos:]
             else:
                self.options[line] = ""
+
+   def parse_log_section (self, expected_logs):
+      lines = [line.strip() for line in expected_logs.splitlines() if line != ""]
+      self.expected_output_log = [line.split(":") for line in lines]
+
+   def parse_output (self, data):
+      matches = gLOG_LINE_RE.findall(str(data))
+      for match in matches:
+         if match[0] != "D":
+            self.output_log.append([match[0], match[1]])
 
    def open (self, path):
       self.content = ""
@@ -83,6 +100,8 @@ class TestFile:
       data = memc.communicate()[0]
       retcode = int(memc.returncode)
 
+      self.parse_output(data)
+
       report = TestReport()
       report.return_code = retcode
       report.command = " ".join(args)
@@ -91,16 +110,19 @@ class TestFile:
       report.name = self.name
       report.source = self.content
 
-      if "must-not-compile" in self.options:
-         if report.return_code == 1:
-            report.status = "passed"
-         elif report.return_code == 0:
-            report.status = "failed"
+      if len(self.expected_output_log) > 0 and self.output_log != self.expected_output_log:
+         report.status = "failed"
       else:
-         if report.return_code == 0:
-            report.status = "passed"
-         elif report.return_code == 1:
-            report.status = "failed"
+         if "must-not-compile" in self.options:
+            if report.return_code == 1:
+               report.status = "passed"
+            elif report.return_code == 0:
+               report.status = "failed"
+         else:
+            if report.return_code == 0:
+               report.status = "passed"
+            elif report.return_code == 1:
+               report.status = "failed"
 
       if report.return_code != 0 and report.return_code != 1:
          report.status = "crashed"
@@ -190,7 +212,6 @@ class TestRunner:
          html += " You have stumbled upon some bugs that we'd like to know about."
          html += "</p>"
 
-      html += "<h2><a name=\"summary\">#</a> Summary</h2>"
       html += "<table id=\"summary\">"
       html += "<tr><th>Failed</th><th>Passed</th></tr>"
       html += "<tr>"
@@ -203,13 +224,18 @@ class TestRunner:
       html += "<tr>"
       html += "</table>"
 
+      html += "<h2><a name=\"summary\">#</a> Summary</h2>"
       html += "<table>"
-      html += "<tr><th>Test</th><th>Status</th></tr>"
+      html += "<tr><th>Test</th><th>Status</th><th>Return code</th></tr>"
 
       for report in self._reports:
          html += "<tr>"
-         html += "<td><a href=\"#" + cgi.escape(report.name) + "\">" + cgi.escape(report.name) + "</a></td>"
-         html += "<td>" + report.status + "</td>"
+         html += "<td>" + cgi.escape(report.name) + "</td>"
+         if report.status != "passed":
+            html += "<td><a href=\"#" + cgi.escape(report.name) + "\">" + cgi.escape(report.status) + "</a></td>"
+         else:
+            html += "<td>Passed</td>"
+         html += "<td>" + cgi.escape(str(report.return_code)) + "</td>"
          html += "</tr>"
       html += "</table>"
 

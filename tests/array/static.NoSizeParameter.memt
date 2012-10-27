@@ -1,6 +1,10 @@
 ### options
 must-not-compile
 
+### log
+F:unsized-type
+F:build-failed
+
 ### file
 main ()
 {

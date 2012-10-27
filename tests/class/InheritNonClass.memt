@@ -1,6 +1,10 @@
 ### options
 must-not-compile
 
+### log
+F:expected-class-type
+F:build-failed
+
 ### file
 class BadClass < int
 {

@@ -1,6 +1,10 @@
 ### options
 must-not-compile
 
+### log
+F:deref-non-pointer
+F:build-failed
+
 ### file
 main ()
 {

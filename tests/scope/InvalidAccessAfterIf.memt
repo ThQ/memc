@@ -1,6 +1,10 @@
 ### options
 must-not-compile
 
+### log
+E:symbol-not-found
+F:build-failed
+
 ### file
 main ()
 {

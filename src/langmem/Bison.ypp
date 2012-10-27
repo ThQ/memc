@@ -118,6 +118,7 @@ extern langmem::Tokenizer gTOKENIZER;
       pos->sFile(file);
 
       log::Message* msg = new log::Error();
+      msg->setId("syntax-error");
       msg->setPrimaryText("Syntax error");
       msg->setSecondaryText(s);
       msg->setPosition(pos);
