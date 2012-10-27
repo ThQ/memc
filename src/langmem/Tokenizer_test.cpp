@@ -105,3 +105,29 @@ TEST(TokenizerTest, CallWithParameters)
 
    assertTokenStream(src, tokens);
 }
+
+TEST(TokenizerTest, ObjectCall)
+{
+   std::string src = "main () {p.some_func(1);}";
+
+   langmem::_TokenKind tokens[] = {
+      // main () {
+      langmem::T_ID,
+      langmem::T_OP,
+      langmem::T_CP,
+      langmem::T_OPEN_BRACE,
+      // p.some_func
+      langmem::T_ID,
+      langmem::T_DOT,
+      langmem::T_ID,
+      // (1)
+      langmem::T_OP,
+      langmem::T_LITERAL_NUMBER,
+      langmem::T_CP,
+      // ;}
+      langmem::T_SEMICOLON,
+      langmem::T_CLOSE_BRACE,
+      langmem::T_YACC_END};
+
+   assertTokenStream(src, tokens);
+}
