@@ -237,7 +237,7 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    // ------------
    //  Array type
    // ------------
-   if (item_ty != NULL)
+   if (item_ty != BugType())
    {
       // Unsized array
       if (arr_size == -1)
@@ -249,6 +249,10 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
       {
          arr_sym = st::util::getSizedArrayType(item_ty, arr_size);
       }
+   }
+   else
+   {
+      arr_sym = BugType();
    }
 
    n->setBoundSymbol(arr_sym);
