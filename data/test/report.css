@@ -1,0 +1,125 @@
+html {
+   padding:0;
+   margin:0;
+}
+body {
+   font-size:0.9em;
+   padding:0;
+   margin:0 10px 0 250px;
+}
+#toc {
+   border-right:5px solid #DADADA;
+   position:fixed;
+   left:0;
+   top:0;
+   width:200px;
+   background:#E6E6E6;
+   margin:0;
+   padding:10px 10px 10px 20px;
+   list-style-type:square;
+   font-family:"Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+   height:100%;
+   font-size:0.8em;
+}
+#toc li {
+   margin:2px 0 2px 0;
+}
+#toc a:link, #toc a:visited, #toc a:hover {
+   color:#1C44B3;
+}
+
+#submit-box {
+   border:1px solid #D5B160;
+   background:#F0DFB4;
+   padding:10px;
+   border-radius:2px;
+}
+
+h1 {
+   font-family:Roboto,arial,sans-serif;
+   font-weight:normal;
+}
+h2 {
+   font-family:Georgia,arial,sans-serif;
+   font-weight:normal;
+}
+h3 {
+   font-family:Georgia,arial,sans-serif;
+   font-weight:normal;
+}
+h4 {
+   font-family:arial,sans-serif;
+   font-size:1em;
+   font-weight:none;
+   border-bottom:1px solid #D0D0D0;
+   padding:10px;
+   background:#FFFFFF;
+   margin:0 0 10px 0;
+   border-top-left-radius:5px;
+   border-top-right-radius:5px;
+}
+.code {
+   display:block;
+   border:1px solid #D0D0D0;
+   border-radius:5px;
+   background:#FFFFFF;
+   color:#333333;
+   font-family:'Droid Sans Mono', sans-mono;
+   font-size:0.9em;
+   padding:5px;
+   margin:20px;
+}
+.tests ul {
+   list-style-type:none;
+   padding:0;
+   margin:5px 0 5px 0;
+}
+.summary {
+   font-size:0.8em;
+}
+.tests li {
+   padding: 0;
+   border:1px solid #D0D0D0;
+   border-radius:5px;
+   background:#F0F0F0;
+   margin:0 0 20px 0;
+}
+a.passed {
+   color:#FFFFFF;
+   padding:3px;
+   font-size:0.8em;
+   font-weight:none;
+   background:#7C8A31;
+   border-radius:3px;
+   margin:0 0 0 10px;
+}
+a.failed {
+   color:#FFFFFF;
+   padding:3px;
+   font-size:0.8em;
+   font-weight:none;
+   background:#B62B15;
+   border-radius:3px;
+   margin:0 0 0 10px;
+}
+
+li.passed {
+}
+li.failed {
+}
+
+table {
+   border:1px solid #D0D0D0;
+   border-radius:2px;
+   border-spacing:0;
+}
+
+th {
+   background-color:#F0F0F0;
+   padding:4px;
+   border-bottom:1px solid #D0D0D0;
+}
+
+td {
+   padding:4px;
+}
