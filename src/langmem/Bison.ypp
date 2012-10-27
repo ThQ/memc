@@ -209,16 +209,18 @@ extern langmem::Tokenizer gTOKENIZER;
 %left <node> T_DOT T_AROBASE
 
 %type <var_decl_node>  argument
-%type <node_list>      argument_list
+%type <node_list>      ArgumentList
+%type <node_list>      ArgumentList_
 %type <binary_op_node> binary_expr
 %type <binary_op_node> binary_operator
 %type <binary_op_node> bool_operator
+%type <node>           ClassParent_
 %type <binary_op_node> comp_operator
 %type <binary_op_node> math_operator
 %type <block_node>     block
 %type <node>           call
 %type <node>           class_declaration
-%type <node_list>      class_members
+%type <node_list>      ClassMembers_
 %type <node>           compound_statement
 %type <node>           dot_expr
 %type <node>           enum_declaration
@@ -228,17 +230,15 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <node>           for_statement
 %type <node>           for_initialization_statement
 %type <node>           for_iteration_statement
-%type <func_node>      function_declaration
-%type <func_node>      function_name
+%type <func_node>      FunctionDeclaration
 %type <id_node>        id
 %type <node>           if
 %type <node>           literal
 %type <node_list>      members_declarations
 %type <node>           member_declaration
-%type <decorator_node> metadata
 %type <block_node>     newline_or_block
 %type <node>           return_statement
-%type <node>           return_type_or_null
+%type <node>           ReturnType_
 %type <final_id_node>  simple_id
 %type <node>           simple_statement
 %type <node>           statement
@@ -268,7 +268,7 @@ input :
    {
       ast->addChild($2);
    }
-   | input function_declaration
+   | input FunctionDeclaration
    {
       ast->addChild($2);
    }
@@ -297,66 +297,49 @@ use_file :
       delete $3;
    }
 
-metadata :
-   T_AROBASE id T_NEWLINE
-   {
-      $$ = new mem::ast::node::Decorator();
-      $$->setValue($2->Value());
-      $$->setNameNode($1);
-      $$->setPosition(new fs::position::Range(@1, @2));
-   }
-   | T_AROBASE id T_OP expr T_CP T_NEWLINE
-   {
-      $$ = new mem::ast::node::Decorator();
-      $$->setValue($2->Value());
-      $$->setPosition(new fs::position::Range(@1, @5));
-
-      delete $4;
-   }
-
 eos : T_SEMICOLON
 
 
 //=============================================================================
-// CLASS
+// CLASS DECLARATION
 //=============================================================================
 
 class_declaration:
-   T_CLASS simple_id class_members
+   T_CLASS simple_id ClassParent_ T_OPEN_BRACE ClassMembers_ T_CLOSE_BRACE
    {
       mem::ast::node::Class* cls = new mem::ast::node::Class();
       cls->setValue($2->Value());
       cls->setNameNode($2);
-      cls->setMembersNode($3);
-      cls->setPosition(new fs::position::Range(@$));
-
-      $$ = cls;
-   }
-   | T_CLASS simple_id T_LT id class_members
-   {
-      mem::ast::node::Class* cls = new mem::ast::node::Class();
-      cls->setValue($2->Value());
-      cls->setNameNode($2);
-      cls->setParentTypeNode($4);
+      cls->setParentTypeNode($3);
       cls->setMembersNode($5);
       cls->setPosition(new fs::position::Range(@$));
 
       $$ = cls;
    }
 
-class_members:
-   T_OPEN_BRACE T_CLOSE_BRACE
+ClassParent_:
+   /* empty */
    {
-      $$ = new mem::ast::node::NodeList();
+      $$ = NULL;
    }
-   | T_OPEN_BRACE members_declarations T_CLOSE_BRACE
+   | T_LT simple_id
    {
       $$ = $2;
    }
 
+ClassMembers_:
+   /* empty */
+   {
+      $$ = new mem::ast::node::NodeList();
+   }
+   | members_declarations
+   {
+      $$ = $1;
+   }
+
 
 //=============================================================================
-// ENUM
+// ENUM DECLARATION
 //=============================================================================
 
 enum_declaration:
@@ -384,72 +367,28 @@ enum_fields:
 
 
 //=============================================================================
-// FUNCTION
+// FUNCTION DECLARATION
 //=============================================================================
 
-function_name:
-   simple_id
-   {
-      mem::ast::node::Func* func = new mem::ast::node::Func();
-      func->setNameNode($1);
-      //func->setPosition(@1.copy_range());
-      func->setValue($1->Value());
-      $$ = func;
-   }
-   | metadata simple_id
-   {
-      mem::ast::node::Func* func = new mem::ast::node::Func();
-      func->setDecoratorNode($1);
-      func->setNameNode($2);
-      func->setValue($2->Value());
-      //func->setPosition(@2.copy_range());
-      $$ = func;
-   }
-
-newline_or_block:
-   eos { $$ = NULL; }
-   | block
-
-return_type_or_null:
-   /* EMPTY */
-   {
-      $$ = NULL;
-   }
-   | T_RARR id
-   {
-      $$ = $2;
-   }
-
-function_declaration:
-   // Ex: my_function_name() -> my_return_type
-   function_name T_OP T_CP return_type_or_null newline_or_block
-   {
-      $$ = $1;
-
-      // Return type
-      if ($4 != NULL) $$->setReturnTypeNode(mem::ast::node::cast<mem::ast::node::Id>($4));
-      else
-      {
-         mem::ast::node::FinalId* void_ty = new mem::ast::node::FinalId();
-         void_ty->setValue("void");
-         $$->setReturnTypeNode(void_ty);
-      }
-
-      // Body block
-      if ($5 != NULL) $$->setBodyNode(mem::ast::node::cast<mem::ast::node::Block>($5));
-
-      $$->setPosition(@$.copy_range());
-   }
+FunctionDeclaration:
    // Ex: my_function_name(my_variable :my_type) :my_return_type
-   | function_name T_OP argument_list T_CP return_type_or_null newline_or_block
+   simple_id T_OP ArgumentList_ T_CP ReturnType_ newline_or_block
    {
-      $$ = $1;
+      $$ = new mem::ast::node::Func();
+      $$->setNameNode($1);
+      $$->setValue($1->Value());
 
       // Argument list
-      $$->setParamsNode($3);
+      if ($3 != NULL)
+      {
+         $$->setParamsNode($3);
+      }
 
       // Return type
-      if ($5 != NULL) $$->setReturnTypeNode(mem::ast::node::cast<mem::ast::node::Id>($5));
+      if ($5 != NULL)
+      {
+         $$->setReturnTypeNode(mem::ast::node::cast<mem::ast::node::Id>($5));
+      }
       else
       {
          mem::ast::node::FinalId* void_ty = new mem::ast::node::FinalId();
@@ -458,23 +397,36 @@ function_declaration:
       }
 
       // Body block
-      if ($6 != NULL) $$->setBodyNode(mem::ast::node::cast<mem::ast::node::Block>($6));
+      if ($6 != NULL)
+      {
+         $$->setBodyNode(mem::ast::node::cast<mem::ast::node::Block>($6));
+      }
 
       $$->setPosition(@$.copy_range());
    }
 
 
-argument_list:
+ArgumentList:
    argument
    {
       $$ = new mem::ast::node::NodeList();
       $$->addChild($1);
       $$->setPosition(@1.copy_range());
    }
-   | argument_list T_COMMA argument
+   | ArgumentList T_COMMA argument
    {
       $$->addChild($3);
       $$->Position()->append(@3);
+   }
+
+ArgumentList_:
+   /* empty */
+   {
+      $$ = NULL;
+   }
+   | ArgumentList
+   {
+      $$ = $1;
    }
 
 argument:
@@ -486,6 +438,19 @@ argument:
       $$->setPosition(new fs::position::Range(@1, @3));
    }
 
+ReturnType_:
+   /* EMPTY */
+   {
+      $$ = NULL;
+   }
+   | T_RARR id
+   {
+      $$ = $2;
+   }
+
+newline_or_block:
+   eos { $$ = NULL; }
+   | block
 
 ///////////////////////////////////////////////////////////////////////////////
 // CONTROL FLOW
@@ -635,7 +600,7 @@ member_declaration :
 
       $$ = (ast::node::Node*)field;
    }
-   | function_declaration
+   | FunctionDeclaration
 
 
 simple_id :
@@ -1010,6 +975,7 @@ call :
    {
       mem::ast::node::Call* n = new mem::ast::node::Call();
       n->setCallerNode($1);
+
       $$ = n;
       $$->setPosition(new fs::position::Range(@1, @3));
    }

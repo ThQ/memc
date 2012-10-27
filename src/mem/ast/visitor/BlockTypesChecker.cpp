@@ -466,8 +466,10 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
    DEBUG_REQUIRE (call_node->CallerNode() != NULL);
 
    node::Node* base_object = call_node->CallerNode();
+   assert (base_object != NULL);
    visitExpr(scope, base_object);
 
+   DEBUG_PRINTF("base obj %s\n", base_object->KindNameCstr());
    if (call_node->hasParamsNode())
    {
       visitExprList(scope, call_node->ParamsNode());
@@ -779,6 +781,10 @@ BlockTypesChecker::visitSymbolName (st::Symbol* scope, node::Node* id_node)
       if (expr_ty != NULL)
       {
          id_node->setExprType(expr_ty);
+      }
+      else
+      {
+         id_node->setExprType(BugType());
       }
    }
    else
