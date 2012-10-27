@@ -781,12 +781,12 @@ qualified_id:
    }
 
 dot_expr:
-   T_OP expr T_CP T_DOT simple_id
+   expr T_DOT simple_id
    {
       mem::ast::node::Dot* n = new mem::ast::node::Dot();
       n->setPosition(@$.copy_range());
-      n->setLeftNode($2);
-      n->setRightNode($5);
+      n->setLeftNode($1);
+      n->setRightNode($3);
       $$ = n;
    }
 
@@ -1006,7 +1006,7 @@ expr_list :
 
 call :
    /* ex: my_func() */
-   simple_id T_OP T_CP
+   expr T_OP T_CP
    {
       mem::ast::node::Call* n = new mem::ast::node::Call();
       n->setCallerNode($1);
@@ -1014,7 +1014,7 @@ call :
       $$->setPosition(new fs::position::Range(@1, @3));
    }
    /* ex: my_func(1, 2, 3) */
-   | simple_id T_OP expr_list T_CP
+   | expr T_OP expr_list T_CP
    {
       mem::ast::node::Call* n = new mem::ast::node::Call();
       n->setCallerNode($1);
