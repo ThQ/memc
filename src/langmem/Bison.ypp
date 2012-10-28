@@ -240,10 +240,12 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <block_node>     newline_or_block
 %type <node>           return_statement
 %type <node>           ReturnType_
+%type <node_list>      SimpleIdList
 %type <final_id_node>  simple_id
 %type <node>           simple_statement
 %type <node>           statement
 %type <block_node>     statements
+%type <node_list>      TemplateArguments_
 %type <node>           TupleExpr
 %type <node>           tuple_type
 %type <id_node>        type_list
@@ -386,22 +388,22 @@ EnumField:
 
 FunctionDeclaration:
    // Ex: my_function_name(my_variable :my_type) :my_return_type
-   simple_id T_OP ArgumentList_ T_CP ReturnType_ newline_or_block
+   simple_id TemplateArguments_ T_OP ArgumentList_ T_CP ReturnType_ newline_or_block
    {
       $$ = new mem::ast::node::Func();
       $$->setNameNode($1);
       $$->setValue($1->Value());
 
       // Argument list
-      if ($3 != NULL)
+      if ($4 != NULL)
       {
-         $$->setParamsNode($3);
+         $$->setParamsNode($4);
       }
 
       // Return type
-      if ($5 != NULL)
+      if ($6 != NULL)
       {
-         $$->setReturnTypeNode(mem::ast::node::cast<mem::ast::node::Id>($5));
+         $$->setReturnTypeNode(mem::ast::node::cast<mem::ast::node::Id>($6));
       }
       else
       {
@@ -413,7 +415,7 @@ FunctionDeclaration:
       // Body block
       if ($6 != NULL)
       {
-         $$->setBodyNode(mem::ast::node::cast<mem::ast::node::Block>($6));
+         $$->setBodyNode(mem::ast::node::cast<mem::ast::node::Block>($7));
       }
 
       $$->setPosition(@$.copy_range());
@@ -460,6 +462,27 @@ ReturnType_:
    | T_RARR id
    {
       $$ = $2;
+   }
+
+TemplateArguments_:
+   /* empty */
+   {
+      $$ = NULL;
+   }
+   | T_LBRACKET SimpleIdList T_RBRACKET
+   {
+      $$ = new mem::ast::node::NodeList();
+   }
+
+SimpleIdList:
+   simple_id
+   {
+      $$ = new mem::ast::node::NodeList();
+      $$->addChild($1);
+   }
+   | SimpleIdList T_COMMA simple_id
+   {
+      $1->addChild($3);
    }
 
 newline_or_block:
