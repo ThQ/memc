@@ -539,14 +539,14 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 
    visitExpr(scope, left_node);
    // Left node is a variable container an object
-   if (left_node->hasExprType())
-   {
+   //if (left_node->hasExprType())
+   //{
       visitSymbolName(left_node->ExprType(), node::cast<node::Text>(right_node));
-   }
-   else
-   {
-      visitSymbolName(left_node->BoundSymbol(), node::cast<node::Text>(right_node));
-   }
+   //}
+   //else
+   //{
+      //visitSymbolName(left_node->BoundSymbol(), node::cast<node::Text>(right_node));
+   //}
 
    assert(node::isa<node::Id>(right_node));
 
@@ -562,7 +562,7 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
             expr_ty = dot_node->BoundSymbol();
          }
 
-         right_node->setBoundSymbol(dot_node->BoundSymbol());
+         //right_node->setBoundSymbol(dot_node->BoundSymbol());
          right_node->setExprType(st::util::getExprType(dot_node->BoundSymbol()));
 
          // If we are not accessing a class member, we can just flatten the dot
@@ -607,18 +607,23 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
 void
 BlockTypesChecker::visitExprList (st::Symbol* scope, node::Node* node)
 {
-   if (scope != NULL) return;
-   if (node != NULL) return;
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (node != NULL);
 
-   node::Node* subnode = NULL;
+   std::vector<st::Type*> types;
+   node::Node* nodeChild = NULL;
    for (size_t i = 0; i < node->ChildCount(); ++i)
    {
-      subnode = node->getChild(i);
-      if (subnode != NULL)
+      nodeChild = node->getChild(i);
+      if (nodeChild != NULL)
       {
-         visitExpr(scope, subnode);
+         visitExpr(scope, nodeChild);
+         types.push_back(nodeChild->ExprType());
       }
    }
+
+   st::TupleType* typeExprList = st::util::getTupleType(scope, types);
+   node->setExprType(typeExprList);
 }
 
 void
@@ -701,6 +706,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
          visitFor(scope, node::cast<node::For>(node));
          break;
 
+      case node::MetaKind::NODE_LIST:
       case node::MetaKind::EXPRESSION_LIST:
          visitExprList(scope, node);
          break;

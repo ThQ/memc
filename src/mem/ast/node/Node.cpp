@@ -100,6 +100,36 @@ Node::replaceChild (Node* search, Node* replace)
    return true;
 }
 
+//-----------------------------------------------------------------------------
+// PROTECTED FUNCTIONS
+//-----------------------------------------------------------------------------
+
+bool
+Node::_checkCircularDependencies ()
+{
+   DEBUG_REQUIRE (KindName() != "");
+   Node* nodeParent = Parent();
+   while (nodeParent != NULL)
+   {
+      if (nodeParent == this)
+      {
+         return false;
+      }
+      nodeParent = nodeParent->Parent();
+   }
+
+   Node* nodeChild = NULL;
+   for (size_t i = 0; i < ChildCount(); ++i)
+   {
+      nodeChild = getChild(i);
+      if (nodeChild != NULL)
+      {
+         nodeChild->_checkCircularDependencies();
+      }
+   }
+   return true;
+}
+
 void
 assertKind (Node* n, int k)
 {

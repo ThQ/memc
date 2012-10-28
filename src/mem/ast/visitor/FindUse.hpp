@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "mem/ast/node/File.hpp"
 #include "mem/ast/node/Text.hpp"
 #include "mem/ast/node/Use.hpp"
 #include "mem/ast/visitor/Visitor.hpp"
@@ -49,6 +50,9 @@ class FindUse : public Visitor
    // Visitor entry point.
    virtual bool
    visit (node::Node* node);
+
+   void
+   visitFile (node::File* nodeFile);
 };
 
 

@@ -67,6 +67,7 @@ class Visitor
    virtual bool
    tearDown() {return true;};
 
+   // Return: true if we should visit child nodes
    virtual bool
    visit (node::Node* node);
 

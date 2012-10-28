@@ -2,6 +2,7 @@
 #define _MEM__AST__NODE__NODE__HPP
 
 
+#include <sstream>
 #include <stdio.h>
 #include <vector>
 #include "mem/ss.hpp"
@@ -68,11 +69,20 @@ class Node
 
    // Parent
    GETTER(Parent, Node*) {return _parent;}
-   SETTER(Parent, Node*) {_parent = val;}
+   SETTER(Parent, Node*) {_parent = val; assert(_checkCircularDependencies());}
 
    // Position
    GETTER(Position, fs::position::Range*) {return _position;}
    SETTER(Position, fs::position::Range*) {_position = val;}
+
+   GETTER(StringRep, std::string)
+   {
+      std::ostringstream str;
+      str << "[@" << static_cast<const void*>(this);
+      str << ", " << KindName();
+      str << "]";
+      return str.str();
+   }
 
    // Value
    GETTER(Value, std::string) {return _value;}
@@ -145,6 +155,15 @@ class Node
 
    virtual void
    setChild (size_t i, Node* n) {}
+
+
+   //--------------------------------------------------------------------------
+   // PROTECTED FUNCTIONS
+   //--------------------------------------------------------------------------
+   protected:
+
+   bool
+   _checkCircularDependencies ();
 
 
    //--------------------------------------------------------------------------

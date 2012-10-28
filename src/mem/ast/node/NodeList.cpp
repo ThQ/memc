@@ -30,8 +30,13 @@ NodeList::addChild (Node* n)
 {
    if (n != NULL)
    {
+      DEBUG_REQUIRE (n != this);
+      DEBUG_REQUIRE (n != this->Parent());
+
       _children.push_back(n);
       n->setParent(this);
+
+      assert(_checkCircularDependencies());
    }
 }
 

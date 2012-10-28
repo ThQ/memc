@@ -244,6 +244,7 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <node>           simple_statement
 %type <node>           statement
 %type <block_node>     statements
+%type <node>           TupleExpr
 %type <node>           tuple_type
 %type <id_node>        type_list
 %type <text_node>      use
@@ -781,23 +782,7 @@ expr:
    {
       $$ = (ast::node::Node*)$1;
    }
-   // ex: (1 + 2 + 3)
-   | T_OP expr T_CP
-   {
-      mem::ast::node::NodeList* n = new mem::ast::node::NodeList();
-      n->addChild($2);
-
-      $$ = n;
-   }
    // ex: (1 + 2, true)
-   | T_OP expr_list T_CP
-   {
-      mem::ast::node::Tuple* n = new mem::ast::node::Tuple();
-      n->eat($2);
-      $$ = n;
-
-      delete $2;
-   }
    | qualified_id
    {
       $$ = ast::node::cast<ast::node::Node>($1);
@@ -845,6 +830,25 @@ expr:
       n->setValueNode($1);
       n->setIndexNode($3);
       $$ = n;
+   }
+   | TupleExpr
+
+TupleExpr:
+   T_OP expr_list T_CP
+   {
+      if ($2->ChildCount() == 1)
+      {
+         $$ = $2->getChild(0);
+         $$->setParent(NULL);
+         //delete $2;
+      }
+      else
+      {
+         mem::ast::node::Tuple* nodeTuple = new mem::ast::node::Tuple();
+         nodeTuple->addChild($2);
+         nodeTuple->setPosition(@$.copy_range());
+         $$ = nodeTuple;
+      }
    }
 
 bool_operator:
@@ -970,14 +974,9 @@ expr_list :
       $$ = new mem::ast::node::NodeList();
       $$->addChild($1);
       $$->setPosition(@$.copy_range());
-
    }
    | expr_list T_COMMA expr
    {
-      if ($$ == 0)
-      {
-         $$ = new mem::ast::node::NodeList();
-      }
       $$->addChild($3);
       $$->Position()->append(@3);
    }
@@ -988,6 +987,7 @@ call :
    {
       mem::ast::node::Call* n = new mem::ast::node::Call();
       n->setCallerNode($1);
+      n->setParamsNode(new mem::ast::node::NodeList());
 
       $$ = n;
       $$->setPosition(new fs::position::Range(@1, @3));

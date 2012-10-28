@@ -1,0 +1,13 @@
+### file
+
+class A
+{
+	field :int;
+}
+
+main ()
+{
+	var i = (new A);
+}
+
+

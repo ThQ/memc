@@ -14,13 +14,24 @@ FindUse::visit (node::Node* node)
 {
    assert (node != NULL);
 
-   if (node::isa<node::Use>(node))
+   if (node::isa<node::File>(node))
    {
-      node::Text* text_node = node::cast<node::Text>(node);
-      _uses.push_back(text_node->Value());
+      visitFile (node::cast<node::File>(node));
    }
-   return true;
+   return false;
 }
 
+void
+FindUse::visitFile (node::File* nodeFile)
+{
+   for (size_t i = 0; i < nodeFile->ChildCount(); ++i)
+   {
+      if (node::isa<node::Use>(nodeFile->getChild(i)))
+      {
+         node::Text* nodeText = node::cast<node::Text>(nodeFile);
+         _uses.push_back(nodeText->Value());
+      }
+   }
+}
 
 } } }

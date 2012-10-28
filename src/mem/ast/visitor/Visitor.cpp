@@ -16,11 +16,21 @@ Visitor::visit (node::Node* node)
 void
 Visitor::visit_preorder (node::Node* node)
 {
-   if (node != NULL && visit(node))
+
+   if (node != NULL)
    {
-      for (size_t i = 0; i < node->ChildCount(); ++i)
+#if 0
+      DEBUG_PRINTF("visit node [@%p, %s], parent[@%p, %s]\n",
+         node, node->KindNameCstr(),
+         node->Parent(), node->Parent() != NULL ? node->Parent()->KindNameCstr() : "");
+#endif
+
+      if(visit(node))
       {
-         visit_preorder(node->getChild(i));
+         for (size_t i = 0; i < node->ChildCount(); ++i)
+         {
+            visit_preorder(node->getChild(i));
+         }
       }
    }
 }

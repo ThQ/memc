@@ -23,6 +23,11 @@ CoherenceChecker::visit (node::Node* node)
 
       if (child_n != NULL && child_n->Parent() != node)
       {
+         DEBUG_PRINTF("node.parent %s, node %s, child.parent %s, child%s\n",
+            node->Parent()->StringRep().c_str(),
+            node->StringRep().c_str(),
+            child_n->Parent()->StringRep().c_str(),
+            child_n->StringRep().c_str());
          errors.push_back("Node parent declared differently between parent and child");
       }
    }
@@ -36,9 +41,7 @@ CoherenceChecker::visit (node::Node* node)
    if (desc.size() != 0)
    {
       log::Message* err = new log::FatalError();
-      err->formatMessage("Invalid node (Kind {ID:%d, NAME:%s})",
-         node->Kind(),
-         node::Node::get_type_name(node->Kind()));
+      err->formatMessage("Invalid node %s", node->StringRep().c_str());
       err->setSecondaryText(desc);
       log(err);
    }
