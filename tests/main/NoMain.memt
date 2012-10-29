@@ -1,0 +1,9 @@
+### options
+must-not-compile
+
+### log
+F:entry-point-not-found
+F:build-failed
+
+### file
+fn () {}
