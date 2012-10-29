@@ -77,6 +77,9 @@ class XmlDumper : public Dumper
    visitCompOp (node::BinaryOp* n);
 
    void
+   visitDerefOperator (node::Node* n);
+
+   void
    visitDot (node::Dot* n);
 
    void

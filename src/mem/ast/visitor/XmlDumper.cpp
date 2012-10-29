@@ -73,6 +73,9 @@ XmlDumper::visit (node::Node* node)
          case node::MetaKind::CLASS:
             visitClass(node::cast<node::Class>(node)); break;
 
+         case node::MetaKind::DEREF:
+            visitDerefOperator (node); break;
+
          case node::MetaKind::DOT:
             visitDot(node::cast<node::Dot>(node)); break;
 
@@ -268,6 +271,19 @@ XmlDumper::visitCompOp (node::BinaryOp* n)
    visit(n->RightNode());
 
    *_out << "</op-" << op_name << ">\n";
+}
+
+void
+XmlDumper::visitDerefOperator (node::Node* n)
+{
+   *_out << "<op-deref";
+   dumpExprType(n);
+   dumpPosition(n);
+   *_out << ">";
+
+   visit(n->getChild(0));
+
+   *_out << "</op-deref>\n";
 }
 
 void
