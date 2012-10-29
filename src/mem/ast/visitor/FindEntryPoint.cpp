@@ -31,8 +31,17 @@ FindEntryPoint::visit (node::Node* node)
       st::Func* func = st::cast<st::Func>(node->BoundSymbol());
       if (func->Name() == "main")
       {
-         _entry_point = func;
-         func->setIsEntryPoint(true);
+         if (_entry_point == NULL)
+         {
+            _entry_point = func;
+            func->setIsEntryPoint(true);
+         }
+         else
+         {
+            mem::log::MultipleMainDefinitions* err = new mem::log::MultipleMainDefinitions();
+            err->setPosition(node->copyPosition());
+            log(err);
+         }
       }
    }
    return true;

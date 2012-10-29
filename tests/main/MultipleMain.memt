@@ -1,6 +1,10 @@
 ### options
 must-not-compile
 
+### log
+E:multiple-main-definitions
+F:build-failed
+
 ### file
 main (argc :int) -> int {}
 

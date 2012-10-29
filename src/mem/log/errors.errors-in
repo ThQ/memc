@@ -44,6 +44,11 @@
 		"message": "Entry point not found",
 		"description": "Declare a main function (anywhere) :%NEWLINE   main () -> int"
 	},
+   "MultipleMainDefinitions":
+   {
+      "type": "Error",
+      "message": "Multiple definitions of main found"
+   },
 	"TypeExpected":
 	{
 		"type": "Error",
