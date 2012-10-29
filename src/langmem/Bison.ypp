@@ -219,7 +219,7 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <binary_op_node> math_operator
 %type <block_node>     block
 %type <node>           call
-%type <node>           class_declaration
+%type <node>           Class
 %type <node_list>      ClassMembers_
 %type <node>           compound_statement
 %type <node>           dot_expr
@@ -264,7 +264,7 @@ input :
    {
       ast->addChild($2);
    }
-   | input class_declaration
+   | input Class
    {
       ast->addChild($2);
    }
@@ -308,7 +308,7 @@ eos : T_SEMICOLON
 // CLASS DECLARATION
 //=============================================================================
 
-class_declaration:
+Class:
    T_CLASS simple_id ClassParent_ T_OPEN_BRACE ClassMembers_ T_CLOSE_BRACE
    {
       mem::ast::node::Class* cls = new mem::ast::node::Class();
@@ -340,6 +340,32 @@ ClassMembers_:
    {
       $$ = $1;
    }
+
+
+members_declarations :
+   member_declaration
+   {
+      $$ = new mem::ast::node::NodeList();
+      $$->addChild($1);
+   }
+   | members_declarations member_declaration
+   {
+      assert ($1 != NULL);
+      $$->addChild($2);
+   }
+
+member_declaration :
+   // Ex: my_variable :my_type
+   simple_id T_COLON id eos
+   {
+      mem::ast::node::Field* field = new mem::ast::node::Field();
+      field->setPosition(@$.copy_range());
+      field->setNameNode($1);
+      field->setTypeNode($3);
+
+      $$ = (ast::node::Node*)field;
+   }
+   | FunctionDeclaration
 
 
 //=============================================================================
@@ -388,7 +414,7 @@ EnumField:
 
 FunctionDeclaration:
    // Ex: my_function_name(my_variable :my_type) :my_return_type
-   simple_id TemplateArguments_ T_OP ArgumentList_ T_CP ReturnType_ newline_or_block
+   simple_id TemplateArguments_ T_OP ArgumentList_ T_CP ReturnType_ block
    {
       $$ = new mem::ast::node::Func();
       $$->setNameNode($1);
@@ -413,8 +439,9 @@ FunctionDeclaration:
       }
 
       // Body block
-      if ($6 != NULL)
+      if ($7 != NULL)
       {
+         DEBUG_PRINTF("Function %s: set block\n", $1->ValueCstr());
          $$->setBodyNode(mem::ast::node::cast<mem::ast::node::Block>($7));
       }
 
@@ -564,6 +591,25 @@ block :
       $$ = mem::ast::node::cast<mem::ast::node::Block>($2);
    }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// STATEMENTS
+///////////////////////////////////////////////////////////////////////////////
+
+statement:
+   expr eos
+   {
+      $$ = $1;
+   }
+   | simple_statement eos
+   {
+      $$ = $1;
+   }
+   | compound_statement
+   {
+      $$ = $1;
+   }
+
 statements :
    /* Empty */
    {
@@ -581,29 +627,15 @@ statements :
       $$->addChild($2);
    }
 
-statement:
-   expr eos
-   {
-      $$ = $1;
-   }
-   | simple_statement eos
-   {
-      $$ = $1;
-   }
-   | compound_statement
-   {
-      $$ = $1;
-   }
-
 compound_statement:
      if
    | while
    | for_statement
 
 simple_statement:
-     variable_declaration{ $$ = $1;}
-   | variable_assignment { $$ = $1;}
-   | return_statement { $$ = $1; }
+     variable_declaration
+   | variable_assignment
+   | return_statement
 
 return_statement:
    T_RETURN expr
@@ -613,32 +645,55 @@ return_statement:
       $$ = n;
    }
 
-
-members_declarations :
-   member_declaration
+variable_assignment :
+   expr assignment_operator expr
    {
-      $$ = new mem::ast::node::NodeList();
-      $$->addChild($1);
-   }
-   | members_declarations member_declaration
-   {
-      assert ($1 != NULL);
-      $$->addChild($2);
+      mem::ast::node::VarAssign* n = new mem::ast::node::VarAssign();
+      n->setPosition(@$.copy_range());
+      n->setNameNode($1);
+      n->setValueNode($3);
+      $$ = (ast::node::Node*)n;
    }
 
-member_declaration :
+variable_declaration :
    // Ex: my_variable :my_type
-   simple_id T_COLON id eos
+   T_VAR simple_id T_COLON id
    {
-      mem::ast::node::Field* field = new mem::ast::node::Field();
-      field->setPosition(@$.copy_range());
-      field->setNameNode($1);
-      field->setTypeNode($3);
-
-      $$ = (ast::node::Node*)field;
+      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
+      n->setNameNode($2);
+      n->setTypeNode($4);
+      n->setPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
    }
-   | FunctionDeclaration
+   // Ex: my_variable = my_function()
+   | T_VAR simple_id T_EQ expr
+   {
+      mem::ast::node::Node* ty_place_holder = new mem::ast::node::Node();
+      ty_place_holder->setKind(ast::node::MetaKind::PLACE_HOLDER);
+      ty_place_holder->setPosition(@4.copy_range());
 
+      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
+      n->setNameNode($2);
+      n->setTypeNode(ty_place_holder);
+      n->setValueNode($4);
+      n->setPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+   }
+   // Ex: my_variable :my_type = my_function()
+   | T_VAR simple_id T_COLON id T_EQ expr
+   {
+      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
+      n->setNameNode($2);
+      n->setTypeNode($4);
+      n->setValueNode($6);
+      n->setPosition(@$.copy_range());
+      $$ = (ast::node::Node*)n;
+   }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// ????
+///////////////////////////////////////////////////////////////////////////////
 
 simple_id :
    T_ID
@@ -709,51 +764,6 @@ tuple_type:
 
 assignment_operator:
    T_EQ | T_PLUS_EQ | T_MINUS_EQ | T_SLASH_EQ | T_STAR_EQ
-
-variable_assignment :
-   expr assignment_operator expr
-   {
-      mem::ast::node::VarAssign* n = new mem::ast::node::VarAssign();
-      n->setPosition(@$.copy_range());
-      n->setNameNode($1);
-      n->setValueNode($3);
-      $$ = (ast::node::Node*)n;
-   }
-
-variable_declaration :
-   // Ex: my_variable :my_type
-   T_VAR simple_id T_COLON id
-   {
-      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
-      n->setNameNode($2);
-      n->setTypeNode($4);
-      n->setPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-   }
-   // Ex: my_variable = my_function()
-   | T_VAR simple_id T_EQ expr
-   {
-      mem::ast::node::Node* ty_place_holder = new mem::ast::node::Node();
-      ty_place_holder->setKind(ast::node::MetaKind::PLACE_HOLDER);
-      ty_place_holder->setPosition(@4.copy_range());
-
-      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
-      n->setNameNode($2);
-      n->setTypeNode(ty_place_holder);
-      n->setValueNode($4);
-      n->setPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-   }
-   // Ex: my_variable :my_type = my_function()
-   | T_VAR simple_id T_COLON id T_EQ expr
-   {
-      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
-      n->setNameNode($2);
-      n->setTypeNode($4);
-      n->setValueNode($6);
-      n->setPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
-   }
 
 /* RECURSIVE */
 qualified_id:
@@ -826,6 +836,7 @@ expr:
       mem::ast::node::UnaryOp* n = new mem::ast::node::UnaryOp();
       n->setKind(ast::node::MetaKind::DEREF);
       n->setValueNode($2);
+      n->setPosition(@$.copy_range());
       $$ = n;
    }
    // ex: new int

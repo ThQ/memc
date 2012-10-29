@@ -248,6 +248,11 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    func_sym->setType(func_ty);
    func_ty->setFunctorType(functor_ty);
 
+   DEBUG_PRINTF("Found function `%s %s' in `%s'\n",
+      func_sym->gQualifiedName().c_str(),
+      func_ty->Name().c_str(),
+      scope->gQualifiedName().c_str());
+
    // ----------------
    //  Ctor specifics
    // ----------------

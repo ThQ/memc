@@ -414,21 +414,22 @@ BlockTypesChecker::visitDeref (st::Symbol* scope, node::Node* n)
    DEBUG_REQUIRE (n->getChild(0) != NULL);
 
    visitExpr(scope, n->getChild(0));
-   node::Node* value_node = n->getChild(0);
-   st::Type* value_ty = value_node != NULL ? value_node->ExprType() : NULL;
+   node::Node* nodeValue = n->getChild(0);
+   st::Type* symValueType = nodeValue != NULL ? nodeValue->ExprType() : NULL;
 
-   if (value_ty != NULL)
+   if (symValueType != NULL)
    {
-      if (st::isa<st::PointerType>(value_ty))
+      if (st::isa<st::PointerType>(symValueType))
       {
-         n->setExprType(st::cast<st::PointerType>(value_ty)->PointedType());
+         n->setExprType(st::cast<st::PointerType>(symValueType)->PointedType());
       }
       else
       {
          n->setExprType(BugType());
 
          log::DerefNonPointer* err = new log::DerefNonPointer();
-         err->setTypeName(value_ty->Name());
+         err->setTypeName(symValueType->Name());
+         err->setPosition(nodeValue->copyPosition());
          err->format();
          log(err);
       }

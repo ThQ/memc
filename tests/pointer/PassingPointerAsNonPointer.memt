@@ -2,7 +2,7 @@
 must-not-compile
 
 ### log
-E:expected-type
+E:cannot-assign
 F:build-failed
 
 ### file

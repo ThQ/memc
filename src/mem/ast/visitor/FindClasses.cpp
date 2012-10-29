@@ -38,6 +38,8 @@ FindClasses::visitClassDecl (node::Class* cls_node)
    cls_node->setBoundSymbol(cls);
 
    st::util::registerType(_symbols, file_sym, cls);
+
+   DEBUG_PRINTF("Found class `%s'\n", cls->Name().c_str());
 }
 
 } } }
