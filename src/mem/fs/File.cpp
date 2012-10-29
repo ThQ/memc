@@ -28,8 +28,11 @@ File::dump ()
 std::string
 File::getLine (size_t i) const
 {
-   assert(i < _lines.size() && "Line out of file");
-   std::string line = *_lines[i];
+   std::string line = "";
+   if (i > 0 && i < _lines.size())
+   {
+      line = *_lines[i];
+   }
    return line;
 }
 
