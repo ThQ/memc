@@ -1,0 +1,12 @@
+### file
+
+fn (t :(int, char, int)) -> int
+{
+   return 1;
+}
+
+main ()
+{
+   var t :(int, char, int);
+   fn (t);
+}

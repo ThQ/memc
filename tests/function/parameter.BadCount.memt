@@ -1,0 +1,17 @@
+### options
+must-not-compile
+
+### log
+E:bad-parameter-count
+F:build-failed
+
+### file
+someFunc (i :int, j :int) -> int
+{
+   return i;
+}
+
+main ()
+{
+   var i :int = someFunc(1, 2, 3);
+}

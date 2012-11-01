@@ -1,0 +1,12 @@
+### file
+
+fn (ip :int*) -> int
+{
+   return 1;
+}
+
+main ()
+{
+   var ip :int*;
+   fn (ip);
+}

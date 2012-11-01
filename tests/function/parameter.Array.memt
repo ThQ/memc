@@ -1,0 +1,12 @@
+### file
+
+fn (a :[int, 5]) -> int
+{
+   return 1;
+}
+
+main ()
+{
+   var arr :[int, 5];
+   fn (arr);
+}
