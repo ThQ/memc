@@ -4,25 +4,25 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 While::While ()
 {
-   _block_node = NULL;
-   _condition_node = NULL;
+   _nodeBlock = NULL;
+   _nodeCondition = NULL;
    _type = While::kTYPE;
 }
 
 While::~While ()
 {
-   delete _block_node;
-   delete _condition_node;
+   delete _nodeBlock;
+   delete _nodeCondition;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -31,9 +31,10 @@ While::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _condition_node;
-      case 1: return _block_node;
+      case 0: return _nodeCondition;
+      case 1: return _nodeBlock;
    }
+   assert(false);
    return NULL;
 }
 
@@ -60,6 +61,7 @@ While::setChild (size_t i, Node* n)
       case 0: setConditionNode(n); break;
       case 1: setBlockNode(node::cast<Block>(n)); break;
    }
+   assert(false);
 }
 
 

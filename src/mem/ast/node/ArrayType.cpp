@@ -4,25 +4,25 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 ArrayType::ArrayType ()
 {
-   _length_node = NULL;
+   _nodeLength = NULL;
+   _nodeType = NULL;
    _type = ArrayType::kTYPE;
-   _type_node = NULL;
 }
 
 ArrayType::~ArrayType ()
 {
-   delete _length_node;
-   delete _type_node;
+   delete _nodeLength;
+   delete _nodeType;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -31,8 +31,8 @@ ArrayType::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _length_node;
-      case 1: return _type_node;
+      case 0: return _nodeLength;
+      case 1: return _nodeType;
    }
    return NULL;
 }
@@ -42,8 +42,8 @@ ArrayType::setChild (size_t i, Node* n)
 {
    switch (i)
    {
-      case 0: _length_node = n;
-      case 1: _type_node = n;
+      case 0: setLengthNode(n);
+      case 1: setTypeNode(n);
    }
 }
 

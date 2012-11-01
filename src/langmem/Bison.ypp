@@ -443,7 +443,7 @@ ArgumentList:
 ArgumentList_:
    /* empty */
    {
-      $$ = NULL;
+      $$ = new mem::ast::node::NodeList();
    }
    | ArgumentList
    {

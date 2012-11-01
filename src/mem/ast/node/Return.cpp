@@ -4,23 +4,23 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 Return::Return ()
 {
+   _nodeValue = NULL;
    _type = Return::kTYPE;
-   _value_node = NULL;
 }
 
 Return::~Return ()
 {
-   delete _value_node;
+   delete _nodeValue;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -29,8 +29,9 @@ Return::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _value_node;
+      case 0: return _nodeValue;
    }
+   assert(false);
    return NULL;
 }
 
@@ -48,6 +49,7 @@ Return::setChild (size_t i, Node* n)
    {
       case 0: setValueNode(n); break;
    }
+   assert(false);
 }
 
 

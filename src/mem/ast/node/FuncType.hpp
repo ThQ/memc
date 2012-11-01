@@ -15,7 +15,7 @@ class FuncType: public Id
    public:
    static const int kTYPE = MetaKind::FUNCTION_TYPE;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -28,7 +28,7 @@ class FuncType: public Id
    ~FuncType ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -37,18 +37,18 @@ class FuncType: public Id
    GETTER(ChildCount, size_t) {return 2;}
 
    // ParamsNode
-   GETTER(ParamsNode, Node*) {return _params_node;}
+   GETTER(ParamsNode, Node*) {return _nodeParams;}
    SETTER(ParamsNode, Node*)
    {
-      _params_node = val;
+      _nodeParams = val;
       if (val != NULL) val->setParent(this);
    }
 
    // ReturnTypeNode
-   GETTER(ReturnTypeNode, Node*) {return _return_type_node;}
+   GETTER(ReturnTypeNode, Node*) {return _nodeReturnType;}
    SETTER(ReturnTypeNode, Node*)
    {
-      _return_type_node = val;
+      _nodeReturnType = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -56,7 +56,7 @@ class FuncType: public Id
    GETTER(MemorySize, int) {return sizeof(FuncType);}
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -68,13 +68,13 @@ class FuncType: public Id
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   Node* _params_node;
-   Node* _return_type_node;
+   Node* _nodeParams;
+   Node* _nodeReturnType;
 };
 
 

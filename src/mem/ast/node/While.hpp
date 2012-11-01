@@ -14,7 +14,7 @@ class While : public Node
    public:
    static const int kTYPE = MetaKind::WHILE;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -27,7 +27,7 @@ class While : public Node
    ~While ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -37,18 +37,18 @@ class While : public Node
    GETTER (ChildCount, size_t) {return 2;}
 
    // ConditionNode
-   GETTER (ConditionNode, Node*) {return _condition_node;}
+   GETTER (ConditionNode, Node*) {return _nodeCondition;}
    SETTER (ConditionNode, Node*)
    {
-      _condition_node = val;
+      _nodeCondition = val;
       if (val != NULL) val->setParent(this);
    }
 
    // BodyNode
-   GETTER (BlockNode, Block*) {return _block_node;}
+   GETTER (BlockNode, Block*) {return _nodeBlock;}
    SETTER (BlockNode, Block*)
    {
-      _block_node = val;
+      _nodeBlock = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -56,8 +56,8 @@ class While : public Node
    GETTER (MemorySize, int) {return sizeof(While);}
 
 
-   //--------------------------------------------------------------------------
-   // PUBLIC METHODS
+   //==========================================================================
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -71,13 +71,13 @@ class While : public Node
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   Node* _condition_node;
-   Block* _block_node;
+   Node* _nodeCondition;
+   Block* _nodeBlock;
 };
 
 

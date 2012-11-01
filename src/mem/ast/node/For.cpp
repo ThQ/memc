@@ -4,29 +4,29 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 For::For ()
 {
-   _block_node = NULL;
-   _condition_node = NULL;
-   _initialization_node = NULL;
-   _iteration_node = NULL;
+   _nodeBlock = NULL;
+   _nodeCondition = NULL;
+   _nodeInitialization = NULL;
+   _nodeIteration = NULL;
    _type = For::kTYPE;
 }
 
 For::~For ()
 {
-   delete _block_node;
-   delete _condition_node;
-   delete _initialization_node;
-   delete _iteration_node;
+   delete _nodeBlock;
+   delete _nodeCondition;
+   delete _nodeInitialization;
+   delete _nodeIteration;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -35,10 +35,10 @@ For::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _initialization_node;
-      case 1: return _condition_node;
-      case 2: return _iteration_node;
-      case 4: return _block_node;
+      case 0: return _nodeInitialization;
+      case 1: return _nodeCondition;
+      case 2: return _nodeIteration;
+      case 4: return _nodeBlock;
    }
    return NULL;
 }

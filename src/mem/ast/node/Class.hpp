@@ -15,7 +15,7 @@ class Class : public Type
    public:
    static const int kTYPE = MetaKind::CLASS;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -28,7 +28,7 @@ class Class : public Type
    ~Class ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -36,24 +36,24 @@ class Class : public Type
    virtual
    GETTER(ChildCount, size_t) {return 3;}
 
-   GETTER(MembersNode, NodeList*) {return _members_node;}
+   GETTER(MembersNode, NodeList*) {return _nodeMembers;}
    SETTER(MembersNode, NodeList*)
    {
-      _members_node = val;
+      _nodeMembers = val;
       if (val != NULL) val->setParent(this);
    }
 
-   GETTER(NameNode, Node*) {return _name_node;}
+   GETTER(NameNode, Node*) {return _nodeName;}
    SETTER(NameNode, Node*)
    {
-      _name_node = val;
+      _nodeName = val;
       if (val != NULL) val->setParent(this);
    }
 
-   GETTER(ParentTypeNode, Node*) {return _parent_type_node;}
+   GETTER(ParentTypeNode, Node*) {return _nodeParentType;}
    SETTER(ParentTypeNode, Node*)
    {
-      _parent_type_node = val;
+      _nodeParentType = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -61,7 +61,7 @@ class Class : public Type
    GETTER(MemorySize, int) {return sizeof(Node);}
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -73,14 +73,14 @@ class Class : public Type
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    public:
 
-   Node* _name_node;
-   Node* _parent_type_node;
-   NodeList* _members_node;
+   Node* _nodeName;
+   Node* _nodeParentType;
+   NodeList* _nodeMembers;
 };
 
 

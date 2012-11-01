@@ -18,7 +18,7 @@ class Func: public Text
    public:
    static const int kTYPE = MetaKind::FUNCTION;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -31,7 +31,7 @@ class Func: public Text
    ~Func ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -40,41 +40,41 @@ class Func: public Text
    GETTER(ChildCount, size_t) {return 5;}
 
    // BodyNode
-   GETTER(BodyNode, Block*) {return _body_node;}
+   GETTER(BodyNode, Block*) {return _nodeBody;}
    SETTER(BodyNode, Block*) {
-      _body_node = val;
+      _nodeBody = val;
       if (val != NULL) val->setParent(this);
    }
 
    // DecoratorNode
-   GETTER(DecoratorNode, Decorator*) {return _decorator_node;}
+   GETTER(DecoratorNode, Decorator*) {return _nodeDecorator;}
    SETTER(DecoratorNode, Decorator*)
    {
-      _decorator_node = val;
+      _nodeDecorator = val;
       if (val != NULL) val->setParent(this);
    }
 
    // NameNode
-   GETTER(NameNode, Id*) {return _name_node;}
+   GETTER(NameNode, Id*) {return _nodeName;}
    SETTER(NameNode, Id*)
    {
-      _name_node = val;
+      _nodeName = val;
       if (val != NULL) val->setParent(this);
    }
 
    // ParamsNode
-   GETTER(ParamsNode, Node*) {return _params_node;}
+   GETTER(ParamsNode, Node*) {return _nodeParams;}
    SETTER(ParamsNode, Node*)
    {
-      _params_node = val;
+      _nodeParams = val;
       if (val != NULL) val->setParent(this);
    }
 
    // ReturnTypeNode
-   GETTER(ReturnTypeNode, Node*) {return _return_type_node;}
+   GETTER(ReturnTypeNode, Node*) {return _nodeReturnType;}
    SETTER(ReturnTypeNode, Node*)
    {
-      _return_type_node = val;
+      _nodeReturnType = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -86,7 +86,7 @@ class Func: public Text
    GETTER(MemorySize, int) {return sizeof(Func);}
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -97,6 +97,9 @@ class Func: public Text
    virtual Node*
    getChild (size_t i) const;
 
+   virtual void
+   isValid (NodeValidator* v);
+
    bool
    isVirtual ();
 
@@ -104,17 +107,17 @@ class Func: public Text
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   Id* _name_node;
    Func* _next_function;
-   Block* _body_node;
-   Decorator* _decorator_node;
-   Node* _params_node;
-   Node* _return_type_node;
+   Id* _nodeName;
+   Block* _nodeBody;
+   Decorator* _nodeDecorator;
+   Node* _nodeParams;
+   Node* _nodeReturnType;
 };
 
 

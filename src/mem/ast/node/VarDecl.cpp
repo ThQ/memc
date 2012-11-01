@@ -4,27 +4,27 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 VarDecl::VarDecl ()
 {
-   _name_node = NULL;
+   _nodeName = NULL;
+   _nodeType = NULL;
+   _nodeValue = NULL;
    _type = VarDecl::kTYPE;
-   _type_node = NULL;
-   _value_node = NULL;
 }
 
 VarDecl::~VarDecl ()
 {
-   delete _name_node;
-   delete _type_node;
-   delete _value_node;
+   delete _nodeName;
+   delete _nodeType;
+   delete _nodeValue;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -33,10 +33,11 @@ VarDecl::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _name_node;
-      case 1: return _type_node;
-      case 2: return _value_node;
+      case 0: return _nodeName;
+      case 1: return _nodeType;
+      case 2: return _nodeValue;
    }
+   assert(false);
    return NULL;
 }
 
@@ -73,6 +74,7 @@ VarDecl::setChild (size_t i, Node* n)
       case 1: setTypeNode(n); break;
       case 2: setValueNode(n); break;
    }
+   assert(false);
 }
 
 

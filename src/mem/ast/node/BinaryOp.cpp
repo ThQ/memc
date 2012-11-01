@@ -4,25 +4,25 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 BinaryOp::BinaryOp ()
 {
-   _left_node = NULL;
-   _right_node = NULL;
+   _nodeLeft = NULL;
+   _nodeRight = NULL;
    _type = BinaryOp::kTYPE;
 }
 
 BinaryOp::~BinaryOp ()
 {
-   delete _left_node;
-   delete _right_node;
+   delete _nodeLeft;
+   delete _nodeRight;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -31,8 +31,8 @@ BinaryOp::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _left_node;
-      case 1: return _right_node;
+      case 0: return _nodeLeft;
+      case 1: return _nodeRight;
    }
    return NULL;
 }
@@ -51,8 +51,8 @@ BinaryOp::setChild (size_t i, Node* n)
 {
    switch (i)
    {
-      case 0: _left_node = n; break;
-      case 1: _right_node = n; break;
+      case 0: setLeftNode(n); break;
+      case 1: setRightNode(n); break;
    }
 }
 

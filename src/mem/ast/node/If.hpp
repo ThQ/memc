@@ -22,7 +22,7 @@ class If: public Node
    public:
    static const int kTYPE = MetaKind::IF;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -35,7 +35,7 @@ class If: public Node
    ~If ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -44,26 +44,26 @@ class If: public Node
    GETTER(ChildCount, size_t) {return 3;}
 
    // ConditionNode
-   GETTER(ConditionNode, node::Node*) {return _condition_node;}
+   GETTER(ConditionNode, node::Node*) {return _nodeCondition;}
    SETTER(ConditionNode, node::Node*)
    {
-      _condition_node = val;
+      _nodeCondition = val;
       if (val != NULL) val->setParent(this);
    }
 
    // IfBlockNode
-   GETTER(IfBlockNode, node::Block*) {return _if_block_node;}
+   GETTER(IfBlockNode, node::Block*) {return _nodeIfBlock;}
    SETTER(IfBlockNode, node::Block*)
    {
-      _if_block_node = val;
+      _nodeIfBlock = val;
       if (val != NULL) val->setParent(this);
    }
 
    // ElseBlockNode
-   GETTER(ElseBlockNode, node::Block*) {return _else_block_node;}
+   GETTER(ElseBlockNode, node::Block*) {return _nodeElseBlock;}
    SETTER(ElseBlockNode, node::Block*)
    {
-      _else_block_node = val;
+      _nodeElseBlock = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -71,7 +71,7 @@ class If: public Node
    GETTER(MemorySize, int) {return sizeof(If);}
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -92,14 +92,14 @@ class If: public Node
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   node::Node* _condition_node;
-   node::Block* _if_block_node;
-   node::Block* _else_block_node;
+   node::Node* _nodeCondition;
+   node::Block* _nodeIfBlock;
+   node::Block* _nodeElseBlock;
 };
 
 } } }

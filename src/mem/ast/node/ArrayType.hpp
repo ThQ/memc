@@ -19,7 +19,7 @@ class ArrayType : public Type
    public:
    static const int kTYPE = MetaKind::ARRAY;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -32,7 +32,7 @@ class ArrayType : public Type
    ~ArrayType ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -40,17 +40,17 @@ class ArrayType : public Type
    virtual
    GETTER(ChildCount, size_t) {return 2;}
 
-   GETTER(TypeNode, Node*) {return _type_node;}
+   GETTER(TypeNode, Node*) {return _nodeType;}
    SETTER(TypeNode, Node*)
    {
-      _type_node = val;
+      _nodeType = val;
       if (val != NULL) val->setParent(this);
    }
 
-   GETTER(LengthNode, Node*) {return _length_node;}
+   GETTER(LengthNode, Node*) {return _nodeLength;}
    SETTER(LengthNode, Node*)
    {
-      _length_node = val;
+      _nodeLength = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -58,7 +58,7 @@ class ArrayType : public Type
    GETTER(MemorySize, int) {return sizeof(ArrayType);}
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -73,13 +73,13 @@ class ArrayType : public Type
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   Node* _type_node;
-   Node* _length_node;
+   Node* _nodeType;
+   Node* _nodeLength;
 };
 
 } } }

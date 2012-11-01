@@ -4,23 +4,23 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 PointerType::PointerType ()
 {
+   _nodeType = NULL;
    _type = PointerType::kTYPE;
-   _type_node = NULL;
 }
 
 PointerType::~PointerType ()
 {
-   delete _type_node;
+   delete _nodeType;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -29,8 +29,9 @@ PointerType::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _type_node;
+      case 0: return _nodeType;
    }
+   assert(false);
    return NULL;
 }
 
@@ -49,6 +50,7 @@ PointerType::setChild (size_t i, Node* n)
    {
       case 0: setTypeNode(n); break;
    }
+   assert(false);
 }
 
 

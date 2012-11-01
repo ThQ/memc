@@ -21,7 +21,7 @@ class VarDecl : public Node
    static const int kTYPE = MetaKind::VARIABLE_DECLARATION;
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -34,8 +34,8 @@ class VarDecl : public Node
    ~VarDecl ();
 
 
-   //--------------------------------------------------------------------------
-   // PUBLIC PROPERTIES
+   //==========================================================================
+   // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
@@ -52,31 +52,31 @@ class VarDecl : public Node
    GETTER (NameCstr, const char*) {return Name().c_str();}
 
    // NameNode
-   GETTER (NameNode, FinalId*) {return _name_node;}
+   GETTER (NameNode, FinalId*) {return _nodeName;}
    SETTER (NameNode, FinalId*)
    {
-      _name_node = val;
+      _nodeName = val;
       if (val != NULL) val->setParent(this);
    }
 
    // TypeNode
-   GETTER (TypeNode, Node*) {return _type_node;}
+   GETTER (TypeNode, Node*) {return _nodeType;}
    SETTER (TypeNode, Node*)
    {
-      _type_node = val;
+      _nodeType = val;
       if (val != NULL) val->setParent(this);
    }
 
    // ValueNode
-   GETTER (ValueNode, Node*) {return _value_node;}
+   GETTER (ValueNode, Node*) {return _nodeValue;}
    SETTER (ValueNode, Node*)
    {
-      _value_node = val;
+      _nodeValue = val;
       if (val != NULL) val->setParent(this);
    }
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -91,14 +91,14 @@ class VarDecl : public Node
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   FinalId* _name_node;
-   Node* _type_node;
-   Node* _value_node;
+   FinalId* _nodeName;
+   Node* _nodeType;
+   Node* _nodeValue;
 };
 
 

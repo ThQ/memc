@@ -4,23 +4,23 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 Decorator::Decorator ()
 {
-   _name_node = NULL;
+   _nodeName = NULL;
    _type = Decorator::kTYPE;
 }
 
 Decorator::~Decorator ()
 {
-   delete _name_node;
+   delete _nodeName;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -29,8 +29,9 @@ Decorator::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _name_node;
+      case 0: return _nodeName;
    }
+   assert(false);
    return NULL;
 }
 
@@ -49,6 +50,7 @@ Decorator::setChild (size_t i, Node* n)
    {
       case 0: setNameNode(n); break;
    }
+   assert(false);
 }
 
 } } }

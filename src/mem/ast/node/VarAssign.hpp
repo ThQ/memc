@@ -14,7 +14,7 @@ class VarAssign : public Node
    static const int kTYPE = MetaKind::VARIABLE_ASSIGNMENT;
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -27,7 +27,7 @@ class VarAssign : public Node
    ~VarAssign ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -41,23 +41,23 @@ class VarAssign : public Node
    GETTER (MemorySize, int) {return sizeof(VarAssign);}
 
    // NameNode
-   GETTER (NameNode, Node*) {return _name_node;}
+   GETTER (NameNode, Node*) {return _nodeName;}
    SETTER (NameNode, Node*)
    {
-      _name_node = val;
+      _nodeName = val;
       if (val != NULL) val->setParent(this);
    }
 
    // ValueNode
-   GETTER (ValueNode, Node*) {return _value_node;}
+   GETTER (ValueNode, Node*) {return _nodeValue;}
    SETTER (ValueNode, Node*)
    {
-      _value_node = val;
+      _nodeValue = val;
       if (val != NULL) val->setParent(this);
    }
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -72,13 +72,13 @@ class VarAssign : public Node
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   Node* _name_node;
-   Node* _value_node;
+   Node* _nodeName;
+   Node* _nodeValue;
 };
 
 

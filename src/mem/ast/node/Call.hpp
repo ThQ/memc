@@ -14,7 +14,7 @@ class Call : public Node
    public:
    static const int kTYPE = MetaKind::CALL;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -27,20 +27,20 @@ class Call : public Node
    ~Call ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
    // Caller
-   GETTER(Caller, st::Symbol*) {return _caller;}
-   SETTER(Caller, st::Symbol*) {_caller = val;}
+   GETTER(Caller, st::Symbol*) {return _symCaller;}
+   SETTER(Caller, st::Symbol*) {_symCaller = val;}
 
    // CallerNode
-   GETTER(CallerNode, Node*) {return _caller_node;}
+   GETTER(CallerNode, Node*) {return _nodeCaller;}
    SETTER(CallerNode, Node*)
    {
-      _caller_node = val;
+      _nodeCaller = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -57,16 +57,16 @@ class Call : public Node
    GETTER(MemorySize, int) {return sizeof(Call);}
 
    // ParamsNode
-   GETTER(ParamsNode, NodeList*) {return _params_node;}
+   GETTER(ParamsNode, NodeList*) {return _nodeParams;}
    SETTER(ParamsNode, NodeList*)
    {
-      _params_node = val;
+      _nodeParams = val;
       if (val != NULL) val->setParent(this);
    }
 
 
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   //==========================================================================
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -86,15 +86,15 @@ class Call : public Node
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   //==========================================================================
+   // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   st::Symbol* _caller;
-   Node* _caller_node;
    bool _is_instance_call;
-   NodeList* _params_node;
+   Node* _nodeCaller;
+   NodeList* _nodeParams;
+   st::Symbol* _symCaller;
 };
 
 

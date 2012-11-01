@@ -4,23 +4,23 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 UnaryOp::UnaryOp ()
 {
+   _nodeValue = NULL;
    _type = UnaryOp::kTYPE;
-   _value_node = NULL;
 }
 
 UnaryOp::~UnaryOp ()
 {
-   delete _value_node;
+   delete _nodeValue;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -29,8 +29,9 @@ UnaryOp::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _value_node;
+      case 0: return _nodeValue;
    }
+   assert(false);
    return NULL;
 }
 
@@ -48,6 +49,7 @@ UnaryOp::setChild (size_t i, Node* n)
    {
       case 0: setValueNode(n);
    }
+   assert(false);
 }
 
 } } }

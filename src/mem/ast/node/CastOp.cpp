@@ -4,25 +4,25 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 CastOp::CastOp ()
 {
    _type = CastOp::kTYPE;
-   _type_node = NULL;
-   _value_node = NULL;
+   _nodeType = NULL;
+   _nodeValue = NULL;
 }
 
 CastOp::~CastOp ()
 {
-   delete _type_node;
-   delete _value_node;
+   delete _nodeType;
+   delete _nodeValue;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -31,8 +31,8 @@ CastOp::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _value_node;
-      case 1: return _type_node;
+      case 0: return _nodeValue;
+      case 1: return _nodeType;
    }
    return NULL;
 }

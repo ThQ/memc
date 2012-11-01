@@ -20,7 +20,7 @@ class PointerType: public Id
    static const int kTYPE = MetaKind::POINTER_TYPE;
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -33,7 +33,7 @@ class PointerType: public Id
    ~PointerType ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -43,16 +43,16 @@ class PointerType: public Id
    GETTER(MemorySize, int) {return sizeof(PointerType);}
 
    // TypeNode
-   GETTER(TypeNode, node::Node*) {return _type_node;}
+   GETTER(TypeNode, node::Node*) {return _nodeType;}
    SETTER(TypeNode, node::Node*)
    {
-      _type_node = val;
+      _nodeType = val;
       if (val != NULL) val->setParent(this);
    }
 
 
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   //==========================================================================
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -66,12 +66,12 @@ class PointerType: public Id
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   node::Node* _type_node;
+   node::Node* _nodeType;
 };
 
 } } }

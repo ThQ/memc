@@ -4,27 +4,27 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 If::If ()
 {
-   _condition_node = NULL;
-   _else_block_node = NULL;
-   _if_block_node = NULL;
+   _nodeCondition = NULL;
+   _nodeElseBlock = NULL;
+   _nodeIfBlock = NULL;
    _type = If::kTYPE;
 }
 
 If::~If ()
 {
-   delete _condition_node;
-   delete _if_block_node;
-   delete _else_block_node;
+   delete _nodeCondition;
+   delete _nodeIfBlock;
+   delete _nodeElseBlock;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -33,9 +33,9 @@ If::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _condition_node;
-      case 1: return _if_block_node;
-      case 2: return _else_block_node;
+      case 0: return _nodeCondition;
+      case 1: return _nodeIfBlock;
+      case 2: return _nodeElseBlock;
    }
    return NULL;
 }

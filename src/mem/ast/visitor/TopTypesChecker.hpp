@@ -57,6 +57,9 @@ class TopTypesChecker : public BlockTypesChecker
    void
    visitEnumType (st::Symbol* scope, node::EnumType* node);
 
+   void
+   visitEnumMembers (st::EnumType* symEnum, node::NodeList* nodeMembers);
+
    // Visit a class field declaration (MEM_NODE_FIELD).
    //
    // Checks whether the type symbol is really one and binds it to the AST.

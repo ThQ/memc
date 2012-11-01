@@ -4,37 +4,47 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
 
 BlockTypesChecker::BlockTypesChecker ()
 {
    _name = "ast.BlockTypesChecker";
 }
 
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
 void
-BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::FunctionType* func_sym, node::Node* params)
+BlockTypesChecker::checkCallParameters (st::Symbol* symCaller, st::FunctionType* symFunc, node::Node* nodeParams)
 {
-   DEBUG_REQUIRE (func_sym != NULL);
+   DEBUG_REQUIRE (symFunc != NULL);
 
-   size_t param_count = params != NULL ? params->ChildCount() : 0;
 
-   if (params != NULL)
+   if (nodeParams != NULL)
    {
-      if (func_sym->ArgumentCount() == param_count)
+      size_t param_count = nodeParams->ChildCount();
+
+      if (symFunc->ArgumentCount() == param_count)
       {
          // Each parameter node must have the same expr type as declared in its
          // function definition.
-         for (size_t i = 0; i < params->ChildCount(); ++i)
+         for (size_t i = 0; i < nodeParams->ChildCount(); ++i)
          {
-            checkAssignment(params->getChild(i), func_sym->getArgument(i));
+            checkAssignment(nodeParams->getChild(i), symFunc->getArgument(i));
          }
       }
       else
       {
          log::BadParameterCount* err = new log::BadParameterCount();
-         err->setExpectedParamCount(func_sym->ArgumentCount());
-         err->setParamCount(params->ChildCount());
+         err->setExpectedParamCount(symFunc->ArgumentCount());
+         err->setParamCount(nodeParams->ChildCount());
          err->format();
-         err->setPosition(params->copyPosition());
+         err->setPosition(nodeParams->copyPosition());
          log(err);
       }
    }
@@ -130,12 +140,12 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::BinaryOp* node)
    DEBUG_REQUIRE (node->RightNode() != NULL);
 
    // Check left node
-   node::Node* left_node = node->LeftNode();
-   visitExpr(scope, left_node);
+   node::Node* nodeLeft = node->LeftNode();
+   visitExpr(scope, nodeLeft);
 
    // Check right node
-   node::Node* right_node = node->RightNode();
-   visitExpr(scope, right_node);
+   node::Node* nodeRight = node->RightNode();
+   visitExpr(scope, nodeRight);
 
    std::string op_name;
    switch (node->Kind())
@@ -157,35 +167,36 @@ BlockTypesChecker::visitArithmeticOp (st::Symbol* scope, node::BinaryOp* node)
          assert (false);
    }
 
+   st::Type* symLeftType = nodeLeft->ExprType();
+   st::Type* symRightType = nodeRight->ExprType();
+
    if (op_name.size() != 0)
    {
-      st::Type* left_ty = left_node->ExprType();
-      st::Type* right_ty = right_node->ExprType();
-      st::Type* common_ty = st::util::getBiggestIntType(
-         st::cast<st::IntType>(left_ty),
-         st::cast<st::IntType>(right_ty));
+      st::Type* symCommonType = st::util::getBiggestIntType(
+         st::cast<st::IntType>(symLeftType),
+         st::cast<st::IntType>(symRightType));
       // FIXME Must check operand types
-      node->setExprType(common_ty);
+      node->setExprType(symCommonType);
    }
    else
    {
       fs::position::Composite* pos = new fs::position::Composite();
-      pos->addChild(left_node->copyPosition());
-      pos->addChild(right_node->copyPosition());
+      pos->addChild(nodeLeft->copyPosition());
+      pos->addChild(nodeRight->copyPosition());
 
       log::UnsupportedArithmeticOperation* err =
          new log::UnsupportedArithmeticOperation();
-      err->setLeftTypeName(left_node->ExprType()->NameCstr());
+      err->setLeftTypeName(symLeftType->NameCstr());
       err->setOpName(op_name.c_str());
-      err->setRightTypeName(right_node->ExprType()->NameCstr());
+      err->setRightTypeName(symRightType->NameCstr());
       err->format();
       err->setPosition(pos);
       log(err);
    }
 
    DEBUG_ENSURE(node->hasExprType());
-   DEBUG_ENSURE(node->getChild(0)->hasExprType());
-   DEBUG_ENSURE(node->getChild(1)->hasExprType());
+   DEBUG_ENSURE(node->LeftNode()->hasExprType());
+   DEBUG_ENSURE(node->RightNode()->hasExprType());
 }
 
 void
@@ -195,40 +206,42 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    DEBUG_REQUIRE (n != NULL);
    DEBUG_REQUIRE (node::isa<node::ArrayType>(n));
 
-   st::Symbol* arr_sym = BugType();
    int arr_size = -1;
-   node::Node* type_n = n->TypeNode();
-   node::Node* length_n = n->LengthNode();
-   st::Type* item_ty = NULL;
 
    // -----------
    //  Item type
    // -----------
-   if (type_n != NULL)
+   node::Node* nodeItemType = n->TypeNode();
+   st::Type* symItemType = NULL;
+
+   if (nodeItemType != NULL)
    {
-      visitExpr(scope, type_n);
-      if (ensureSymbolIsType(type_n, type_n->BoundSymbol()))
+      visitExpr(scope, nodeItemType);
+      if (ensureSymbolIsType(nodeItemType, nodeItemType->BoundSymbol()))
       {
-         item_ty = st::cast<st::Type>(type_n->BoundSymbol());
+         symItemType = st::cast<st::Type>(nodeItemType->BoundSymbol());
       }
       else
       {
-         item_ty = BugType();
+         symItemType = BugType();
       }
    }
 
    // ------
    //  Size
    // ------
-   if (length_n != NULL)
+   node::Node* nodeLength = n->LengthNode();
+
+   if (nodeLength != NULL)
    {
-      visitExpr(scope, length_n);
-      if (node::isa<node::Number>(length_n)
-         && length_n->hasBoundSymbol()
-         && st::isa<st::IntConstant>(length_n->BoundSymbol())
-         && st::isa<st::IntType>(length_n->ExprType()))
+      visitExpr(scope, nodeLength);
+
+      if (node::isa<node::Number>(nodeLength)
+         && nodeLength->hasBoundSymbol()
+         && st::isa<st::IntConstant>(nodeLength->BoundSymbol())
+         && st::isa<st::IntType>(nodeLength->ExprType()))
       {
-         st::IntConstant* i_const = st::cast<st::IntConstant>(length_n->BoundSymbol());
+         st::IntConstant* i_const = st::cast<st::IntConstant>(nodeLength->BoundSymbol());
          // FIXME This may break since it returns an int64_t
          arr_size = (int)i_const->getSignedValue();
       }
@@ -237,32 +250,30 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    // ------------
    //  Array type
    // ------------
-   if (item_ty != BugType())
+   st::Symbol* symArrayType = BugType();
+
+   if (symItemType != BugType())
    {
       // Unsized array
       if (arr_size == -1)
       {
-         arr_sym = st::util::getUnsizedArrayType(item_ty);
+         symArrayType = st::util::getUnsizedArrayType(symItemType);
       }
       // Sized array
       else
       {
-         arr_sym = st::util::getSizedArrayType(item_ty, arr_size);
+         symArrayType = st::util::getSizedArrayType(symItemType, arr_size);
       }
    }
-   else
-   {
-      arr_sym = BugType();
-   }
 
-   n->setBoundSymbol(arr_sym);
-   n->setExprType(st::cast<st::Type>(arr_sym));
+   n->setBoundSymbol(symArrayType);
+   n->setExprType(st::cast<st::Type>(symArrayType));
 
    DEBUG_ENSURE (n->hasBoundSymbol());
    DEBUG_ENSURE (n->hasExprType());
-   DEBUG_ENSURE (type_n != NULL);
-   DEBUG_ENSURE (type_n->hasBoundSymbol());
-   DEBUG_ENSURE (type_n->hasExprType());
+   DEBUG_ENSURE (nodeItemType != NULL);
+   DEBUG_ENSURE (nodeItemType->hasBoundSymbol());
+   DEBUG_ENSURE (nodeItemType->hasExprType());
 }
 
 void
@@ -275,46 +286,47 @@ BlockTypesChecker::visitBracketOp (st::Symbol* scope, node::BracketOp* n)
    visitExpr (scope, n->ValueNode());
    visitExpr (scope, n->IndexNode());
 
-   node::Node* value_node = n->ValueNode();
-   node::Node* index_n = n->IndexNode();
-   st::Type* value_ty = value_node->ExprType();
+   node::Node* nodeValue = n->ValueNode();
+   node::Node* nodeIndex = n->IndexNode();
+   st::Type* symValueType = nodeValue->ExprType();
 
-   if (value_ty != NULL)
+   if (symValueType != NULL)
    {
-      if (st::isa<st::PointerType>(value_ty))
+      if (st::isa<st::PointerType>(symValueType))
       {
-         value_ty = st::cast<st::PointerType>(value_ty)->PointedType();
+         symValueType = st::cast<st::PointerType>(symValueType)->PointedType();
       }
 
-      if (st::isa<st::ArrayType>(value_ty))
+      if (st::isa<st::ArrayType>(symValueType))
       {
-         st::ArrayType* arr = st::cast<st::ArrayType>(value_ty);
+         st::ArrayType* arr = st::cast<st::ArrayType>(symValueType);
          n->setExprType(arr->ItemType());
       }
-      else if (st::isa<st::TupleType>(value_ty))
+      else if (st::isa<st::TupleType>(symValueType))
       {
          // FIXME Nothing super safe here...
-         if (node::cast<node::Number>(index_n)
-            && index_n->hasBoundSymbol()
-            && st::isa<st::IntConstant>(index_n->BoundSymbol()))
+         if (node::cast<node::Number>(nodeIndex)
+            && nodeIndex->hasBoundSymbol()
+            && st::isa<st::IntConstant>(nodeIndex->BoundSymbol()))
          {
-            node::Number* index_nb_n = node::cast<node::Number>(index_n);
-            st::IntConstant* i_const = st::cast<st::IntConstant>(index_nb_n->BoundSymbol());
+            node::Number* nodeIndexNb = node::cast<node::Number>(nodeIndex);
+            st::IntConstant* i_const = st::cast<st::IntConstant>(nodeIndexNb->BoundSymbol());
 
             // FIXME This may break, it returns an int64_t
             int item_index = (int)i_const->getSignedValue();
             // FIXME No bound checking...
-            n->setExprType(st::cast<st::TupleType>(value_ty)->Subtypes()[item_index]);
+            n->setExprType(st::cast<st::TupleType>(symValueType)->Subtypes()[item_index]);
          }
       }
       else
       {
          log::Error* err = new log::Error();
          err->setPrimaryText("Subscripted value is not of array or tuple type");
-         err->setPosition(value_node->copyPosition());
+         err->setPosition(nodeValue->copyPosition());
          _logger->log(err);
       }
    }
+
    if (!n->hasExprType())
    {
       n->setExprType(BugType());
@@ -378,12 +390,12 @@ BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
    visitExpr(scope, n->LeftNode());
    visitExpr(scope, n->RightNode());
 
-   st::Type* left_ty = n->LeftNode()->ExprType();
-   st::Type* right_ty = n->RightNode()->ExprType();
+   st::Type* symLeftType = n->LeftNode()->ExprType();
+   st::Type* symRightType = n->RightNode()->ExprType();
 
    // FIXME Must check that type is a primitive type
 
-   if (left_ty == right_ty)
+   if (symLeftType == symRightType)
    {
       n->setExprType(_core_types->BoolTy());
    }
@@ -391,13 +403,13 @@ BlockTypesChecker::visitCompOp (st::Symbol* scope, node::BinaryOp* n)
    {
       fs::position::Composite* pos = new fs::position::Composite();
       pos->addChild(n->LeftNode()->Position()->copy_range());
-      //pos->addChild(n->RightNode()->Position()->copy_range());
+      pos->addChild(n->RightNode()->Position()->copy_range());
 
       n->setExprType(BugType());
 
       log::DifferentOperandsType* err = new log::DifferentOperandsType();
-      err->setLeftType(left_ty);
-      err->setRightType(right_ty);
+      err->setLeftType(symLeftType);
+      err->setRightType(symRightType);
       err->setPosition(pos);
       err->format();
       log(err);
@@ -459,21 +471,20 @@ BlockTypesChecker::visitLogicalExpr (st::Symbol* scope, node::Node* expr_node)
 }
 
 void
-BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
+BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* nodeCall)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (call_node != NULL);
-   DEBUG_REQUIRE (node::isa<node::Call>(call_node));
-   DEBUG_REQUIRE (call_node->CallerNode() != NULL);
+   DEBUG_REQUIRE (nodeCall != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(nodeCall));
+   DEBUG_REQUIRE (nodeCall->CallerNode() != NULL);
 
-   node::Node* base_object = call_node->CallerNode();
-   assert (base_object != NULL);
-   visitExpr(scope, base_object);
+   node::Node* nodeCaller = nodeCall->CallerNode();
+   assert (nodeCaller != NULL);
+   visitExpr(scope, nodeCaller);
 
-   DEBUG_PRINTF("base obj %s\n", base_object->KindNameCstr());
-   if (call_node->hasParamsNode())
+   if (nodeCall->hasParamsNode())
    {
-      visitExprList(scope, call_node->ParamsNode());
+      visitExprList(scope, nodeCall->ParamsNode());
    }
 
    /*
@@ -487,38 +498,38 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
    }
    */
 
-   if (base_object->hasBoundSymbol())
+   if (nodeCaller->hasBoundSymbol())
    {
       // Macro call
-      if (st::isa<st::Macro>(base_object->BoundSymbol()))
+      if (st::isa<st::Macro>(nodeCaller->BoundSymbol()))
       {
-         visitMacroCall(scope, call_node);
+         visitMacroCall(scope, nodeCall);
       }
       // Function call
-      else if (st::isa<st::Func>(base_object->BoundSymbol()))
+      else if (st::isa<st::Func>(nodeCaller->BoundSymbol()))
       {
-         visitFunctionCall(scope, call_node);
+         visitFunctionCall(scope, nodeCall);
       }
       // Function pointer call
-      else if (st::util::isFunctorType(base_object->ExprType()))
+      else if (st::util::isFunctorType(nodeCaller->ExprType()))
       {
-         visitFunctorCall(scope, call_node);
+         visitFunctorCall(scope, nodeCall);
       }
       else
       {
-         call_node->setExprType(BugType());
+         nodeCall->setExprType(BugType());
 
          log::CallNonFunction* err = new log::CallNonFunction();
-         err->setObjectName(base_object->BoundSymbol()->Name());
-         err->setObjectTypeName(base_object->ExprType()->gQualifiedName());
-         err->setPosition(base_object->Position()->copy());
+         err->setObjectName(nodeCaller->BoundSymbol()->Name());
+         err->setObjectTypeName(nodeCaller->ExprType()->gQualifiedName());
+         err->setPosition(nodeCaller->Position()->copy());
          err->format();
          log(err);
       }
    }
    else
    {
-      call_node->setBoundSymbol(BugType());
+      nodeCall->setBoundSymbol(BugType());
    }
 
    // FIXME We cannot assert this since it can be a macro that may not have
@@ -527,76 +538,67 @@ BlockTypesChecker::visitCall (st::Symbol* scope, node::Call* call_node)
 }
 
 void
-BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* dot_node)
+BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* nodeDot)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (dot_node != NULL);
-   DEBUG_REQUIRE (node::isa<node::Dot>(dot_node));
-   DEBUG_REQUIRE (dot_node->LeftNode() != NULL);
-   DEBUG_REQUIRE (dot_node->RightNode() != NULL);
+   DEBUG_REQUIRE (nodeDot != NULL);
+   DEBUG_REQUIRE (node::isa<node::Dot>(nodeDot));
+   DEBUG_REQUIRE (nodeDot->LeftNode() != NULL);
+   DEBUG_REQUIRE (nodeDot->RightNode() != NULL);
 
-   node::Node* left_node = dot_node->LeftNode();
-   node::Node* right_node = dot_node->RightNode();
+   node::Node* nodeLeft = nodeDot->LeftNode();
+   node::Node* nodeRight = nodeDot->RightNode();
 
-   visitExpr(scope, left_node);
-   // Left node is a variable container an object
-   //if (left_node->hasExprType())
-   //{
-      visitSymbolName(left_node->ExprType(), node::cast<node::Text>(right_node));
-   //}
-   //else
-   //{
-      //visitSymbolName(left_node->BoundSymbol(), node::cast<node::Text>(right_node));
-   //}
+   visitExpr(scope, nodeLeft);
+   visitSymbolName(nodeLeft->ExprType(), node::cast<node::Text>(nodeRight));
 
-   assert(node::isa<node::Id>(right_node));
+   assert(node::isa<node::Id>(nodeRight));
 
-   if (left_node->hasBoundSymbol())
+   if (nodeLeft->hasBoundSymbol())
    {
-      dot_node->setBoundSymbol(right_node->BoundSymbol());
+      nodeDot->setBoundSymbol(nodeRight->BoundSymbol());
 
-      if (dot_node->hasBoundSymbol())
+      if (nodeDot->hasBoundSymbol())
       {
-         st::Symbol* expr_ty = st::util::getExprType(dot_node->BoundSymbol());
+         st::Symbol* expr_ty = st::util::getExprType(nodeDot->BoundSymbol());
          if (expr_ty == NULL)
          {
-            expr_ty = dot_node->BoundSymbol();
+            expr_ty = nodeDot->BoundSymbol();
          }
 
          //right_node->setBoundSymbol(dot_node->BoundSymbol());
-         right_node->setExprType(st::util::getExprType(dot_node->BoundSymbol()));
+         nodeRight->setExprType(st::util::getExprType(nodeDot->BoundSymbol()));
 
          // If we are not accessing a class member, we can just flatten the dot
          // node by replacing it by final id.
-         if (st::isa<st::Class>(left_node->BoundSymbol())
-            || st::isa<st::EnumType>(left_node->BoundSymbol())
-            || st::isa<st::Namespace>(left_node->BoundSymbol()))
+         if (st::isa<st::Class>(nodeLeft->BoundSymbol())
+            || st::isa<st::EnumType>(nodeLeft->BoundSymbol())
+            || st::isa<st::Namespace>(nodeLeft->BoundSymbol()))
          {
             ast::node::FinalId* fid = new ast::node::FinalId();
-            fid->setValue(right_node->BoundSymbol()->Name());
-            fid->setBoundSymbol(right_node->BoundSymbol());
+            fid->setValue(nodeRight->BoundSymbol()->Name());
+            fid->setBoundSymbol(nodeRight->BoundSymbol());
             if (st::isa<st::Type>(expr_ty))
             {
                fid->setExprType(expr_ty);
             }
-            dot_node->Parent()->replaceChild(dot_node, fid);
-            //dot_node->unlink();
-            delete dot_node;
+            nodeDot->Parent()->replaceChild(nodeDot, fid);
+            delete nodeDot;
          }
          else
          {
-            dot_node->setExprType(st::cast<st::Type>(expr_ty));
+            nodeDot->setExprType(st::cast<st::Type>(expr_ty));
          }
       }
       else
       {
-         dot_node->setExprType(BugType());
+         nodeDot->setExprType(BugType());
 
          log::SymbolNotFound* err = new log::SymbolNotFound();
-         err->setSymbolName(node::cast<node::Text>(right_node)->Value());
-         err->setScopeName(left_node->ExprType()->gQualifiedName());
+         err->setSymbolName(node::cast<node::Text>(nodeRight)->Value());
+         err->setScopeName(nodeLeft->ExprType()->gQualifiedName());
          err->format();
-         err->setPosition(right_node->copyPosition());
+         err->setPosition(nodeRight->copyPosition());
          log(err);
       }
    }
@@ -759,7 +761,7 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
       default:
          DEBUG_PRINTF("Unsupported node kind {kind: %d, name: %s}\n",
             node->Kind(),
-            node::kKIND_NAMES[node->Kind()]);
+            node->KindNameCstr());
          assert(false);
    }
 }
@@ -806,82 +808,82 @@ BlockTypesChecker::visitSymbolName (st::Symbol* scope, node::Node* id_node)
 }
 
 void
-BlockTypesChecker::visitFor (st::Symbol* scope, node::For* for_node)
+BlockTypesChecker::visitFor (st::Symbol* scope, node::For* nodeFor)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (for_node != NULL);
-   DEBUG_REQUIRE (node::isa<node::For>(for_node));
+   DEBUG_REQUIRE (nodeFor != NULL);
+   DEBUG_REQUIRE (node::isa<node::For>(nodeFor));
 
    // Block scope
-   st::Symbol* for_block = new st::Symbol();
-   for_block->hintName(scope, "~for");
-   scope->addChild(for_block);
-   for_node->BlockNode()->setBoundSymbol(for_block);
+   st::Symbol* nodeBlock = new st::Symbol();
+   nodeBlock->hintName(scope, "~for");
+   scope->addChild(nodeBlock);
+   nodeFor->BlockNode()->setBoundSymbol(nodeBlock);
 
    // Initialization
-   visitExpr(for_block, for_node->InitializationNode());
+   visitExpr(nodeBlock, nodeFor->InitializationNode());
 
    // Condition
-   visitExpr(for_block, for_node->ConditionNode());
-   ensureBoolExpr(for_node->ConditionNode());
+   visitExpr(nodeBlock, nodeFor->ConditionNode());
+   ensureBoolExpr(nodeFor->ConditionNode());
 
    // Iteration
-   visitExpr(for_block, for_node->IterationNode());
+   visitExpr(nodeBlock, nodeFor->IterationNode());
 
    // Block
-   visitBlock(for_block, for_node->BlockNode());
+   visitBlock(nodeBlock, nodeFor->BlockNode());
 
-   DEBUG_ENSURE(for_node->ConditionNode()->hasExprType());
+   DEBUG_ENSURE(nodeFor->ConditionNode()->hasExprType());
 }
 
 void
-BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* call_n)
+BlockTypesChecker::visitFunctionCall (st::Symbol* scope, node::Call* nodeCall)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (call_n != NULL);
-   DEBUG_REQUIRE (node::isa<node::Call>(call_n));
-   DEBUG_REQUIRE (call_n->CallerNode() != NULL);
-   DEBUG_REQUIRE (call_n->CallerNode()->BoundSymbol() != NULL);
-   DEBUG_REQUIRE (st::isa<st::Func>(call_n->CallerNode()->BoundSymbol()));
+   DEBUG_REQUIRE (nodeCall != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(nodeCall));
+   DEBUG_REQUIRE (nodeCall->CallerNode() != NULL);
+   DEBUG_REQUIRE (nodeCall->CallerNode()->BoundSymbol() != NULL);
+   DEBUG_REQUIRE (st::isa<st::Func>(nodeCall->CallerNode()->BoundSymbol()));
 
-   node::Node* base_object = call_n->CallerNode();
+   node::Node* nodeCaller = nodeCall->CallerNode();
 
-   st::Func* base_func = st::cast<st::Func>(base_object->BoundSymbol());
-   call_n->setExprType(base_func->ReturnType());
+   st::Func* symCaller = st::cast<st::Func>(nodeCaller->BoundSymbol());
+   nodeCall->setExprType(symCaller->ReturnType());
 
    // Search for an overriding function that may fit the same signature
    // FIXME Spaghetti
-   if (call_n->IsInstanceCall())
+   if (nodeCall->IsInstanceCall())
    {
-      st::Class* cls = st::cast<st::Class>(base_func->Parent());
-      st::FunctionVector funcs = cls->getFunctionsLike(base_func->Name(), base_func->Type());
-      st::Func* new_func = chooseOverridenFunction (funcs, call_n->ParamsNode()->packChildrenExprTypes());
-      call_n->CallerNode()->setBoundSymbol(new_func);
+      st::Class* cls = st::cast<st::Class>(symCaller->Parent());
+      st::FunctionVector funcs = cls->getFunctionsLike(symCaller->Name(), symCaller->Type());
+      st::Func* symNewCaller = chooseOverridenFunction (funcs, nodeCall->ParamsNode()->packChildrenExprTypes());
+      nodeCall->CallerNode()->setBoundSymbol(symNewCaller);
    }
 
-   if (call_n->hasParamsNode())
+   if (nodeCall->hasParamsNode())
    {
-      checkCallParameters(call_n->Caller(), base_func->Type(), call_n->ParamsNode());
+      checkCallParameters(nodeCall->Caller(), symCaller->Type(), nodeCall->ParamsNode());
    }
 
-   DEBUG_ENSURE(call_n->hasExprType());
+   DEBUG_ENSURE(nodeCall->hasExprType());
 }
 
 void
-BlockTypesChecker::visitFunctorCall (st::Symbol* scope, node::Call* call_n)
+BlockTypesChecker::visitFunctorCall (st::Symbol* scope, node::Call* nodeCall)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (call_n != NULL);
-   DEBUG_REQUIRE (node::isa<node::Call>(call_n));
+   DEBUG_REQUIRE (nodeCall != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(nodeCall));
 
-   node::Node* base_object = call_n->CallerNode();
-   st::PointerType* ptr_ty = st::cast<st::PointerType>(base_object->ExprType());
-   st::FunctionType* func_ty = st::cast<st::FunctionType>(ptr_ty->getNonPointerParent());
-   call_n->setExprType(func_ty->ReturnType());
+   node::Node* nodeCaller = nodeCall->CallerNode();
+   st::PointerType* symPointerType = st::cast<st::PointerType>(nodeCaller->ExprType());
+   st::FunctionType* symFuncType = st::cast<st::FunctionType>(symPointerType->getNonPointerParent());
+   nodeCall->setExprType(symFuncType->ReturnType());
 
-   if (call_n->hasParamsNode())
+   if (nodeCall->hasParamsNode())
    {
-      checkCallParameters(NULL, func_ty, call_n->ParamsNode());
+      checkCallParameters(NULL, symFuncType, nodeCall->ParamsNode());
    }
 }
 
@@ -899,80 +901,83 @@ BlockTypesChecker::visitGroup (st::Symbol* scope, node::Node* n)
 }
 
 void
-BlockTypesChecker::visitIf (st::Symbol* scope, node::If* if_node)
+BlockTypesChecker::visitIf (st::Symbol* scope, node::If* nodeIf)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (if_node != NULL);
-   DEBUG_REQUIRE (node::isa<node::If>(if_node));
+   DEBUG_REQUIRE (nodeIf != NULL);
+   DEBUG_REQUIRE (node::isa<node::If>(nodeIf));
 
    // Check condition expression
-   visitExpr(scope, if_node->ConditionNode());
-   ensureBoolExpr(if_node->ConditionNode());
+   visitExpr(scope, nodeIf->ConditionNode());
+   ensureBoolExpr(nodeIf->ConditionNode());
 
    // Check block statements
    // FIXME Should create a special type of Symbol here
-   st::Symbol* if_block = new st::Symbol();
-   if_block->hintName(scope, "~if");
-   scope->addChild(if_block);
-   if_node->IfBlockNode()->setBoundSymbol(if_block);
+   st::Symbol* symIfBlock = new st::Symbol();
+   symIfBlock->hintName(scope, "~if");
+   scope->addChild(symIfBlock);
+   nodeIf->IfBlockNode()->setBoundSymbol(symIfBlock);
 
-   visitBlock(if_block, if_node->IfBlockNode());
+   visitBlock(symIfBlock, nodeIf->IfBlockNode());
 
-   if (if_node->hasElseBlockNode())
+   if (nodeIf->hasElseBlockNode())
    {
-      st::Symbol* else_block = new st::Symbol();
-      else_block->hintName(scope, "~else");
-      scope->addChild(else_block);
-      if_node->ElseBlockNode()->setBoundSymbol(else_block);
+      st::Symbol* symElseBlock = new st::Symbol();
+      symElseBlock->hintName(scope, "~else");
+      scope->addChild(symElseBlock);
+      nodeIf->ElseBlockNode()->setBoundSymbol(symElseBlock);
 
-      visitBlock(else_block, if_node->ElseBlockNode());
+      visitBlock(symElseBlock, nodeIf->ElseBlockNode());
    }
 
-   DEBUG_ENSURE (if_node->ConditionNode()->hasExprType());
+   DEBUG_ENSURE (nodeIf->ConditionNode()->hasExprType());
 }
 
 void
-BlockTypesChecker::visitMacroCall (st::Symbol* scope, node::Call* call_n)
+BlockTypesChecker::visitMacroCall (st::Symbol* scope, node::Call* nodeCall)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (call_n != NULL);
-   DEBUG_REQUIRE (node::isa<node::Call>(call_n));
+   DEBUG_REQUIRE (nodeCall != NULL);
+   DEBUG_REQUIRE (node::isa<node::Call>(nodeCall));
 
-   node::Node* base_object = call_n->CallerNode();
-   st::Macro* macro_sym = st::cast<st::Macro>(base_object->BoundSymbol());
-   macro::Macro* macro = static_cast<macro::Macro*>(macro_sym->MacroExpander());
-   node::Node* macro_result = macro->expand(call_n);
-   delete call_n;
-   visitExpr(scope, macro_result);
+   node::Node* nodeMacro = nodeCall->CallerNode();
+   st::Macro* symMacro = st::cast<st::Macro>(nodeMacro->BoundSymbol());
+   macro::Macro* macro = static_cast<macro::Macro*>(symMacro->MacroExpander());
+   node::Node* nodeMacroResult = macro->expand(nodeCall);
+   delete nodeCall;
+
+   visitExpr(scope, nodeMacroResult);
 }
 
 void
-BlockTypesChecker::visitNew (st::Symbol* scope, node::New* new_node)
+BlockTypesChecker::visitNew (st::Symbol* scope, node::New* nodeNew)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (new_node != NULL);
-   DEBUG_REQUIRE (node::isa<node::New>(new_node));
+   DEBUG_REQUIRE (nodeNew != NULL);
+   DEBUG_REQUIRE (node::isa<node::New>(nodeNew));
 
-   node::Node* ty_node = new_node->TypeNode();
-   assert (ty_node != NULL);
+   node::Node* nodeType = nodeNew->TypeNode();
+   assert (nodeType != NULL);
 
-   visitExpr(scope, ty_node);
-   ensureSymbolIsType(ty_node, ty_node->BoundSymbol());
+   visitExpr(scope, nodeType);
+   ensureSymbolIsType(nodeType, nodeType->BoundSymbol());
 
-   if (st::isa<st::ArrayType>(ty_node->BoundSymbol()))
+   st::Type* symPointerType = NULL;
+   if (st::isa<st::ArrayType>(nodeType->BoundSymbol()))
    {
-      st::ArrayType* arr_ty = st::cast<st::ArrayType>(ty_node->BoundSymbol());
-      st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(arr_ty);
-      st::Type* ptr_ty = st::util::getPointerType(unsized_arr_ty);
-      new_node->setExprType(ptr_ty);
+      st::ArrayType* symArrayType = st::cast<st::ArrayType>(nodeType->BoundSymbol());
+      st::ArrayType* symUnsizedArrayType = st::util::getUnsizedArrayType(symArrayType);
+
+      symPointerType = st::util::getPointerType(symUnsizedArrayType);
    }
    else
    {
-      st::Type* ptr_ty = st::util::getPointerType(ty_node->ExprType());
-      new_node->setExprType(ptr_ty);
+      symPointerType = st::util::getPointerType(nodeType->ExprType());
    }
 
-   DEBUG_ENSURE(new_node->hasExprType());
+   nodeNew->setExprType(symPointerType);
+
+   DEBUG_ENSURE(nodeNew->hasExprType());
 }
 
 void
@@ -1033,109 +1038,107 @@ BlockTypesChecker::visitBlock (st::Symbol* scope, node::Node* block)
 }
 
 void
-BlockTypesChecker::visitPointer (st::Symbol* scope, node::PointerType* n)
+BlockTypesChecker::visitPointer (st::Symbol* scope, node::PointerType* nodePointerType)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (n != NULL);
-   DEBUG_REQUIRE (node::isa<node::PointerType>(n));
+   DEBUG_REQUIRE (nodePointerType != NULL);
+   DEBUG_REQUIRE (node::isa<node::PointerType>(nodePointerType));
+   DEBUG_REQUIRE (nodePointerType->TypeNode() != NULL);
 
-   if (n->TypeNode() != NULL)
+   visitExpr(scope, nodePointerType->TypeNode());
+
+   node::Node* nodeType = nodePointerType->TypeNode();
+
+   ensureSymbolIsType(nodeType, nodeType->BoundSymbol());
+
+   if (!nodeType->hasBoundSymbol())
    {
-      visitExpr(scope, n->TypeNode());
-
-      ensureSymbolIsType(n->TypeNode(), n->TypeNode()->BoundSymbol());
-
-      if (!n->TypeNode()->hasBoundSymbol())
-      {
-         n->TypeNode()->setBoundSymbol(BugType());
-      }
-
-      if (n->TypeNode()->hasBoundSymbol()
-         && st::isa<st::Type>(n->TypeNode()->BoundSymbol()))
-      {
-         st::Symbol* ptr_ty = st::util::lookupPointer(scope,
-            st::cast<st::Type>(n->TypeNode()->BoundSymbol()));
-         assert (ptr_ty != NULL);
-         n->setBoundSymbol(ptr_ty);
-         n->setExprType(st::cast<st::Type>(ptr_ty));
-      }
-      else
-      {
-         n->setBoundSymbol(BugType());
-         n->setExprType(BugType());
-      }
+      nodeType->setBoundSymbol(BugType());
    }
 
-   DEBUG_ENSURE (n->hasExprType());
-   DEBUG_ENSURE (n->hasBoundSymbol());
-}
-
-void
-BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* n)
-{
-   DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (n != NULL);
-   DEBUG_REQUIRE (node::isa<node::Return>(n));
-
-   st::Func* parent_func = util::getParentFunction(n);
-   assert (parent_func);
-   assert (st::isa<st::Func>(parent_func));
-
-   node::Node* value_node = n->ValueNode();
-   assert (value_node != NULL);
-
-   visitExpr(scope, value_node);
-
-   if (checkAssignment(value_node, parent_func->ReturnType()))
+   if (nodeType->hasBoundSymbol()
+      && st::isa<st::Type>(nodeType->BoundSymbol()))
    {
-      n->setExprType(parent_func->ReturnType());
+      st::Symbol* symPointerType = st::util::lookupPointer(scope, st::cast<st::Type>(nodeType->BoundSymbol()));
+      nodePointerType->setBoundSymbol(symPointerType);
+      nodePointerType->setExprType(st::cast<st::Type>(symPointerType));
    }
    else
    {
-      log::ReturnTypeDiffersFromPrototype* err = new
-         log::ReturnTypeDiffersFromPrototype();
-      err->setFuncName(parent_func->gQualifiedName());
-      err->setRetTy(n->ValueNode()->ExprType());
-      err->setExpectedRetTy(parent_func->ReturnType());
-      //err->setPosition(value_node->copyPosition());
-      err->format();
-      log(err);
-
-      n->setExprType(BugType());
+      nodePointerType->setBoundSymbol(BugType());
+      nodePointerType->setExprType(BugType());
    }
 
-   DEBUG_ENSURE (n->hasExprType());
-   DEBUG_ENSURE (n->ValueNode()->hasExprType());
+   DEBUG_ENSURE (nodePointerType->hasExprType());
+   DEBUG_ENSURE (nodePointerType->hasBoundSymbol());
 }
 
 void
-BlockTypesChecker::visitString (st::Symbol* scope, node::String* n)
-{
-   DEBUG_REQUIRE (n != NULL);
-   DEBUG_REQUIRE (node::isa<node::String>(n));
-
-   st::IntType* char_ty = _symbols->_core_types.CharTy();
-   st::ArrayType* unsized_arr_ty = st::util::getUnsizedArrayType(char_ty);
-   n->setExprType(st::util::getPointerType(unsized_arr_ty));
-
-   DEBUG_ENSURE (n->hasExprType());
-}
-
-void
-BlockTypesChecker::visitTuple (st::Symbol* scope, node::Tuple* n)
+BlockTypesChecker::visitReturn (st::Symbol* scope, node::Return* nodeReturn)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (n != NULL);
-   DEBUG_REQUIRE (node::isa<node::Tuple>(n));
+   DEBUG_REQUIRE (nodeReturn != NULL);
+   DEBUG_REQUIRE (node::isa<node::Return>(nodeReturn));
+
+   st::Func* symParentFunc = util::getParentFunction(nodeReturn);
+
+   node::Node* nodeValue = nodeReturn->ValueNode();
+
+   visitExpr(scope, nodeValue);
+
+   if (checkAssignment(nodeValue, symParentFunc->ReturnType()))
+   {
+      nodeReturn->setExprType(symParentFunc->ReturnType());
+   }
+   else
+   {
+      nodeReturn->setExprType(BugType());
+
+      log::ReturnTypeDiffersFromPrototype* err = new log::ReturnTypeDiffersFromPrototype();
+      err->setFuncName(symParentFunc->gQualifiedName());
+      err->setRetTy(nodeValue->ExprType());
+      err->setExpectedRetTy(symParentFunc->ReturnType());
+      err->setPosition(nodeValue->copyPosition());
+      err->format();
+      log(err);
+   }
+
+   DEBUG_ENSURE (nodeReturn->hasExprType());
+   DEBUG_ENSURE (nodeReturn->ValueNode()->hasExprType());
+}
+
+void
+BlockTypesChecker::visitString (st::Symbol* scope, node::String* nodeString)
+{
+   DEBUG_REQUIRE (nodeString != NULL);
+   DEBUG_REQUIRE (node::isa<node::String>(nodeString));
+
+   st::IntType* symCharType = _symbols->_core_types.CharTy();
+   st::ArrayType* symUnsizedArrayType = st::util::getUnsizedArrayType(symCharType);
+   nodeString->setExprType(st::util::getPointerType(symUnsizedArrayType));
+
+   DEBUG_ENSURE (nodeString->hasExprType());
+}
+
+void
+BlockTypesChecker::visitTuple (st::Symbol* scope, node::Tuple* nodeTuple)
+{
+   DEBUG_REQUIRE (scope != NULL);
+   DEBUG_REQUIRE (nodeTuple != NULL);
+   DEBUG_REQUIRE (node::isa<node::Tuple>(nodeTuple));
 
    st::TypeVector tys;
    bool an_expr_failed = false;
-   for (size_t i = 0; i < n->ChildCount(); ++i)
+   node::Node* nodeChildType = NULL;
+
+   for (size_t i = 0; i < nodeTuple->ChildCount(); ++i)
    {
-      visitExpr(scope, n->getChild(i));
-      if (n->getChild(i)->hasExprType())
+      nodeChildType = nodeTuple->getChild(i);
+
+      visitExpr(scope, nodeChildType);
+      if (nodeChildType->hasExprType())
       {
-         tys.push_back(n->getChild(i)->ExprType());
+         tys.push_back(nodeChildType->ExprType());
       }
       else
       {
@@ -1146,195 +1149,217 @@ BlockTypesChecker::visitTuple (st::Symbol* scope, node::Tuple* n)
 
    if (!an_expr_failed)
    {
-      st::TupleType* tuple_ty = st::util::getTupleType(_symbols->System(), tys);
-      n->setExprType(tuple_ty);
-      ensureSizedExprType(n);
+      st::TupleType* symTupleType = st::util::getTupleType(_symbols->System(), tys);
+      nodeTuple->setExprType(symTupleType);
+      ensureSizedExprType(nodeTuple);
    }
    else
    {
-      n->setExprType(BugType());
+      nodeTuple->setExprType(BugType());
    }
 
-   DEBUG_ENSURE (n->hasExprType());
+   DEBUG_ENSURE (nodeTuple->hasExprType());
 }
 
 void
-BlockTypesChecker::visitTupleType (st::Symbol* scope, node::TupleType* n)
+BlockTypesChecker::visitTupleType (st::Symbol* scope, node::TupleType* nodeTupleType)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (n != NULL);
-   DEBUG_REQUIRE (node::isa<node::TupleType>(n));
+   DEBUG_REQUIRE (nodeTupleType != NULL);
+   DEBUG_REQUIRE (node::isa<node::TupleType>(nodeTupleType));
 
    st::TypeVector tys;
-   for (size_t i = 0; i < n->ChildCount(); ++i)
+   node::Node* nodeChildType = NULL;
+   for (size_t i = 0; i < nodeTupleType->ChildCount(); ++i)
    {
-      visitExpr(scope, n->getChild(i));
-      ensureSizedExprType (n->getChild(i));
-      assert(n->getChild(i)->hasExprType());
-      tys.push_back(n->getChild(i)->ExprType());
+      nodeChildType = nodeTupleType->getChild(i);
+
+      visitExpr(scope, nodeChildType);
+      ensureSizedExprType(nodeChildType);
+      tys.push_back(nodeChildType->ExprType());
    }
 
-   st::TupleType* tuple_ty = st::util::getTupleType(_symbols->System(), tys);
+   st::TupleType* symTupleType = st::util::getTupleType(_symbols->System(), tys);
 
-   if (tuple_ty != NULL)
+   if (symTupleType != NULL)
    {
-      n->setExprType(tuple_ty);
-      n->setBoundSymbol(tuple_ty);
+      nodeTupleType->setExprType(symTupleType);
+      nodeTupleType->setBoundSymbol(symTupleType);
    }
    else
    {
-      n->setExprType(BugType());
-      n->setBoundSymbol(BugType());
+      nodeTupleType->setExprType(BugType());
+      nodeTupleType->setBoundSymbol(BugType());
    }
+
+   DEBUG_ENSURE (nodeTupleType->hasExprType());
+   DEBUG_ENSURE (nodeTupleType->hasBoundSymbol());
 }
 
 void
-BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* node)
+BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* nodeAssign)
 {
-   DEBUG_REQUIRE (node != NULL);
-   DEBUG_REQUIRE (node::isa<node::VarAssign>(node));
-   DEBUG_REQUIRE (node->NameNode() != NULL);
-   DEBUG_REQUIRE (node->ValueNode() != NULL);
+   DEBUG_REQUIRE (nodeAssign != NULL);
+   DEBUG_REQUIRE (node::isa<node::VarAssign>(nodeAssign));
+   DEBUG_REQUIRE (nodeAssign->NameNode() != NULL);
+   DEBUG_REQUIRE (nodeAssign->ValueNode() != NULL);
 
-   visitExpr(scope, node->NameNode());
-   visitExpr(scope, node->ValueNode());
+   node::Node* nodeName = nodeAssign->NameNode();
+   node::Node* nodeValue = nodeAssign->ValueNode();
 
-   if (node->NameNode()->isAssignable())
+   visitExpr(scope, nodeName);
+   visitExpr(scope, nodeValue);
+
+   if (nodeName->isAssignable())
    {
-      if (node->NameNode()->hasExprType())
+      if (nodeName->hasExprType())
       {
-         node->setExprType(node->NameNode()->ExprType());
+         nodeAssign->setExprType(nodeName->ExprType());
       }
       else
       {
-         node->NameNode()->setExprType(BugType());
-         node->NameNode()->setBoundSymbol(BugType());
+         nodeName->setExprType(BugType());
+         nodeName->setBoundSymbol(BugType());
       }
-      checkAssignment (node->ValueNode(), node->ExprType());
+      checkAssignment (nodeValue, nodeAssign->ExprType());
    }
    else
    {
-      node->NameNode()->setExprType(BugType());
-      node->NameNode()->setBoundSymbol(BugType());
+      nodeName->setExprType(BugType());
+      nodeName->setBoundSymbol(BugType());
 
-      log::NotAssignable* e = new log::NotAssignable();
-      e->setPosition(node->NameNode()->copyPosition());
-      e->format();
-      log(e);
+      log::NotAssignable* err = new log::NotAssignable();
+      err->setPosition(nodeName->copyPosition());
+      err->format();
+      log(err);
    }
 
-   DEBUG_ENSURE (node->hasExprType());
+   DEBUG_ENSURE (nodeAssign->hasExprType());
 }
 
 void
-BlockTypesChecker::visitVarDecl (st::Symbol* scope,
-   node::VarDecl* var_decl_node)
+BlockTypesChecker::visitVarDecl (st::Symbol* scope, node::VarDecl* nodeDecl)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (var_decl_node != NULL);
-   DEBUG_REQUIRE (node::isa<node::VarDecl>(var_decl_node));
-   DEBUG_REQUIRE (var_decl_node->NameNode() != NULL);
-   DEBUG_REQUIRE (var_decl_node->TypeNode() != NULL);
+   DEBUG_REQUIRE (nodeDecl != NULL);
+   DEBUG_REQUIRE (node::isa<node::VarDecl>(nodeDecl));
+   DEBUG_REQUIRE (nodeDecl->NameNode() != NULL);
+   DEBUG_REQUIRE (nodeDecl->TypeNode() != NULL);
 
-   node::Text* name_node = var_decl_node->NameNode();
-   node::Node* type_node = var_decl_node->TypeNode();
-   node::Node* value_node = var_decl_node->ValueNode();
+   node::Text* nodeName = nodeDecl->NameNode();
+   node::Node* nodeType = nodeDecl->TypeNode();
+   node::Node* nodeValue = nodeDecl->ValueNode();
 
    // ------------------
    //  Check VALUE node
    // ------------------
    // Value is declared
-   if (value_node != NULL)
+   if (nodeValue != NULL)
    {
-      visitExpr(scope, value_node);
-      value_node = var_decl_node->ValueNode();
-      if (!value_node->hasExprType()) value_node->setExprType(BugType());
+      visitExpr(scope, nodeValue);
+
+      if (!nodeValue->hasExprType())
+      {
+         nodeValue->setExprType(BugType());
+      }
    }
 
    // -----------------
    //  Check TYPE node
    // -----------------
-   if (type_node->Kind() == node::MetaKind::PLACE_HOLDER)
+   // Type is not explicitly declared (type inference)
+   if (nodeType->Kind() == node::MetaKind::PLACE_HOLDER)
    {
-      // Type is not explicitly declared (type inference)
-
       // If type is not declared, we MUST have a value node to infer type from
-      assert (value_node != NULL);
+      assert (nodeValue != NULL);
 
-      type_node->setExprType(value_node->ExprType());
-      type_node->setBoundSymbol(value_node->ExprType());
+      nodeType->setExprType(nodeValue->ExprType());
+      nodeType->setBoundSymbol(nodeValue->ExprType());
    }
+   // Type is explicity declared
    else
    {
-      // Type is explicity declared
-      visitExpr(scope, type_node);
-      type_node = var_decl_node->TypeNode();
+      visitExpr(scope, nodeType);
    }
-   if (!type_node->hasExprType()) type_node->setExprType(BugType());
-   if (!type_node->hasBoundSymbol()) type_node->setBoundSymbol(BugType());
 
-   var_decl_node->setExprType(type_node->ExprType());
-
-
-   // Add the variable to the current scope
-   if (type_node->hasExprType())
+   if (!nodeType->hasExprType())
    {
-      if (scope->getChild(var_decl_node->Name()) == NULL)
-      {
-         st::Var* var = new st::Var();
-         var->setName(var_decl_node->Name());
-         var->setType(type_node->ExprType());
-         scope->addChild(var);
+      nodeType->setExprType(BugType());
+   }
 
-         name_node->setBoundSymbol(var);
-         name_node->setExprType(var->Type());
-         var_decl_node->setBoundSymbol(var);
+   if (!nodeType->hasBoundSymbol())
+   {
+      nodeType->setBoundSymbol(BugType());
+   }
+
+   nodeDecl->setExprType(nodeType->ExprType());
+
+
+   // ---------------------------------------
+   //  Add the variable to the current scope
+   // ---------------------------------------
+   if (nodeType->hasExprType())
+   {
+      if (scope->getChild(nodeDecl->Name()) == NULL)
+      {
+         st::Var* symVar = new st::Var();
+         symVar->setName(nodeDecl->Name());
+         symVar->setType(nodeType->ExprType());
+         scope->addChild(symVar);
+
+         nodeName->setBoundSymbol(symVar);
+         nodeName->setExprType(symVar->Type());
+         nodeDecl->setBoundSymbol(symVar);
       }
       else
       {
-         var_decl_node->setBoundSymbol(BugType());
+         nodeDecl->setBoundSymbol(BugType());
 
          log::VariableAlreadyDefined* err = new log::VariableAlreadyDefined();
-         err->setVarName(var_decl_node->Name());
-         err->setPosition(var_decl_node->copyPosition());
+         err->setVarName(nodeDecl->Name());
+         err->setPosition(nodeDecl->copyPosition());
          err->format();
          log(err);
       }
    }
 
-   ensureSizedExprType(type_node);
-   if (var_decl_node->ValueNode() != NULL)
+   ensureSizedExprType(nodeType);
+   if (nodeValue != NULL)
    {
-      checkAssignment(var_decl_node->ValueNode(), var_decl_node->ExprType());
+      checkAssignment(nodeValue, nodeDecl->ExprType());
    }
 
-   DEBUG_ENSURE (var_decl_node->hasExprType());
-   DEBUG_ENSURE (var_decl_node->hasBoundSymbol());
-   DEBUG_ENSURE (var_decl_node->TypeNode()->hasExprType());
-   DEBUG_ENSURE (var_decl_node->TypeNode()->hasBoundSymbol());
+   DEBUG_ENSURE (nodeDecl->hasExprType());
+   DEBUG_ENSURE (nodeDecl->hasBoundSymbol());
+   DEBUG_ENSURE (nodeDecl->TypeNode()->hasExprType());
+   DEBUG_ENSURE (nodeDecl->TypeNode()->hasBoundSymbol());
 }
 
 void
-BlockTypesChecker::visitWhile (st::Symbol* scope, node::While* while_node)
+BlockTypesChecker::visitWhile (st::Symbol* scope, node::While* nodeWhile)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (while_node != NULL);
-   DEBUG_REQUIRE (node::isa<node::While>(while_node));
+   DEBUG_REQUIRE (nodeWhile != NULL);
+   DEBUG_REQUIRE (node::isa<node::While>(nodeWhile));
 
-   // Check condition node
-   visitExpr(scope, while_node->ConditionNode());
-   ensureBoolExpr(while_node->ConditionNode());
+   // ----------------------
+   //  Check condition node
+   // ----------------------
+   visitExpr(scope, nodeWhile->ConditionNode());
+   ensureBoolExpr(nodeWhile->ConditionNode());
 
-   // Check block node
-   st::Symbol* while_block = new st::Symbol();
-   while_block->hintName(scope, "~while");
-   scope->addChild(while_block);
-   while_node->BlockNode()->setBoundSymbol(while_block);
+   // ------------------
+   //  Check block node
+   // ------------------
+   st::Symbol* symWhileBlock = new st::Symbol();
+   symWhileBlock->hintName(scope, "~while");
+   scope->addChild(symWhileBlock);
+   nodeWhile->BlockNode()->setBoundSymbol(symWhileBlock);
 
-   visitBlock(while_block, while_node->BlockNode());
+   visitBlock(symWhileBlock, nodeWhile->BlockNode());
 
-   DEBUG_ENSURE (while_node->ConditionNode()->hasExprType());
-   DEBUG_ENSURE (while_node->ConditionNode()->ExprType()->Name() == "bool");
+   DEBUG_ENSURE (nodeWhile->ConditionNode()->hasExprType());
+   DEBUG_ENSURE (nodeWhile->ConditionNode()->ExprType()->Name() == "bool");
 }
 
 

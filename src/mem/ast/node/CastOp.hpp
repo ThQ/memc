@@ -16,7 +16,7 @@ class CastOp: public Node
    public:
    static const int kTYPE = MetaKind::OP_CAST;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -29,25 +29,33 @@ class CastOp: public Node
    ~CastOp ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
    // ValueNode
-   GETTER(ValueNode, node::Node*) {return _value_node;}
-   SETTER(ValueNode, node::Node*) {_value_node = val;}
+   GETTER(ValueNode, node::Node*) {return _nodeValue;}
+   SETTER(ValueNode, node::Node*)
+   {
+      _nodeValue = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    // TypeNode
-   GETTER(TypeNode, node::Node*) {return _type_node;}
-   SETTER(TypeNode, node::Node*) {_type_node = val;}
+   GETTER(TypeNode, node::Node*) {return _nodeType;}
+   SETTER(TypeNode, node::Node*)
+   {
+      _nodeType = val;
+      if (val != NULL) val->setParent(this);
+   }
 
    virtual
    GETTER(MemorySize, int) {return sizeof(Node);}
 
 
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   //==========================================================================
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -61,13 +69,13 @@ class CastOp: public Node
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    public:
 
-   Node* _type_node;
-   Node* _value_node;
+   Node* _nodeType;
+   Node* _nodeValue;
 };
 
 } } }

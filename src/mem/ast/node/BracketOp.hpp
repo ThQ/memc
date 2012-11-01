@@ -13,7 +13,7 @@ class BracketOp: public Node
    public:
    static const int kTYPE = MetaKind::BRACKET_OP;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -26,24 +26,24 @@ class BracketOp: public Node
    ~BracketOp ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
    // ValueNode
-   GETTER(ValueNode, node::Node*) {return _value_node;}
+   GETTER(ValueNode, node::Node*) {return _nodeValue;}
    SETTER(ValueNode, node::Node*)
    {
-      _value_node = val;
+      _nodeValue = val;
       if (val != NULL) val->setParent(this);
    }
 
    // IndexNode
-   GETTER(IndexNode, node::Node*) {return _index_node;}
+   GETTER(IndexNode, node::Node*) {return _nodeIndex;}
    SETTER(IndexNode, node::Node*)
    {
-      _index_node = val;
+      _nodeIndex = val;
       if (val != NULL) val->setParent(this);
    }
 
@@ -51,8 +51,8 @@ class BracketOp: public Node
    GETTER(MemorySize, int) {return sizeof(BracketOp);}
 
 
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   //==========================================================================
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -66,13 +66,13 @@ class BracketOp: public Node
    setChild (size_t i, Node* n);
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
 
-   node::Node* _value_node;
-   node::Node* _index_node;
+   node::Node* _nodeIndex;
+   node::Node* _nodeValue;
 };
 
 } } }

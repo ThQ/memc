@@ -4,27 +4,27 @@
 namespace mem { namespace ast { namespace node {
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // CONSTRUCTORS / DESTRUCTOR
 //-----------------------------------------------------------------------------
 
 Call::Call ()
 {
-   _caller = NULL;
-   _caller_node = NULL;
    _is_instance_call = false;
-   _params_node = NULL;
+   _nodeCaller = NULL;
+   _nodeCaller = NULL;
+   _symCaller = NULL;
    _type = Call::kTYPE;
 }
 
 Call::~Call ()
 {
-   delete _caller_node;
-   delete _params_node;
+   delete _nodeCaller;
+   delete _nodeParams;
 }
 
 
-//-----------------------------------------------------------------------------
+//=============================================================================
 // PUBLIC FUNCTIONS
 //-----------------------------------------------------------------------------
 
@@ -33,8 +33,8 @@ Call::getChild (size_t i) const
 {
    switch (i)
    {
-      case 0: return _caller_node;
-      case 1: return _params_node;
+      case 0: return _nodeCaller;
+      case 1: return _nodeParams;
    }
    return NULL;
 }
