@@ -6,7 +6,7 @@ if [ ! -d "${cwd}/build" ] ; then mkdir "${cwd}/build" ; fi
 
 cd "${cwd}/build"
 
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_DEBUG="-Wall -O2" \
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS_DEBUG="-Wextra -O2" \
    && make \
    && make test
 

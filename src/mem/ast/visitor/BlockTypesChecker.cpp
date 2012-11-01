@@ -15,7 +15,7 @@ BlockTypesChecker::checkCallParameters (st::Symbol* caller, st::FunctionType* fu
 {
    DEBUG_REQUIRE (func_sym != NULL);
 
-   int param_count = params != NULL ? params->ChildCount() : 0;
+   size_t param_count = params != NULL ? params->ChildCount() : 0;
 
    if (params != NULL)
    {

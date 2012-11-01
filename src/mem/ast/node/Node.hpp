@@ -21,7 +21,7 @@ class Node
    static const int kTYPE = MetaKind::UNKNOWN;
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -34,14 +34,17 @@ class Node
    ~Node ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
    // BoundSymbol
-   GETTER(BoundSymbol, st::Symbol*) {return _bound_type;}
-   SETTER(BoundSymbol, st::Symbol*) {_bound_type = val;}
+   st::Symbol*
+   BoundSymbol() const {return _bound_type;}
+
+   void
+   setBoundSymbol(st::Symbol* val) {_bound_type = val;}
 
    // ChildCount
    virtual
@@ -51,31 +54,51 @@ class Node
    void Depth (unsigned long depth);
 
    // ExprType
-   GETTER(ExprType, st::Type*) {return _exp_type;}
-   SETTER(ExprType, st::Type*) {_exp_type = val;}
-   SETTER(ExprType, st::Symbol*) {assert(st::isa<st::Type>(val));_exp_type = st::cast<st::Type>(val);}
+   st::Type*
+   ExprType () const {return _exp_type;}
+
+   void
+   setExprType (st::Type* val) {_exp_type = val;}
+
+   void
+   setExprType (st::Symbol* val) {assert(st::isa<st::Type>(val));_exp_type = st::cast<st::Type>(val);}
 
    // Kind
-   GETTER(Kind, int) {return _type;}
-   SETTER(Kind, int) {_type = val;}
+   int
+   Kind () const {return _type;}
+
+   void
+   setKind (int val) {_type = val;}
 
    // KindName
-   GETTER(KindName, std::string) {return get_type_name(_type);}
-   GETTER(KindNameCstr, const char*) {return get_type_name(_type);}
+   std::string
+   KindName () const {return get_type_name(_type);}
+
+   // KindNameCstr
+   const char*
+   KindNameCstr () const {return get_type_name(_type);}
 
    // MemorySize
-   virtual
-   GETTER(MemorySize, int) {return sizeof(Node);}
+   virtual int
+   MemorySize () const {return sizeof(Node);}
 
    // Parent
-   GETTER(Parent, Node*) {return _parent;}
-   SETTER(Parent, Node*) {_parent = val; assert(_checkCircularDependencies());}
+   Node*
+   Parent() const {return _parent;}
+
+   void
+   setParent (Node* val) {_parent = val; assert(_checkCircularDependencies());}
 
    // Position
-   GETTER(Position, fs::position::Range*) {return _position;}
-   SETTER(Position, fs::position::Range*) {_position = val;}
+   fs::position::Range*
+   Position () const {return _position;}
 
-   GETTER(StringRep, std::string)
+   void
+   setPosition (fs::position::Range* val) {_position = val;}
+
+   // StringRep
+   std::string
+   StringRep () const
    {
       std::ostringstream str;
       str << "[@" << static_cast<const void*>(this);
@@ -85,13 +108,18 @@ class Node
    }
 
    // Value
-   GETTER(Value, std::string) {return _value;}
-   SETTER(Value, std::string) {_value = val;}
+   std::string
+   Value () const {return _value;}
+
+   void
+   setValue (std::string val) {_value = val;}
 
    // ValueCstr
-   GETTER(ValueCstr, const char*) {return _value.c_str();}
+   const char*
+   ValueCstr () const {return _value.c_str();}
 
-   //--------------------------------------------------------------------------
+
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -143,7 +171,7 @@ class Node
 
    // Returns true if the node is of a given type.
    inline bool
-   isKind (unsigned int kind) const { return _type == kind; }
+   isKind (int kind) const { return _type == kind; }
 
    // Returns a vector of the node's children types.
    st::TypeVector

@@ -168,6 +168,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/ast/node/FinalId.cpp
 	${memc_SRC}/mem/ast/node/For.cpp
 	${memc_SRC}/mem/ast/node/Func.cpp
+	${memc_SRC}/mem/ast/node/FuncType.cpp
 	${memc_SRC}/mem/ast/node/Id.cpp
 	${memc_SRC}/mem/ast/node/If.cpp
 	${memc_BUILT}/mem/ast/node/Kind.cpp
