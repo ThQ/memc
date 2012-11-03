@@ -3,6 +3,9 @@
 namespace mem { namespace fs { namespace position {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
 Cursor::Cursor ()
 {
    _file = NULL;
@@ -24,6 +27,11 @@ Cursor::Cursor (fs::File* file, int line, int column)
    _line = line;
 }
 
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
 Position*
 Cursor::copy ()
 {
@@ -36,7 +44,7 @@ Cursor::copy ()
 }
 
 PositionType
-Cursor::getTypeAt (int column)
+Cursor::getTypeAt (int column) const
 {
    if (column == _column)
    {
@@ -44,5 +52,6 @@ Cursor::getTypeAt (int column)
    }
    return NOTHING;
 }
+
 
 } } }

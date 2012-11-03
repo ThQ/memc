@@ -12,13 +12,34 @@ namespace mem { namespace fs { namespace position {
 
 class Composite : public Position
 {
-   public : std::vector<Position*> _children;
+   //==========================================================================
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
+
+   // Destructor.
+   virtual
+   ~Composite ();
 
 
-   public: virtual ~Composite ();
+   //==========================================================================
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
 
-   public: void addChild (Position* child);
-   public: virtual PositionType getTypeAt (int column);
+   void
+   addChild (Position* child);
+
+   virtual PositionType
+   getTypeAt (int column) const;
+
+
+   //==========================================================================
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   std::vector<Position*> _children;
 };
 
 

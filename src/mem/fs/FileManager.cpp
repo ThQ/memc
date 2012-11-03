@@ -4,6 +4,10 @@
 namespace mem { namespace fs {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 FileManager::~FileManager ()
 {
    std::map<std::string,File*>::iterator it = _files.begin();
@@ -13,12 +17,17 @@ FileManager::~FileManager ()
    }
 }
 
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
 std::string
 FileManager::getLineOf (std::string file_path, unsigned int lineno)
 {
-   std::string line;
-   std::map<std::string, File*>::iterator file_it;
-   if ((file_it = _files.find(file_path)) != _files.end())
+   std::string line = "";
+   std::map<std::string, File*>::iterator file_it = _files.find(file_path);
+   if (file_it != _files.end())
    {
       if (file_it->second->Lines().size() > lineno)
       {
@@ -31,6 +40,7 @@ FileManager::getLineOf (std::string file_path, unsigned int lineno)
 File*
 FileManager::openFile (std::string file_path)
 {
+   // FIXME Unecessary new/delete
    File* file = new File();
    if (file->open(file_path))
    {
@@ -42,8 +52,7 @@ FileManager::openFile (std::string file_path)
 }
 
 File*
-FileManager::tryOpenFile (std::string file_path,
-   std::vector<std::string>& paths_tried)
+FileManager::tryOpenFile (std::string file_path, std::vector<std::string>& paths_tried)
 {
    File* res = openFile(file_path);
    paths_tried.push_back(file_path);

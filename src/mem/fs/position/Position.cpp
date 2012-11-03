@@ -4,9 +4,18 @@
 namespace mem { namespace fs { namespace position {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Position::~Position()
 {
 }
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 Position*
 Position::copy ()
@@ -17,7 +26,7 @@ Position::copy ()
 }
 
 PositionType
-Position::getTypeAt (int column)
+Position::getTypeAt (int column) const
 {
    return NOTHING;
 }

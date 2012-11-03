@@ -71,7 +71,7 @@ using namespace mem;
          (Current).setLineEnd(YYRHSLOC (Rhs, 1).LineEnd()); \
          (Current).setColumnStart(YYRHSLOC (Rhs, 1).ColumnStart()); \
          (Current).setColumnEnd(YYRHSLOC (Rhs, N).ColumnEnd()); \
-         (Current).sFile(YYRHSLOC(Rhs, 1)._file); \
+         (Current).setFile(YYRHSLOC(Rhs, 1).File()); \
       } \
       else \
       { \
@@ -79,7 +79,7 @@ using namespace mem;
          (Current).setLineEnd(YYRHSLOC (Rhs, 0).LineEnd()); \
          (Current).setColumnStart(YYRHSLOC (Rhs, 0).ColumnEnd()); \
          (Current).setColumnEnd(YYRHSLOC (Rhs, 0).ColumnEnd()); \
-         (Current).sFile(NULL); \
+         (Current).setFile(NULL); \
       } \
    } \
    while (YYID (0))
@@ -116,7 +116,7 @@ extern langmem::Tokenizer gTOKENIZER;
       const char *s)
    {
       fs::position::Position* pos = new fs::position::Position();
-      pos->sFile(file);
+      pos->setFile(file);
 
       log::Message* msg = new log::Error();
       msg->setId("syntax-error");

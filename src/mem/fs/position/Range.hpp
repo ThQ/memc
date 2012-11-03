@@ -2,7 +2,6 @@
 #define _MEM__FS__POSITION__RANGE__HPP_
 
 
-#include <iostream>
 #include "mem/fs/position/Position.hpp"
 
 
@@ -11,15 +10,17 @@ namespace mem { namespace fs { namespace position {
 
 class Range : public Position
 {
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
    Range ();
+
    Range (Range pos_start, Range pos_end);
 
-   //--------------------------------------------------------------------------
+
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -37,7 +38,8 @@ class Range : public Position
    GETTER(LineEnd, int) {return _line_end;}
    SETTER(LineEnd, int) {_line_end = val;}
 
-   //--------------------------------------------------------------------------
+
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -55,12 +57,14 @@ class Range : public Position
    import (Range r);
 
    virtual PositionType
-   getTypeAt (int column);
+   getTypeAt (int column) const;
 
-   //--------------------------------------------------------------------------
+
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    protected:
+
    int _column_start;
    int _column_end;
    int _line_end;

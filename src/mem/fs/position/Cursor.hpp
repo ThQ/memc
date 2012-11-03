@@ -10,14 +10,35 @@ namespace mem { namespace fs { namespace position {
 
 class Cursor : public Position
 {
-   public: int _column;
+   //==========================================================================
+   // CONSTRUCTORS / DESTRUCTOR
+   //--------------------------------------------------------------------------
+   public:
 
-   public: Cursor();
-   public: Cursor (int line, int column);
-   public: Cursor (fs::File* file, int line, int column);
+   Cursor();
 
-   public: virtual Position* copy ();
-   public: virtual PositionType getTypeAt (int column);
+   Cursor (int line, int column);
+
+   Cursor (fs::File* file, int line, int column);
+
+   //==========================================================================
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   virtual Position*
+   copy ();
+
+   virtual PositionType
+   getTypeAt (int column) const;
+
+
+   //==========================================================================
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   int _column;
 };
 
 } } }

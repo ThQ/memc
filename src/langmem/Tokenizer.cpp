@@ -59,7 +59,7 @@ Tokenizer::getNextToken ()
      t.Location().LineEnd(), t.Location().ColumnEnd());
 #endif
 
-   t.Location().sFile(_fs_file);
+   t.Location().setFile(_fs_file);
    return t;
 }
 

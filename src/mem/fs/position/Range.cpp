@@ -3,6 +3,11 @@
 
 namespace mem { namespace fs { namespace position {
 
+
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Range::Range ()
 {
    _file = NULL;
@@ -20,6 +25,11 @@ Range::Range (Range pos_start, Range pos_end)
    _column_start = pos_start._column_start;
    _column_end = pos_end._column_end;
 }
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 void
 Range::append (Range r)
@@ -56,7 +66,7 @@ Range::import (Range r)
 }
 
 PositionType
-Range::getTypeAt (int column)
+Range::getTypeAt (int column) const
 {
    // @FIXME : does not work on multi-lines
    if (column == _column_start)

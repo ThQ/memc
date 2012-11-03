@@ -3,6 +3,10 @@
 namespace mem { namespace fs { namespace position {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 Composite::~Composite ()
 {
    for (size_t i = 0; i < _children.size() ; ++i)
@@ -11,16 +15,21 @@ Composite::~Composite ()
    }
 }
 
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
 void
 Composite::addChild (Position* child)
 {
-   _file = child->_file;
-   _line = child->_line;
+   _file = child->File();
+   _line = child->Line();
    _children.push_back(child);
 }
 
 PositionType
-Composite::getTypeAt (int column)
+Composite::getTypeAt (int column) const
 {
    PositionType i_type = NOTHING;
    PositionType cur_type = NOTHING;

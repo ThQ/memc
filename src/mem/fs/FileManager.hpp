@@ -14,7 +14,38 @@ namespace mem { namespace fs {
 
 class FileManager
 {
+   //==========================================================================
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
+   public:
+
+   // Destructor.
+   ~FileManager();
+
+
+   //==========================================================================
+   // PUBLIC FUNCTIONS
+   //--------------------------------------------------------------------------
+   public:
+
+   // Append the include path.
+   inline void
+   appendPath (std::string dir_path) {_path.push_back(dir_path);}
+
+   // Return the Nth line in a given previously opened file.
+   std::string
+   getLineOf (std::string file_path, unsigned int line);
+
+   // Open a file.
+   File*
+   openFile (std::string file_path);
+
+   // Try to open a file.
+   File*
+   tryOpenFile (std::string file_path, std::vector<std::string>& paths_tried);
+
+
+   //==========================================================================
    // FIELDS
    //--------------------------------------------------------------------------
    public:
@@ -22,46 +53,6 @@ class FileManager
    std::map<std::string, File*> _files;
    std::vector<std::string> _path;
 
-
-   //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
-   //--------------------------------------------------------------------------
-   public:
-
-   /**
-    * Destructor.
-    */
-   ~FileManager();
-
-
-   //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
-   //--------------------------------------------------------------------------
-   public:
-
-   /**
-    * Append the include path.
-    */
-   inline void
-   appendPath (std::string dir_path) {_path.push_back(dir_path);}
-
-   /**
-    * Return the Nth line in a given previously opened file.
-    */
-   std::string
-   getLineOf (std::string file_path, unsigned int line);
-
-   /**
-    * Open a file.
-    */
-   File*
-   openFile (std::string file_path);
-
-   /**
-    * Try to open a file.
-    */
-   File*
-   tryOpenFile (std::string file_path, std::vector<std::string>& paths_tried);
 };
 
 

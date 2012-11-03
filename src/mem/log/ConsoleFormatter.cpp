@@ -117,10 +117,10 @@ void
 ConsoleFormatter::_formatPosition (std::ostream& str, fs::position::Position* pos_a)
 {
    fs::position::Range* pos = static_cast<fs::position::Range*>(pos_a);
-   if (pos->_file != NULL)
+   if (pos->File() != NULL)
    {
       str << "     @ ";
-      str << pos->gFile()->Path();
+      str << pos->File()->Path();
       str << ":";
       str << pos->LineStart();
       str << "\n";
@@ -136,10 +136,12 @@ ConsoleFormatter::_formatPosition (std::ostream& str, fs::position::Position* po
 void
 ConsoleFormatter::_formatSourceLines (std::ostream& str, fs::position::Range* pos)
 {
+   DEBUG_REQUIRE (pos != NULL);
+   DEBUG_REQUIRE (pos->File() != NULL);
 
-   if (pos->LineStart() > 0 && pos->gFile()->isLineInFile(pos->LineStart()-1))
+   if (pos->LineStart() > 0 && pos->File()->isLineInFile(pos->LineStart()-1))
    {
-      std::vector<std::string> lines = pos->gFile()->getLineWithContext(pos->LineStart()-1, _num_context_lines);
+      std::vector<std::string> lines = pos->File()->getLineWithContext(pos->LineStart()-1, _num_context_lines);
 
       for (size_t i = 0; i < lines.size(); ++i)
       {
