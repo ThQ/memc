@@ -912,14 +912,19 @@ TupleExpr:
       {
          $$ = $2->getChild(0);
          $$->setParent(NULL);
+         // For some reason, we get a segfault if we delete $2
          //delete $2;
       }
       else
       {
+         DEBUG_PRINT("Tuple with several expr\n");
          mem::ast::node::Tuple* nodeTuple = new mem::ast::node::Tuple();
-         nodeTuple->addChild($2);
+         nodeTuple->eat($2);
          nodeTuple->setPosition(@$.copy_range());
          $$ = nodeTuple;
+
+         // See before
+         //delete $2;
       }
    }
 
