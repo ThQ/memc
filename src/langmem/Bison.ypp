@@ -715,6 +715,7 @@ Block:
    T_OPEN_BRACE Statements T_CLOSE_BRACE
    {
       $$ = mem::ast::node::cast<mem::ast::node::Block>($2);
+      $$->setPosition(@$.copy_range());
    }
 
 SimpleId:
