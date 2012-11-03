@@ -280,7 +280,7 @@ class TestRunner:
       if f:
          f.write(html)
          f.close()
-         self._logger.logln("HTML report written to " + report_file)
+         self._logger.logln("HTML report: " + report_file)
 
    def get_memc_version_string (self):
       args = [kMEMC, "--version"]
@@ -288,9 +288,9 @@ class TestRunner:
       return memc.communicate()[0].decode()
 
    def log_section (self, name):
-      section = "=" * 79 + "\n"
-      section += " " + name + "\n"
-      section += "-" * 79
+      section = "\n " + ("=" * 77) + " \n"
+      section += "| " + name.ljust(75) + " |\n"
+      section += " " + ("=" * 77) + " "
       self._logger.logln(section)
 
    def print_summary (self):
@@ -298,11 +298,17 @@ class TestRunner:
       percent_passed = int(round(100-(1.0 * len(self._failed_tests)/self._num_tests)*100, 0))
       print ("")
       self.log_section("Summary")
-      summary = str(self._num_tests) + " tests run\n"
-      summary += " - Failed: " + str(self._num_failed_tests) + " (" + str(self._percent_failed_tests) + "%)\n"
-      summary += " - Passed: " + str(self._num_tests - self._num_failed_tests) + " (" +  str(self._percent_passed_tests) + "%)"
+      summary =  "   Tests run: " + str(self._num_tests) + " (100%)\n"
+      summary += "Tests failed: " + str(self._num_failed_tests).rjust(len(str(self._num_tests))) + " (" + str(self._percent_failed_tests) + "%)\n"
+      summary += "Tests passed: " + str(self._num_tests - self._num_failed_tests).rjust(len(str(self._num_tests))) + " (" +  str(self._percent_passed_tests) + "%)"
       summary += "\n"
       self._logger.logln(summary)
+
+      if self._num_tests != self._num_passed_tests:
+         self.log_section("/!\ Please submit this report")
+         self._logger.logln("You have stumbled upon some bugs that we would like to know about.")
+         self._logger.logln("Please submit this report to\n>>> https://github.com/ThQ/memc/issues/new")
+         self._logger.logln("")
 
    def read_file (self, path):
       contents = ""
@@ -313,16 +319,27 @@ class TestRunner:
       return contents
 
    def run (self):
-      self.log_section("Running tests for `" + kMEMC + "'...")
-      self._logger.logln("Test directory: " + kTEST_DIR)
-      self._logger.logln("Reports directory: " + kREPORT_DIR)
+      uname = os.uname()
+      self.log_section("Environment")
+      self._logger.logln("Platform".rjust(11) + ": " + sys.platform)
+      self._logger.logln("System name".rjust(11) + ": " + uname[0])
+      self._logger.logln("Node name".rjust(11) + ": " + uname[1])
+      self._logger.logln("Release".rjust(11) + ": " + uname[2])
+      self._logger.logln("Version".rjust(11) + ": " + uname[3])
+      self._logger.logln("Machine".rjust(11) + ": " + uname[4])
       self._logger.logln("")
 
       self.discover_tests(kTEST_DIR)
 
-      self._logger.logln(str(self._num_tests) + " tests discovered:")
+      self.log_section("Running tests for `" + kMEMC + "'...")
+      self._logger.logln("Test directory".rjust(17) + ": " + kTEST_DIR)
+      self._logger.logln("Reports directory".rjust(17) + ": " + kREPORT_DIR)
+      self._logger.logln("Tests discovered".rjust(17) + ": " + str(self._num_tests))
+      self._logger.logln("")
 
       self.run_tests()
+
+      self._logger.logln("")
 
       if self._num_tests != 0:
          self._percent_failed_tests = round(self._num_failed_tests * 100 / self._num_tests, 1)
@@ -331,24 +348,25 @@ class TestRunner:
          self._percent_failed_tests = 0
          self._percent_passed_tests = 0
 
+
    def run_tests (self):
       i = 1
       for test in self._tests:
          progress = str(i).rjust(len(str(self._num_tests))) + "/" + str(self._num_tests)
 
          log_ln = ("(" + progress + ") Running <" + test.name + ">").ljust(71, ".") + " "
-         self._logger.log(log_ln)
+         #self._logger.log(log_ln)
          report = test.run()
          self._reports.append(report)
 
          if report.status == "passed":
-            self._logger.logln("OK")
+            self._logger.log(".")
             self._num_passed_tests += 1
          elif report.status == "failed":
-            self._logger.logln("FAILED")
+            self._logger.log("!")
             self._num_failed_tests += 1
          else:
-            self._logger.logln("CRASHED")
+            self._logger.log("#")
             self._num_failed_tests += 1
 
          i += 1
@@ -360,12 +378,4 @@ runner.print_summary()
 runner.dump_html_report(os.path.join(kREPORT_DIR, "memc-test-report.html"))
 
 if runner._num_tests != runner._num_passed_tests:
-    print("\n" + "=" * 80)
-    print("")
-    print("   Please submit this test report to")
-    print("")
-    print("      >>> https://github.com/ThQ/memc/issues/new")
-    print("")
-    print("   You have stumbled upon some bugs we'd like to know.\n")
-    print("=" * 80 + "\n")
-    sys.exit(1)
+   sys.exit(1)
