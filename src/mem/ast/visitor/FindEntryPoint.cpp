@@ -4,11 +4,20 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 FindEntryPoint::FindEntryPoint ()
 {
    _name = "ast.FindEntryPoint";
    _entry_point = NULL;
 }
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 bool
 FindEntryPoint::tearDown ()
@@ -28,13 +37,13 @@ FindEntryPoint::visit (node::Node* node)
 {
    if (node::isa<node::Func>(node))
    {
-      st::Func* func = st::cast<st::Func>(node->BoundSymbol());
-      if (func->Name() == "main")
+      st::Func* symFunc = st::cast<st::Func>(node->BoundSymbol());
+      if (symFunc->Name() == "main")
       {
          if (_entry_point == NULL)
          {
-            _entry_point = func;
-            func->setIsEntryPoint(true);
+            _entry_point = symFunc;
+            symFunc->setIsEntryPoint(true);
          }
          else
          {

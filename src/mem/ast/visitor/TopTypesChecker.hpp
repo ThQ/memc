@@ -25,25 +25,21 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-/**
- * Checks correctness of types in high level declarations : functions
- * and fields.
- */
+// Checks correctness of types in high level declarations : functions
+// and fields.
 class TopTypesChecker : public BlockTypesChecker
 {
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    TopTypesChecker ();
 
 
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   //==========================================================================
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 

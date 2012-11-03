@@ -4,10 +4,19 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 FindClasses::FindClasses ()
 {
    _name = "ast.FindClasses";
 }
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 bool
 FindClasses::visit (node::Node* node)
@@ -16,30 +25,37 @@ FindClasses::visit (node::Node* node)
 
    if (node::isa<node::Class>(node))
    {
-      node::Class* cls_node = node::cast<node::Class>(node);
-      visitClassDecl(cls_node);
+      node::Class* nodeClass = node::cast<node::Class>(node);
+      visitClassDecl(nodeClass);
    }
 
    return true;
 }
 
 void
-FindClasses::visitClassDecl (node::Class* cls_node)
+FindClasses::visitClassDecl (node::Class* nodeClass)
 {
-   assert(cls_node != NULL);
+   DEBUG_REQUIRE (nodeClass != NULL);
 
-   node::File* file_node = util::getFileNode(cls_node);
-   assert(file_node != NULL);
-   st::Namespace* file_sym = st::cast<st::Namespace>(file_node->BoundSymbol());
-   assert(file_sym != NULL);
+   //-------------------
+   // Create class type
+   //-------------------
+   st::Class* symClass = new st::Class();
+   symClass->setName(nodeClass->Value());
 
-   st::Class* cls = new st::Class();
-   cls->setName(cls_node->Value());
-   cls_node->setBoundSymbol(cls);
 
-   st::util::registerType(_symbols, file_sym, cls);
+   //--------------------------------
+   // Register class in symbol table
+   //--------------------------------
+   node::File* nodeFile = util::getFileNode(nodeClass);
+   st::Namespace* symFile = st::cast<st::Namespace>(nodeFile->BoundSymbol());
+   st::util::registerType(_symbols, symFile, symClass);
 
-   DEBUG_PRINTF("Found class `%s'\n", cls->Name().c_str());
+   nodeClass->setBoundSymbol(symClass);
+
+   DEBUG_PRINTF("Found class type `%s'(%p), associated with node `%s' (%p)\n",
+      symClass->gQualifiedNameCstr(), symClass,
+      nodeClass->KindNameCstr(), nodeClass);
 }
 
 } } }

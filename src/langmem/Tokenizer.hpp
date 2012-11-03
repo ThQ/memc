@@ -22,31 +22,7 @@ namespace langmem {
 
 class Tokenizer
 {
-   //--------------------------------------------------------------------------
-   // FIELDS
-   //--------------------------------------------------------------------------
-   protected:
-
-   static const int kBUFFER_SIZE=10;
-   std::string _tokenBuffer;
-   char _buffer[kBUFFER_SIZE];
-   int _bufferCursor;
-   int _bufferSize;
-   int _cur_line;
-   int _cur_column;
-   mem::fs::File* _fs_file;
-   std::string _indent_unit;
-   //int _indent_level;
-   bool _eat_space;
-   std::istream* _in;
-   mem::fs::position::Range _location;
-   mem::log::Logger* _logger;
-   int _state;
-   int _cur_tok;
-   std::queue<Token> _token_queue;
-
-
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -58,7 +34,7 @@ class Tokenizer
    SETTER(FsFile, mem::fs::File*) {_fs_file = val;}
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -70,7 +46,7 @@ class Tokenizer
    ~Tokenizer ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -106,7 +82,7 @@ class Tokenizer
    }
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROTECTED FUNCTIONS
    //--------------------------------------------------------------------------
    protected:
@@ -218,6 +194,32 @@ class Tokenizer
       _location.setLineEnd(_cur_line);
       _location.setColumnEnd(_cur_column);
    }
+
+
+   //==========================================================================
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   static const int kBUFFER_SIZE=10;
+   std::string _tokenBuffer;
+   char _buffer[kBUFFER_SIZE];
+   int _bufferCursor;
+   int _bufferSize;
+   int _cur_line;
+   int _cur_column;
+   mem::fs::File* _fs_file;
+   std::string _indent_unit;
+   //int _indent_level;
+   bool _eat_space;
+   std::istream* _in;
+   mem::fs::position::Range _location;
+   mem::log::Logger* _logger;
+   int _state;
+   int _cur_tok;
+   std::queue<Token> _token_queue;
+
+
 };
 
 

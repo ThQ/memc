@@ -24,12 +24,11 @@ BlockTypesChecker::checkCallParameters (st::Symbol* symCaller, st::FunctionType*
 {
    DEBUG_REQUIRE (symFunc != NULL);
 
-
    if (nodeParams != NULL)
    {
-      size_t param_count = nodeParams->ChildCount();
+      size_t nParams = nodeParams->ChildCount();
 
-      if (symFunc->ArgumentCount() == param_count)
+      if (symFunc->ArgumentCount() == nParams)
       {
          // Each parameter node must have the same expr type as declared in its
          // function definition.
@@ -42,7 +41,7 @@ BlockTypesChecker::checkCallParameters (st::Symbol* symCaller, st::FunctionType*
       {
          log::BadParameterCount* err = new log::BadParameterCount();
          err->setExpectedParamCount(symFunc->ArgumentCount());
-         err->setParamCount(nodeParams->ChildCount());
+         err->setParamCount(nParams);
          err->format();
          err->setPosition(nodeParams->copyPosition());
          log(err);
@@ -104,30 +103,30 @@ BlockTypesChecker::visitAmpersand (st::Symbol* scope, node::UnaryOp* node)
    DEBUG_REQUIRE (node != NULL);
    DEBUG_REQUIRE (node::isa<node::UnaryOp>(node));
 
-   node::Node* value_n = node->ValueNode();
+   node::Node* nodeValue = node->ValueNode();
 
-   visitExpr(scope, value_n);
+   visitExpr(scope, nodeValue);
 
-   if (value_n->hasExprType())
+   if (nodeValue->hasExprType())
    {
-      st::Type* ptr_base_ty = st::cast<st::Type>(value_n->ExprType());
-      std::string base_ty_name = ptr_base_ty->Name();
-      st::Type* amp_ty = st::util::getPointerType(ptr_base_ty);
+      st::Type* symPointerBaseType = st::cast<st::Type>(nodeValue->ExprType());
+      std::string base_ty_name = symPointerBaseType->Name();
+      st::Type* symAmpType = st::util::getPointerType(symPointerBaseType);
 
-      assert (amp_ty != NULL);
-      node->setExprType(amp_ty);
+      assert (symAmpType != NULL);
+      node->setExprType(symAmpType);
 
       // FIXME There should be more checks. For ex you should not be able to
       // do : &2
    }
    else
    {
-      value_n->setExprType(BugType());
+      nodeValue->setExprType(BugType());
    }
 
    DEBUG_ENSURE (node->hasExprType());
-   DEBUG_ENSURE (value_n != NULL);
-   DEBUG_ENSURE (value_n->hasExprType());
+   DEBUG_ENSURE (nodeValue != NULL);
+   DEBUG_ENSURE (nodeValue->hasExprType());
 }
 
 void
@@ -206,7 +205,9 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    DEBUG_REQUIRE (n != NULL);
    DEBUG_REQUIRE (node::isa<node::ArrayType>(n));
 
-   int arr_size = -1;
+
+   int nArraySize = -1;
+
 
    // -----------
    //  Item type
@@ -243,7 +244,7 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
       {
          st::IntConstant* i_const = st::cast<st::IntConstant>(nodeLength->BoundSymbol());
          // FIXME This may break since it returns an int64_t
-         arr_size = (int)i_const->getSignedValue();
+         nArraySize = (int)i_const->getSignedValue();
       }
    }
 
@@ -255,14 +256,14 @@ BlockTypesChecker::visitArrayType (st::Symbol* scope, node::ArrayType* n)
    if (symItemType != BugType())
    {
       // Unsized array
-      if (arr_size == -1)
+      if (nArraySize == -1)
       {
          symArrayType = st::util::getUnsizedArrayType(symItemType);
       }
       // Sized array
       else
       {
-         symArrayType = st::util::getSizedArrayType(symItemType, arr_size);
+         symArrayType = st::util::getSizedArrayType(symItemType, nArraySize);
       }
    }
 
@@ -425,8 +426,9 @@ BlockTypesChecker::visitDeref (st::Symbol* scope, node::Node* n)
    DEBUG_REQUIRE (n != NULL);
    DEBUG_REQUIRE (n->getChild(0) != NULL);
 
-   visitExpr(scope, n->getChild(0));
    node::Node* nodeValue = n->getChild(0);
+   visitExpr(scope, nodeValue);
+
    st::Type* symValueType = nodeValue != NULL ? nodeValue->ExprType() : NULL;
 
    if (symValueType != NULL)
@@ -449,25 +451,28 @@ BlockTypesChecker::visitDeref (st::Symbol* scope, node::Node* n)
 }
 
 void
-BlockTypesChecker::visitLogicalExpr (st::Symbol* scope, node::Node* expr_node)
+BlockTypesChecker::visitLogicalExpr (st::Symbol* scope, node::Node* node)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (expr_node != NULL);
-   DEBUG_REQUIRE (expr_node->getChild(0) != NULL);
-   DEBUG_REQUIRE (expr_node->getChild(1) != NULL);
+   DEBUG_REQUIRE (node != NULL);
+   DEBUG_REQUIRE (node->getChild(0) != NULL);
+   DEBUG_REQUIRE (node->getChild(1) != NULL);
 
-   if (expr_node->Kind() == node::MetaKind::OP_AND || expr_node->Kind() == node::MetaKind::OP_OR)
+   node::Node* nodeLeft = node->getChild(0);
+   node::Node* nodeRight = node->getChild(1);
+
+   if (node->Kind() == node::MetaKind::OP_AND || node->Kind() == node::MetaKind::OP_OR)
    {
-      visitExpr(scope, expr_node->getChild(0));
-      visitExpr(scope, expr_node->getChild(1));
+      visitExpr(scope, nodeLeft);
+      ensureBoolExpr(nodeLeft);
 
-      ensureBoolExpr(expr_node->getChild(0));
-      ensureBoolExpr(expr_node->getChild(1));
+      visitExpr(scope, nodeRight);
+      ensureBoolExpr(nodeRight);
 
-      expr_node->setExprType(_core_types->BoolTy());
+      node->setExprType(_core_types->BoolTy());
    }
 
-   DEBUG_ENSURE (expr_node->hasExprType());
+   DEBUG_ENSURE (node->hasExprType());
 }
 
 void
@@ -767,44 +772,44 @@ BlockTypesChecker::visitExpr (st::Symbol* scope, node::Node* node)
 }
 
 void
-BlockTypesChecker::visitSymbolName (st::Symbol* scope, node::Node* id_node)
+BlockTypesChecker::visitSymbolName (st::Symbol* scope, node::Node* nodeId)
 {
    DEBUG_REQUIRE (scope != NULL);
-   DEBUG_REQUIRE (id_node != NULL);
+   DEBUG_REQUIRE (nodeId != NULL);
 
-   st::Symbol* sym = _symbols->lookupSymbol(scope, id_node->Value());
+   st::Symbol* sym = _symbols->lookupSymbol(scope, nodeId->Value());
 
    if (sym != NULL)
    {
       if (st::isa<st::Alias>(sym))
       {
-         id_node->setBoundSymbol(st::cast<st::Alias>(sym)->Aliased());
+         nodeId->setBoundSymbol(st::cast<st::Alias>(sym)->Aliased());
       }
       else
       {
-         id_node->setBoundSymbol(sym);
+         nodeId->setBoundSymbol(sym);
       }
 
-      st::Type* expr_ty = st::util::getExprType(sym);
+      st::Type* symExprType = st::util::getExprType(sym);
 
-      if (expr_ty != NULL)
+      if (symExprType != NULL)
       {
-         id_node->setExprType(expr_ty);
+         nodeId->setExprType(symExprType);
       }
       else
       {
-         id_node->setExprType(BugType());
+         nodeId->setExprType(BugType());
       }
    }
    else
    {
-      id_node->setBoundSymbol(BugType());
-      id_node->setExprType(BugType());
+      nodeId->setBoundSymbol(BugType());
+      nodeId->setExprType(BugType());
 
-      logSymbolNotFound(scope, id_node, id_node->Value());
+      logSymbolNotFound(scope, nodeId, nodeId->Value());
    }
 
-   DEBUG_ENSURE(id_node->hasBoundSymbol());
+   DEBUG_ENSURE(nodeId->hasBoundSymbol());
 }
 
 void
@@ -894,6 +899,7 @@ BlockTypesChecker::visitGroup (st::Symbol* scope, node::Node* n)
    DEBUG_REQUIRE (n != NULL);
    DEBUG_REQUIRE (n->getChild(0) != NULL);
 
+   // FIXME Rather strange... shouldn't we iterate over all children ?
    visitExpr(scope, n->getChild(0));
    n->setExprType(n->getChild(0)->ExprType());
 
@@ -1210,18 +1216,10 @@ BlockTypesChecker::visitVarAssign (st::Symbol* scope, node::VarAssign* nodeAssig
    visitExpr(scope, nodeName);
    visitExpr(scope, nodeValue);
 
-   if (nodeName->isAssignable())
+   if (nodeName->isAssignable() && nodeName->hasExprType())
    {
-      if (nodeName->hasExprType())
-      {
-         nodeAssign->setExprType(nodeName->ExprType());
-      }
-      else
-      {
-         nodeName->setExprType(BugType());
-         nodeName->setBoundSymbol(BugType());
-      }
-      checkAssignment (nodeValue, nodeAssign->ExprType());
+      nodeAssign->setExprType(nodeName->ExprType());
+      checkAssignment(nodeValue, nodeAssign->ExprType());
    }
    else
    {
@@ -1246,13 +1244,11 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope, node::VarDecl* nodeDecl)
    DEBUG_REQUIRE (nodeDecl->NameNode() != NULL);
    DEBUG_REQUIRE (nodeDecl->TypeNode() != NULL);
 
-   node::Text* nodeName = nodeDecl->NameNode();
-   node::Node* nodeType = nodeDecl->TypeNode();
-   node::Node* nodeValue = nodeDecl->ValueNode();
-
    // ------------------
    //  Check VALUE node
    // ------------------
+   node::Node* nodeValue = nodeDecl->ValueNode();
+
    // Value is declared
    if (nodeValue != NULL)
    {
@@ -1267,6 +1263,8 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope, node::VarDecl* nodeDecl)
    // -----------------
    //  Check TYPE node
    // -----------------
+   node::Node* nodeType = nodeDecl->TypeNode();
+
    // Type is not explicitly declared (type inference)
    if (nodeType->Kind() == node::MetaKind::PLACE_HOLDER)
    {
@@ -1298,6 +1296,8 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope, node::VarDecl* nodeDecl)
    // ---------------------------------------
    //  Add the variable to the current scope
    // ---------------------------------------
+   node::Text* nodeName = nodeDecl->NameNode();
+
    if (nodeType->hasExprType())
    {
       if (scope->getChild(nodeDecl->Name()) == NULL)

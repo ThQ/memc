@@ -73,8 +73,8 @@ VarDecl::setChild (size_t i, Node* n)
       case 0: setNameNode(node::cast<FinalId>(n)); break;
       case 1: setTypeNode(n); break;
       case 2: setValueNode(n); break;
+      default: assert(false);
    }
-   assert(false);
 }
 
 

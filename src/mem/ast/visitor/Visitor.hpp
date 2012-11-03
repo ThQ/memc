@@ -17,23 +17,18 @@ class Node;
 namespace mem { namespace ast { namespace visitor {
 
 
-/**
- * A base class for all AST visitors.
- */
+// A base class for all AST visitors.
 class Visitor
 {
-   //--------------------------------------------------------------------------
-   // FIELDS
+   //==========================================================================
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   st::CoreTypes* _core_types;
-   log::Logger* _logger;
-   std::string _name;
-   st::SymbolTable* _symbols;
+   virtual ~Visitor ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -45,16 +40,9 @@ class Visitor
 
    GETTER (BugType, st::Type*) {return _symbols->_core_types._bug_type;}
 
-   //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTOR
-   //--------------------------------------------------------------------------
-   public:
 
-   virtual ~Visitor ();
-
-
-   //--------------------------------------------------------------------------
-   // FUNCTIONS
+   //==========================================================================
+   // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
@@ -73,6 +61,17 @@ class Visitor
 
    virtual void
    visit_preorder (node::Node* node);
+
+
+   //==========================================================================
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   st::CoreTypes* _core_types;
+   log::Logger* _logger;
+   std::string _name;
+   st::SymbolTable* _symbols;
 };
 
 

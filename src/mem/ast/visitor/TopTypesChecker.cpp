@@ -3,10 +3,19 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 TopTypesChecker::TopTypesChecker ()
 {
    _name = "ast.TopTypesChecker";
 }
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 bool
 TopTypesChecker::visit (node::Node* node)
@@ -19,7 +28,6 @@ TopTypesChecker::visit (node::Node* node)
    {
       case node::MetaKind::CLASS:
       {
-         assert (parent != NULL);
          visitClass(node->BoundSymbol(), node::cast<node::Class>(node));
          return false;
       }
@@ -54,6 +62,10 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* nodeClass)
    DEBUG_REQUIRE (nodeClass != NULL);
    DEBUG_REQUIRE (node::isa<node::Class>(nodeClass));
 
+
+   //------------------------------
+   // Register parent class if any
+   //------------------------------
    node::Node* nodeParentType = nodeClass->ParentTypeNode();
 
    if (nodeParentType != NULL)
@@ -66,6 +78,9 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* nodeClass)
       }
    }
 
+   // ---------------------
+   //  Visit class members
+   // ---------------------
    node::NodeList* nodeMembers = nodeClass->MembersNode();
    node::Node* nodeMember = NULL;
 
@@ -77,9 +92,13 @@ TopTypesChecker::visitClass (st::Symbol* scope, node::Class* nodeClass)
       {
          visitFuncDecl(nodeClass->BoundSymbol(), node::cast<node::Func>(nodeMember));
       }
-      else
+      else if (node::isa<node::Field>(nodeMember))
       {
          visitField(nodeClass->BoundSymbol(), node::cast<node::Field>(nodeMember));
+      }
+      else
+      {
+         assert(false);
       }
    }
 }

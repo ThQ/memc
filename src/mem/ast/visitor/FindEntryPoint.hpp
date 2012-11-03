@@ -12,33 +12,23 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-/**
- * Visits the AST in order to find an entry point (a function declaration for
- * main, ie :
- * >   main () -> int
- */
+// Visits the AST in order to find an entry point whose signature is:
+// >>> main (argc :int, argv :[char]*) -> int
+// Each type is optional though. The following function is a valid main
+// definition:
+// >>> main (argc :int) -> int
 class FindEntryPoint : public Visitor
 {
-   //--------------------------------------------------------------------------
-   // FIELDS
-   //--------------------------------------------------------------------------
-   protected:
-
-   st::Symbol* _entry_point;
-
-
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Default constructor.
-    */
+   // Default constructor.
    FindEntryPoint();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:
@@ -48,6 +38,14 @@ class FindEntryPoint : public Visitor
 
    virtual bool
    visit (node::Node* node);
+
+
+   //==========================================================================
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   st::Symbol* _entry_point;
 };
 
 

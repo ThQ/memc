@@ -14,12 +14,10 @@
 namespace mem { namespace ast { namespace visitor {
 
 
-/**
- * Visits the AST in order to find MEM_NODE_CLASS nodes.
- */
+// Visits the AST in order to find MEM_NODE_CLASS nodes.
 class FindClasses : public Visitor
 {
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -27,7 +25,7 @@ class FindClasses : public Visitor
    FindClasses ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // FUNCTIONS
    //--------------------------------------------------------------------------
    public:

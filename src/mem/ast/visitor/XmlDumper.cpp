@@ -2,6 +2,11 @@
 
 namespace mem { namespace ast { namespace visitor {
 
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
 void
 XmlDumper::dumpBoundSymbol (node::Node* n)
 {

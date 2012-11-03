@@ -4,10 +4,19 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
+
 CoherenceChecker::CoherenceChecker ()
 {
    _name = "ast.CoherenceChecker";
 }
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 bool
 CoherenceChecker::visit (node::Node* node)
@@ -16,18 +25,18 @@ CoherenceChecker::visit (node::Node* node)
 
    std::vector<std::string> errors;
 
-   node::Node* child_n = NULL;
+   node::Node* nodeChild = NULL;
    for (size_t i = 0; i < node->ChildCount(); ++i)
    {
-      child_n = node->getChild(i);
+      nodeChild = node->getChild(i);
 
-      if (child_n != NULL && child_n->Parent() != node)
+      if (nodeChild != NULL && nodeChild->Parent() != node)
       {
          DEBUG_PRINTF("node.parent %s, node %s, child.parent %s, child%s\n",
             node->Parent()->StringRep().c_str(),
             node->StringRep().c_str(),
-            child_n->Parent()->StringRep().c_str(),
-            child_n->StringRep().c_str());
+            nodeChild->Parent()->StringRep().c_str(),
+            nodeChild->StringRep().c_str());
          errors.push_back("Node parent declared differently between parent and child");
       }
    }

@@ -2,6 +2,11 @@
 
 namespace mem { namespace ast { namespace visitor {
 
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
+
 bool
 TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
 {

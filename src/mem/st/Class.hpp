@@ -59,10 +59,8 @@ class Class : public Type
    virtual bool
    canCastTo (st::Type* ty) const;
 
-   /**
-    * Return the number of fields in the class type, taking into account the
-    * ancestor's fields.
-    */
+   // Return the number of fields in the class type, taking into account the
+   // ancestor's fields.
    int
    getAbsoluteFieldCount ();
 
@@ -95,10 +93,11 @@ class Class : public Type
    bool
    isSubclassOf (Class* cls) const;
 
+
    //--------------------------------------------------------------------------
    // FIELDS
    //--------------------------------------------------------------------------
-   public:
+   protected:
 
    int _cur_field_index;
    Func* _default_ctor;

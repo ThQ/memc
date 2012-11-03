@@ -4,10 +4,18 @@
 namespace mem { namespace ast { namespace visitor {
 
 
+//=============================================================================
+// CONSTRUCTORS / DESTRUCTOR
+//-----------------------------------------------------------------------------
 CheckValidity::CheckValidity ()
 {
    _name = "ast.CheckValidity";
 }
+
+
+//=============================================================================
+// PUBLIC FUNCTIONS
+//-----------------------------------------------------------------------------
 
 bool
 CheckValidity::visit (node::Node* node)
