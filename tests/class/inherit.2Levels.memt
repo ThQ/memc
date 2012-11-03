@@ -1,0 +1,18 @@
+### file
+
+class Parent
+{
+   fieldParent :int;
+}
+
+class Child < Parent
+{
+   fieldChild :int;
+}
+
+main ()
+{
+   var someChild :Child;
+   var i1 :int = someChild.fieldParent;
+   var i2 :int = someChild.fieldChild;
+}

@@ -1,0 +1,16 @@
+### file
+
+class Parent
+{
+   field :int;
+}
+
+class Child < Parent
+{
+
+}
+
+main ()
+{
+   var someChild :Child;
+}

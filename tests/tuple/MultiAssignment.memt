@@ -1,0 +1,5 @@
+### file
+main ()
+{
+   (var i1, var i2) = (1, 2);
+}
