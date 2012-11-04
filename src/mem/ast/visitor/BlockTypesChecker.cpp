@@ -1285,16 +1285,18 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope, node::VarDecl* nodeDecl)
       nodeType->setExprType(BugType());
    }
 
-   if (nodeType->hasBoundSymbol() && st::isa<st::Type>(nodeType->BoundSymbol()))
+   st::Symbol* symVarType = nodeType->BoundSymbol();
+   if (symVarType)
    {
-      st::Type* symType = st::cast<st::Type>(nodeType->BoundSymbol());
-      if (!symType->hasByteSize())
+      if (symVarType != BugType() && st::isa<st::Type>(symVarType))
       {
-         DEBUG_PRINTF("no size : %d\n", symType->ByteSize());
-         log::UnsizedType* err = new log::UnsizedType();
-         err->setTypeName(nodeType->BoundSymbol()->gQualifiedName());
-         err->format();
-         log(err);
+         if (!st::cast<st::Type>(symVarType)->hasByteSize())
+         {
+            log::UnsizedType* err = new log::UnsizedType();
+            err->setTypeName(nodeType->BoundSymbol()->gQualifiedName());
+            err->format();
+            log(err);
+         }
       }
    }
    else
