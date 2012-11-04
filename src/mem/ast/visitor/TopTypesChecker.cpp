@@ -141,7 +141,7 @@ TopTypesChecker::visitEnumMembers (st::EnumType* symEnum, node::NodeList* nodeMe
    for (size_t i = 0; i < nodeMembers->ChildCount(); ++i)
    {
       node::FinalId* nodeFieldType = new node::FinalId();
-      nodeFieldType->setValue(symEnum->Type()->Name());
+      nodeFieldType->setValue(symEnum->Name());
 
       nodeField = node::cast<node::VarDecl>(nodeMembers->getChild(i));
       nodeField->setTypeNode(nodeFieldType);
@@ -153,7 +153,7 @@ TopTypesChecker::visitEnumMembers (st::EnumType* symEnum, node::NodeList* nodeMe
       {
          ensureConstantExpr(nodeField->ValueNode());
       }
-      nodeField->setExprType(symEnum->Type());
+      nodeField->setExprType(symEnum);
    }
 }
 
