@@ -31,7 +31,6 @@ class Range : public Position
    GETTER(ColumnEnd, int) {return _column_end;}
    SETTER(ColumnEnd, int) {_column_end = val;}
 
-
    GETTER(LineStart, int) {return _line_start;}
    SETTER(LineStart, int) {_line_start = val;}
 
@@ -45,13 +44,13 @@ class Range : public Position
    public:
 
    void
-   append(fs::position::Range r);
+   append (fs::position::Range r);
 
    virtual Position*
    copy ();
 
    virtual Range*
-   copy_range();
+   copy_range ();
 
    void
    import (Range r);
