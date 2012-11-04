@@ -45,8 +45,8 @@ class Class : public Type
    SETTER(DefaultCtor, Func*) { _default_ctor = val;}
 
    // The parent class in the type hierarchy.
-   GETTER(ParentClass, st::Class*) { return _parent_class;}
-   SETTER(ParentClass, st::Class*) { _parent_class = st::cast<st::Class>(val);  }
+   GETTER(ParentClass, st::Class*) { return _parent_type != NULL ? st::cast<st::Class>(_parent_type) : NULL;}
+   SETTER(ParentClass, st::Class*) { _parent_type = val;}
 
    //--------------------------------------------------------------------------
    // PUBLIC FUNCTIONS
@@ -101,7 +101,6 @@ class Class : public Type
 
    int _cur_field_index;
    Func* _default_ctor;
-   st::Class* _parent_class;
 };
 
 } }

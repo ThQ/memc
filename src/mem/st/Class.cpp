@@ -13,7 +13,6 @@ Class::Class ()
    _cur_field_index = 0;
    _default_ctor = NULL;
    _kind = Class::kTYPE;
-   _parent_class = NULL;
 }
 
 Class::~Class ()

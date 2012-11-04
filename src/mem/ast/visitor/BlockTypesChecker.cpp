@@ -555,61 +555,62 @@ BlockTypesChecker::visitDot (st::Symbol* scope, node::Dot* nodeDot)
    node::Node* nodeRight = nodeDot->RightNode();
 
    visitExpr(scope, nodeLeft);
-   visitSymbolName(nodeLeft->ExprType(), node::cast<node::Text>(nodeRight));
 
-   assert(node::isa<node::Id>(nodeRight));
-
-   if (nodeLeft->hasBoundSymbol())
+   if (nodeLeft->hasExprType())
    {
-      nodeDot->setBoundSymbol(nodeRight->BoundSymbol());
+      bool bIsInstance = st::isa<st::Class>(nodeLeft->ExprType())
+                         || st::isa<st::EnumType>(nodeLeft->ExprType())
+                         || st::isa<st::PointerType>(nodeLeft->ExprType());
 
-      if (nodeDot->hasBoundSymbol())
+      if (bIsInstance)
       {
-         st::Symbol* expr_ty = st::util::getExprType(nodeDot->BoundSymbol());
-         if (expr_ty == NULL)
-         {
-            expr_ty = nodeDot->BoundSymbol();
-         }
+         st::Type* symInstanceType = st::cast<st::Type>(nodeLeft->ExprType());
+         st::Symbol* symMember = _symbols->lookupMember(symInstanceType, node::cast<node::Id>(nodeRight)->Value());
 
-         //right_node->setBoundSymbol(dot_node->BoundSymbol());
-         nodeRight->setExprType(st::util::getExprType(nodeDot->BoundSymbol()));
+         if (symMember != NULL)
+         {
+            nodeRight->setBoundSymbol(symMember);
+            nodeRight->setExprType(st::util::getExprType(symMember));
 
-         // If we are not accessing a class member, we can just flatten the dot
-         // node by replacing it by final id.
-         if (st::isa<st::Class>(nodeLeft->BoundSymbol())
-            || st::isa<st::EnumType>(nodeLeft->BoundSymbol())
-            || st::isa<st::Namespace>(nodeLeft->BoundSymbol()))
-         {
-            ast::node::FinalId* fid = new ast::node::FinalId();
-            fid->setValue(nodeRight->BoundSymbol()->Name());
-            fid->setBoundSymbol(nodeRight->BoundSymbol());
-            if (st::isa<st::Type>(expr_ty))
-            {
-               fid->setExprType(expr_ty);
-            }
-            nodeDot->Parent()->replaceChild(nodeDot, fid);
-            delete nodeDot;
-         }
-         else
-         {
-            nodeDot->setExprType(st::cast<st::Type>(expr_ty));
+            nodeDot->setBoundSymbol(symMember);
+            nodeDot->setExprType(st::util::getExprType(symMember));
          }
       }
       else
       {
-         nodeDot->setExprType(BugType());
+         // We are not accessing a member of a type instance, we can just
+         // flatten the dot node by replacing it by a final id.
 
-         log::SymbolNotFound* err = new log::SymbolNotFound();
-         err->setSymbolName(node::cast<node::Text>(nodeRight)->Value());
-         err->setScopeName(nodeLeft->ExprType()->gQualifiedName());
-         err->format();
-         err->setPosition(nodeRight->copyPosition());
-         log(err);
+         visitSymbolName(nodeLeft->ExprType(), node::cast<node::Text>(nodeRight));
+
+         ast::node::FinalId* fid = new ast::node::FinalId();
+         fid->setValue(nodeRight->BoundSymbol()->Name());
+         fid->setBoundSymbol(nodeRight->BoundSymbol());
+
+         if (st::isa<st::Type>(nodeRight->ExprType()))
+         {
+            fid->setExprType(nodeRight->ExprType());
+         }
+         nodeDot->Parent()->replaceChild(nodeDot, fid);
+
+         delete nodeDot;
       }
    }
+   else
+   {
+      nodeDot->setExprType(BugType());
+      nodeDot->setBoundSymbol(BugType());
 
-   //DEBUG_ENSURE (dot_node->hasExprType());
-   //DEBUG_ENSURE (dot_node->hasBoundSymbol());
+      log::SymbolNotFound* err = new log::SymbolNotFound();
+      err->setSymbolName(node::cast<node::Text>(nodeRight)->Value());
+      err->setScopeName(nodeLeft->ExprType()->gQualifiedName());
+      err->setPosition(nodeRight->copyPosition());
+      err->format();
+      log(err);
+   }
+
+   DEBUG_ENSURE (nodeDot->hasExprType());
+   DEBUG_ENSURE (nodeDot->hasBoundSymbol());
 }
 
 void

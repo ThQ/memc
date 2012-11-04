@@ -87,6 +87,9 @@ class SymbolTable
    inline bool
    isVoidType (st::Symbol* s) {return s == _core_types.VoidTy();}
 
+   st::Symbol*
+   lookupMember (st::Type* symCurrentType, std::string sSymbolName);
+
    // Lookup a symbol from a given scope.
    //
    // It starts from the home namespace, then switches to the system namespace.
