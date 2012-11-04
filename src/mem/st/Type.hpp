@@ -46,7 +46,7 @@ class Type: public Symbol
    canCastTo (Type* dest_ty) const {return this==dest_ty;}
 
    inline bool
-   hasByteSize() {return _byte_size > 0;}
+   hasByteSize() {return ByteSize() > 0;}
 
    bool
    isSubclass (Type* parent);

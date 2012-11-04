@@ -1285,13 +1285,24 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope, node::VarDecl* nodeDecl)
       nodeType->setExprType(BugType());
    }
 
-   if (!nodeType->hasBoundSymbol())
+   if (nodeType->hasBoundSymbol() && st::isa<st::Type>(nodeType->BoundSymbol()))
+   {
+      st::Type* symType = st::cast<st::Type>(nodeType->BoundSymbol());
+      if (!symType->hasByteSize())
+      {
+         DEBUG_PRINTF("no size : %d\n", symType->ByteSize());
+         log::UnsizedType* err = new log::UnsizedType();
+         err->setTypeName(nodeType->BoundSymbol()->gQualifiedName());
+         err->format();
+         log(err);
+      }
+   }
+   else
    {
       nodeType->setBoundSymbol(BugType());
    }
 
    nodeDecl->setExprType(nodeType->ExprType());
-
 
    // ---------------------------------------
    //  Add the variable to the current scope
@@ -1323,7 +1334,6 @@ BlockTypesChecker::visitVarDecl (st::Symbol* scope, node::VarDecl* nodeDecl)
       }
    }
 
-   ensureSizedExprType(nodeType);
    if (nodeValue != NULL)
    {
       checkAssignment(nodeValue, nodeDecl->ExprType());
