@@ -145,6 +145,27 @@ class TestLogger:
    def logln (self, msg):
       print (msg)
 
+   def log_default_color (self):
+      print ("\033[0m", end="")
+
+   def log_blue (self, text, bold=False):
+      print ("\033[" + ("1" if bold else "0") + ";34m" + text + "\033[0m", end="")
+
+   def log_green (self, text, bold=False):
+      print ("\033[" + ("1" if bold else "0") + ";32m" + text + "\033[0m", end="")
+
+   def log_section (self, name):
+      self.logln("")
+      self.logln(" " + ("=" * 78))
+      self.log("| ")
+      self.log_blue(name.ljust(76), bold=True)
+      self.logln(" |")
+      self.logln(" " + ("-" * 78))
+
+
+   def log_red (self, text, bold=False):
+      print ("\033[" + ("1" if bold else "0") + ";31m" + text + "\033[0m", end="")
+
 
 class TestReport:
    def __init__ (self):
@@ -287,25 +308,22 @@ class TestRunner:
       memc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
       return memc.communicate()[0].decode()
 
-   def log_section (self, name):
-      section = "\n " + ("=" * 77) + " \n"
-      section += "| " + name.ljust(75) + " |\n"
-      section += " " + ("=" * 77) + " "
-      self._logger.logln(section)
-
    def print_summary (self):
       percent_failed = int(round(1.0 * len(self._failed_tests)/self._num_tests*100, 0))
       percent_passed = int(round(100-(1.0 * len(self._failed_tests)/self._num_tests)*100, 0))
-      print ("")
-      self.log_section("Summary")
+      self._logger.logln("")
+      self._logger.log_section("Summary")
       summary =  "   Tests run: " + str(self._num_tests) + " (100%)\n"
-      summary += "Tests failed: " + str(self._num_failed_tests).rjust(len(str(self._num_tests))) + " (" + str(self._percent_failed_tests) + "%)\n"
-      summary += "Tests passed: " + str(self._num_tests - self._num_failed_tests).rjust(len(str(self._num_tests))) + " (" +  str(self._percent_passed_tests) + "%)"
-      summary += "\n"
+      summary += "Tests passed: " + str(self._num_tests - self._num_failed_tests).rjust(len(str(self._num_tests))) + " (" +  str(self._percent_passed_tests) + "%)\n"
+      summary += "Tests failed: " + str(self._num_failed_tests).rjust(len(str(self._num_tests))) + " (" + str(self._percent_failed_tests) + "%)"
       self._logger.logln(summary)
 
+      for report in self._reports:
+         if report.status != "passed":
+            self._logger.logln("              * " + report.name)
+
       if self._num_tests != self._num_passed_tests:
-         self.log_section("/!\ Please submit this report")
+         self._logger.log_section("/!\ Please submit this report")
          self._logger.logln("You have stumbled upon some bugs that we would like to know about.")
          self._logger.logln("Please submit this report to\n>>> https://github.com/ThQ/memc/issues/new")
          self._logger.logln("")
@@ -319,8 +337,10 @@ class TestRunner:
       return contents
 
    def run (self):
+      self._logger.log_red("Black box test suite".center(80) + "\n", bold=True)
+
       uname = os.uname()
-      self.log_section("Environment")
+      self._logger.log_section("Environment")
       self._logger.logln("Platform".rjust(11) + ": " + sys.platform)
       self._logger.logln("System name".rjust(11) + ": " + uname[0])
       self._logger.logln("Node name".rjust(11) + ": " + uname[1])
@@ -331,7 +351,8 @@ class TestRunner:
 
       self.discover_tests(kTEST_DIR)
 
-      self.log_section("Running tests for `" + kMEMC + "'...")
+      self._logger.log_section("Running tests")
+      self._logger.logln("Executable".rjust(17) + ": " + kMEMC)
       self._logger.logln("Test directory".rjust(17) + ": " + kTEST_DIR)
       self._logger.logln("Reports directory".rjust(17) + ": " + kREPORT_DIR)
       self._logger.logln("Tests discovered".rjust(17) + ": " + str(self._num_tests))
@@ -351,11 +372,17 @@ class TestRunner:
 
    def run_tests (self):
       i = 1
+      str_num_tests_len = len(str(self._num_tests))
+      tests_per_line = 80 - str_num_tests_len * 2 - 3 - 1
       for test in self._tests:
-         progress = str(i).rjust(len(str(self._num_tests))) + "/" + str(self._num_tests)
 
-         log_ln = ("(" + progress + ") Running <" + test.name + ">").ljust(71, ".") + " "
-         #self._logger.log(log_ln)
+         if (i-1) % tests_per_line == 0:
+            progress = str(i).rjust(str_num_tests_len)
+            progress += "-"
+            progress += str(min(self._num_tests, i + tests_per_line - 1)).rjust(str_num_tests_len)
+
+            self._logger.log("[" + progress + "] ")
+
          report = test.run()
          self._reports.append(report)
 
@@ -363,12 +390,14 @@ class TestRunner:
             self._logger.log(".")
             self._num_passed_tests += 1
          elif report.status == "failed":
-            self._logger.log("!")
+            self._logger.log_red("!", bold=True)
             self._num_failed_tests += 1
          else:
-            self._logger.log("#")
+            self._logger.log_red("#", bold=True)
             self._num_failed_tests += 1
 
+         if i % tests_per_line == 0:
+            self._logger.log("\n")
          i += 1
 
 
