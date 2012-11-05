@@ -3,16 +3,17 @@
 namespace mem {
 
 
-void
-Util::namespace_to_path (std::string& path)
+std::string
+Util::getPathFromNamespace (std::string sNamespace)
 {
-   for (size_t i = 0 ; i < path.size() ; ++i)
+   for (size_t i = 0 ; i < sNamespace.size() ; ++i)
    {
-      if (path[i] == '.')
+      if (sNamespace[i] == '.')
       {
-         path[i] = '/';
+         sNamespace[i] = '/';
       }
    }
+   return sNamespace;
 }
 
 void
@@ -34,7 +35,7 @@ Util::partition_full_type_name (std::string full_type_name, std::string& ns,
 
 
 std::string
-Util::getNamespaceNameFromPath (std::string path)
+Util::getNamespaceFromPath (std::string path)
 {
    std::string ns_name = stripFileExtension(path);
 

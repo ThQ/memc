@@ -52,7 +52,7 @@ class FindUse : public Visitor
    //--------------------------------------------------------------------------
    public:
 
-   std::vector<std::string> _uses; //! A vector of file names to be included
+   std::vector<node::Use*> _uses; //! A vector of file names to be included
 };
 
 

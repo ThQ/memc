@@ -506,7 +506,11 @@ XmlDumper::visitUse (node::Use* nodeUse)
    *_out << "<use";
    dumpPosition(nodeUse);
    *_out << " id=\"" << nodeUse->Value() << "\"";
-   *_out << " />\n";
+   *_out << ">\n";
+
+   visitChildrenOf(nodeUse);
+
+   *_out << "</use>\n";
 }
 void
 XmlDumper::visitTuple (node::Tuple* nodeTuple)

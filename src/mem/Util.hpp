@@ -16,11 +16,16 @@ namespace mem {
 
 class Util
 {
-   public: static void namespace_to_path (std::string& path);
-   public: static void partition_full_type_name (std::string full_type_name, std::string& ns, std::string& type_name);
+   public:
+
+   static void
+   partition_full_type_name (std::string full_type_name, std::string& ns, std::string& type_name);
 
    static std::string
-   getNamespaceNameFromPath (std::string path);
+   getPathFromNamespace (std::string sNamespace);
+
+   static std::string
+   getNamespaceFromPath (std::string sPath);
 
    public: static std::string stripFileExtension (std::string file_path);
    public: static std::vector<std::string>split (std::string qualified_name, char separator);

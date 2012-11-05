@@ -55,24 +55,20 @@ class Compiler
 {
    public: typedef enum {NO, XML} StDumpFormat;
 
-   //--------------------------------------------------------------------------
-   // FIELDS
+
+   //==========================================================================
+   // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
 
-   mem::ast::node::Root ast;
-   std::vector<mem::ast::visitor::Visitor*> ast_visitors;
-   std::vector<mem::st::visitor::Visitor*> st_visitors;
-   mem::fs::FileManager fm;
-   mem::log::ConsoleLogger* _logger;
-   opt::Options* _opts;
-   std::queue<std::string> _parse_queue;
-   mem::st::SymbolTable symbols;
-   Toolbox _tools;
-   mem::decorator::DecoratorMap _decorators;
-   langmem::Parse* _parser;
+   // Default constructor.
+   Compiler(opt::Options* opts);
 
-   //--------------------------------------------------------------------------
+   // Destructor.
+   ~Compiler();
+
+
+   //==========================================================================
    // PROPERTIES
    //--------------------------------------------------------------------------
    public:
@@ -81,30 +77,12 @@ class Compiler
    SETTER(Options, opt::Options*) {_opts = val;}
 
 
-   //--------------------------------------------------------------------------
-   // CONSTRUCTORS / DESTRUCTOR
-   //--------------------------------------------------------------------------
-   public:
-
-   /**
-    * Default constructor.
-    */
-   Compiler(opt::Options* opts);
-
-   /**
-    * Destructor.
-    */
-   ~Compiler();
-
-
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC FUNCTIONS
    //--------------------------------------------------------------------------
    public:
 
-   /**
-    * Append an AST visitor to the visitor list (FIFO).
-    */
+   // Append an AST visitor to the visitor list (FIFO).
    inline void
    addAstVisitor (mem::ast::visitor::Visitor* visitor){ast_visitors.push_back(visitor);}
 
@@ -114,9 +92,7 @@ class Compiler
    void
    addMacro (mem::ast::macro::Macro* macro);
 
-   /**
-    * Append an ST visitor to the visitor list (FIFO).
-    */
+   // Append an ST visitor to the visitor list (FIFO).
    inline void
    addStVisitor (mem::st::visitor::Visitor* visitor){st_visitors.push_back(visitor);}
 
@@ -126,15 +102,11 @@ class Compiler
    void
    dumpSt ();
 
-   /**
-    * Emit code depending on what the user requested.
-    */
+   // Emit code depending on what the user requested.
    void
    emitCode ();
 
-   /**
-    * Return true if no warnings nor fatal errors have been emitted.
-    */
+   // Return true if no warnings nor fatal errors have been emitted.
    bool
    isBuildSuccessful () const
    {
@@ -142,24 +114,18 @@ class Compiler
          _logger->ErrorCount()==0;
    }
 
-   /**
-    * Parse a file given its path.
-    */
+   // Parse a file given its path.
    void
-   parse (std::string file_path);
+   parse (mem::ast::node::Use* nodeUse);
 
    void
    printUsage (std::ostream& out);
 
-   /**
-    * Parse each file in the parse queue until there's nothing left.
-    */
+   // Parse each file in the parse queue until there's nothing left.
    void
    processParseQueue ();
 
-   /**
-    * Start a compiling job starting with an entry file.
-    */
+   // Start a compiling job starting with an entry file.
    void
    run ();
 
@@ -169,7 +135,8 @@ class Compiler
    void
    runStVisitors ();
 
-   //--------------------------------------------------------------------------
+
+   //==========================================================================
    // PROTECTED FUNCTIONS
    //--------------------------------------------------------------------------
    protected:
@@ -181,6 +148,24 @@ class Compiler
    // Log a compilation summary
    void
    _logBuildSummary ();
+
+
+   //==========================================================================
+   // FIELDS
+   //--------------------------------------------------------------------------
+   public:
+
+   mem::ast::node::Root ast;
+   std::vector<mem::ast::visitor::Visitor*> ast_visitors;
+   std::vector<mem::st::visitor::Visitor*> st_visitors;
+   mem::fs::FileManager fm;
+   mem::log::ConsoleLogger* _logger;
+   opt::Options* _opts;
+   std::queue<mem::ast::node::Use*> _parse_queue;
+   mem::st::SymbolTable symbols;
+   Toolbox _tools;
+   mem::decorator::DecoratorMap _decorators;
+   langmem::Parse* _parser;
 };
 
 

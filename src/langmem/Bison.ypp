@@ -251,8 +251,7 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <node>         TupleType
 %type <nodeId>       TypeList
 %type <nodeId>       TypeList_
-%type <nodeText>     Use
-%type <nodeText>     UseFile
+%type <node>         Use
 %type <node>         VariableAssignment
 %type <node>         VariableDeclaration
 %type <nodeWhile>    While
@@ -646,27 +645,14 @@ Return:
    }
 
 Use:
-   T_USE UseFile
+   T_USE QualifiedId T_SEMICOLON
    {
-      $$ = new mem::ast::node::Use();
-      $$->setValue($2->Value());
-      $$->setPosition(new fs::position::Range(@1, @2));
+      mem::ast::node::Use* nodeUse = new mem::ast::node::Use();
+      nodeUse->setValue($2->Value());
+      nodeUse->setPosition(@$.copy_range());
+      nodeUse->setIdNode(mem::ast::node::cast<mem::ast::node::FinalId>($2));
 
-      delete $2;
-   }
-
-UseFile:
-   T_ID
-   {
-      $$ = new mem::ast::node::Text();
-      $$->setValue($1->c_str());
-      delete $1;
-   }
-   | UseFile T_DOT T_ID
-   {
-      $$->setValue($$->Value() + '.' + $3->c_str());
-
-      delete $3;
+      $$ = nodeUse;
    }
 
 VariableAssignment:

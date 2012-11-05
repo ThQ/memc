@@ -217,32 +217,35 @@ Compiler::emitCode ()
 }
 
 void
-Compiler::parse (std::string file_path)
+Compiler::parse (mem::ast::node::Use* nodeUse)
 {
-   _logger->debug("[%s] parsing...", file_path.c_str());
+   std::string sFileNamespace = nodeUse->Value();
+   std::string sFilePath = mem::Util::getPathFromNamespace(sFileNamespace) + ".mem";
 
-   std::string ns_name = mem::Util::getNamespaceNameFromPath(file_path);
-   std::vector<std::string> ns_parts = mem::Util::split(ns_name, '.');
-   mem::st::Namespace* file_sym = mem::st::util::createNamespace(symbols.Home(), ns_parts);
-   assert(file_sym != NULL);
+   _logger->debug("Parsing `%s'", sFilePath.c_str());
+
+   std::vector<std::string> ns_parts = mem::Util::split(sFileNamespace, '.');
+   mem::st::Namespace* symFileNamespace = mem::st::util::createNamespace(symbols.Home(), ns_parts);
+   assert(symFileNamespace != NULL);
 
    std::vector<std::string> paths_tried;
 
-   mem::fs::File* file = fm.tryOpenFile(file_path, paths_tried);
+   mem::fs::File* file = fm.tryOpenFile(sFilePath, paths_tried);
 
    if (file != NULL)
    {
-      mem::ast::node::File* file_node = NULL;
       gTOKENIZER.reset();
       gTOKENIZER.setInputFile(file->Path());
-      file_node = _parser->parse (file);
-      file_node->setBoundSymbol(file_sym);
-      file_node->setId(ns_name);
-      file_node->setIncludePath(file->IncludePath());
-      file_node->setPath(file_path);
-      ast.addChild(file_node);
 
-      _findUses(file_node);
+      mem::ast::node::File* nodeFile = NULL;
+      nodeFile = _parser->parse (file);
+      nodeFile->setBoundSymbol(symFileNamespace);
+      nodeFile->setId(sFileNamespace);
+      nodeFile->setIncludePath(file->IncludePath());
+      nodeFile->setPath(sFilePath);
+      ast.addChild(nodeFile);
+
+      _findUses(nodeFile);
    }
    else
    {
@@ -250,11 +253,15 @@ Compiler::parse (std::string file_path)
       std::vector<std::string>::size_type i;
       for (i=0; i<paths_tried.size(); ++i)
       {
-         description.append("* {path:" + paths_tried[i] + "}\n");
+         description.append("* " + paths_tried[i] + "\n");
       }
 
       mem::log::Message* msg = new mem::log::Error();
-      msg->formatMessage("Couldn't open file {path:%s}.", file_path.c_str());
+      msg->formatMessage("Couldn't open file `%s'", sFilePath.c_str());
+      if (nodeUse->IdNode() != NULL)
+      {
+         msg->setPosition(nodeUse->IdNode()->copyPosition());
+      }
       msg->setSecondaryText(description);
       _logger->log(msg);
    }
@@ -327,7 +334,9 @@ Compiler::run ()
    }
    else if (_opts->hasArguments())
    {
-      _parse_queue.push(_opts->getArgument(0));
+      mem::ast::node::Use nodeUse;
+      nodeUse.setValue(mem::Util::getNamespaceFromPath(_opts->getArgument(0)));
+      _parse_queue.push(&nodeUse);
 
       processParseQueue();
 
@@ -349,8 +358,9 @@ Compiler::run ()
 void
 Compiler::runAstVisitors ()
 {
-   for (size_t i=0;
-      i < ast_visitors.size() && _logger->FatalErrorCount() == 0 && _logger->ErrorCount()==0; ++i)
+   bool bNoErrors = _logger->FatalErrorCount()==0 && _logger->ErrorCount()==0;
+
+   for (size_t i=0; i < ast_visitors.size() && bNoErrors; ++i)
    {
       _logger->debug("[%s] running...", ast_visitors[i]->_name.c_str());
       ast_visitors[i]->SymbolTable(&symbols);
@@ -379,30 +389,28 @@ Compiler::runStVisitors ()
 //-----------------------------------------------------------------------------
 
 void
-Compiler::_findUses (mem::ast::node::File* file_n)
+Compiler::_findUses (mem::ast::node::File* nodeFile)
 {
    _logger->debug("Searching for use statements", "");
 
    mem::ast::visitor::FindUse use_finder;
-   use_finder.visit_preorder(file_n);
+   use_finder.visit_preorder(nodeFile);
 
-   std::vector<std::string> uses = use_finder._uses;
+   std::vector<mem::ast::node::Use*> uses = use_finder._uses;
 
    for (size_t i = 0; i < uses.size(); ++i)
    {
-      if (file_n->Id() == uses[i])
+      if (nodeFile->Id() != uses[i]->Value())
       {
-         mem::log::AutoInclude* err = new mem::log::AutoInclude();
-         err->setFilePath(file_n->Path());
-         err->format();
-         _logger->log(err);
+         _parse_queue.push(uses[i]);
       }
+      // Trying to include itself
       else
       {
-         std::string rel_file_path = uses[i];
-         mem::Util::namespace_to_path(rel_file_path);
-         rel_file_path += ".mem";
-         _parse_queue.push(rel_file_path);
+         mem::log::AutoInclude* err = new mem::log::AutoInclude();
+         err->setFilePath(nodeFile->Path());
+         err->format();
+         _logger->log(err);
       }
    }
 }
