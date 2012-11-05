@@ -53,7 +53,8 @@ add_custom_target(
 		--memc-exe=${CMAKE_CURRENT_BINARY_DIR}/memc
 		--test-dir=${CMAKE_CURRENT_SOURCE_DIR}/tests
 		--data-dir=${CMAKE_CURRENT_SOURCE_DIR}/data
-		--report-dir=${CMAKE_CURRENT_BINARY_DIR})
+		--report-dir=${CMAKE_CURRENT_BINARY_DIR}
+	DEPENDS memc)
 add_custom_target(
 	run-blackbox-test
 	COMMAND
