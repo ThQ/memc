@@ -41,16 +41,6 @@ Class::addChild (Symbol* s)
    return Type::addChild(s);
 }
 
-bool
-Class::canCastTo (Type* dest_ty) const
-{
-   if (st::isa<st::Class>(dest_ty))
-   {
-      return this == dest_ty || isSubclassOf(st::cast<st::Class>(dest_ty));
-   }
-   return false;
-}
-
 int
 Class::getAbsoluteFieldCount ()
 {
@@ -190,19 +180,6 @@ Class::isDependingOn (Class* other_cls)
       }
    }
 
-   return false;
-}
-
-bool
-Class::isSubclassOf (Class* cls) const
-{
-   st::Symbol* parent = cls;
-
-   while (parent != NULL)
-   {
-      if (parent == cls) return true;
-      parent = parent->Parent();
-   }
    return false;
 }
 

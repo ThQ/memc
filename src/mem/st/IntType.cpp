@@ -25,13 +25,13 @@ IntType::IntType (std::string name, int byte_size)
 //-----------------------------------------------------------------------------
 
 bool
-IntType::canCastTo (Type* dest_ty) const
+IntType::canCastTo (Type* symDestType) const
 {
-   DEBUG_REQUIRE (dest_ty);
+   DEBUG_REQUIRE (symDestType != NULL);
 
-   if (st::isa<st::IntType>(dest_ty) && dest_ty->hasByteSize())
+   if (st::isa<st::IntType>(symDestType))
    {
-      return ByteSize() <= dest_ty->ByteSize();
+      return symDestType->hasByteSize() && ByteSize() <= symDestType->ByteSize();
    }
    return false;
 }

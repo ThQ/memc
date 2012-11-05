@@ -31,22 +31,10 @@ class EnumType : public Type
    //--------------------------------------------------------------------------
    public:
 
+   virtual GETTER(ByteSize, int) {return ParentType() != NULL ? ParentType()->ByteSize() : -1;}
+
    GETTER(Type, st::Type*) {return _type;}
    SETTER(Type, st::Type*) {_type = val; _byte_size = _type->ByteSize();}
-
-   //--------------------------------------------------------------------------
-   // PUBLIC FUNCTIONS
-   //--------------------------------------------------------------------------
-   public:
-
-   virtual bool
-   canCastTo (class Type* dest_ty) const {return dest_ty == this;}
-
-
-   //--------------------------------------------------------------------------
-   // PROTECTED FUNCTIONS
-   //--------------------------------------------------------------------------
-   protected:
 
 
    //--------------------------------------------------------------------------

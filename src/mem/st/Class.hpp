@@ -56,9 +56,6 @@ class Class : public Type
    bool
    addChild (st::Symbol* sym);
 
-   virtual bool
-   canCastTo (st::Type* ty) const;
-
    // Return the number of fields in the class type, taking into account the
    // ancestor's fields.
    int
@@ -89,9 +86,6 @@ class Class : public Type
    // Checks wether a class depends on another (directly or indirectly).
    bool
    isDependingOn (Class* cls);
-
-   bool
-   isSubclassOf (Class* cls) const;
 
 
    //--------------------------------------------------------------------------

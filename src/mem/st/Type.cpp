@@ -20,19 +20,27 @@ Type::Type ()
 //-----------------------------------------------------------------------------
 
 bool
-Type::isSubclass (Type* possible_parent)
+Type::isSubTypeOf (Type* symPossibleParentType) const
 {
-   Type* direct_parent = this;
-
-   while (direct_parent != NULL)
+   DEBUG_PRINTF("is %s subtype of %s\n", _name.c_str(), symPossibleParentType->gQualifiedNameCstr());
+   if (symPossibleParentType == this)
    {
-      if (direct_parent == possible_parent)
-      {
-         return true;
-      }
-      direct_parent = direct_parent->_parent_type;
+      return true;
    }
-   return false;
+   else
+   {
+      Type* symParentType = this->ParentType();
+
+      while (symParentType != NULL)
+      {
+         if (symParentType == symPossibleParentType)
+         {
+            return true;
+         }
+         symParentType = symParentType->ParentType();
+      }
+      return false;
+   }
 }
 
 

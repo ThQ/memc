@@ -117,7 +117,7 @@ TopTypesChecker::visitEnumType (st::Symbol* scope, node::EnumType* nodeEnum)
    // -----------------------------
    st::EnumType* symEnum = new st::EnumType();
    symEnum->setName(nodeEnum->Value());
-   symEnum->setType(st::cast<st::Type>(nodeEnum->ParentTypeNode()->BoundSymbol()));
+   symEnum->setParentType(st::cast<st::Type>(nodeEnum->ParentTypeNode()->BoundSymbol()));
 
    // Add the enum to the parent file node
    scope->addChild(symEnum);

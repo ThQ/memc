@@ -42,7 +42,7 @@ TypeMatch::visitVarDecl (node::VarDecl* var_decl_node)
    node::Node* type_node = var_decl_node->TypeNode();
    st::Type* var_ty = st::cast<st::Type>(type_node->BoundSymbol());
 
-   if (value_ty != NULL && !value_ty->isSubclass(var_ty))
+   if (value_ty != NULL && !value_ty->isSubTypeOf(var_ty))
    {
 
       fs::position::Composite* pos = new fs::position::Composite();

@@ -8,34 +8,39 @@ namespace mem { namespace ast { namespace visitor {
 //-----------------------------------------------------------------------------
 
 bool
-TypeChecker::checkAssignment (node::Node* source, st::Type* dest_ty)
+TypeChecker::checkAssignment (node::Node* nodeSource, st::Type* symDestType)
 {
-   DEBUG_REQUIRE (source != NULL);
-   DEBUG_REQUIRE (dest_ty != NULL);
+   DEBUG_REQUIRE (nodeSource != NULL);
+   DEBUG_REQUIRE (symDestType != NULL);
 
-   bool is_safe_cast = false;
-
-   if (source->hasExprType())
+   bool bIsSafeCast = false;
+   DEBUG_PRINT("Check assign\n");
+   if (nodeSource->hasExprType())
    {
-      st::Type* src_ty = source->ExprType();
+      st::Type* symSourceType = nodeSource->ExprType();
 
-      if (src_ty != BugType() && dest_ty != BugType())
+      if (symSourceType != BugType() && symDestType != BugType())
       {
-         is_safe_cast = src_ty->canCastTo(dest_ty);
+         bIsSafeCast = symSourceType->canCastTo(symDestType);
 
-         if (!is_safe_cast)
+         DEBUG_PRINTF(" is casting safe ? %s -> %s = %d\n",
+            symSourceType->Name().c_str(),
+            symDestType->Name().c_str(),
+            bIsSafeCast);
+
+         if (!bIsSafeCast)
          {
             log::CannotAssign* err = new log::CannotAssign();
-            err->setTypeName(src_ty->Name());
-            err->setExpectedTypeName(dest_ty->Name());
-            err->setPosition(source->Position()->copy());
+            err->setTypeName(symSourceType->Name());
+            err->setExpectedTypeName(symDestType->Name());
+            err->setPosition(nodeSource->Position()->copy());
             err->format();
             log(err);
          }
       }
    }
 
-   return is_safe_cast;
+   return bIsSafeCast;
 }
 
 bool
