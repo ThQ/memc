@@ -441,6 +441,7 @@ Compiler::_logBuildSummary ()
    {
       mem::log::BuildFailed* err = new mem::log::BuildFailed();
       err->setSecondaryText(sec_text.str());
+      err->format();
       _logger->log(err);
    }
 }
