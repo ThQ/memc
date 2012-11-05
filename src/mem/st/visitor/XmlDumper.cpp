@@ -120,6 +120,10 @@ XmlDumper::visitEnumType (st::EnumType* e)
 {
    *_out << "<EnumType name=\"" + e->Name() + "\"";
    *_out << " byte-size=\"" << e->ByteSize() << "\"";
+   if (e->ParentType() != NULL)
+   {
+      *_out << " parent-type=\"" + e->ParentType()->gQualifiedName() + "\"";
+   }
    *_out << ">\n";
    this->visitChildren(e);
    *_out << "</EnumType>";
