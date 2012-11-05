@@ -78,7 +78,7 @@ class TestFile:
    def parse_output (self, data):
       matches = gLOG_LINE_RE.findall(str(data))
       for match in matches:
-         if match[0] != "D":
+         if match[0] != "D" and match[0] != "I":
             self.output_log.append([match[0], match[1]])
 
    def open (self, path):
@@ -111,21 +111,26 @@ class TestFile:
       report.source = self.content
 
       if len(self.expected_output_log) > 0 and self.output_log != self.expected_output_log:
+         print(self.output_log, self.expected_output_log)
          report.status = "failed"
+         report.reason = "Logs differ"
       else:
          if "must-not-compile" in self.options:
             if report.return_code == 1:
                report.status = "passed"
             elif report.return_code == 0:
+               report.reason = "Should not have compiled"
                report.status = "failed"
          else:
             if report.return_code == 0:
                report.status = "passed"
             elif report.return_code == 1:
+               report.reason = "Should have compiled"
                report.status = "failed"
 
       if report.return_code != 0 and report.return_code != 1:
          report.status = "crashed"
+         report.reason = "Crashed"
 
       return report
 
@@ -174,6 +179,7 @@ class TestReport:
       self.log = ""
       self.path = ""
       self.name = ""
+      self.reason = ""
       self.status = ""
 
 
@@ -277,7 +283,7 @@ class TestRunner:
             if report.status == "passed":
                html += "<a class=\"passed\">Passed</a>"
             else:
-               html += "<a class=\"failed\">Failed</a>"
+               html += "<a class=\"failed\">" + cgi.escape(report.reason) + "</a>"
 
             html += "</h4>"
 
