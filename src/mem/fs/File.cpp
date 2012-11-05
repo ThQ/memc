@@ -46,16 +46,19 @@ File::getLine (size_t i) const
    return line;
 }
 
-std::vector<std::string>
-File::getLineWithContext(size_t line, int context_line_count)
+std::vector<std::pair<int, std::string> >
+File::getLineWithContext(size_t iLine, int nContextLines)
 {
-   std::vector<std::string> lines;
-   int first_line = line - context_line_count;
-   int last_line = line + context_line_count + 1;
+   std::vector<std::pair<int, std::string> > lines;
+   int iFirstLine = iLine - nContextLines;
+   if (iFirstLine < 1) iFirstLine = 1;
 
-   for (int i = first_line ; i < last_line ; ++i)
+   int iLastLine = iLine + nContextLines + 1;
+   if (iLastLine > _lines.size()) iLastLine = _lines.size();
+
+   for (int i = iFirstLine ; i < iLastLine ; ++i)
    {
-      lines.push_back(getLine(i));
+      lines.push_back(std::pair<int, std::string>(i, getLine(i)));
    }
 
    return lines;

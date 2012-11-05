@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 #include "mem/ss.hpp"
 
@@ -58,8 +59,8 @@ class File
    inline const char*
    getLineCstr(size_t i) const {return this->getLine(i).c_str();}
 
-   // Return the line requested and some context lines
-   std::vector<std::string>
+   // Return a vector of pairs like <LineNumber, Line>
+   std::vector<std::pair<int, std::string> >
    getLineWithContext(size_t line, int context_line_count);
 
    // Return true if the i is a valid line.

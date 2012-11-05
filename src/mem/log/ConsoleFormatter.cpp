@@ -34,6 +34,7 @@ ConsoleFormatter::format (Message* msg)
    if (msg->SecondaryText() != "")
    {
       this->_formatDescription(res, msg);
+      res << "\n";
    }
 
    if (msg->Position() != NULL)
@@ -139,27 +140,19 @@ ConsoleFormatter::_formatSourceLines (std::ostream& str, fs::position::Range* po
    DEBUG_REQUIRE (pos != NULL);
    DEBUG_REQUIRE (pos->File() != NULL);
 
-   if (pos->LineStart() > 0 && pos->File()->isLineInFile(pos->LineStart()-1))
+   int iLineStart = pos->LineStart() - 1;
+   if (iLineStart >= 0 && pos->File()->isLineInFile(iLineStart))
    {
-      std::vector<std::string> lines = pos->File()->getLineWithContext(pos->LineStart()-1, _num_context_lines);
+      std::vector<std::pair<int, std::string> > lines = pos->File()->getLineWithContext(iLineStart, _num_context_lines);
 
       for (size_t i = 0; i < lines.size(); ++i)
       {
-         if (i == _num_context_lines)
-         {
-            str << "       ";
-         }
-         else
-         {
-            str << "     | ";
-         }
-         str << lines[i];
-         str << "\n";
+         str << "     " << _getLinuxColor("1;30") << "> " << _getLinuxColor("0") << lines[i].second << "\n";
 
-         if (i == _num_context_lines)
+         if (lines[i].first == iLineStart)
          {
             str << "       ";
-            for (size_t j = 1 ; j < lines[i].length() ; ++j)
+            for (size_t j = 1 ; j < lines[i].second.length() ; ++j)
             {
                switch (pos->getTypeAt(j))
                {
@@ -171,26 +164,10 @@ ConsoleFormatter::_formatSourceLines (std::ostream& str, fs::position::Range* po
             str << "\n";
          }
       }
-
-      /*
-      std::string context_line = pos->gFile()->getLineCstr(pos->LineStart()-1);
-      for (size_t i = 1 ; i < context_line.length() ; ++i)
-      {
-         switch (pos->getTypeAt(i))
-         {
-            case fs::position::NOTHING: str << " "; break;
-            case fs::position::RANGE:   str << "-"; break;
-            case fs::position::CURSOR:  str << "^"; break;
-         }
-      }
-      str << "\n";
-      */
    }
    else
    {
-      str << "<bad line:";
-      str << pos->LineStart();
-      str << ">\n";
+      str << "     <bad line:" << pos->LineStart() << ">\n";
    }
 }
 
