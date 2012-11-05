@@ -152,6 +152,9 @@ XmlDumper::visit (node::Node* node)
          case node::MetaKind::TUPLE:
             visitTuple(node::cast<node::Tuple>(node)); break;
 
+         case node::MetaKind::USE:
+            visitUse(node::cast<node::Use>(node)); break;
+
          case node::MetaKind::VARIABLE_ASSIGNMENT:
             visitVarAssign(node::cast<node::VarAssign>(node)); break;
 
@@ -497,6 +500,14 @@ XmlDumper::visitRoot (node::Root* n)
    *_out << "</root>\n";
 }
 
+void
+XmlDumper::visitUse (node::Use* nodeUse)
+{
+   *_out << "<use";
+   dumpPosition(nodeUse);
+   *_out << " id=\"" << nodeUse->Value() << "\"";
+   *_out << " />\n";
+}
 void
 XmlDumper::visitTuple (node::Tuple* nodeTuple)
 {

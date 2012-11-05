@@ -20,6 +20,7 @@
 #include "mem/ast/node/Return.hpp"
 #include "mem/ast/node/Root.hpp"
 #include "mem/ast/node/Tuple.hpp"
+#include "mem/ast/node/Use.hpp"
 #include "mem/ast/node/VarAssign.hpp"
 #include "mem/ast/node/VarDecl.hpp"
 #include "mem/ast/node/While.hpp"
@@ -129,6 +130,9 @@ class XmlDumper : public Dumper
 
    void
    visitTuple (node::Tuple* n);
+
+   void
+   visitUse (node::Use* nodeUse);
 
    void
    visitVarAssign (node::VarAssign* n);
