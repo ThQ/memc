@@ -22,7 +22,6 @@ Type::Type ()
 bool
 Type::isSubTypeOf (Type* symPossibleParentType) const
 {
-   DEBUG_PRINTF("is %s subtype of %s\n", _name.c_str(), symPossibleParentType->gQualifiedNameCstr());
    if (symPossibleParentType == this)
    {
       return true;

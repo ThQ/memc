@@ -1,0 +1,12 @@
+### file
+enum FileError < char
+{
+   OK;
+   FileNotFound;
+   CannotOpenFile;
+}
+
+main ()
+{
+   var err :char = FileError.OK;
+}

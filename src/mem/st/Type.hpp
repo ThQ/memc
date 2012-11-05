@@ -43,10 +43,7 @@ class Type: public Symbol
    public:
 
    virtual bool
-   canCastTo (Type* symDestType) const {
-      DEBUG_PRINTF("canCast %s to %s ?\n", _name.c_str(), symDestType->gQualifiedNameCstr());
-      return this->isSubTypeOf(symDestType);
-   }
+   canCastTo (Type* symDestType) const { return this->isSubTypeOf(symDestType); }
 
 
    inline bool

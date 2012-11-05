@@ -352,16 +352,24 @@ member_declaration :
 //=============================================================================
 
 Enum:
-   T_ENUM SimpleId T_OPEN_BRACE EnumFields T_CLOSE_BRACE
+   T_ENUM SimpleId ClassParent_ T_OPEN_BRACE EnumFields T_CLOSE_BRACE
    {
-      mem::ast::node::FinalId* enum_ty = new mem::ast::node::FinalId();
-      enum_ty->setValue("int");
 
       mem::ast::node::EnumType* e = new mem::ast::node::EnumType();
       e->setNameNode($2);
       e->setValue($2->Value());
-      e->setParentTypeNode(enum_ty);
-      e->setMembersNode($4);
+      if ($3 == NULL)
+      {
+         // FIXME Not sure if it belongs here, maybe in TopTypesChecker ?
+         mem::ast::node::FinalId* enum_ty = new mem::ast::node::FinalId();
+         enum_ty->setValue("int");
+         e->setParentTypeNode(enum_ty);
+      }
+      else
+      {
+         e->setParentTypeNode($3);
+      }
+      e->setMembersNode($5);
 
       $$ = e;
    }

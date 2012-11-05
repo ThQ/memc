@@ -14,7 +14,6 @@ TypeChecker::checkAssignment (node::Node* nodeSource, st::Type* symDestType)
    DEBUG_REQUIRE (symDestType != NULL);
 
    bool bIsSafeCast = false;
-   DEBUG_PRINT("Check assign\n");
    if (nodeSource->hasExprType())
    {
       st::Type* symSourceType = nodeSource->ExprType();
@@ -22,11 +21,6 @@ TypeChecker::checkAssignment (node::Node* nodeSource, st::Type* symDestType)
       if (symSourceType != BugType() && symDestType != BugType())
       {
          bIsSafeCast = symSourceType->canCastTo(symDestType);
-
-         DEBUG_PRINTF(" is casting safe ? %s -> %s = %d\n",
-            symSourceType->Name().c_str(),
-            symDestType->Name().c_str(),
-            bIsSafeCast);
 
          if (!bIsSafeCast)
          {
