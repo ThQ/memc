@@ -236,7 +236,7 @@ class TestRunner:
       html += "<div id=\"contents\">"
       if self._num_failed_tests > 0:
          html += "<p id=\"submit-box\">"
-         html += "Please <strong>submit this report</strong> to our <a href=\"https://github.com/ThQ/memc/issues/new?title=Failing+tests\">issue tracker</a>."
+         html += "Please <strong>submit this report</strong> to our <a href=\"https://github.com/ThQ/memc/issues/new?title=Failed+black-box+tests&labels[]=Failed+tests\">issue tracker</a>."
          html += " You have stumbled upon some bugs that we'd like to know about."
          html += "</p>"
 
