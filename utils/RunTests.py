@@ -5,6 +5,7 @@ import os.path
 import re
 import subprocess
 import sys
+import time
 
 args_parser = argparse.ArgumentParser(description='Test a memc executable')
 args_parser.add_argument("--memc-exe", required=True)
@@ -95,14 +96,19 @@ class TestFile:
    def run (self):
       self.write_test_source()
 
+      report = TestReport()
+
       args = [kMEMC, "--log-level=debug", "--color=no", "--log-formatter=\"test-friendly\"", "--output=" + kBIN, str(self.out_path)]
+      time_start = time.time()
       memc = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
       data = memc.communicate()[0]
+      report.time_seconds = time.time() - time_start
+      if report.time_seconds < 0:
+         report.time_seconds = 0
       retcode = int(memc.returncode)
 
       self.parse_output(data)
 
-      report = TestReport()
       report.return_code = retcode
       report.command = " ".join(args)
       report.log = data.decode()
@@ -180,6 +186,7 @@ class TestReport:
       self.name = ""
       self.reason = ""
       self.status = ""
+      self.time_seconds = 0.0
 
 
 class TestRunner:
@@ -224,20 +231,16 @@ class TestRunner:
       html += "</head>"
       html += "<body>"
 
+      html += "<div id=\"title\"><h1>Black-box test report</h1></div>"
 
-      html += "<h1><a name=\"top\"></a> Test report</h1>"
-      html += "<ul id=\"toc\">"
-      html += "<li><a href=\"#summary\">Summary</a></li>"
-      html += "<li><a href=\"#memc\">memc</a></li>"
-      html += "<li><a href=\"#tests\">Tests</a></li>"
-      html += "</ul>"
-
+      html += "<div id=\"contents\">"
       if self._num_failed_tests > 0:
          html += "<p id=\"submit-box\">"
          html += "Please <strong>submit this report</strong> to our <a href=\"https://github.com/ThQ/memc/issues/new?title=Failing+tests\">issue tracker</a>."
          html += " You have stumbled upon some bugs that we'd like to know about."
          html += "</p>"
 
+      html += "<div class=\"section\">"
       html += "<table id=\"summary\">"
       html += "<tr><th>Failed</th><th>Passed</th></tr>"
       html += "<tr>"
@@ -249,10 +252,12 @@ class TestRunner:
       html += "<td>" + str(self._num_passed_tests) + "</td>"
       html += "<tr>"
       html += "</table>"
+      html += "</div>"
 
-      html += "<h2><a name=\"summary\">#</a> Summary</h2>"
+      html += "<h2><a name=\"summary\"></a> Summary</h2>"
+      html += "<div class=\"section\">"
       html += "<table>"
-      html += "<tr><th>Test</th><th>Status</th><th>Return code</th></tr>"
+      html += "<tr><th>Test</th><th>Status</th><th>Return code</th><th>Time (ms)</th></tr>"
 
       for report in self._reports:
          html += "<tr>"
@@ -262,42 +267,50 @@ class TestRunner:
          else:
             html += "<td>Passed</td>"
          html += "<td>" + cgi.escape(str(report.return_code)) + "</td>"
+         html += "<td>" + cgi.escape(str(round(report.time_seconds * 1000, 1))) + "</td>"
          html += "</tr>"
       html += "</table>"
+      html += "</div>"
 
-      html += "<h2><a name=\"memc\">#</a> memc</h2>"
-      html += "<pre class=\"code\">" + cgi.escape(self.get_memc_version_string()) + "</pre>"
+      html += "<h2><a name=\"memc\"></a> memc</h2>"
+      html += "<div class=\"section\">"
+      html += "<pre class=\"code\">$ " + cgi.escape(kMEMC) + " --version\n" + cgi.escape(self.get_memc_version_string()) + "</pre>"
+      html += "</div>"
 
-      html += "<h2><a name=\"tests\">#</a> Tests (" + str(self._num_tests) + ")</h2>"
 
-      html += "<h3><a name=\"failed-tests\">##</a> Failed (" + str(self._num_failed_tests) + ")</h3>"
-      html += "<div class=\"tests\">"
-      html += "<ul>"
+      html += "<h2><a name=\"failed-tests\"></a> Failed tests (" + str(self._num_failed_tests) + ")</h3>"
       for report in self._reports:
          if report.status != "passed":
-            html += "<li class=\""
-            html += "\">"
-            html += "<h4>"
+            html += "<h3>"
             html += "<a name=\"" + cgi.escape(report.name) + "\" />" + cgi.escape(report.name)
             if report.status == "passed":
                html += "<a class=\"passed\">Passed</a>"
             else:
                html += "<a class=\"failed\">" + cgi.escape(report.reason) + "</a>"
 
-            html += "</h4>"
+            html += "</h3>"
+            html += "<div class=\"section\">"
 
-            html += "<p>Command:</p>"
-            html += "<pre class=\"code\">" + cgi.escape(report.command) + "</pre>"
+            html += "<p>Command</p>"
+            html += "<pre class=\"code\">$ " + cgi.escape(report.command) + "</pre>"
 
-            html += "<p>Source:<p>"
+            html += "<p>Source<p>"
             html += "<pre class=\"code\">" + cgi.escape(report.source) + "</pre>"
 
-            html += "<p>Output:</p>"
+            html += "<p>Output</p>"
             html += "<pre class=\"code\">" + cgi.escape(report.log) + "</pre>"
-            html += "</li>"
 
+            html += "</div>"
+
+      """
+      html += "<div id=\"toc\">"
+      html += "<ul>"
+      html += "<li><a href=\"#summary\">Summary</a></li>"
+      html += "<li><a href=\"#memc\">memc</a></li>"
+      html += "<li><a href=\"#tests\">Tests</a></li>"
       html += "</ul>"
       html += "</div>"
+      """
 
       html += "</body>"
       html += "</html>"
