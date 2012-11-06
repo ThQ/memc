@@ -26,7 +26,7 @@ if not os.path.isdir(kREPORT_DIR):
 kBIN = os.path.join(kREPORT_DIR, "memt")
 kMEM_SRC = os.path.join(kREPORT_DIR, "test.mem")
 
-gLOG_LINE_RE = re.compile("\(([DIWEF])\) ([a-z-]+)", re.MULTILINE)
+gLOG_LINE_RE = re.compile("\(([DIWEF])(:[a-z-]+)?\)", re.MULTILINE)
 
 class TextOutsideOfSectionError (Exception):
    pass
@@ -80,7 +80,7 @@ class TestFile:
       matches = gLOG_LINE_RE.findall(str(data))
       for match in matches:
          if match[0] != "D" and match[0] != "I":
-            self.output_log.append([match[0], match[1]])
+            self.output_log.append([match[0], match[1][1:] if match[1] != "" else ""])
 
    def open (self, path):
       self.content = ""

@@ -4,7 +4,7 @@ namespace mem { namespace log {
 
 Message::Message ()
 {
-   _id = "unknown";
+   _id = "";
    _level = UNKNOWN;
    _position = NULL;
 }
