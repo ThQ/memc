@@ -2,6 +2,7 @@
 
 namespace mem { namespace st {
 
+
 CoreTypes::CoreTypes ()
 {
    _void_ty = new st::VoidType();
@@ -28,6 +29,12 @@ CoreTypes::CoreTypes ()
    _uint16_ty = new st::IntType("uint16", 2);
    _uint32_ty = new st::IntType("uint32", 4);
    _uint64_ty = new st::IntType("uint64", 8);
+
+   _bug_type = new st::PrimitiveType();
+   _bug_type->setName("$BadType");
+
+   _null = new st::Null();
+   _null->setType(_void_ty);
 }
 
 } }

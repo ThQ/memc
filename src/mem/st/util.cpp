@@ -455,7 +455,7 @@ lookupPointer (Symbol* scope, std::string base_ty_name, size_t ptr_level)
    st::Type* cur_sym = NULL;
    std::string cur_ptr_name = base_ty_name;
 
-   for (int i = 0; i <= ptr_level; ++i)
+   for (size_t i = 0; i <= ptr_level; ++i)
    {
       if (i == 0)
       {
@@ -550,9 +550,7 @@ setupBool (SymbolTable& st, CoreTypes& core_types)
 void
 setupBugType (SymbolTable& st, CoreTypes& core_types)
 {
-   core_types._bug_type = new st::PrimitiveType();
-   core_types._bug_type->setName("$BadType");
-   util::registerType(&st, st.System(), core_types._bug_type);
+   util::registerType(&st, st.System(), core_types.BugTy());
 }
 
 void
@@ -580,11 +578,7 @@ void
 setupVoid (SymbolTable& st, CoreTypes& core_types)
 {
    util::registerType(&st, st.System(), core_types.VoidTy());
-
-   core_types._null = new st::Null();
-   core_types._null->setType(getPointerType(core_types.VoidTy()));
-
-   st.System()->addChild(core_types._null);
+   st.System()->addChild(core_types.NullVal());
 }
 
 std::vector<std::string>

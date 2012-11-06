@@ -129,7 +129,7 @@ Class::getOrderedFields ()
          if (st::isa<st::Field>(i->second))
          {
             field = st::cast<st::Field>(i->second);
-            v[parent_field_count + field->_field_index] = field;
+            v[parent_field_count + field->FieldIndex()] = field;
          }
       }
       IF_DEBUG

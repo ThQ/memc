@@ -38,7 +38,7 @@ class Visitor
    void Logger (log::Logger* logger) { _logger = logger; }
 
 
-   GETTER (BugType, st::Type*) {return _symbols->_core_types._bug_type;}
+   GETTER (BugType, st::Type*) {return _symbols->_core_types.BugTy();}
 
 
    //==========================================================================

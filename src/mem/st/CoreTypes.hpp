@@ -11,29 +11,7 @@ namespace mem { namespace st {
 
 class CoreTypes
 {
-   public:
-   Type* _bug_type;
-   IntType* _bool_ty;
-   IntType* _char_ty;
-   IntType* _long_ty;
-   IntType* _int_ty;
-   IntType* _int64_ty;
-   IntType* _int32_ty;
-   IntType* _int16_ty;
-   IntType* _int8_ty;
-   IntType* _short_ty;
-   IntType* _uchar_ty;
-   IntType* _ushort_ty;
-   IntType* _uint_ty;
-   IntType* _uint64_ty;
-   IntType* _uint32_ty;
-   IntType* _uint16_ty;
-   IntType* _uint8_ty;
-   IntType* _ulong_ty;
-   VoidType* _void_ty;
-   Null* _null;
-
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTOR
    //--------------------------------------------------------------------------
    public:
@@ -41,12 +19,14 @@ class CoreTypes
    CoreTypes ();
 
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // PUBLIC PROPERTIES
    //--------------------------------------------------------------------------
    public:
 
    GETTER(BoolTy, class IntType*) { return _bool_ty; }
+
+   GETTER(BugTy, class Type*) { return _bug_type; }
 
    GETTER(CharTy, class IntType*) { return _char_ty; }
 
@@ -81,6 +61,35 @@ class CoreTypes
    GETTER(ULongTy, class IntType*) { return _ulong_ty; }
 
    GETTER(VoidTy, VoidType*) { return _void_ty; }
+
+   GETTER(NullVal, Null*) {return _null;}
+
+
+   //==========================================================================
+   // FIELDS
+   //--------------------------------------------------------------------------
+   protected:
+
+   Type* _bug_type;
+   IntType* _bool_ty;
+   IntType* _char_ty;
+   IntType* _long_ty;
+   IntType* _int_ty;
+   IntType* _int64_ty;
+   IntType* _int32_ty;
+   IntType* _int16_ty;
+   IntType* _int8_ty;
+   IntType* _short_ty;
+   IntType* _uchar_ty;
+   IntType* _ushort_ty;
+   IntType* _uint_ty;
+   IntType* _uint64_ty;
+   IntType* _uint32_ty;
+   IntType* _uint16_ty;
+   IntType* _uint8_ty;
+   IntType* _ulong_ty;
+   VoidType* _void_ty;
+   Null* _null;
 };
 
 } }

@@ -16,13 +16,13 @@ class Null : public Constant
    public:
    static const int kTYPE = MetaKind::NULL_CONSTANT;
 
-   //--------------------------------------------------------------------------
+   //==========================================================================
    // CONSTRUCTORS / DESTRUCTORS
    //--------------------------------------------------------------------------
    public:
 
    // Default constructor.
-   Null();
+   Null ();
 };
 
 
