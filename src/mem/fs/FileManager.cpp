@@ -64,7 +64,7 @@ FileManager::tryOpenFile (std::string file_path, std::vector<std::string>& paths
       std::vector<std::string>::size_type i;
       for (i=0; res==NULL && i < _path.size(); ++i)
       {
-         try_file_path = _path[i] + "/" + file_path;
+         try_file_path = _path[i] + file_path;
          DEBUG_PRINTF("Trying to open %s\n", try_file_path.c_str());
          paths_tried.push_back(try_file_path);
 

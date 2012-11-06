@@ -215,6 +215,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/dep/Tree.cpp
 	${memc_SRC}/mem/fs/File.cpp
 	${memc_SRC}/mem/fs/FileManager.cpp
+	${memc_SRC}/mem/fs/path.cpp
 	${memc_SRC}/mem/fs/position/Composite.cpp
 	${memc_SRC}/mem/fs/position/Cursor.cpp
 	${memc_SRC}/mem/fs/position/Position.cpp
@@ -284,6 +285,7 @@ include_directories(${memc_SRC} ${memc_BUILT})
 #------------------------------------------------------------------------------
 
 set(memc_test_SOURCES
+   ${memc_SRC}/mem/fs/path_test.cpp
    ${memc_SRC}/langmem/Tokenizer_test.cpp
    ${gtest_SRC}/gtest-all.cc
    ${gtest_SRC}/gtest_main.cc)

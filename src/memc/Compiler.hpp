@@ -34,6 +34,7 @@
 #include "mem/decorator/Virtual.hpp"
 #include "mem/fs/File.hpp"
 #include "mem/fs/FileManager.hpp"
+#include "mem/fs/path.hpp"
 #include "mem/log/ConsoleFormatter.hpp"
 #include "mem/log/ConsoleLogger.hpp"
 #include "mem/log/TestFriendlyFormatter.hpp"

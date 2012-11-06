@@ -297,8 +297,6 @@ Compiler::run ()
 {
    _logger->begin();
 
-   fm.appendPath(".");
-
    // Need to set this before parsing command line arguments because it can
    // raise warnings
 #ifdef NDEBUG
@@ -334,8 +332,12 @@ Compiler::run ()
    }
    else if (_opts->hasArguments())
    {
+      std::pair<std::string, std::string> FilePath = mem::fs::path::split(_opts->getArgument(0));
+
+      fm.appendPath(FilePath.first);
+
       mem::ast::node::Use nodeUse;
-      nodeUse.setValue(mem::Util::getNamespaceFromPath(_opts->getArgument(0)));
+      nodeUse.setValue(mem::Util::getNamespaceFromPath(FilePath.second));
       _parse_queue.push(&nodeUse);
 
       processParseQueue();
