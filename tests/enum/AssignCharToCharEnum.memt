@@ -1,0 +1,20 @@
+### options
+must-not-compile
+
+### log
+E:cannot-assign
+F:build-failed
+
+### file
+enum FileError < char
+{
+   OK;
+   FileNotFound;
+   CannotOpenFile;
+}
+
+main ()
+{
+   var c :char = 1 :char;
+   var err :FileError = c;
+}
