@@ -1,0 +1,11 @@
+### options
+must-not-compile
+
+### log
+E:whatever-error
+
+### file
+main ()
+{
+   true = false;
+}
