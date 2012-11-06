@@ -537,8 +537,14 @@ setupBool (SymbolTable& st, CoreTypes& core_types)
 {
    util::registerType(&st, st.System(), core_types.BoolTy());
 
-   st.System()->addChild(new st::Var("true", core_types.BoolTy()));
-   st.System()->addChild(new st::Var("false", core_types.BoolTy()));
+   st::Var* symTrue = new st::Var("true", core_types.BoolTy());
+   symTrue->setIsConstant(true);
+
+   st::Var* symFalse = new st::Var("false", core_types.BoolTy());
+   symFalse->setIsConstant(true);
+
+   st.System()->addChild(symTrue);
+   st.System()->addChild(symFalse);
 }
 
 void
