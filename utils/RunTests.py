@@ -111,7 +111,6 @@ class TestFile:
       report.source = self.content
 
       if len(self.expected_output_log) > 0 and self.output_log != self.expected_output_log:
-         print(self.output_log, self.expected_output_log)
          report.status = "failed"
          report.reason = "Logs differ"
       else:
@@ -326,7 +325,7 @@ class TestRunner:
 
       for report in self._reports:
          if report.status != "passed":
-            self._logger.logln("              * " + report.name)
+            self._logger.logln("              * " + report.name + " (" + report.reason + ")")
 
       if self._num_tests != self._num_passed_tests:
          self._logger.log_section("/!\ Please submit this report")
