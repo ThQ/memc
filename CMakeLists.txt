@@ -123,6 +123,7 @@ add_custom_command(
 	OUTPUT
 		${memc_SRC}/langmem/Bison.hpp
 		${memc_SRC}/langmem/Bison.cpp
+		${memc_BUILT}/langmem/TokenKind.hpp
 	COMMAND
 		${BISON} -y
 		-d ${memc_SRC}/langmem/Bison.ypp
@@ -135,7 +136,7 @@ add_custom_command(
 		${BISON}
 		${memc_SRC}/langmem/Bison.ypp)
 add_custom_target(
-	bison-parser ALL
+	bison-parser
 	DEPENDS
 		${memc_SRC}/langmem/Bison.hpp
 		${memc_SRC}/langmem/Bison.cpp)
@@ -279,6 +280,7 @@ set(memc_VERSION "${memc_VERSION_MAJOR}.${memc_VERSION_MINOR}.${memc_VERSION_PAT
 configure_file(${memc_SRC}/config.h.in ${memc_BUILT}/config.h)
 
 add_executable(memc ${memc_SOURCES} ${memc_SRC}/memc/main.cpp)
+add_dependencies(memc bison-parser)
 include_directories(${memc_SRC} ${memc_BUILT})
 
 
