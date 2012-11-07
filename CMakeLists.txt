@@ -223,6 +223,7 @@ set(memc_SOURCES
 	${memc_SRC}/mem/fs/position/Range.cpp
 	${memc_SRC}/mem/log/ConsoleFormatter.cpp
 	${memc_SRC}/mem/log/ConsoleLogger.cpp
+	${memc_BUILT}/mem/log/errors.hpp
 	${memc_SRC}/mem/log/Formatter.cpp
 	${memc_SRC}/mem/log/Logger.cpp
 	${memc_SRC}/mem/log/Message.cpp
