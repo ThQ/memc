@@ -46,7 +46,7 @@ CHECK_INCLUDE_FILE("stdint.h" HAVE_STDINT_H)
 #------------------------------------------------------------------------------
 # Testing
 add_custom_target(
-	run-whitebox-test
+	run-blackbox-test
 	COMMAND
 		cd ${CMAKE_CURRENT_SOURCE_DIR}/tests && ${PYTHON_EXECUTABLE}
 		${memc_UTILS}/RunTests.py
@@ -55,8 +55,9 @@ add_custom_target(
 		--data-dir=${CMAKE_CURRENT_SOURCE_DIR}/data
 		--report-dir=${CMAKE_CURRENT_BINARY_DIR}
 	DEPENDS memc)
+
 add_custom_target(
-	run-blackbox-test
+	run-whitebox-test
 	COMMAND
 		memc-test
 	DEPENDS memc-test)
