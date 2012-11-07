@@ -1,0 +1,16 @@
+### file
+someFunction () -> int
+{
+   return 1;
+}
+
+someOtherFunction () -> int
+{
+   return 2;
+}
+
+main ()
+{
+   var myFunctor = someFunction;
+   myFunctor = someOtherFunction;
+}

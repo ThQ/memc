@@ -1,0 +1,22 @@
+### options
+must-not-compile
+
+### log
+E:wathever-error
+
+### file
+someFunction () -> int
+{
+   return 1;
+}
+
+someOtherFunction () -> int
+{
+   return 2;
+}
+
+main ()
+{
+
+   someFunction = someOtherFunction;
+}
