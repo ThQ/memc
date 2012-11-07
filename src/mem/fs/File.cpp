@@ -53,10 +53,10 @@ File::getLineWithContext(size_t iLine, int nContextLines)
    int iFirstLine = iLine - nContextLines;
    if (iFirstLine < 1) iFirstLine = 1;
 
-   int iLastLine = iLine + nContextLines + 1;
+   size_t iLastLine = iLine + nContextLines + 1;
    if (iLastLine > _lines.size()) iLastLine = _lines.size();
 
-   for (int i = iFirstLine ; i < iLastLine ; ++i)
+   for (size_t i = iFirstLine ; i < iLastLine ; ++i)
    {
       lines.push_back(std::pair<int, std::string>(i, getLine(i)));
    }
