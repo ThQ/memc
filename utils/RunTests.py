@@ -221,7 +221,7 @@ class TestRunner:
       css_file = open(os.path.join(kDATA_DIR, "test", "report.css"))
       css = ""
       if css_file:
-         css = css_file.read()
+         css = css_file.read().replace("\n", "")
 
       html = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">"
       html += "<html xmlns=\"http://www.w3.org/1999/xhtml\">"
@@ -231,7 +231,17 @@ class TestRunner:
       html += "</head>"
       html += "<body>"
 
-      html += "<div id=\"title\"><h1>Black-box test report</h1></div>"
+      html += "<div id=\"navbar\">"
+      html += "<div id=\"title\">"
+      html += "<h1>Black-box test report</h1>"
+      html += "<ul id=\"toc\">"
+      html += "<li><a href=\"#summary\">Summary</a></li>"
+      html += "<li><a href=\"#memc\">memc</a></li>"
+      html += "<li><a href=\"#environment\">Environment</a></li>"
+      html += "<li><a href=\"#failed-tests\">Failed tests</a></li>"
+      html += "</ul>"
+      html += "</div>"
+      html += "</div>"
 
       html += "<div id=\"contents\">"
       if self._num_failed_tests > 0:
@@ -277,6 +287,16 @@ class TestRunner:
       html += "<pre class=\"code\">$ " + cgi.escape(kMEMC) + " --version\n" + cgi.escape(self.get_memc_version_string()) + "</pre>"
       html += "</div>"
 
+      uname = os.uname()
+      html += "<h2><a name=\"environment\"></a> Environment</h2>"
+      html += "<div class=\"section\">"
+      html += "<table>"
+      html += "<tr><th>Platform</th><td>" + cgi.escape(sys.platform) + "</td></tr>"
+      html += "<tr><th>Release</th><td>" + cgi.escape(uname[2]) + "</td></tr>"
+      html += "<tr><th>Version</th><td>" + cgi.escape(uname[3]) + "</td></tr>"
+      html += "<tr><th>Arch</th><td>" + cgi.escape(uname[4]) + "</td></tr>"
+      html += "</table>"
+      html += "</div>"
 
       html += "<h2><a name=\"failed-tests\"></a> Failed tests (" + str(self._num_failed_tests) + ")</h3>"
       for report in self._reports:
@@ -301,16 +321,6 @@ class TestRunner:
             html += "<pre class=\"code\">" + cgi.escape(report.log) + "</pre>"
 
             html += "</div>"
-
-      """
-      html += "<div id=\"toc\">"
-      html += "<ul>"
-      html += "<li><a href=\"#summary\">Summary</a></li>"
-      html += "<li><a href=\"#memc\">memc</a></li>"
-      html += "<li><a href=\"#tests\">Tests</a></li>"
-      html += "</ul>"
-      html += "</div>"
-      """
 
       html += "</body>"
       html += "</html>"
@@ -356,16 +366,6 @@ class TestRunner:
 
    def run (self):
       self._logger.log_red("Black box test suite".center(80) + "\n", bold=True)
-
-      uname = os.uname()
-      self._logger.log_section("Environment")
-      self._logger.logln("Platform".rjust(11) + ": " + sys.platform)
-      self._logger.logln("System name".rjust(11) + ": " + uname[0])
-      self._logger.logln("Node name".rjust(11) + ": " + uname[1])
-      self._logger.logln("Release".rjust(11) + ": " + uname[2])
-      self._logger.logln("Version".rjust(11) + ": " + uname[3])
-      self._logger.logln("Machine".rjust(11) + ": " + uname[4])
-      self._logger.logln("")
 
       self.discover_tests(kTEST_DIR)
 
