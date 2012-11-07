@@ -237,8 +237,8 @@ extern langmem::Tokenizer gTOKENIZER;
 %type <nodeId>       Id
 %type <node>         If
 %type <node>         Literal
-%type <nodeList>     members_declarations
-%type <node>         member_declaration
+%type <nodeList>     ClassMembers
+%type <node>         ClassMember
 %type <node>         Return
 %type <node>         ReturnType_
 %type <nodeList>     SimpleIdList
@@ -311,25 +311,24 @@ ClassMembers_:
    {
       $$ = new mem::ast::node::NodeList();
    }
-   | members_declarations
+   | ClassMembers
    {
       $$ = $1;
    }
 
-
-members_declarations :
-   member_declaration
+ClassMembers:
+   ClassMember
    {
       $$ = new mem::ast::node::NodeList();
       $$->addChild($1);
    }
-   | members_declarations member_declaration
+   | ClassMembers ClassMember
    {
       assert ($1 != NULL);
       $$->addChild($2);
    }
 
-member_declaration :
+ClassMember:
    // Ex: my_variable :my_type
    SimpleId T_COLON Id T_SEMICOLON
    {
@@ -583,8 +582,9 @@ For:
       n->setConditionNode($4);
       n->setIterationNode($6);
       n->setBlockNode(mem::ast::node::cast<mem::ast::node::Block>($7));
+      n->setPosition(@$.copy_range());
+
       $$ = n;
-      $$->setPosition(new fs::position::Range(@1, @7));
    }
 
 
@@ -678,16 +678,17 @@ VariableDeclaration:
    // Ex: my_variable = my_function()
    | T_VAR SimpleId T_EQ Expr
    {
-      mem::ast::node::Node* ty_place_holder = new mem::ast::node::Node();
-      ty_place_holder->setKind(ast::node::MetaKind::PLACE_HOLDER);
-      ty_place_holder->setPosition(@4.copy_range());
+      mem::ast::node::Node* nodeTypePlaceHolder = new mem::ast::node::Node();
+      nodeTypePlaceHolder->setKind(ast::node::MetaKind::PLACE_HOLDER);
+      nodeTypePlaceHolder->setPosition(@4.copy_range());
 
-      mem::ast::node::VarDecl* n = new mem::ast::node::VarDecl();
-      n->setNameNode($2);
-      n->setTypeNode(ty_place_holder);
-      n->setValueNode($4);
-      n->setPosition(@$.copy_range());
-      $$ = (ast::node::Node*)n;
+      mem::ast::node::VarDecl* nodeVarDecl = new mem::ast::node::VarDecl();
+      nodeVarDecl->setNameNode($2);
+      nodeVarDecl->setTypeNode(nodeTypePlaceHolder);
+      nodeVarDecl->setValueNode($4);
+      nodeVarDecl->setPosition(@$.copy_range());
+
+      $$ = (ast::node::Node*)nodeVarDecl;
    }
    // Ex: my_variable :my_type = my_function()
    | T_VAR SimpleId T_COLON Id T_EQ Expr

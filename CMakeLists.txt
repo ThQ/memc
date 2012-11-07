@@ -120,15 +120,15 @@ add_custom_target(
 # Bison parser + Token kinds
 add_custom_command(
 	OUTPUT
-		${memc_BUILT}/langmem/Bison.hpp
-		${memc_BUILT}/langmem/Bison.cpp
+		${memc_SRC}/langmem/Bison.hpp
+		${memc_SRC}/langmem/Bison.cpp
 	COMMAND
 		${BISON} -y
 		-d ${memc_SRC}/langmem/Bison.ypp
-		-o ${memc_BUILT}/langmem/Bison.cpp
+		-o ${memc_SRC}/langmem/Bison.cpp
 	COMMAND
 		${PYTHON_EXECUTABLE} ${memc_UTILS}/GenTokenKind.py
-		${memc_BUILT}/langmem/Bison.hpp
+		${memc_SRC}/langmem/Bison.hpp
 		${memc_BUILT}/langmem/TokenKind.hpp
 	DEPENDS
 		${BISON}
@@ -136,8 +136,8 @@ add_custom_command(
 add_custom_target(
 	bison-parser ALL
 	DEPENDS
-		${memc_BUILT}/langmem/Bison.hpp
-		${memc_BUILT}/langmem/Bison.cpp)
+		${memc_SRC}/langmem/Bison.hpp
+		${memc_SRC}/langmem/Bison.cpp)
 
 
 #------------------------------------------------------------------------------
@@ -261,7 +261,7 @@ set(memc_SOURCES
 	${memc_SRC}/memc/tool/CommandChain.cpp
 	${memc_SRC}/memc/tool/Toolbox.cpp
 	${memc_SRC}/memc/Compiler.cpp
-	${memc_BUILT}/langmem/Bison.cpp
+	${memc_SRC}/langmem/Bison.cpp
 	${memc_SRC}/langmem/Parser.cpp
 	${memc_SRC}/langmem/Tokenizer.cpp)
 
