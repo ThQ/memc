@@ -219,7 +219,6 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
 
    func_decl->setBoundSymbol(func_sym);
    func_decl->NameNode()->setBoundSymbol(func_sym);
-   func_decl->NameNode()->setExprType(func_sym);
 
    visitFuncReturnType (func_decl, func_sym);
 
@@ -251,6 +250,8 @@ TopTypesChecker::visitFuncDecl (st::Symbol* scope, node::Func* func_decl)
    st::PointerType* functor_ty = st::util::getPointerType(func_ty);
    func_sym->setType(func_ty);
    func_ty->setFunctorType(functor_ty);
+
+   func_decl->NameNode()->setExprType(functor_ty);
 
    DEBUG_PRINTF("Found function `%s %s' in `%s'\n",
       func_sym->gQualifiedName().c_str(),

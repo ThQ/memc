@@ -21,7 +21,7 @@ namespace mem { namespace st {
 //
 // Functions are nodes of a linked list which lists all functions. This is
 // useful when code generating.
-class Func: public Type
+class Func: public Symbol
 {
    public:
    static const int kTYPE = MetaKind::FUNCTION;

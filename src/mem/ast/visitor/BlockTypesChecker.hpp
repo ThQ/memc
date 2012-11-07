@@ -159,15 +159,11 @@ class BlockTypesChecker : public TypeChecker
    void
    visitVarAssign (st::Symbol* scope, node::VarAssign* var_assign_node);
 
-   /**
-    * Visits a MEM_NODE_VARIABLE_DECLARATION node.
-    */
+   // Visits a MEM_NODE_VARIABLE_DECLARATION node.
    void
    visitVarDecl (st::Symbol* scope, node::VarDecl* var_decl_node);
 
-   /**
-    * Visits a MEM_NODE_WHILE node.
-    */
+   // Visits a MEM_NODE_WHILE node.
    void
    visitWhile (st::Symbol* scope, node::While* while_node);
 };

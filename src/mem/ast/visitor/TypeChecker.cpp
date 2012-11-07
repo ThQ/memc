@@ -17,6 +17,7 @@ TypeChecker::checkAssignment (node::Node* nodeSource, st::Type* symDestType)
    if (nodeSource->hasExprType())
    {
       st::Type* symSourceType = nodeSource->ExprType();
+      assert (symSourceType != NULL);
 
       if (symSourceType != BugType() && symDestType != BugType())
       {

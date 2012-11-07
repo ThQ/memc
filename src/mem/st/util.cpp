@@ -33,34 +33,33 @@ createNamespace (Symbol* scope, std::vector<std::string> ns_name_parts)
 Type*
 getExprType (Symbol* s)
 {
-   assert (s != NULL);
+   DEBUG_REQUIRE (s != NULL);
 
-   st::Type* ret = NULL;
+   st::Type* symExprType = NULL;
 
    if (st::isa<st::Type>(s))
    {
-      ret = st::cast<st::Type>(s);
+      symExprType = st::cast<st::Type>(s);
    }
    else if (st::isa<st::Arg>(s))
    {
-      ret = st::cast<st::Arg>(s)->Type();
+      symExprType = st::cast<st::Arg>(s)->Type();
    }
    else if (st::isa<st::Field>(s))
    {
-      ret = st::cast<st::Field>(s)->Type();
+      symExprType = st::cast<st::Field>(s)->Type();
    }
    else if (st::isa<st::Var>(s) || st::isa<st::Null>(s))
    {
-      ret = st::cast<st::Var>(s)->Type();
+      symExprType = st::cast<st::Var>(s)->Type();
    }
    else if (st::isa<st::Func>(s))
    {
-      // FIXME : Which one ?
-      ret = st::cast<st::Func>(s)->Type();
-      ret = st::cast<st::FunctionType>(ret)->FunctorType();
+      symExprType = st::cast<st::Func>(s)->Type()->FunctorType();
    }
 
-   return ret;
+   DEBUG_ENSURE (symExprType == NULL || st::isa<st::Type>(symExprType));
+   return symExprType;
 }
 
 FunctionType*
